@@ -48,9 +48,9 @@ runmysteriet.scene.Game.prototype.init = function() {
     this.m_player = new rune.display.Graphic(
         0,
         0,
-        64,
-        64,
-        "jord-gubbe"
+        32,
+        32,
+        "start"
     );
 
     this.stage.addChild(this.m_player);
@@ -72,6 +72,14 @@ runmysteriet.scene.Game.prototype.init = function() {
  */
 runmysteriet.scene.Game.prototype.update = function(step) {
     rune.scene.Scene.prototype.update.call(this, step);
+    
+    //kontrollerar om höger/vänster knapp är nedtryckt och flyttar spelaren i den riktning
+    if (this.keyboard.pressed("RIGHT")){
+        this.m_player.x += 2;
+    }
+    if(this.keyboard.pressed("LEFT")){
+        this.m_player.x -= 2;
+    }
 };
 
 /**
