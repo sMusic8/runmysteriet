@@ -38,7 +38,7 @@ runmysteriet.entity.Player.prototype.update = function(step) {
         this.x -= 3;
     }
     //hoppning
-    if(this.keyboard.pressed("SPACE") && this.m_onground){
+    if(this.keyboard.pressed("UP") && this.m_onground){
         this.m_velocityY = this.m_jumping;
         this.m_onground = false;
     }
@@ -46,7 +46,7 @@ runmysteriet.entity.Player.prototype.update = function(step) {
     //lägger till gravitation
     this.m_velocityY += this.m_gravity;
     this.y += this.m_velocityY;
-
+//kontrolerar om spelaren är på marken och stoppar den isåfall
     if(this.y >=this.m_groundY){
         this.y = this.m_groundY;
         this.m_velocityY = 0;
