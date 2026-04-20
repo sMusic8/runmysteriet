@@ -59,7 +59,13 @@ var runmysteriet = function() {
     //--------------------------------------------------------------------------
     // Return public scope object
     //--------------------------------------------------------------------------
-
+    /**
+     * This package includes the entities that make up the application. Entities
+     * @namespace entity
+     * @memberof runmysteriet
+     * @since 1.0
+     */
+    m_this.entity ={};
     /**
      * Public scope.
      */
