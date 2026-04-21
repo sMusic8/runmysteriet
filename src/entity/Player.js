@@ -42,7 +42,7 @@ runmysteriet.entity.Player.prototype.update = function(step) {
         this.m_velocityY = this.m_jumping;
         this.m_onground = false;
     }
-
+//ny kommentar
     //lägger till gravitation
     this.m_velocityY += this.m_gravity;
     this.y += this.m_velocityY;
