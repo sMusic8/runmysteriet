@@ -2,7 +2,7 @@ runmysteriet.entity.Player = function() {
    //variabler för att hantera hoppning
     this.m_velocityY = 0;
     this.m_gravity = 0.5;
-    this.m_jumping = -5;
+    this.m_jumping = -7;
     this.m_groundY = 0;
     this.m_onground = false;
 
