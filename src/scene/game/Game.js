@@ -44,6 +44,7 @@ runmysteriet.scene.Game.prototype.init = function() {
     this.r_bana2.x = 300;
     this.r_bana2.y = 180;
     this.stage.addChild(this.r_bana2);
+    this.stage.addChild(this.r_bana1);
     this.stage.addChild(this.m_player);
 };
 
