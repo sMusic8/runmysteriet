@@ -2,27 +2,20 @@
 // Constructor scope
 //------------------------------------------------------------------------------
 
-/**
- * Creates a new object.
- *
- * @constructor
- * @extends rune.scene.Scene
- *
- * @class
- * @classdesc
- * 
- * Game scene.
- */
 runmysteriet.scene.Game = function() {
 
-    //--------------------------------------------------------------------------
-    // Super call
-    //--------------------------------------------------------------------------
-    this.m_player = null;
-    /**
-     * Calls the constructor method of the super class.
-     */
     rune.scene.Scene.call(this);
+
+    this.m_player = null;
+
+    this.r_bana1 = null;
+    this.r_bana2 = null;
+
+    // state
+    this.m_isOnGround = false;
+
+    // spawn position
+    this.m_startY = 0;
 };
 
 //------------------------------------------------------------------------------
@@ -33,58 +26,90 @@ runmysteriet.scene.Game.prototype = Object.create(rune.scene.Scene.prototype);
 runmysteriet.scene.Game.prototype.constructor = runmysteriet.scene.Game;
 
 //------------------------------------------------------------------------------
-// Override public prototype methods (ENGINE)
+// INIT
 //------------------------------------------------------------------------------
 
-/**
- * This method is automatically executed once after the scene is instantiated. 
- * The method is used to create objects to be used within the scene.
- *
- * @returns {undefined}
- */
 runmysteriet.scene.Game.prototype.init = function() {
+
     rune.scene.Scene.prototype.init.call(this);
 
+    // PLAYER
     this.m_player = new runmysteriet.entity.Player();
     this.m_player.x = 0;
     this.m_player.y = 180;
 
+    this.m_startY = this.m_player.y;
+
     this.stage.addChild(this.m_player);
 
-    this.r_bana = new runmysteriet.ui.Platform();
-    this.r_bana.x = 200;
-    this.r_bana.y = 180;
-    this.stage.addChild(this.r_bana);
-    
+    // PLATFORM 1
+    this.r_bana1 = new runmysteriet.ui.Platform();
+    this.r_bana1.x = 200;
+    this.r_bana1.y = 180;
+    this.stage.addChild(this.r_bana1);
+
+    // PLATFORM 2
+    this.r_bana2 = new runmysteriet.ui.Platform();
+    this.r_bana2.x = 350;
+    this.r_bana2.y = 120;
+    this.stage.addChild(this.r_bana2);
+
+    // TEXT
     var text = new rune.text.BitmapField("Hello World!");
     text.autoSize = true;
     text.center = this.application.screen.center;
-    
     this.stage.addChild(text);
 };
 
-/**
- * This method is automatically executed once per "tick". The method is used for 
- * calculations such as application logic.
- *
- * @param {number} step Fixed time step.
- *
- * @returns {undefined}
- */
+//------------------------------------------------------------------------------
+// UPDATE
+//------------------------------------------------------------------------------
+
 runmysteriet.scene.Game.prototype.update = function(step) {
+
     rune.scene.Scene.prototype.update.call(this, step);
 
-   
+    var player = this.m_player;
+
+    // GRAVITATION (bara om vi inte står på något)
+    if (!this.m_isOnGround) {
+        player.y += 2;
+    }
+
+    // reset ground state varje frame
+    this.m_isOnGround = false;
+
+    // check platform 1
+    if (player.hitTestObject(this.r_bana1)) {
+        this.landOnPlatform(this.r_bana1);
+    }
+
+    // check platform 2
+    if (player.hitTestObject(this.r_bana2)) {
+        this.landOnPlatform(this.r_bana2);
+    }
 };
 
-/**
- * This method is automatically called once just before the scene ends. Use 
- * the method to reset references and remove objects that no longer need to 
- * exist when the scene is destroyed. The process is performed in order to 
- * avoid memory leaks.
- *
- * @returns {undefined}
- */
+//------------------------------------------------------------------------------
+// LANDING LOGIC
+//------------------------------------------------------------------------------
+
+runmysteriet.scene.Game.prototype.landOnPlatform = function(platform) {
+
+    var player = this.m_player;
+
+    // placera exakt ovanpå plattformen
+    player.y = platform.y - player.height;
+
+    // markera som grounded
+    this.m_isOnGround = true;
+};
+
+//------------------------------------------------------------------------------
+// DISPOSE
+//------------------------------------------------------------------------------
+
 runmysteriet.scene.Game.prototype.dispose = function() {
+
     rune.scene.Scene.prototype.dispose.call(this);
 };
