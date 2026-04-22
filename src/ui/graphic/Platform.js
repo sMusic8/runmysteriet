@@ -2,10 +2,10 @@
  * Klass för plattformar
  * 
  */
-function Plattform(x, y, heigt, length){
+function Platform(x, y, height, length){
     this.x = x;
     this.y = y;
-    this. heigt = heigt;
+    this.height = height;
     this.length = length;
 
     //construktor
