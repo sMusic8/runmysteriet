@@ -9,7 +9,6 @@ function Plattform(x, y, heigt, length){
     this.length = length;
 
     //construktor
-
-    //min fil rör inte kamske om jag inte behöver hjälp
+    
     
 }
