@@ -9,6 +9,6 @@ function Platform(x, y, height, length){
     this.length = length;
 
     //construktor
-    
+    var img = 
     
 }
