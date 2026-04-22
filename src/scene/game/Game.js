@@ -50,8 +50,8 @@ runmysteriet.scene.Game.prototype.init = function() {
 
     // PLATFORM 2
     this.r_bana2 = new runmysteriet.ui.Platform();
-    this.r_bana2.x = 350;
-    this.r_bana2.y = 120;
+    this.r_bana2.x = 300;
+    this.r_bana2.y = 180;
     this.stage.addChild(this.r_bana2);
 
     // TEXT
