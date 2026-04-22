@@ -66,6 +66,15 @@ var runmysteriet = function() {
      * @since 1.0
      */
     m_this.entity ={};
+
+/**
+     * This package includes the entities that make up the application. Entities
+     * @namespace ui
+     * @memberof runmysteriet
+     * @since 1.0
+     */
+    m_this.ui ={};
+    
     /**
      * Public scope.
      */

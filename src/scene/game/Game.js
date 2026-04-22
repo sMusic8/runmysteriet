@@ -49,8 +49,12 @@ runmysteriet.scene.Game.prototype.init = function() {
     this.m_player.x = 0;
     this.m_player.y = 180;
 
-
     this.stage.addChild(this.m_player);
+
+    this.r_bana = new runmysteriet.ui.Platform();
+    this.r_bana.x = 200;
+    this.r_bana.y = 180;
+    this.stage.addChild(this.r_bana);
     
     var text = new rune.text.BitmapField("Hello World!");
     text.autoSize = true;
