@@ -9,7 +9,6 @@ function Platform(x, y, height, length){
     this.length = length;
 
     //construktor
-
-    //min fil rör inte kamske om jag inte behöver hjälp
+    
     
 }
