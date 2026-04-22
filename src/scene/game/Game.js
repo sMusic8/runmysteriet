@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-// Constructor scope
+// Constructor
 //------------------------------------------------------------------------------
 
 runmysteriet.scene.Game = function() {
@@ -11,11 +11,7 @@ runmysteriet.scene.Game = function() {
     this.r_bana1 = null;
     this.r_bana2 = null;
 
-    // state
     this.m_isOnGround = false;
-
-    // spawn position
-    this.m_startY = 0;
 };
 
 //------------------------------------------------------------------------------
@@ -38,27 +34,20 @@ runmysteriet.scene.Game.prototype.init = function() {
     this.m_player.x = 0;
     this.m_player.y = 180;
 
-    this.m_startY = this.m_player.y;
-
-    this.stage.addChild(this.m_player);
-
-    // PLATFORM 1
+    // PLATTFORM 1
     this.r_bana1 = new runmysteriet.ui.Platform();
     this.r_bana1.x = 200;
     this.r_bana1.y = 180;
-    this.stage.addChild(this.r_bana1);
 
-    // PLATFORM 2
+    // PLATTFORM 2
     this.r_bana2 = new runmysteriet.ui.Platform();
     this.r_bana2.x = 350;
     this.r_bana2.y = 120;
-    this.stage.addChild(this.r_bana2);
 
-    // TEXT
-    var text = new rune.text.BitmapField("Hello World!");
-    text.autoSize = true;
-    text.center = this.application.screen.center;
-    this.stage.addChild(text);
+    // 🔥 VIKTIGT: rätt render order
+    this.stage.addChild(this.r_bana1);
+    this.stage.addChild(this.r_bana2);
+    this.stage.addChild(this.m_player);
 };
 
 //------------------------------------------------------------------------------
@@ -71,38 +60,38 @@ runmysteriet.scene.Game.prototype.update = function(step) {
 
     var player = this.m_player;
 
-    // GRAVITATION (bara om vi inte står på något)
+    // gravitation
     if (!this.m_isOnGround) {
         player.y += 2;
     }
 
-    // reset ground state varje frame
+    // reset varje frame
     this.m_isOnGround = false;
 
-    // check platform 1
-    if (player.hitTestObject(this.r_bana1)) {
-        this.landOnPlatform(this.r_bana1);
-    }
-
-    // check platform 2
-    if (player.hitTestObject(this.r_bana2)) {
-        this.landOnPlatform(this.r_bana2);
-    }
+    // check plattformar
+    this.checkPlatform(this.r_bana1);
+    this.checkPlatform(this.r_bana2);
 };
 
 //------------------------------------------------------------------------------
-// LANDING LOGIC
+// PLATFORM COLLISION (STABIL VERSION)
 //------------------------------------------------------------------------------
 
-runmysteriet.scene.Game.prototype.landOnPlatform = function(platform) {
+runmysteriet.scene.Game.prototype.checkPlatform = function(platform) {
 
     var player = this.m_player;
 
-    // placera exakt ovanpå plattformen
-    player.y = platform.y - player.height;
+    if (!player.hitTestObject(platform)) {
+        return;
+    }
 
-    // markera som grounded
-    this.m_isOnGround = true;
+    // enkel och stabil landing:
+    // spelaren måste vara ovanför plattformen
+    if (player.y < platform.y) {
+
+        player.y = platform.y - player.height;
+        this.m_isOnGround = true;
+    }
 };
 
 //------------------------------------------------------------------------------
