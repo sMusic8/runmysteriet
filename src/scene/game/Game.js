@@ -1,84 +1,49 @@
 //------------------------------------------------------------------------------
-// Constructor
+// GAME SCENE
 //------------------------------------------------------------------------------
 
-// Skapar en konstruktorfunktion för Game-scenen
 runmysteriet.scene.Game = function() {
 
-    // Anropar basklassens konstruktor (Scene)
     rune.scene.Scene.call(this);
 
-    // Referens till spelaren, initialt null
     this.m_player = null;
 
-    // Referenser till två plattformar, initialt null
     this.r_bana1 = null;
     this.r_bana2 = null;
 
-    // Boolean som anger om spelaren står på marken
     this.m_isOnGround = false;
 };
 
-//------------------------------------------------------------------------------
 // Inheritance
-//------------------------------------------------------------------------------
-
-// Skapar prototypkedja så Game ärver från Scene
 runmysteriet.scene.Game.prototype = Object.create(rune.scene.Scene.prototype);
-
-// Sätter korrekt konstruktorreferens tillbaka till Game
 runmysteriet.scene.Game.prototype.constructor = runmysteriet.scene.Game;
 
 //------------------------------------------------------------------------------
 // INIT
 //------------------------------------------------------------------------------
 
-// Init-funktion som körs när scenen startas
 runmysteriet.scene.Game.prototype.init = function() {
 
-    // Anropar basklassens init-metod
     rune.scene.Scene.prototype.init.call(this);
 
-    // PLAYER
-
-    // Skapar en ny Player-instans
+    // Player
     this.m_player = new runmysteriet.entity.Player();
-
-    // Sätter spelarens x-position
     this.m_player.x = 0;
-
-    // Sätter spelarens y-position
     this.m_player.y = 180;
 
-    // PLATTFORM 1
-
-    // Skapar första plattformen
+    // Platform 1
     this.r_bana1 = new runmysteriet.ui.Platform();
-
-    // Sätter plattformens x-position
     this.r_bana1.x = 200;
-
-    // Sätter plattformens y-position
     this.r_bana1.y = 180;
 
-    // PLATTFORM 2
-
-    // Skapar andra plattformen
+    // Platform 2
     this.r_bana2 = new runmysteriet.ui.Platform();
-
-    // Sätter plattformens x-position
     this.r_bana2.x = 300;
-
-    // Sätter plattformens y-position
     this.r_bana2.y = 180;
 
-    // Lägger till plattform 2 i scenens display-lista
-    this.stage.addChild(this.r_bana2);
-
-    // Lägger till plattform 1 i scenens display-lista
+    // Add to stage
     this.stage.addChild(this.r_bana1);
-
-    // Lägger till spelaren i scenens display-lista
+    this.stage.addChild(this.r_bana2);
     this.stage.addChild(this.m_player);
 };
 
@@ -86,66 +51,64 @@ runmysteriet.scene.Game.prototype.init = function() {
 // UPDATE
 //------------------------------------------------------------------------------
 
-// Uppdateringsfunktion som körs varje frame
 runmysteriet.scene.Game.prototype.update = function(step) {
 
-    // Anropar basklassens update-metod
     rune.scene.Scene.prototype.update.call(this, step);
 
-    // Skapar lokal referens till spelaren
     var player = this.m_player;
 
-    // gravitation
+    // Input (måste komma före fysik)
+    player.handleInput();
 
-    // Om spelaren inte är på marken
-    if (!this.m_isOnGround) {
-
-        // Ökar spelarens y-position (rör sig nedåt)
-        player.y += 2;
-    }
-
-    // reset varje frame
-
-    // Återställer mark-status inför nya kollisionskontroller
+    // Reset ground state varje frame
     this.m_isOnGround = false;
+    player.isOnGround = false;
 
-    // check plattformar
+    // Gravitation (enda platsen där gravitation sker)
+    player.velocityY += player.gravity;
 
-    // Kontrollerar kollision med plattform 1
+    // Rörelse
+    player.y += player.velocityY;
+
+    // Kollisioner
     this.checkPlatform(this.r_bana1);
-
-    // Kontrollerar kollision med plattform 2
     this.checkPlatform(this.r_bana2);
+
+    // Fallback mark (om ingen plattform träffas)
+    if (player.y >= player.groundY && !this.m_isOnGround) {
+
+        player.y = player.groundY;
+        player.velocityY = 0;
+
+        this.m_isOnGround = true;
+        player.isOnGround = true;
+    }
 };
 
 //------------------------------------------------------------------------------
-// PLATFORM COLLISION (STABIL VERSION)
+// PLATFORM COLLISION
 //------------------------------------------------------------------------------
 
-// Funktion för att kontrollera kollision mellan spelare och en plattform
 runmysteriet.scene.Game.prototype.checkPlatform = function(platform) {
 
-    // Skapar lokal referens till spelaren
     var player = this.m_player;
 
-    // Om ingen kollision sker mellan spelare och plattform
     if (!player.hitTestObject(platform)) {
-
-        // Avslutar funktionen direkt
         return;
     }
 
-    // enkel och stabil landing:
-    // spelaren måste vara ovanför plattformen
+    // bara om spelaren faller nedåt
+    if (player.velocityY >= 0 && player.y < platform.y) {
 
-    // Kontrollerar om spelarens y-position är ovanför plattformens y-position
-    if (player.y < platform.y) {
-
-        // Placerar spelaren ovanpå plattformen
+        // placera ovanpå plattform
         player.y = platform.y - player.height;
 
-        // Sätter att spelaren står på marken
+        // stoppa fall
+        player.velocityY = 0;
+
+        // sätt ground state
         this.m_isOnGround = true;
+        player.isOnGround = true;
     }
 };
 
@@ -153,9 +116,7 @@ runmysteriet.scene.Game.prototype.checkPlatform = function(platform) {
 // DISPOSE
 //------------------------------------------------------------------------------
 
-// Funktion som körs när scenen tas bort
 runmysteriet.scene.Game.prototype.dispose = function() {
 
-    // Anropar basklassens dispose-metod
     rune.scene.Scene.prototype.dispose.call(this);
 };

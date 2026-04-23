@@ -1,22 +1,9 @@
-// Skapar konstruktorfunktion för Player-klassen
+//------------------------------------------------------------------------------
+// PLAYER
+//------------------------------------------------------------------------------
+
 runmysteriet.entity.Player = function() {
 
-    // Variabel för vertikal hastighet (Y-led)
-    this.m_velocityY = 0;
-
-    // Gravitationsvärde som påverkar fallhastighet
-    this.m_gravity = 0.5;
-
-    // Startvärde för hopp (negativt = uppåt i skärmkoordinater)
-    this.m_jumping = -5;
-
-    // Sparar marknivå i Y-led
-    this.m_groundY = 0;
-
-    // Boolean som anger om spelaren är på marken
-    this.m_onground = false;
-
-    // Anropar basklassen Graphic med position, storlek och bild
     rune.display.Graphic.call(this,
         0,
         0,
@@ -24,73 +11,59 @@ runmysteriet.entity.Player = function() {
         32,
         "start"
     );
+
+    // Y-hastighet
+    this.velocityY = 0;
+
+    // Gravitation
+    this.gravity = 0.5;
+
+    // Hopphastighet
+    this.jumpPower = -7;
+
+    // Markstatus
+    this.isOnGround = false;
+
+    // Startmark
+    this.groundY = 0;
 };
 
-// Skapar arv så Player ärver från Graphic
+// Inheritance
 runmysteriet.entity.Player.prototype = Object.create(rune.display.Graphic.prototype);
-
-// Sätter korrekt constructor tillbaka till Player
 runmysteriet.entity.Player.prototype.constructor = runmysteriet.entity.Player;
 
-// Init-metod som körs vid start
+//------------------------------------------------------------------------------
+// INIT
+//------------------------------------------------------------------------------
+
 runmysteriet.entity.Player.prototype.init = function() {
 
-    // Anropar basklassens init-metod
     rune.display.Graphic.prototype.init.call(this);
 
-    // Sätter marknivå till spelarens startposition
-    this.m_groundY = this.y;
-
-    // Sätter spelaren som på marken vid start
-    this.m_onground = true;
+    this.groundY = this.y;
+    this.isOnGround = true;
 };
 
-// Uppdateringsmetod som körs varje frame/steg
-runmysteriet.entity.Player.prototype.update = function(step) {
+//------------------------------------------------------------------------------
+// INPUT
+//------------------------------------------------------------------------------
 
-    // Anropar basklassens update-metod
-    rune.display.Graphic.prototype.update.call(this, step);
+runmysteriet.entity.Player.prototype.handleInput = function() {
 
-    // Om högerpil är nedtryckt flyttas spelaren åt höger
+    // Höger
     if (this.keyboard.pressed("RIGHT")) {
         this.x += 4;
     }
 
-    // Om vänsterpil är nedtryckt flyttas spelaren åt vänster
+    // Vänster
     if (this.keyboard.pressed("LEFT")) {
-        this.x -= 3;
+        this.x -= 4;
     }
 
-    // Hopp-logik
+    // Hopp
+    if (this.keyboard.pressed("UP") && this.isOnGround) {
 
-    // Om upp-pil trycks och spelaren är på marken
-    if (this.keyboard.pressed("UP") && this.m_onground) {
-
-        // Sätter vertikal hastighet till hoppvärde
-        this.m_velocityY = this.m_jumping;
-
-        // Sätter att spelaren inte längre är på marken
-        this.m_onground = false;
-    }
-
-    // Gravitation läggs till på vertikal hastighet
-    this.m_velocityY += this.m_gravity;
-
-    // Y-position uppdateras med hastigheten
-    this.y += this.m_velocityY;
-
-    // Kontroll av markkontakt
-
-    // Om spelaren har nått eller passerat marknivå
-    if (this.y >= this.m_groundY) {
-
-        // Sätter spelarens position exakt på marknivå
-        this.y = this.m_groundY;
-
-        // Nollställer vertikal hastighet
-        this.m_velocityY = 0;
-
-        // Markerar att spelaren står på marken
-        this.m_onground = true;
+        this.velocityY = this.jumpPower;
+        this.isOnGround = false;
     }
 };
