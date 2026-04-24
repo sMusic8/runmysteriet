@@ -78,6 +78,11 @@ var runmysteriet = function() {
     /**
      * Public scope.
      */
+    m_this.Shield ={};
+    
+    /**
+     * Public scope.
+     */
     return m_this;
 }();
 
