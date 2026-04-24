@@ -5,11 +5,11 @@
 runmysteriet.ui.Platform = function() {
 
     rune.display.Graphic.call(this,
-        225,
-        225,
-        50,
-        50,
-        "rand"
+        0,
+        0,
+        30,
+        32,
+        "bana-gras"
     );
 };
 

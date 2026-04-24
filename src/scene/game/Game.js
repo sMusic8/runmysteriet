@@ -7,10 +7,10 @@ runmysteriet.scene.Game = function() {
     rune.scene.Scene.call(this);
 
     this.m_players = [];
-    this.m_shields = []; // 🔁 FLYTTAD hit (från global)
+    this.m_shields = []; //  FLYTTAD hit (från global)
+    this.m_platforms = []; 
 
-    this.r_bana1 = null;
-    this.r_bana2 = null;
+   
 };
 
 // Inheritance
@@ -25,13 +25,9 @@ runmysteriet.scene.Game.prototype.init = function() {
 
     rune.scene.Scene.prototype.init.call(this);
 
-    //==============================================================================
-    // HÄR SÄTTER DU DINA BILDER (SPRITESHEETS)
-    //==============================================================================
-
     var player1 = new runmysteriet.entity.Player(
 
-        // 🎮 Kontroller
+        //  Kontroller
         {
             left: "LEFT",
             right: "RIGHT",
@@ -46,7 +42,7 @@ runmysteriet.scene.Game.prototype.init = function() {
         }
     );
     player1.x = 0;
-    player1.y = 180;
+    player1.y = 188;
 
     var player2 = new runmysteriet.entity.Player(
         { left: "A", right: "D", jump: "W" },
@@ -57,25 +53,30 @@ runmysteriet.scene.Game.prototype.init = function() {
         }
     );
     player2.x = 100;
-    player2.y = 180;
+    player2.y = 188;
 
     this.m_players.push(player1);
     this.m_players.push(player2);
 
-    //==============================================================================
-    // PLATTFORMAR
-    //==============================================================================
+//------------------------------------------------------------------------------
+// PLATTFORMAR ÖVER HELA FÖNSTRET
+//------------------------------------------------------------------------------
 
-    this.r_bana1 = new runmysteriet.ui.Platform();
-    this.r_bana1.x = 200;
-    this.r_bana1.y = 180;
+    var tileSize = 30;
+    var screenWidth = this.application.screen.width;
+    var groundY = 220;
 
-    this.r_bana2 = new runmysteriet.ui.Platform();
-    this.r_bana2.x = 300;
-    this.r_bana2.y = 180;
+    for (var x = 0; x < screenWidth; x += tileSize) {
 
+        var platform = new runmysteriet.ui.Platform();
+        platform.x = x;
+        platform.y = groundY;
+
+        this.m_platforms.push(platform);
+        this.stage.addChild(platform);
+}
     //==============================================================================
-    // 🛡️ SHIELDS (🔁 FLYTTAD IN HIT – VIKTIGT)
+    //  SHIELDS (FLYTTAD IN HIT – VIKTIGT)
     //==============================================================================
 
     var shield1 = new runmysteriet.ui.Shield();
@@ -93,12 +94,11 @@ runmysteriet.scene.Game.prototype.init = function() {
     // ADD TO STAGE
     //==============================================================================
 
-    this.stage.addChild(this.r_bana1);
-    this.stage.addChild(this.r_bana2);
-
     this.stage.addChild(shield1);
     this.stage.addChild(shield2);
 
+    
+//Lägger till spelare till stage
     for (var i = 0; i < this.m_players.length; i++) {
         this.stage.addChild(this.m_players[i]);
     }
@@ -126,16 +126,15 @@ runmysteriet.scene.Game.prototype.update = function(step) {
         // 3. Anta att spelaren inte står på något
         player.isOnGround = false;
 
+        // 4. Kolla plattformar
         var onPlatform = false;
 
-        // 4. Kolla plattformar
-        if (this.checkPlatform(player, this.r_bana1)) {
-            onPlatform = true;
-        }
+        for (var j = 0; j < this.m_platforms.length; j++) {
+            if (this.checkPlatform(player, this.m_platforms[j])) {
+                onPlatform = true;
+    }
 
-        if (this.checkPlatform(player, this.r_bana2)) {
-            onPlatform = true;
-        }
+}
 
         // 5. Kolla marken
         if (player.y >= player.groundY && onPlatform === false) {
