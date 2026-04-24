@@ -25,7 +25,7 @@ runmysteriet.scene.Game.prototype.init = function() {
     rune.scene.Scene.prototype.init.call(this);
 
     //==============================================================================
-    // 🔥 HÄR SÄTTER DU DINA BILDER (SPRITESHEETS)
+    // HÄR SÄTTER DU DINA BILDER (SPRITESHEETS)
     //==============================================================================
 
     var player1 = new runmysteriet.entity.Player(
@@ -37,17 +37,11 @@ runmysteriet.scene.Game.prototype.init = function() {
             jump: "UP"
         },
 
-        // 🖼️ SPRITE CONFIG
+        // SPRITE CONFIG
         {
-            texture: "spritesheet_freya_move", // 🔥 ← NAMNET från din asset-loader
+            texture: "spritesheet_freya_move", // ← NAMNET från din asset-loader
 
-            start: "idle",
-
-            animations: [
-                new rune.animation.Animation("idle", [0], 5, true),
-                new rune.animation.Animation("run", [1,2,3,4], 10, true),
-                new rune.animation.Animation("jump", [5], 1, false)
-            ]
+            start: "idle"
         }
     );
 
@@ -70,13 +64,7 @@ runmysteriet.scene.Game.prototype.init = function() {
         {
             texture: "spritesheet_thor_move", // 🔥 ← ANDRA bilden
 
-            start: "idle",
-
-            animations: [
-                new rune.animation.Animation("idle", [0], 5, true),
-                new rune.animation.Animation("run", [1,2,3,4], 10, true),
-                new rune.animation.Animation("jump", [5], 1, false)
-            ]
+            start: "idle"
         }
     );
 
@@ -123,15 +111,19 @@ runmysteriet.scene.Game.prototype.update = function(step) {
 
         var player = this.m_players[i];
 
+        // 1. Hantera input först
         player.handleInput();
 
-        player.isOnGround = false;
-
+        // 2. Lägg på gravitation
         player.velocityY += player.gravity;
         player.y += player.velocityY;
 
+        // 3. Anta att spelaren inte står på något
+        player.isOnGround = false;
+
         var onPlatform = false;
 
+        // 4. Kolla plattformar
         if (this.checkPlatform(player, this.r_bana1)) {
             onPlatform = true;
         }
@@ -140,11 +132,15 @@ runmysteriet.scene.Game.prototype.update = function(step) {
             onPlatform = true;
         }
 
-        if (player.y >= player.groundY && !onPlatform) {
+        // 5. Kolla marken
+        if (player.y >= player.groundY && onPlatform === false) {
             player.y = player.groundY;
             player.velocityY = 0;
             player.isOnGround = true;
         }
+
+        // 6. Animation sist
+        player.updateAnimation();
     }
 };
 

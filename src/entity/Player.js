@@ -4,38 +4,35 @@
 
 runmysteriet.entity.Player = function(controls, spriteConfig) {
 
-    // 🔁 ÄNDRING: Graphic → Sprite (krävs för animationer)
-    rune.display.Sprite.call(this,
+    rune.display.Sprite.call(
+        this,
         0,
         0,
         32,
         32,
-        spriteConfig.texture // 🔥 HÄR används bilden du skickar in från Game
+        spriteConfig.texture
     );
 
-    // Kontroller (vänster/höger/hopp)
     this.controls = controls;
-
-    // 🔁 NYTT: sparar animation-data
     this.spriteConfig = spriteConfig;
 
-    // Y-hastighet
+    this.speed = 2;
+
     this.velocityY = 0;
-
-    // Gravitation
     this.gravity = 0.5;
+    this.jumpPower = -9;
 
-    // Hopphastighet
-    this.jumpPower = -7;
-
-    // Markstatus
     this.isOnGround = false;
-
-    // Startmark
     this.groundY = 0;
+
+    this.isMoving = false;
+    this.currentAnimation = "";
 };
 
-// Inheritance
+//------------------------------------------------------------------------------
+// INHERITANCE
+//------------------------------------------------------------------------------
+
 runmysteriet.entity.Player.prototype = Object.create(rune.display.Sprite.prototype);
 runmysteriet.entity.Player.prototype.constructor = runmysteriet.entity.Player;
 
@@ -50,13 +47,36 @@ runmysteriet.entity.Player.prototype.init = function() {
     this.groundY = this.y;
     this.isOnGround = true;
 
-    // 🔁 NYTT: Lägg till animationer från config
-    for (var i = 0; i < this.spriteConfig.animations.length; i++) {
-        this.animation.add(this.spriteConfig.animations[i]);
-    }
+    /*
+        Eftersom dina move-spritesheets har 2 frames:
+        frame 0 = står still / första bild
+        frame 1 = rörelse / andra bild
+    */
 
-    // 🔁 Start-animation
-    this.animation.play(this.spriteConfig.start);
+    this.animation.create("idle", [0], 1, true);
+    this.animation.create("run", [0, 1], 4, true);
+    this.animation.create("jump", [1], 1, false);
+
+    this.playAnimation("idle");
+};
+
+//------------------------------------------------------------------------------
+// UPDATE
+//------------------------------------------------------------------------------
+
+runmysteriet.entity.Player.prototype.update = function(step) {
+
+    rune.display.Sprite.prototype.update.call(this, step);
+
+    /*
+        Game.js sköter:
+        - handleInput()
+        - gravitation
+        - plattformskollision
+        - updateAnimation()
+
+        Därför ska vi inte göra det här också.
+    */
 };
 
 //------------------------------------------------------------------------------
@@ -67,32 +87,51 @@ runmysteriet.entity.Player.prototype.handleInput = function() {
 
     var moving = false;
 
-    // Höger
     if (this.keyboard.pressed(this.controls.right)) {
-        this.x += 4;
+        this.x += this.speed;
         moving = true;
+        this.flippedX = false;
     }
 
-    // Vänster
     if (this.keyboard.pressed(this.controls.left)) {
-        this.x -= 4;
+        this.x -= this.speed;
         moving = true;
+        this.flippedX = true;
     }
 
-    // Hopp
-    if (this.keyboard.pressed(this.controls.jump) && this.isOnGround) {
+    if (this.keyboard.pressed(this.controls.jump) && this.isOnGround === true) {
         this.velocityY = this.jumpPower;
         this.isOnGround = false;
     }
 
-    // 🔁 NYTT: Animation baserat på rörelse
-    if (!this.isOnGround) {
-        this.animation.play("jump");
+    this.isMoving = moving;
+};
+
+//------------------------------------------------------------------------------
+// ANIMATION
+//------------------------------------------------------------------------------
+
+runmysteriet.entity.Player.prototype.updateAnimation = function() {
+
+    if (this.isOnGround === false) {
+        this.playAnimation("jump");
     }
-    else if (moving) {
-        this.animation.play("run");
+    else if (this.isMoving === true) {
+        this.playAnimation("run");
     }
     else {
-        this.animation.play("idle");
+        this.playAnimation("idle");
+    }
+};
+
+//------------------------------------------------------------------------------
+// ANIMATION HELPER
+//------------------------------------------------------------------------------
+
+runmysteriet.entity.Player.prototype.playAnimation = function(name) {
+
+    if (this.currentAnimation !== name) {
+        this.animation.gotoAndPlay(name);
+        this.currentAnimation = name;
     }
 };
