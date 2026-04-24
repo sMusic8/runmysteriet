@@ -2,7 +2,7 @@
 // PLAYER
 //------------------------------------------------------------------------------
 
-runmysteriet.entity.Player = function() {
+runmysteriet.entity.Player = function(controls) {
 
     rune.display.Graphic.call(this,
         0,
@@ -11,6 +11,9 @@ runmysteriet.entity.Player = function() {
         32,
         "start"
     );
+
+    // Kontroller
+    this.controls = controls;
 
     // Y-hastighet
     this.velocityY = 0;
@@ -51,17 +54,17 @@ runmysteriet.entity.Player.prototype.init = function() {
 runmysteriet.entity.Player.prototype.handleInput = function() {
 
     // Höger
-    if (this.keyboard.pressed("RIGHT")) {
+    if (this.keyboard.pressed(this.controls.right)) {
         this.x += 4;
     }
 
     // Vänster
-    if (this.keyboard.pressed("LEFT")) {
+    if (this.keyboard.pressed(this.controls.left)) {
         this.x -= 4;
     }
 
     // Hopp
-    if (this.keyboard.pressed("UP") && this.isOnGround) {
+    if (this.keyboard.pressed(this.controls.jump) && this.isOnGround) {
 
         this.velocityY = this.jumpPower;
         this.isOnGround = false;
