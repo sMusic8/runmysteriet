@@ -1,0 +1,3 @@
+runmysteriet.ui.ShieldHandler = function(){
+    
+}
