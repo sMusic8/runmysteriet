@@ -10,17 +10,28 @@ runmysteriet.ui.Shield = function() {
     rune.display.Graphic.call(this,
         0,
         0,
-        20,
-        20,
+        40,
+        40,
         "shield"
     );
 
     this.rune = "";
-
     this.__collected = false;
     this.active = true;
 
-    // ⭐ PULS DATA
+    //------------------------------------------------------------------------------ 
+    // TEXT
+    //------------------------------------------------------------------------------
+
+    this.m_text = new rune.text.BitmapField("");
+    this.m_text.autoSize = true;
+
+    this.addChild(this.m_text);
+
+    //------------------------------------------------------------------------------ 
+    // PULS
+    //------------------------------------------------------------------------------
+
     this.m_baseScale = 1;
     this.m_pulseSpeed = 0.05;
     this.m_pulseValue = 0;
@@ -31,7 +42,7 @@ runmysteriet.ui.Shield.prototype = Object.create(rune.display.Graphic.prototype)
 runmysteriet.ui.Shield.prototype.constructor = runmysteriet.ui.Shield;
 
 //------------------------------------------------------------------------------
-// UPDATE (PULS)
+// UPDATE
 //------------------------------------------------------------------------------
 
 runmysteriet.ui.Shield.prototype.update = function() {
@@ -40,10 +51,21 @@ runmysteriet.ui.Shield.prototype.update = function() {
 
     this.m_pulseValue += this.m_pulseSpeed;
 
-    var scale = this.m_baseScale + Math.sin(this.m_pulseValue) * 0.05;
+    var scale = this.m_baseScale + Math.sin(this.m_pulseValue) * 0.08;
 
     this.scaleX = scale;
     this.scaleY = scale;
+};
+
+//------------------------------------------------------------------------------
+// CENTER TEXT (VIKTIG FIX)
+//------------------------------------------------------------------------------
+
+runmysteriet.ui.Shield.prototype.centerText = function() {
+
+    // center baserat på textens storlek
+    this.m_text.x = (this.width - this.m_text.width) / 2;
+    this.m_text.y = (this.height - this.m_text.height) / 2;
 };
 
 //------------------------------------------------------------------------------
@@ -54,5 +76,10 @@ runmysteriet.ui.Shield.prototype.setRune = function(letter) {
 
     this.rune = letter;
 
-    console.log("Shield received letter:", this.rune);
+    this.m_text.text = letter;
+
+    // 🔥 centrera EFTER att texten satts
+    this.centerText();
+
+    console.log("Shield letter:", letter);
 };
