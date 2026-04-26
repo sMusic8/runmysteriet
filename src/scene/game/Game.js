@@ -28,6 +28,20 @@ runmysteriet.scene.Game.prototype.init = function() {
     rune.scene.Scene.prototype.init.call(this);
 
     //------------------------------------------------------------------------------
+    // 🌄 BAKGRUND (VIKTIG: LÄGGS FÖRST)
+    //------------------------------------------------------------------------------
+
+    var background = new rune.display.Graphic(
+        0,
+        0,
+        400,
+        225,
+        "background"
+    );
+
+    this.stage.addChild(background);
+
+    //------------------------------------------------------------------------------
     // ☁️ MOLN
     //------------------------------------------------------------------------------
 
@@ -197,7 +211,7 @@ runmysteriet.scene.Game.prototype.update = function(step) {
     }
 
     //------------------------------------------------------------------------------
-    // ☁️ MOLN UPDATE (FIXAD)
+    // ☁️ MOLN UPDATE
     //------------------------------------------------------------------------------
 
     for (var i = 0; i < this.m_clouds.length; i++) {
