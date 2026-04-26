@@ -26,14 +26,15 @@ runmysteriet.handler.ShieldHandler.prototype.init = function() {
     var startX = 150;
     var spacing = 50;
 
-  var words  = ["apa", "fagel", "tiger", "lejon", "bjorn", "ratta", "varg", "orm", "hare", "uggla"];
+    var words = ["apa", "fagel", "tiger", "lejon", "bjorn", "ratta", "varg", "orm", "hare", "uggla"];
     var word = words[Math.floor(Math.random() * words.length)];
 
     this.m_word = word;
 
     console.log("WORD:", word);
 
-    for (var i = 0; i < 5; i++) {
+    // ⭐ FIX: skapa sköldar efter ordets längd
+    for (var i = 0; i < word.length; i++) {
 
         var shield = new runmysteriet.ui.Shield();
 
@@ -43,8 +44,7 @@ runmysteriet.handler.ShieldHandler.prototype.init = function() {
         shield.__collected = false;
         shield.active = true;
 
-        // ⭐ VIKTIG FIX: ge bokstav direkt här
-        var letter = word[i] || "?";
+        var letter = word[i];
         shield.setRune(letter);
 
         this.m_shields.push(shield);
@@ -87,12 +87,10 @@ runmysteriet.handler.ShieldHandler.prototype.collectShield = function(shield) {
     shield.__collected = true;
     shield.active = false;
 
-    // ⭐ VIKTIGT: skriv ut bokstav här (NU FUNKAR DET)
     console.log("Letter on pickup:", shield.rune);
 
     this.m_stage.removeChild(shield);
 
-    // ta bort från array
     var index = this.m_shields.indexOf(shield);
     if (index !== -1) {
         this.m_shields.splice(index, 1);
@@ -102,32 +100,6 @@ runmysteriet.handler.ShieldHandler.prototype.collectShield = function(shield) {
 
     console.log("Collected shield:", shield);
     console.log("Total collected:", this.m_collected.length);
-};
-
-//------------------------------------------------------------------------------
-// SET WORD
-//------------------------------------------------------------------------------
-
-runmysteriet.handler.ShieldHandler.prototype.setWord = function() {
-
-    var words = ["björn", "råtta", "uggla", "gädda", "tiger"];
-
-    var word = words[Math.floor(Math.random() * words.length)];
-
-    this.m_word = word;
-
-    console.log("WORD:", word);
-
-    // ge varje sköld en bokstav
-    for (var i = 0; i < this.m_shields.length; i++) {
-
-        if (i >= word.length) break;
-
-        var shield = this.m_shields[i];
-        var letter = word[i];
-
-        shield.setRune(letter);
-    }
 };
 
 //------------------------------------------------------------------------------
