@@ -26,7 +26,7 @@ runmysteriet.handler.ShieldHandler.prototype.init = function() {
     var startX = 150;
     var spacing = 50;
 
-    var words = ["björn", "råtta", "uggla", "gädda", "tiger"];
+  var words  = ["apa", "fagel", "tiger", "lejon", "bjorn", "ratta", "varg", "orm", "hare", "uggla"];
     var word = words[Math.floor(Math.random() * words.length)];
 
     this.m_word = word;

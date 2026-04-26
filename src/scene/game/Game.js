@@ -10,6 +10,9 @@ runmysteriet.scene.Game = function() {
     this.m_platforms = [];
 
     this.m_shieldHandler = null;
+
+    // ☁️ MOLN
+    this.m_clouds = [];
 };
 
 // Inheritance
@@ -23,6 +26,37 @@ runmysteriet.scene.Game.prototype.constructor = runmysteriet.scene.Game;
 runmysteriet.scene.Game.prototype.init = function() {
 
     rune.scene.Scene.prototype.init.call(this);
+
+    //------------------------------------------------------------------------------
+    // ☁️ MOLN
+    //------------------------------------------------------------------------------
+
+    var cloudResources = ["moln1", "moln2", "moln3"];
+
+    var startX = 0;
+    var spacing = 160;
+
+    for (var i = 0; i < 8; i++) {
+
+        var randomIndex = Math.floor(Math.random() * cloudResources.length);
+
+        var cloud = new rune.display.Graphic(
+            startX + (i * spacing),
+            20 + Math.random() * 70,
+            100,
+            60,
+            cloudResources[randomIndex]
+        );
+
+        cloud.speed = 0.2 + Math.random() * 0.3;
+
+        this.m_clouds.push(cloud);
+        this.stage.addChild(cloud);
+    }
+
+    //------------------------------------------------------------------------------
+    // PLAYERS
+    //------------------------------------------------------------------------------
 
     var player1 = new runmysteriet.entity.Player(
         {
@@ -79,7 +113,7 @@ runmysteriet.scene.Game.prototype.init = function() {
     }
 
     //------------------------------------------------------------------------------
-    // SHIELDS (HANDLER)
+    // SHIELDS
     //------------------------------------------------------------------------------
 
     this.m_shieldHandler = new runmysteriet.handler.ShieldHandler(this.stage);
@@ -102,7 +136,7 @@ runmysteriet.scene.Game.prototype.update = function(step) {
 
     rune.scene.Scene.prototype.update.call(this, step);
 
-    // 1. INPUT + SPARA POSITION
+    // 1. INPUT
     for (var i = 0; i < this.m_players.length; i++) {
 
         var player = this.m_players[i];
@@ -129,14 +163,12 @@ runmysteriet.scene.Game.prototype.update = function(step) {
 
         var onPlatform = false;
 
-        // plattformar
         for (var j = 0; j < this.m_platforms.length; j++) {
             if (this.checkPlatform(player, this.m_platforms[j])) {
                 onPlatform = true;
             }
         }
 
-        // andra spelare
         for (var k = 0; k < this.m_players.length; k++) {
 
             var other = this.m_players[k];
@@ -147,7 +179,6 @@ runmysteriet.scene.Game.prototype.update = function(step) {
             }
         }
 
-        // mark
         if (player.y >= player.groundY && onPlatform === false) {
             player.y = player.groundY;
             player.velocityY = 0;
@@ -158,11 +189,28 @@ runmysteriet.scene.Game.prototype.update = function(step) {
     }
 
     //------------------------------------------------------------------------------
-    // SHIELD SYSTEM
+    // SHIELDS
     //------------------------------------------------------------------------------
 
     if (this.m_shieldHandler) {
         this.m_shieldHandler.update(this.m_players);
+    }
+
+    //------------------------------------------------------------------------------
+    // ☁️ MOLN UPDATE (FIXAD)
+    //------------------------------------------------------------------------------
+
+    for (var i = 0; i < this.m_clouds.length; i++) {
+
+        var cloud = this.m_clouds[i];
+
+        cloud.x += cloud.speed;
+
+        if (cloud.x > this.application.screen.width + 150) {
+
+            cloud.x = -150;
+            cloud.y = 20 + Math.random() * 70;
+        }
     }
 };
 
