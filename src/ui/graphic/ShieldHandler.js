@@ -24,16 +24,19 @@ runmysteriet.handler.ShieldHandler = function(stage) {
 runmysteriet.handler.ShieldHandler.prototype.init = function() {
 
     var startX = 150;
-    var spacing = 50;
+    var spacing = 55;
 
-    var words = ["apa", "fagel", "tiger", "lejon", "bjorn", "ratta", "varg", "orm", "hare", "uggla"];
+    var words = [
+        "apa", "fagel", "tiger", "lejon", "bjorn",
+        "ratta", "varg", "orm", "hare", "uggla"
+    ];
+
     var word = words[Math.floor(Math.random() * words.length)];
-
     this.m_word = word;
 
     console.log("WORD:", word);
 
-    // ⭐ FIX: skapa sköldar efter ordets längd
+    // ⭐ SKAPA EXAKT LÄNGD SOM ORDET
     for (var i = 0; i < word.length; i++) {
 
         var shield = new runmysteriet.ui.Shield();
@@ -44,8 +47,7 @@ runmysteriet.handler.ShieldHandler.prototype.init = function() {
         shield.__collected = false;
         shield.active = true;
 
-        var letter = word[i];
-        shield.setRune(letter);
+        shield.setRune(word[i]);
 
         this.m_shields.push(shield);
         this.m_stage.addChild(shield);
@@ -73,6 +75,9 @@ runmysteriet.handler.ShieldHandler.prototype.update = function(players) {
                 break;
             }
         }
+
+        // ⭐ PULS UPDATE
+        shield.update();
     }
 };
 
@@ -103,7 +108,7 @@ runmysteriet.handler.ShieldHandler.prototype.collectShield = function(shield) {
 };
 
 //------------------------------------------------------------------------------
-// GET COLLECTED
+// GETTER
 //------------------------------------------------------------------------------
 
 runmysteriet.handler.ShieldHandler.prototype.getCollected = function() {
