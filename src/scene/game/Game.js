@@ -7,10 +7,8 @@ runmysteriet.scene.Game = function() {
     rune.scene.Scene.call(this);
 
     this.m_players = [];
-    this.m_shields = []; //  FLYTTAD hit (från global)
+    this.m_shields = [];
     this.m_platforms = []; 
-
-   
 };
 
 // Inheritance
@@ -26,18 +24,13 @@ runmysteriet.scene.Game.prototype.init = function() {
     rune.scene.Scene.prototype.init.call(this);
 
     var player1 = new runmysteriet.entity.Player(
-
-        //  Kontroller
         {
             left: "LEFT",
             right: "RIGHT",
             jump: "UP"
         },
-
-        // SPRITE CONFIG
         {
-            texture: "spritesheet_freya_move", // ← NAMNET från din asset-loader
-
+            texture: "spritesheet_freya_move",
             start: "idle"
         }
     );
@@ -47,19 +40,22 @@ runmysteriet.scene.Game.prototype.init = function() {
     var player2 = new runmysteriet.entity.Player(
         { left: "A", right: "D", jump: "W" },
         {
-            texture: "spritesheet_thor_move", // 🔥 ← ANDRA bilden
-
+            texture: "spritesheet_thor_move",
             start: "idle"
         }
     );
     player2.x = 100;
     player2.y = 188;
 
+    // ⭐ INIT previousY
+    player1.previousY = player1.y;
+    player2.previousY = player2.y;
+
     this.m_players.push(player1);
     this.m_players.push(player2);
 
-//------------------------------------------------------------------------------
-// PLATTFORMAR ÖVER HELA FÖNSTRET
+    //------------------------------------------------------------------------------
+// PLATTFORMAR
 //------------------------------------------------------------------------------
 
     var tileSize = 30;
@@ -74,11 +70,9 @@ runmysteriet.scene.Game.prototype.init = function() {
 
         this.m_platforms.push(platform);
         this.stage.addChild(platform);
-}
-    //==============================================================================
-    //  SHIELDS (FLYTTAD IN HIT – VIKTIGT)
-    //==============================================================================
+    }
 
+    // SHIELDS
     var shield1 = new runmysteriet.ui.Shield();
     shield1.x = 150;
     shield1.y = 140;
@@ -90,73 +84,99 @@ runmysteriet.scene.Game.prototype.init = function() {
     this.m_shields.push(shield1);
     this.m_shields.push(shield2);
 
-    //==============================================================================
-    // ADD TO STAGE
-    //==============================================================================
-
     this.stage.addChild(shield1);
     this.stage.addChild(shield2);
 
-    
-//Lägger till spelare till stage
+    // Lägg till spelare
     for (var i = 0; i < this.m_players.length; i++) {
         this.stage.addChild(this.m_players[i]);
     }
 };
 
 //------------------------------------------------------------------------------
-// UPDATE (oförändrad)
+// UPDATE
 //------------------------------------------------------------------------------
 
 runmysteriet.scene.Game.prototype.update = function(step) {
 
     rune.scene.Scene.prototype.update.call(this, step);
 
+    // =========================
+    // 1. INPUT + SPARA POSITION
+    // =========================
     for (var i = 0; i < this.m_players.length; i++) {
 
         var player = this.m_players[i];
 
-        // 1. Hantera input först
         player.handleInput();
 
-        // 2. Lägg på gravitation
+        // spara gammal position
+        player.previousY = player.y;
+    }
+
+    // =========================
+    // 2. RÖRELSE (ALLA SAMTIDIGT)
+    // =========================
+    for (var i = 0; i < this.m_players.length; i++) {
+
+        var player = this.m_players[i];
+
         player.velocityY += player.gravity;
         player.y += player.velocityY;
 
-        // 3. Anta att spelaren inte står på något
         player.isOnGround = false;
+    }
 
-        // 4. Kolla plattformar
+    // =========================
+    // 3. KOLLISION (ALLA SAMTIDIGT)
+    // =========================
+    for (var i = 0; i < this.m_players.length; i++) {
+
+        var player = this.m_players[i];
+
         var onPlatform = false;
 
+        // plattformar
         for (var j = 0; j < this.m_platforms.length; j++) {
             if (this.checkPlatform(player, this.m_platforms[j])) {
                 onPlatform = true;
-    }
+            }
+        }
 
-}
+        // andra spelare
+        for (var k = 0; k < this.m_players.length; k++) {
 
-        // 5. Kolla marken
+            var other = this.m_players[k];
+            if (player === other) continue;
+
+            if (this.checkPlatform(player, other)) {
+                onPlatform = true;
+            }
+        }
+
+        // mark
         if (player.y >= player.groundY && onPlatform === false) {
             player.y = player.groundY;
             player.velocityY = 0;
             player.isOnGround = true;
         }
 
-        // 6. Animation sist
         player.updateAnimation();
     }
 };
 
 //------------------------------------------------------------------------------
-// PLATFORM COLLISION (oförändrad)
+// PLATFORM COLLISION (FIXAD)
 //------------------------------------------------------------------------------
 
 runmysteriet.scene.Game.prototype.checkPlatform = function(player, platform) {
 
     if (!player.hitTestObject(platform)) return false;
 
-    if (player.velocityY >= 0 && player.y < platform.y) {
+    // ⭐ MÅSTE HA VARIT OVANFÖR
+    var wasAbove = player.previousY + player.height <= platform.y;
+
+    if (player.velocityY >= 0 && wasAbove) {
         player.y = platform.y - player.height;
         player.velocityY = 0;
         player.isOnGround = true;

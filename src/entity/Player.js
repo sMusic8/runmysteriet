@@ -27,6 +27,8 @@ runmysteriet.entity.Player = function(controls, spriteConfig) {
 
     this.isMoving = false;
     this.currentAnimation = "";
+
+    this.isMoving = false
 };
 
 //------------------------------------------------------------------------------
