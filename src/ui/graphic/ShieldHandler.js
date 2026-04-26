@@ -1,6 +1,7 @@
 //------------------------------------------------------------------------------
 // NAMESPACE
 //------------------------------------------------------------------------------
+
 var runmysteriet = runmysteriet || {};
 runmysteriet.handler = runmysteriet.handler || {};
 
@@ -13,6 +14,7 @@ runmysteriet.handler.ShieldHandler = function(stage) {
     this.m_stage = stage;
     this.m_shields = [];
     this.m_collected = [];
+    this.m_word = "";
 };
 
 //------------------------------------------------------------------------------
@@ -24,6 +26,13 @@ runmysteriet.handler.ShieldHandler.prototype.init = function() {
     var startX = 150;
     var spacing = 50;
 
+    var words = ["björn", "råtta", "uggla", "gädda", "tiger"];
+    var word = words[Math.floor(Math.random() * words.length)];
+
+    this.m_word = word;
+
+    console.log("WORD:", word);
+
     for (var i = 0; i < 5; i++) {
 
         var shield = new runmysteriet.ui.Shield();
@@ -31,20 +40,29 @@ runmysteriet.handler.ShieldHandler.prototype.init = function() {
         shield.x = startX + (i * spacing);
         shield.y = 140;
 
+        shield.__collected = false;
+        shield.active = true;
+
+        // ⭐ VIKTIG FIX: ge bokstav direkt här
+        var letter = word[i] || "?";
+        shield.setRune(letter);
+
         this.m_shields.push(shield);
         this.m_stage.addChild(shield);
     }
 };
 
 //------------------------------------------------------------------------------
-// UPDATE (FIXAD: stabil collision-loop)
+// UPDATE
 //------------------------------------------------------------------------------
 
 runmysteriet.handler.ShieldHandler.prototype.update = function(players) {
 
-    for (var i = 0; i < this.m_shields.length; i++) {
+    for (var i = this.m_shields.length - 1; i >= 0; i--) {
 
         var shield = this.m_shields[i];
+
+        if (!shield.active) continue;
 
         for (var j = 0; j < players.length; j++) {
 
@@ -59,7 +77,7 @@ runmysteriet.handler.ShieldHandler.prototype.update = function(players) {
 };
 
 //------------------------------------------------------------------------------
-// COLLECT SHIELD (FIXAD)
+// COLLECT
 //------------------------------------------------------------------------------
 
 runmysteriet.handler.ShieldHandler.prototype.collectShield = function(shield) {
@@ -67,27 +85,53 @@ runmysteriet.handler.ShieldHandler.prototype.collectShield = function(shield) {
     if (!shield || shield.__collected) return;
 
     shield.__collected = true;
+    shield.active = false;
 
-    // ta bort från scen
+    // ⭐ VIKTIGT: skriv ut bokstav här (NU FUNKAR DET)
+    console.log("Letter on pickup:", shield.rune);
+
     this.m_stage.removeChild(shield);
 
-    // ta bort från active array
-    for (var i = 0; i < this.m_shields.length; i++) {
-        if (this.m_shields[i] === shield) {
-            this.m_shields.splice(i, 1);
-            break;
-        }
+    // ta bort från array
+    var index = this.m_shields.indexOf(shield);
+    if (index !== -1) {
+        this.m_shields.splice(index, 1);
     }
 
-    // lägg i collected-lista
     this.m_collected.push(shield);
 
-    console.log("Collected shield object:", shield);
+    console.log("Collected shield:", shield);
     console.log("Total collected:", this.m_collected.length);
 };
 
 //------------------------------------------------------------------------------
-// GETTER
+// SET WORD
+//------------------------------------------------------------------------------
+
+runmysteriet.handler.ShieldHandler.prototype.setWord = function() {
+
+    var words = ["björn", "råtta", "uggla", "gädda", "tiger"];
+
+    var word = words[Math.floor(Math.random() * words.length)];
+
+    this.m_word = word;
+
+    console.log("WORD:", word);
+
+    // ge varje sköld en bokstav
+    for (var i = 0; i < this.m_shields.length; i++) {
+
+        if (i >= word.length) break;
+
+        var shield = this.m_shields[i];
+        var letter = word[i];
+
+        shield.setRune(letter);
+    }
+};
+
+//------------------------------------------------------------------------------
+// GET COLLECTED
 //------------------------------------------------------------------------------
 
 runmysteriet.handler.ShieldHandler.prototype.getCollected = function() {
