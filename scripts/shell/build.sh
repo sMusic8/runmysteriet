@@ -13,6 +13,9 @@ npx google-closure-compiler \
 --js "./../../src/ui/graphic/Platform.js" \
 --js "./../../src/ui/graphic/Shield.js" \
 --js "./../../src/ui/graphic/ShieldHandler.js" \
+--js "./../../src/handler/CloudHandler.js" \
+--js "./../../src/handler/PlatformHandler.js" \
+--js "./../../src/handler/PlayerHandler.js" \
 --js "./../../src/scene/game/Game.js" \
 --js "./../../src/scene/menu/Menu.js" \
 --js "./../../src/system/Main.js" \

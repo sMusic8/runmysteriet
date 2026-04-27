@@ -11,6 +11,7 @@
  * @class
  * @classdesc
  * 
+ * 
  * Menu scene.
  */
 runmysteriet.scene.Menu = function() {

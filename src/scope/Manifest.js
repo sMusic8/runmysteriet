@@ -68,7 +68,7 @@ var runmysteriet = function() {
     m_this.entity ={};
 
 /**
-     * This package includes the entities that make up the application. Entities
+     * This package includes 
      * @namespace ui
      * @memberof runmysteriet
      * @since 1.0
@@ -79,6 +79,14 @@ var runmysteriet = function() {
      * Public scope.
      */
     m_this.Shield ={};
+
+    /**
+     * This package includes 
+     * @namespace handler
+     * @memberof runmysteriet
+     * @since 1.0
+     */
+    m_this.handler ={};
     
     /**
      * Public scope.
