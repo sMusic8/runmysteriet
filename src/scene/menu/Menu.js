@@ -43,13 +43,25 @@ runmysteriet.scene.Menu.prototype.constructor = runmysteriet.scene.Menu;
  * @returns {undefined}
  */
 runmysteriet.scene.Menu.prototype.init = function() {
+
     rune.scene.Scene.prototype.init.call(this);
     
+    // första raden
     var text = new rune.text.BitmapField("Hello Menu!");
     text.autoSize = true;
     text.center = this.application.screen.center;
+    text.y -= 15; // 🔥 flytta upp
+text.flicker.start(1000, 0.5);
     
     this.stage.addChild(text);
+
+    // andra raden
+    var text2 = new rune.text.BitmapField("Hello player!");
+    text2.autoSize = true;
+    text2.center = this.application.screen.center;
+    text2.y += 15; // 🔥 flytta ner
+    
+    this.stage.addChild(text2);
 };
 
 /**
