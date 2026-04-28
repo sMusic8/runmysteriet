@@ -11,9 +11,9 @@ this.cloudResources = ["moln1", "moln2", "moln3"];
 
 };
 
-//init
 //Init-funktionen skapar moln med hjälp av en loop. 
-//Loopen placerar ut molnen med ett visst avstånd (spacing) och ger dem en slumpmässig y-position och en slumpmässig hastighet. Molnen läggs sedan till på scenen.
+//Loopen placerar ut molnen med ett visst avstånd (spacing) och ger dem en slumpmässig y-position och en slumpmässig hastighet. 
+//Molnen läggs sedan till på scenen.
 runmysteriet.handler.CloudHandler.prototype.init = function() {
 
     var startX = 0;
