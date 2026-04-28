@@ -1,5 +1,6 @@
-//måln handler
-
+//moln handler
+// Klassen där alla moln i spelet hanteras. 
+// Den sköter om att skapa moln, rita dem och flytta dem över skärmen.
 runmysteriet.handler.CloudHandler = function(stage, screenWidth) {
 
 this.stage = stage;
@@ -11,7 +12,8 @@ this.cloudResources = ["moln1", "moln2", "moln3"];
 };
 
 //init
-
+//Init-funktionen skapar moln med hjälp av en loop. 
+//Loopen placerar ut molnen med ett visst avstånd (spacing) och ger dem en slumpmässig y-position och en slumpmässig hastighet. Molnen läggs sedan till på scenen.
 runmysteriet.handler.CloudHandler.prototype.init = function() {
 
     var startX = 0;
