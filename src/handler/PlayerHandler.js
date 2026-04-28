@@ -2,13 +2,15 @@
 // PLAYER HANDLER
 //------------------------------------------------------------------------------
 
-runmysteriet.handler.PlayerHandler = function(stage, platforms) {
+runmysteriet.handler.PlayerHandler = function(stage, platforms, application) {
 
     this.stage = stage;
     this.platforms = platforms;
+    this.application = application;
+
 
     this.players = [];
-};
+}; 
 
 //------------------------------------------------------------------------------
 // INIT
@@ -54,6 +56,7 @@ runmysteriet.handler.PlayerHandler.prototype.init = function() {
 
     for (var i = 0; i < this.players.length; i++) {
         this.stage.addChild(this.players[i]);
+
     }
 };
 
@@ -71,15 +74,23 @@ runmysteriet.handler.PlayerHandler.prototype.update = function() {
 //------------------------------------------------------------------------------
 // INPUT
 //------------------------------------------------------------------------------
-
+// Här hanterar vi både tangentbord och gamepad-input
 runmysteriet.handler.PlayerHandler.prototype.updateInput = function() {
 
     for (var i = 0; i < this.players.length; i++) {
 
         var player = this.players[i];
+        
+        //Tangentbord
+        player.handleInput();
+
+        // Gamepad
+        player.previousY = player.y;
 
         player.handleInput();
-        player.previousY = player.y;
+
+        //skickar in player och index för att veta vilken gamepad som hör till vilken spelare
+        this.handleGamepadInput(player, i);
     }
 };
 
@@ -199,4 +210,65 @@ runmysteriet.handler.PlayerHandler.prototype.checkPlayerPlatform = function(play
     }
 
     return false;
+};
+//------------------------------------------------------------------------------
+// GAMEPAD INPUT
+//------------------------------------------------------------------------------
+
+runmysteriet.handler.PlayerHandler.prototype.handleGamepadInput = function(player, gamepadID) {
+
+    var gamepad = this.getGamepad(gamepadID);
+
+    if (gamepad === null || gamepad === undefined) {
+        return;
+    }
+
+    var moving = player.isMoving === true;
+
+    // Höger med vänster joystick
+    if (gamepad.stickLeftRight) {
+        player.x += player.speed;
+        player.flippedX = false;
+        moving = true;
+    }
+
+    // Vänster med vänster joystick
+    if (gamepad.stickLeftLeft) {
+        player.x -= player.speed;
+        player.flippedX = true;
+        moving = true;
+    }
+
+    // Hoppa med knapp 0
+    // På många kontroller är knapp 0 = A / X beroende på kontroll
+    if (
+    typeof gamepad.justPressed === "function" &&
+    gamepad.justPressed(0) &&
+    player.isOnGround === true
+) {
+    player.velocityY = player.jumpPower;
+    player.isOnGround = false;
+}
+
+    player.isMoving = moving;
+};
+
+runmysteriet.handler.PlayerHandler.prototype.getGamepad = function(gamepadID) {
+
+    if (this.application === null || this.application === undefined) {
+        return null;
+    }
+
+    if (this.application.inputs === null || this.application.inputs === undefined) {
+        return null;
+    }
+
+    if (
+        this.application.inputs.gamepads === null ||
+        this.application.inputs.gamepads === undefined
+    ) {
+        return null;
+    }
+
+    return this.application.inputs.gamepads.get(gamepadID);
 };

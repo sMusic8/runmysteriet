@@ -57,7 +57,8 @@ runmysteriet.scene.Game.prototype.init = function() {
     // Spelare
     this.m_playerHandler = new runmysteriet.handler.PlayerHandler(
         this.stage,
-        this.m_platformHandler.platforms
+        this.m_platformHandler.platforms,
+        this.application
     );
 
     this.m_playerHandler.init();
