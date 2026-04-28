@@ -129,11 +129,11 @@ runmysteriet.scene.Menu.prototype.update = function(step) {
         }
 
         if (this.selectedIndex === 1) {
-            console.log("Öppna Las mer");
+            new runmysteriet.scene.More;
         }
 
         if (this.selectedIndex === 2) {
-            console.log("Öppna Credits");
+            new runmysteriet.scene.Credits;
         }
     }
 };
