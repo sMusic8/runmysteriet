@@ -2,6 +2,12 @@
 // PAUSE SCENE
 //------------------------------------------------------------------------------
 
+/**
+ * Pause scene.
+ *
+ * @constructor
+ * @extends rune.scene.Scene
+ */
 runmysteriet.scene.Paus = function() {
 
     rune.scene.Scene.call(this);
@@ -18,6 +24,11 @@ runmysteriet.scene.Paus.prototype.constructor = runmysteriet.scene.Paus;
 // INIT
 //------------------------------------------------------------------------------
 
+/**
+ * Initializes the pause scene.
+ *
+ * @return {undefined}
+ */
 runmysteriet.scene.Paus.prototype.init = function() {
 
     rune.scene.Scene.prototype.init.call(this);
@@ -44,6 +55,12 @@ runmysteriet.scene.Paus.prototype.init = function() {
 // UPDATE
 //------------------------------------------------------------------------------
 
+/**
+ * Updates pause scene logic.
+ *
+ * @param {number} step Fixed time step.
+ * @return {undefined}
+ */
 runmysteriet.scene.Paus.prototype.update = function(step) {
 
     rune.scene.Scene.prototype.update.call(this, step);
@@ -69,6 +86,11 @@ runmysteriet.scene.Paus.prototype.update = function(step) {
 // DISPOSE
 //------------------------------------------------------------------------------
 
+/**
+ * Cleans up the pause scene before destruction.
+ *
+ * @return {undefined}
+ */
 runmysteriet.scene.Paus.prototype.dispose = function() {
 
     rune.scene.Scene.prototype.dispose.call(this);
