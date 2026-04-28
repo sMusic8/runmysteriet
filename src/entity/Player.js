@@ -1,6 +1,10 @@
 //------------------------------------------------------------------------------
 // PLAYER
 //------------------------------------------------------------------------------
+// Denna klassen representerar en spelare i spelet. 
+// Den har ingen kollisionslogik, ingen input-logik och ingen gravitationslogik. 
+// Den sköter bara om att rita spelaren och spela animationer.
+// Allt annat sköts av PlayerHandler.js 
 
 runmysteriet.entity.Player = function(controls, spriteConfig) {
 
