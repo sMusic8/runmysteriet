@@ -82,6 +82,22 @@ runmysteriet.scene.Game.prototype.update = function(step) {
     if (this.m_shieldHandler) {
         this.m_shieldHandler.update(this.m_playerHandler.players);
     }
+
+    // ----------------------------------------------------
+    // PAUS (Keyboard + Gamepad)
+    // ----------------------------------------------------
+
+    var gamepad = this.application.gamepads ? this.application.gamepads.get(0) : null;
+
+    var startPressed = gamepad && gamepad.justPressed("START");
+    var pPressed = this.keyboard.justPressed("P");
+
+    if (startPressed || pPressed) {
+
+        this.application.scenes.load([
+            new runmysteriet.scene.Paus()
+        ]);
+    }
 };
 
 //------------------------------------------------------------------------------
