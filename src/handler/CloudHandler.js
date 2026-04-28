@@ -38,6 +38,8 @@ runmysteriet.handler.CloudHandler.prototype.init = function() {
 
 //Uppdate
 
+//I update-funktionen flyttas molnen över skärmen där det uppdateras deras x-position och hastighet. 
+// Om ett moln flyttas utanför skärmen på höger sida, så återställs det till vänster sida av skärmen med en ny slumpmässig y-position.
 runmysteriet.handler.CloudHandler.prototype.update = function(){
 
     for (var i = 0; i < this.clouds.length; i++){
