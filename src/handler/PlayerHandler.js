@@ -2,6 +2,8 @@
 // PLAYER HANDLER
 //------------------------------------------------------------------------------
 
+//Klassen där alla spelare i spelet hanteras.
+//Den skapar spelare, ritar dem och kollar kollisioner mellan spelaren och plattformarna.
 runmysteriet.handler.PlayerHandler = function(stage, platforms, application) {
 
     this.stage = stage;
@@ -15,6 +17,10 @@ runmysteriet.handler.PlayerHandler = function(stage, platforms, application) {
 //------------------------------------------------------------------------------
 // INIT
 //------------------------------------------------------------------------------
+
+//init funktion skapar players och lägger till de på spelplanen. //Här skapar vi två spelare, player1 och player2, med olika kontroller och spritesheets.
+//Player1 använder piltangenterna för att röra sig, medan player2 använder WASD-tangenterna.
+//Efter att spelarna har skapats och konfigurerats, läggs de till i this.players-arrayen och på scenen med this.stage.addChild.
 
 runmysteriet.handler.PlayerHandler.prototype.init = function() {
 
@@ -64,6 +70,9 @@ runmysteriet.handler.PlayerHandler.prototype.init = function() {
 // UPDATE
 //------------------------------------------------------------------------------
 
+//Update-funktionen hanterar input, rörelse och kollisioner för alla spelare i spelet.
+//För varje spelare i this.players-arrayen, anropas updateInput(), updateMovement() och updateCollisions() för att uppdatera deras tillstånd baserat på användarens input, rörelse och kollisioner med plattformar och andra spelare.
+//Genom att separera dessa funktioner i olika metoder (updateInput, updateMovement, updateCollisions) håller sig koden organiserad och lätt att underhålla.
 runmysteriet.handler.PlayerHandler.prototype.update = function() {
 
     this.updateInput();
@@ -75,6 +84,13 @@ runmysteriet.handler.PlayerHandler.prototype.update = function() {
 // INPUT
 //------------------------------------------------------------------------------
 // Här hanterar vi både tangentbord och gamepad-input
+
+// Hanterar tangentbord och gamepad för alla spelare.
+// previousY sparas före rörelse för att kollisioner ska kunna avgöra
+// om spelaren landar ovanpå en plattform eller en annan spelare.
+// Tangentbord hanteras i Player-klassen via handleInput().
+// Gamepad hanteras i PlayerHandler via handleGamepadInput().
+// Indexet i players-arrayen används för att koppla rätt gamepad till rätt spelare.
 runmysteriet.handler.PlayerHandler.prototype.updateInput = function() {
 
     for (var i = 0; i < this.players.length; i++) {
@@ -215,6 +231,11 @@ runmysteriet.handler.PlayerHandler.prototype.checkPlayerPlatform = function(play
 // GAMEPAD INPUT
 //------------------------------------------------------------------------------
 
+//handleGamepadInput hanterar gamepad-input för en specifik spelare baserat på gamepadID.
+//Först hämtas gamepaden med hjälp av getGamepad(gamepadID). Om gamepaden inte är tillgänglig, returneras funktionen.
+//Om gamepaden är tillgänglig, kontrolleras input från vänster joystick (stickLeftRight och stickLeftLeft) för att röra spelaren höger eller vänster. 
+//Om knappen 0 (vanligtvis A / X) just har tryckts och spelaren är på marken, får spelaren en vertikal hastighet som gör att den hoppar.
+//Genom att använda gamepadID kan du hantera flera spelare med olika gamepads, där varje spelare reagerar på input från sin tilldelade gamepad.
 runmysteriet.handler.PlayerHandler.prototype.handleGamepadInput = function(player, gamepadID) {
 
     var gamepad = this.getGamepad(gamepadID);
@@ -253,6 +274,11 @@ runmysteriet.handler.PlayerHandler.prototype.handleGamepadInput = function(playe
     player.isMoving = moving;
 };
 
+
+//getGamepad är en hjälpfunktion som hämtar en gamepad baserat på dess ID.
+//Funktionen kontrollerar först om application, application.inputs och application.inputs.gamepads är tillgängliga. Om någon av dessa är null eller undefined, returneras null.
+//Om alla kontroller passerar, hämtas och returneras gamepaden med det angivna gamepadID:t från application.inputs.gamepads.
+//Genom att använda denna funktion kan det säkert hämtas en gamepad utan att riskera fel på grund av otillgängliga egenskaper i application-objektet.
 runmysteriet.handler.PlayerHandler.prototype.getGamepad = function(gamepadID) {
 
     if (this.application === null || this.application === undefined) {
