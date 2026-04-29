@@ -33,6 +33,8 @@ runmysteriet.entity.Player = function(controls, spriteConfig) {
     this.currentAnimation = "";
 
     this.isMoving = false
+
+       this.jumpSound = this.application.sounds.sound.get("jump");
 };
 
 //------------------------------------------------------------------------------
@@ -105,12 +107,15 @@ runmysteriet.entity.Player.prototype.handleInput = function() {
         this.flippedX = true;
     }
 
-    if (this.keyboard.pressed(this.controls.jump) && this.isOnGround === true) {
+   // 🔥 ÄNDRING HÄR
+    if (this.keyboard.justPressed(this.controls.jump) && this.isOnGround === true) {
         this.velocityY = this.jumpPower;
         this.isOnGround = false;
-    }
 
-    this.isMoving = moving;
+        // 🔊 Ljud triggas korrekt EN gång
+    this.jumpSound.play(true)
+    }
+ this.isMoving = moving;
 };
 
 //------------------------------------------------------------------------------
