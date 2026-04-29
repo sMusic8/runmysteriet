@@ -2,16 +2,16 @@
 // PLATFORM HANDLER
 //------------------------------------------------------------------------------
 
-// Denna klassen hanterar alla plattformar i spelet. 
-// Den sköter om att skapa plattformar, rita dem och kolla kollisioner mellan spelaren och plattformarna. 
+// Denna klassen hanterar alla plattformar i spelet, skapar och kontrolerar dess kolision med players. 
 runmysteriet.handler.PlatformHandler = function(stage, screenWidth) {
 
     this.stage = stage;
     this.screenWidth = screenWidth;
+    this.levelWidth = screenWidth * 4; //då vi tänkt göra 4 segment till att börja med
 
     this.platforms = [];
 
-    this.tileSize = 50;
+    this.tileSize = 30;
     this.groundY = 220;
 };
 
@@ -21,19 +21,20 @@ runmysteriet.handler.PlatformHandler = function(stage, screenWidth) {
 //funktionen init skapar plattformar över hela skärmen, 
 //med hjälp av tileSize för att bestämma avståndet mellan dem.
 runmysteriet.handler.PlatformHandler.prototype.init = function() {
-var gris = [];
-    for (var y=0; y < 5; y++){
-        for (var x = 0; x < this.screenWidth; x += this.tileSize) {
 
-        var platform = gris;
-        console.log(gris);
+   
+        for (var x = 0; x < this.levelWidth; x += this.tileSize) {
+
+        var platform = new runmysteriet.ui.Platform();
+       
+        console.log(platform);
         platform.x = x;
         platform.y = this.groundY;
 
         this.platforms.push(platform);
         this.stage.addChild(platform);
     }
-    }
+    
     
 };
 

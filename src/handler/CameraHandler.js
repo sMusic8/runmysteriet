@@ -34,6 +34,10 @@ runmysteriet.handler.CameraHandler.prototype.update = function(){
     }
 
 
-this.camera.x = centerX -this.camera.width / 2;
-this.camera.y = 0;
+this.camera.viewport.x = centerX - this.camera.viewport.width / 2;
+this.camera.viewport.y = 0;
+if (this.camera.viewport.x < 0) {
+    this.camera.viewport.x = 0;
+}
+this.camera.viewport.y = 0;
 };
