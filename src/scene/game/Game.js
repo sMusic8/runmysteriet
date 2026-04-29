@@ -64,7 +64,7 @@ runmysteriet.scene.Game.prototype.init = function() {
     this.m_playerHandler.init();
 
     // Sköldar
-    this.m_shieldHandler = new runmysteriet.handler.ShieldHandler(this.stage);
+    this.m_shieldHandler = new runmysteriet.handler.ShieldHandler(this.stage,  this.application);
     this.m_shieldHandler.init();
 };
 
