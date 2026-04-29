@@ -42,7 +42,8 @@ runmysteriet.scene.Menu.prototype.constructor = runmysteriet.scene.Menu;
  * @return {undefined}
  */
 runmysteriet.scene.Menu.prototype.init = function() {
-
+this.menuSound = this.application.sounds.sound.get("sound_menu");
+ 
     rune.scene.Scene.prototype.init.call(this);
 
     var text = new rune.text.BitmapField("Valkommen till runmysteriet!");
@@ -97,7 +98,7 @@ runmysteriet.scene.Menu.prototype.update = function(step) {
 
     // ↓
     if (this.keyboard.justPressed("DOWN")) {
-
+ this.menuSound.play(true);
         this.selectedIndex++;
 
         if (this.selectedIndex >= this.menuItems.length) {
@@ -109,7 +110,7 @@ runmysteriet.scene.Menu.prototype.update = function(step) {
 
     // ↑
     if (this.keyboard.justPressed("UP")) {
-
+ this.menuSound.play(true);
         this.selectedIndex--;
 
         if (this.selectedIndex < 0) {
