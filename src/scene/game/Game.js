@@ -5,10 +5,11 @@
 runmysteriet.scene.Game = function () {
   rune.scene.Scene.call(this);
 
-  this.m_playerHandler = null;
-  this.m_platformHandler = null;
-  this.m_cloudHandler = null;
-  this.m_shieldHandler = null;
+    this.m_playerHandler = null;
+    this.m_platformHandler = null;
+    this.m_cloudHandler = null;
+    this.m_shieldHandler = null;
+    this.m_cameraHandler = null;
 };
 
 //------------------------------------------------------------------------------
@@ -23,16 +24,18 @@ runmysteriet.scene.Game.prototype.constructor = runmysteriet.scene.Game;
 //------------------------------------------------------------------------------
 
 runmysteriet.scene.Game.prototype.init = function () {
-    //Musik
+    rune.scene.Scene.prototype.init.call(this);
+
+  //Musik
   this.backgroundMusic = this.application.sounds.sound.get("sound_music");
   this.backgroundMusic.play(true);
-  rune.scene.Scene.prototype.init.call(this);
+      //console.log("CAMERAS:", this.cameras);
 
   // Bakgrund
   var background = new rune.display.Graphic(
     0,
     0,
-    this.application.screen.width,
+    2000,
     this.application.screen.height,
     "background",
   );
@@ -64,6 +67,12 @@ runmysteriet.scene.Game.prototype.init = function () {
 
   this.m_playerHandler.init();
 
+  //kamera
+  this.m_cameraHandler = new runmysteriet.handler.CameraHandler(
+    this.cameras.getCameraAt(0),
+    this.m_playerHandler
+  );
+
   // Sköldar
   this.m_shieldHandler = new runmysteriet.handler.ShieldHandler(
     this.stage,
@@ -82,10 +91,16 @@ runmysteriet.scene.Game.prototype.update = function (step) {
   this.m_cloudHandler.update();
   this.m_playerHandler.update();
 
+
   if (this.m_shieldHandler) {
     this.m_shieldHandler.update(this.m_playerHandler.players);
   }
 
+  //kameran uppdateras 
+  if (this.m_cameraHandler) {
+    this.m_cameraHandler.update();
+
+  }
   // ----------------------------------------------------
   // PAUS (Keyboard + Gamepad)
   // ----------------------------------------------------

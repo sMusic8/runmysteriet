@@ -1,6 +1,6 @@
 //moln handler
-// Klassen där alla moln i spelet hanteras. 
-// Den sköter om att skapa moln, rita dem och flytta dem över skärmen.
+// Klassen som skapar moln och hanterar dess rörelse
+
 runmysteriet.handler.CloudHandler = function(stage, screenWidth) {
 
 this.stage = stage;
@@ -12,7 +12,7 @@ this.cloudResources = ["moln1", "moln2", "moln3"];
 };
 
 //Init-funktionen skapar moln med hjälp av en loop. 
-//Loopen placerar ut molnen med ett visst avstånd (spacing) och ger dem en slumpmässig y-position och en slumpmässig hastighet. 
+//Loopen placerar ut molnen med ett visst avstånd (spacing) och ger dem en slupmässig y-positon och en slumpmässig hastighet. 
 //Molnen läggs sedan till på scenen.
 runmysteriet.handler.CloudHandler.prototype.init = function() {
 
@@ -23,8 +23,8 @@ runmysteriet.handler.CloudHandler.prototype.init = function() {
         var randomIndex = Math.floor(Math.random() * this.cloudResources.length);
         
         var cloud = new rune.display.Graphic(
-            startX + (i * spacing),
-            20 + Math.random() * 70,
+            startX + (i * spacing), 
+            20 + Math.random() * 70,//
             100,
             60,
             this.cloudResources[randomIndex]
@@ -36,10 +36,9 @@ runmysteriet.handler.CloudHandler.prototype.init = function() {
     }
 }
 
-//Uppdate
+//Uppdaterar molnens position och slumpar ny position för samma när molnen är utanför screenWidth.
 
-//I update-funktionen flyttas molnen över skärmen där det uppdateras deras x-position och hastighet. 
-// Om ett moln flyttas utanför skärmen på höger sida, så återställs det till vänster sida av skärmen med en ny slumpmässig y-position.
+
 runmysteriet.handler.CloudHandler.prototype.update = function(){
 
     for (var i = 0; i < this.clouds.length; i++){
@@ -47,8 +46,8 @@ runmysteriet.handler.CloudHandler.prototype.update = function(){
         cloud.x += cloud.speed;
 
         if( cloud.x > this.screenWidth + 150){
-            cloud.x = -150;
-            cloud.y = 20 + Math.random() * 70;
+            cloud.x = -150; 
+            cloud.y = 20 + Math.random() * 70; 
 
         }
 
