@@ -3,20 +3,22 @@
 
 runmysteriet.handler.BackgroundHandler = function(stage, camera, screenWidth, screenHeight) {
 
-    this.stage = stage;
+    this.stage = stage; 
     this.camera = camera;
     this.screenWidth = screenWidth;
     this.screenHeight = screenHeight;
-    this.levelWidth = screenWidth * 4; //då vi tänkt göra 4 segment till att börja med vi kan ändra detta senare
-
+   // this.levelWidth = this.screenWidth * this.backgrounds.length;
     this.backgrounds = [];
     this.backgroundTextures = ["background", "background1", "background2", "background3"];
    
+this.backgroundCount = this.backgroundTextures.length;
+this.levelWidth = this.screenWidth * this.backgroundCount;
 }
 
     runmysteriet.handler.BackgroundHandler.prototype.init = function() {
 
         for(var i = 0; i < this.backgroundTextures.length; i++){
+            
             var background = new rune.display.Graphic(
                 i * this.screenWidth,
                 0,
@@ -43,6 +45,9 @@ var cameraX = this.camera.viewport.x;
 
     if (background.x + this.screenWidth < cameraX) {
         background.x += this.levelWidth;
+    }
+    if (background.x > cameraX + this.screenWidth) {
+        background.x -= this.levelWidth;
     }
 
  }

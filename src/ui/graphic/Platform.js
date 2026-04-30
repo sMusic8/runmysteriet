@@ -9,7 +9,7 @@ runmysteriet.ui.Platform = function() {
         0,
         268,
         32,
-        "rand"
+        "bana-gras1"
     );
 };
 

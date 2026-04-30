@@ -141,6 +141,11 @@ runmysteriet.handler.PlayerHandler.prototype.updateCollisions = function() {
 
         // Plattformar
         for (var j = 0; j < this.platforms.length; j++) {
+            var platform = this.platforms[j];
+
+            if (Math.abs(platform.x - player.x) > 350) {
+                continue;
+            }
 
             if (this.checkPlatform(player, this.platforms[j])) {
                 onPlatform = true;

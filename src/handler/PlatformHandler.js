@@ -18,26 +18,7 @@ runmysteriet.handler.PlatformHandler = function(stage, screenWidth) {
 //------------------------------------------------------------------------------
 // INIT
 //------------------------------------------------------------------------------
-//funktionen init skapar plattformar över hela skärmen, 
-//med hjälp av tileSize för att bestämma avståndet mellan dem.
-runmysteriet.handler.PlatformHandler.prototype.init = function() {
-
-   
-        for (var x = 0; x < this.levelWidth; x += this.tileSize) {
-
-        var platform = new runmysteriet.ui.Platform();
-       
-        console.log(platform);
-        platform.x = x;
-        platform.y = this.groundY;
-
-        this.platforms.push(platform);
-        this.stage.addChild(platform);
-    }
-    
-    
-};
-
+//funktionen init skapar plattformar på skärmen, 
 runmysteriet.handler.PlatformHandler.prototype.init = function() {
 
     for (var x = 0; x < this.levelWidth; x += this.tileSize) {
