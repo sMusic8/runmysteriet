@@ -29,19 +29,16 @@ runmysteriet.scene.Game.prototype.init = function () {
   //Musik
   this.backgroundMusic = this.application.sounds.sound.get("sound_music");
   this.backgroundMusic.play(true);
-      //console.log("CAMERAS:", this.cameras);
+      //console.log("kamera", this.camera.viewport);
 
   // Bakgrund
-  var background = new rune.display.Graphic(
-    0,
-    0,
-    2000,
-    this.application.screen.height,
-    "background",
+  this.m_backgroundHandler = new runmysteriet.handler.BackgroundHandler(
+    this.stage,
+    this.cameras.getCameraAt(0),
+    this.application.screen.width,
+    this.application.screen.height
   );
-
-  this.stage.addChild(background);
-
+  this.m_backgroundHandler.init();
   // Moln
   this.m_cloudHandler = new runmysteriet.handler.CloudHandler(
     this.stage,
@@ -100,6 +97,9 @@ runmysteriet.scene.Game.prototype.update = function (step) {
   if (this.m_cameraHandler) {
     this.m_cameraHandler.update();
 
+  }
+  if (this.m_backgroundHandler) {
+    this.m_backgroundHandler.update();
   }
   // ----------------------------------------------------
   // PAUS (Keyboard + Gamepad)

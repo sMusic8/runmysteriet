@@ -11,7 +11,7 @@ runmysteriet.handler.PlatformHandler = function(stage, screenWidth) {
 
     this.platforms = [];
 
-    this.tileSize = 30;
+    this.tileSize = 268;
     this.groundY = 220;
 };
 
@@ -40,7 +40,7 @@ runmysteriet.handler.PlatformHandler.prototype.init = function() {
 
 runmysteriet.handler.PlatformHandler.prototype.init = function() {
 
-    for (var x = 0; x < this.screenWidth; x += this.tileSize) {
+    for (var x = 0; x < this.levelWidth; x += this.tileSize) {
 
         var platform = new runmysteriet.ui.Platform();
 

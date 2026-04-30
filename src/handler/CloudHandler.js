@@ -5,6 +5,8 @@ runmysteriet.handler.CloudHandler = function(stage, screenWidth) {
 
 this.stage = stage;
 this.screenWidth = screenWidth;
+this.levelWidth = screenWidth * 4; //då vi tänkt göra 4 segment till att börja med
+
 
 this.clouds = [];
 this.cloudResources = ["moln1", "moln2", "moln3"];
@@ -29,7 +31,7 @@ runmysteriet.handler.CloudHandler.prototype.init = function() {
             60,
             this.cloudResources[randomIndex]
         );
-        cloud.speed = 0.2 + Math.random() * 0.3;
+        cloud.speed = 0.5 + Math.random() * 0.3;
         this.clouds.push(cloud);
         this.stage.addChild(cloud);
         
@@ -45,7 +47,7 @@ runmysteriet.handler.CloudHandler.prototype.update = function(){
         var cloud = this.clouds[i];
         cloud.x += cloud.speed;
 
-        if( cloud.x > this.screenWidth + 150){
+        if( cloud.x > this.levelWidth + 150){
             cloud.x = -150; 
             cloud.y = 20 + Math.random() * 70; 
 

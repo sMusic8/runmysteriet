@@ -7,9 +7,9 @@ runmysteriet.ui.Platform = function() {
     rune.display.Graphic.call(this,
         0,
         0,
-        30,
+        268,
         32,
-        "bana-gras"
+        "rand"
     );
 };
 

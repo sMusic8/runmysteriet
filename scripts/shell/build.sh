@@ -12,6 +12,7 @@ npx google-closure-compiler \
 --js "./../../src/entity/Player.js" \
 --js "./../../src/ui/graphic/Platform.js" \
 --js "./../../src/ui/graphic/Shield.js" \
+--js "./../../src/handler/BackgroundHandler.js" \
 --js "./../../src/handler/ShieldHandler.js" \
 --js "./../../src/handler/MakeLevel.js" \
 --js "./../../src/handler/CameraHandler.js" \
