@@ -10,6 +10,10 @@ runmysteriet.scene.Game = function () {
     this.m_cloudHandler = null;
     this.m_shieldHandler = null;
     this.m_cameraHandler = null;
+    this.m_backgroundHandler = null;
+
+    this.m_isPaused = false;
+    this.m_pauseText = null;
 };
 
 //------------------------------------------------------------------------------
@@ -26,6 +30,7 @@ runmysteriet.scene.Game.prototype.constructor = runmysteriet.scene.Game;
 runmysteriet.scene.Game.prototype.init = function () {
     rune.scene.Scene.prototype.init.call(this);
 
+    
   //Musik
   this.backgroundMusic = this.application.sounds.sound.get("sound_music");
   this.backgroundMusic.play(true);
@@ -76,8 +81,15 @@ runmysteriet.scene.Game.prototype.init = function () {
     this.application,
   );
   this.m_shieldHandler.init();
-};
 
+//text för paus ---OBS----låt ligga sist så den inte hamnar bakom bakgrund och molnen
+    this.m_pauseText = new rune.text.BitmapField("SPELET AR PAUSAT");
+    this.m_pauseText.autoSize = true;
+    this.m_pauseText.x = 90;
+    this.m_pauseText.y = 100;
+    this.m_pauseText.visible = false;
+    this.stage.addChild(this.m_pauseText);        
+};
 //------------------------------------------------------------------------------
 // UPDATE
 //------------------------------------------------------------------------------
@@ -85,10 +97,15 @@ runmysteriet.scene.Game.prototype.init = function () {
 runmysteriet.scene.Game.prototype.update = function (step) {
   rune.scene.Scene.prototype.update.call(this, step);
 
+  this.updatePauseInput();
+  if(this.m_isPaused === true){
+    return;
+
+  }
+
   this.m_cloudHandler.update();
   this.m_playerHandler.update();
-
-
+  
   if (this.m_shieldHandler) {
     this.m_shieldHandler.update(this.m_playerHandler.players);
   }
@@ -101,20 +118,6 @@ runmysteriet.scene.Game.prototype.update = function (step) {
   if (this.m_backgroundHandler) {
     this.m_backgroundHandler.update();
   }
-  // ----------------------------------------------------
-  // PAUS (Keyboard + Gamepad)
-  // ----------------------------------------------------
-
-  var gamepad = this.application.gamepads
-    ? this.application.gamepads.get(0)
-    : null;
-
-  var startPressed = gamepad && gamepad.justPressed("START");
-  var pPressed = this.keyboard.justPressed("P");
-
-  if (startPressed || pPressed) {
-    this.application.scenes.load([new runmysteriet.scene.Paus()]);
-  }
 };
 
 //------------------------------------------------------------------------------
@@ -124,3 +127,48 @@ runmysteriet.scene.Game.prototype.update = function (step) {
 runmysteriet.scene.Game.prototype.dispose = function () {
   rune.scene.Scene.prototype.dispose.call(this);
 };
+
+//paus funtion kollar tangent p o gamepad
+runmysteriet.scene.Game.prototype.updatePauseInput = function(){
+  var gamepad = null;
+  if(this.application && this.application.inputs && this.application.inputs.gamepads){
+    gamepad = this.application.inputs.gamepads.get(0);
+  }
+
+  var startIsPressed = false;
+
+  if(gamepad !== null && gamepad !== undefined) {
+    if(typeof gamepad.justPressed === "function"){
+      startIsPressed = gamepad.justPressed("START") || gamepad.justPressed(9);
+    }
+    
+  }
+  if (startIsPressed || this.keyboard.justPressed("P")) {
+      this.m_isPaused = !this.m_isPaused;
+
+      if(this.m_pauseText){
+
+          this.m_pauseText.visible = this.m_isPaused;
+          this.m_pauseText.x = this.cameras.getCameraAt(0).viewport.x + 90;
+          this.m_pauseText.y = this.cameras.getCameraAt(0).viewport.y + 100;
+      } 
+      if (this.backgroundMusic){
+        if(this.m_isPaused === true){
+            this.backgroundMusic.pause();
+
+        }
+        else {
+            this.backgroundMusic.play(true);
+        }
+
+
+      }
+
+   console.log("Paus", this.m_isPaused);
+
+
+
+  }
+
+
+}

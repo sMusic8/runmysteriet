@@ -12,6 +12,8 @@ runmysteriet.handler.PlayerHandler = function(stage, platforms, application) {
 
 
     this.players = [];
+    this.jumpSound = this.application.sounds.sound.get("sound_jump");
+
 }; 
 
 //------------------------------------------------------------------------------
@@ -83,30 +85,19 @@ runmysteriet.handler.PlayerHandler.prototype.update = function() {
 //------------------------------------------------------------------------------
 // INPUT
 //------------------------------------------------------------------------------
-// Här hanterar vi både tangentbord och gamepad-input
-
-// Hanterar tangentbord och gamepad för alla spelare.
-// previousY sparas före rörelse för att kollisioner ska kunna avgöra
-// om spelaren landar ovanpå en plattform eller en annan spelare.
-// Tangentbord hanteras i Player-klassen via handleInput().
-// Gamepad hanteras i PlayerHandler via handleGamepadInput().
-// Indexet i players-arrayen används för att koppla rätt gamepad till rätt spelare.
 runmysteriet.handler.PlayerHandler.prototype.updateInput = function() {
 
     for (var i = 0; i < this.players.length; i++) {
 
-        var player = this.players[i];
+        var player = this.players[i]; // Hämtar den aktuella spelare
         
-        //Tangentbord
-        player.handleInput();
 
-        // Gamepad
-        player.previousY = player.y;
+        player.previousY = player.y; // spelarens y position innan rörelse
 
-        player.handleInput();
+        player.isMoving = false; 
 
         //skickar in player och index för att veta vilken gamepad som hör till vilken spelare
-        this.handleGamepadInput(player, i);
+        this.handleInput(player, i);
     }
 };
 
@@ -141,13 +132,14 @@ runmysteriet.handler.PlayerHandler.prototype.updateCollisions = function() {
 
         // Plattformar
         for (var j = 0; j < this.platforms.length; j++) {
+
             var platform = this.platforms[j];
 
             if (Math.abs(platform.x - player.x) > 350) {
                 continue;
             }
 
-            if (this.checkPlatform(player, this.platforms[j])) {
+            if (this.checkPlatform(player, platform)) {
                 onPlatform = true;
             }
         }
@@ -236,54 +228,8 @@ runmysteriet.handler.PlayerHandler.prototype.checkPlayerPlatform = function(play
 // GAMEPAD INPUT
 //------------------------------------------------------------------------------
 
-//handleGamepadInput hanterar gamepad-input för en specifik spelare baserat på gamepadID.
-//Först hämtas gamepaden med hjälp av getGamepad(gamepadID). Om gamepaden inte är tillgänglig, returneras funktionen.
-//Om gamepaden är tillgänglig, kontrolleras input från vänster joystick (stickLeftRight och stickLeftLeft) för att röra spelaren höger eller vänster. 
-//Om knappen 0 (vanligtvis A / X) just har tryckts och spelaren är på marken, får spelaren en vertikal hastighet som gör att den hoppar.
-//Genom att använda gamepadID kan du hantera flera spelare med olika gamepads, där varje spelare reagerar på input från sin tilldelade gamepad.
-runmysteriet.handler.PlayerHandler.prototype.handleGamepadInput = function(player, gamepadID) {
-
-    var gamepad = this.getGamepad(gamepadID);
-
-    if (gamepad === null || gamepad === undefined) {
-        return;
-    }
-
-    var moving = player.isMoving === true;
-
-    // Höger med vänster joystick
-    if (gamepad.stickLeftRight) {
-        player.x += player.speed;
-        player.flippedX = false;
-        moving = true;
-    }
-
-    // Vänster med vänster joystick
-    if (gamepad.stickLeftLeft) {
-        player.x -= player.speed;
-        player.flippedX = true;
-        moving = true;
-    }
-
-    // Hoppa med knapp 0
-    // På många kontroller är knapp 0 = A / X beroende på kontroll
-    if (
-    typeof gamepad.justPressed === "function" &&
-    gamepad.justPressed(0) &&
-    player.isOnGround === true
-) {
-    player.velocityY = player.jumpPower;
-    player.isOnGround = false;
-}
-
-    player.isMoving = moving;
-};
 
 
-//getGamepad är en hjälpfunktion som hämtar en gamepad baserat på dess ID.
-//Funktionen kontrollerar först om application, application.inputs och application.inputs.gamepads är tillgängliga. Om någon av dessa är null eller undefined, returneras null.
-//Om alla kontroller passerar, hämtas och returneras gamepaden med det angivna gamepadID:t från application.inputs.gamepads.
-//Genom att använda denna funktion kan det säkert hämtas en gamepad utan att riskera fel på grund av otillgängliga egenskaper i application-objektet.
 runmysteriet.handler.PlayerHandler.prototype.getGamepad = function(gamepadID) {
 
     if (this.application === null || this.application === undefined) {
@@ -302,4 +248,76 @@ runmysteriet.handler.PlayerHandler.prototype.getGamepad = function(gamepadID) {
     }
 
     return this.application.inputs.gamepads.get(gamepadID);
+};
+
+//------------------------------------------------------------------------------
+// INPUT
+//------------------------------------------------------------------------------
+
+runmysteriet.handler.PlayerHandler.prototype.handleInput = function(player, gamepadID) {
+
+    var moving = false;
+    var gamepad = this.getGamepad(gamepadID);
+
+    //--------------------------------------------------------------------------
+    // TANGENTBORD
+    //--------------------------------------------------------------------------
+
+    if (player.keyboard.pressed(player.controls.right)) {
+        player.x += player.speed;
+        moving = true;
+        player.flippedX = false;
+    }
+
+    if (player.keyboard.pressed(player.controls.left)) {
+        player.x -= player.speed;
+        moving = true;
+        player.flippedX = true;
+    }
+
+    if (
+        player.keyboard.justPressed(player.controls.jump) &&
+        player.isOnGround === true
+    ) {
+        player.velocityY = player.jumpPower;
+        player.isOnGround = false;
+
+            if(this.jumpSound) {
+                this.jumpSound.play();
+
+            }
+    }
+
+    //--------------------------------------------------------------------------
+    // GAMEPAD
+    //--------------------------------------------------------------------------
+
+    if (gamepad !== null && gamepad !== undefined) {
+
+        if (gamepad.stickLeftRight) {
+            player.x += player.speed;
+            moving = true;
+            player.flippedX = false;
+        }
+
+        if (gamepad.stickLeftLeft) {
+            player.x -= player.speed;
+            moving = true;
+            player.flippedX = true;
+        }
+
+        if (
+            typeof gamepad.justPressed === "function" &&
+            gamepad.justPressed(0) &&
+            player.isOnGround === true
+        ) {
+            player.velocityY = player.jumpPower;
+            player.isOnGround = false;
+
+            if(this.jumpSound) {
+                this.jumpSound.play();}
+        }
+    }
+
+    player.isMoving = moving;
 };

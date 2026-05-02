@@ -65,21 +65,9 @@ runmysteriet.scene.Paus.prototype.update = function(step) {
 
     rune.scene.Scene.prototype.update.call(this, step);
 
-    if (this.keyboard.justPressed("P")) {
-
-        this.application.scenes.load([
-            new runmysteriet.scene.Game()
-        ]);
-    }
-
     var gamepad = this.application.gamepads ? this.application.gamepads.get(0) : null;
 
-    if ((gamepad && gamepad.justPressed("START")) || this.keyboard.justPressed("P")) {
-
-        this.application.scenes.load([
-            new runmysteriet.scene.Game()
-        ]);
-    }
+   
 };
 
 //------------------------------------------------------------------------------
