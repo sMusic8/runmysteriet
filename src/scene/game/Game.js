@@ -246,7 +246,7 @@ runmysteriet.scene.Game.prototype.updateTimer = function(){
 
   if(this.allRunesColected()){
     if(this.m_timerText){
-        this.m_timerText.text = "Alla runor är insamlade Ta dig till bAten!";
+        this.m_timerText.text = "Alla runor ar insamlade Ta dig till bAten!";
 
         this.m_timerText.x = cameraX.viewport.x + 15;
         this.m_timerText.y = cameraX.viewport.y + 15;
