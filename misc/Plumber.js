@@ -1,0 +1,1 @@
+!function(){console.log("%cJSPlumber: Activated.","color: green");var e=Object.getOwnPropertyNames(window),n=null,o={};setInterval(function(){if(n=Object.getOwnPropertyNames(window),e.length!=n.length)for(var l=0;l<n.length;l++)e[l]||o[l]||(o[l]=n[l],window[o[l]]&&window[o[l]].system&&window[o[l]].system.Main||console.log("%cJSPlumber: Leak > "+n[l],"color: red"))},1e3)}();
