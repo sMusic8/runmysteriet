@@ -68,7 +68,7 @@ runmysteriet.handler.ShieldHandler.prototype.init = function () {
     var shield = new runmysteriet.ui.Shield();
 
     shield.x = startX + i * spacing; 
-    shield.y = 170;
+    shield.y = 140;
 
     shield.__collected = false;
     shield.active = true;

@@ -164,7 +164,7 @@ runmysteriet.scene.Game.prototype.update = function (step) {
   this.m_cloudHandler.update();
   this.m_playerHandler.update();
 
- // ✅ LÄGG TILL DENNA
+ //  LÄGG TILL DENNA
 if (this.m_kristen) {
     this.m_kristen.update(step, this.m_playerHandler.players);
 }
@@ -213,10 +213,11 @@ runmysteriet.scene.Game.prototype.updatePauseInput = function(){
   if (startIsPressed || this.keyboard.justPressed("P")) {
       this.m_isPaused = !this.m_isPaused;
 
+      
       if(this.m_pauseText){
 
           this.m_pauseText.visible = this.m_isPaused;
-          this.m_pauseText.x = this.cameras.getCameraAt(0).viewport.x + 90;
+          this.m_pauseText.x = this.cameras.getCameraAt(0).viewport.x + 90; 
           this.m_pauseText.y = this.cameras.getCameraAt(0).viewport.y + 100;
       } 
       if (this.backgroundMusic){
@@ -263,43 +264,55 @@ if (this.m_timerText){
 }
 
 };
-runmysteriet.scene.Game.prototype.checkLevelCompletion = function(){
-  var players = this.m_playerHandler.players;
+runmysteriet.scene.Game.prototype.checkLevelCompletion = function() {
+    var players = this.m_playerHandler.players;
 
-  if(!player){ 
-    return;
+    for (var i = 0; i < players.length; i++) {
+        var player = players[i];
+
+        if (!player || player.isDead === true) {
+            continue;
+        }
+
+        if (player.y > 360) {
+            player.isDead = true;
+            player.visible = false;
+            player.active = false;
+            player.velocityY = 0;
+
+            console.log("PLAYER DEAD", i);
+            continue;
+        }
+
+        if (player.x >= this.m_finishX) {
+            if (this.allRunesColected()) {
+                this.winGame();
+                return;
+            }
+        }
     }
 
-  for (var i = 0; i < players.length; i++) {
-    var player = players[i];
-
-    if(!player){ // säkerhetskoll om player inte finns, hoppa över för tillfällrt så det inte buggar
-      continue;
-
+    if (this.areAllPlayersDead()) {
+        this.loseGame();
+        return;
     }
-  if(players.y > 360) { 
-    this.loseGame();
-    return;
-  }
-  if(players.x >= this.m_finishX){
-    if(this.allRunesColected()){
 
-      this.winGame();
-      return;
-    }
-    
-  
-  }
-
-  
-}
     if (this.m_timeLeft <= 0 && this.allRunesColected() === false) {
-    this.loseGame();
- }
+        this.loseGame();
+    }
+};
 
-}
+runmysteriet.scene.Game.prototype.areAllPlayersDead = function() {
+    var players = this.m_playerHandler.players;
 
+    for (var i = 0; i < players.length; i++) {
+        if (players[i] && players[i].isDead !== true) {
+            return false;
+        }
+    }
 
+    return true;
+};
 
 /**
  * 

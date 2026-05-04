@@ -170,12 +170,12 @@ runmysteriet.handler.PlayerHandler.prototype.updateCollisions = function() {
             }
         }
 
-        // GROUND
-        if (player.y >= player.groundY && !onPlatform) {
-            player.y = player.groundY;
-            player.velocityY = 0;
-            player.isOnGround = true;
-        }
+        // GROUND - - - - låt vara bortkommenterad- - - - - - - - 
+        // if (player.y >= player.groundY && !onPlatform) {
+        //     player.y = player.groundY;
+        //     player.velocityY = 0;
+        //     player.isOnGround = true;
+        //}
     }
 };
 
