@@ -47,7 +47,7 @@ runmysteriet.scene.Game.prototype.init = function () {
   // Moln
   this.m_cloudHandler = new runmysteriet.handler.CloudHandler(
     this.stage,
-    this.application.screen.width,
+    this.application.screen.width
   );
 
   this.m_cloudHandler.init();
@@ -55,7 +55,7 @@ runmysteriet.scene.Game.prototype.init = function () {
   // Plattformar
   this.m_platformHandler = new runmysteriet.handler.PlatformHandler(
     this.stage,
-    this.application.screen.width,
+    this.application.screen.width
   );
 
   this.m_platformHandler.init();
@@ -64,7 +64,7 @@ runmysteriet.scene.Game.prototype.init = function () {
   this.m_playerHandler = new runmysteriet.handler.PlayerHandler(
     this.stage,
     this.m_platformHandler.platforms,
-    this.application,
+    this.application
   );
 
   this.m_playerHandler.init();
@@ -78,7 +78,7 @@ runmysteriet.scene.Game.prototype.init = function () {
   // Sköldar
   this.m_shieldHandler = new runmysteriet.handler.ShieldHandler(
     this.stage,
-    this.application,
+    this.application
   );
   this.m_shieldHandler.init();
 
