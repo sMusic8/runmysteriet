@@ -14,7 +14,7 @@ runmysteriet.handler.PlatformHandler = function(stage, screenWidth) {
 
     this.tileSize = 268;//storleken på varje plattform, används för att skapa plattformar i init funktionen
     this.groundY = 220;//y-positionen där plattformarna ska placeras, används i init funktionen
-    this.holeWidth = 60;
+    this.holeWidth = 50;
     
     this.holesAfterPlatform = [
         2,
