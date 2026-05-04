@@ -3,68 +3,70 @@
 //------------------------------------------------------------------------------
 
 //Klassen där alla spelare i spelet hanteras.
-//Den skapar spelare, ritar dem och kollar kollisioner mellan spelaren och plattformarna.
 runmysteriet.handler.PlayerHandler = function(stage, platforms, application) {
 
     this.stage = stage;
     this.platforms = platforms;
     this.application = application;
 
-
     this.players = [];
     this.jumpSound = this.application.sounds.sound.get("sound_jump");
-
-}; 
+};
 
 //------------------------------------------------------------------------------
 // INIT
 //------------------------------------------------------------------------------
 
-//init funktion skapar players och lägger till de på spelplanen. //Här skapar vi två spelare, player1 och player2, med olika kontroller och spritesheets.
-//Player1 använder piltangenterna för att röra sig, medan player2 använder WASD-tangenterna.
-//Efter att spelarna har skapats och konfigurerats, läggs de till i this.players-arrayen och på scenen med this.stage.addChild.
-
 runmysteriet.handler.PlayerHandler.prototype.init = function() {
 
     var player1 = new runmysteriet.entity.Player(
-        {
-            left: "LEFT",
-            right: "RIGHT",
-            jump: "UP"
-        },
-        {
-            texture: "spritesheet_freya_move",
-            start: "idle"
-        }
+        { left: "LEFT", right: "RIGHT", jump: "UP" },
+        { texture: "spritesheet_freya_move", start: "idle" }
+    );
+
+    var player2 = new runmysteriet.entity.Player(
+        { left: "A", right: "D", jump: "W" },
+        { texture: "spritesheet_thor_move", start: "idle" }
     );
 
     player1.x = 0;
     player1.y = 188;
 
-    var player2 = new runmysteriet.entity.Player(
-        {
-            left: "A",
-            right: "D",
-            jump: "W"
-        },
-        {
-            texture: "spritesheet_thor_move",
-            start: "idle"
-        }
-    );
-
     player2.x = 100;
     player2.y = 188;
 
+    // HP INIT
+    player1.hp = 100;
+    player1.maxHp = 100;
+
+    player2.hp = 100;
+    player2.maxHp = 100;
+
+    // PHYSICS INIT
     player1.previousY = player1.y;
     player2.previousY = player2.y;
+
+    player1.velocityY = 0;
+    player2.velocityY = 0;
+
+    player1.gravity = 0.5;
+    player2.gravity = 0.5;
+
+    player1.isOnGround = false;
+    player2.isOnGround = false;
 
     this.players.push(player1);
     this.players.push(player2);
 
+    // HP BARS
+    player1.hpBar = this.createHpBar();
+    player2.hpBar = this.createHpBar();
+
+    this.stage.addChild(player1.hpBar);
+    this.stage.addChild(player2.hpBar);
+
     for (var i = 0; i < this.players.length; i++) {
         this.stage.addChild(this.players[i]);
-
     }
 };
 
@@ -72,31 +74,45 @@ runmysteriet.handler.PlayerHandler.prototype.init = function() {
 // UPDATE
 //------------------------------------------------------------------------------
 
-//Update-funktionen hanterar input, rörelse och kollisioner för alla spelare i spelet.
-//För varje spelare i this.players-arrayen, anropas updateInput(), updateMovement() och updateCollisions() för att uppdatera deras tillstånd baserat på användarens input, rörelse och kollisioner med plattformar och andra spelare.
-//Genom att separera dessa funktioner i olika metoder (updateInput, updateMovement, updateCollisions) håller sig koden organiserad och lätt att underhålla.
 runmysteriet.handler.PlayerHandler.prototype.update = function() {
 
     this.updateInput();
     this.updateMovement();
     this.updateCollisions();
+
+    for (var i = 0; i < this.players.length; i++) {
+
+        var p = this.players[i];
+
+        // HP BAR UPDATE
+        if (p.hpBar) {
+
+            p.hpBar.x = p.x;
+            p.hpBar.y = p.y - 12;
+
+            var hpPercent = p.hp / p.maxHp;
+            if (hpPercent < 0) hpPercent = 0;
+
+            p.hpBar.scaleX = hpPercent;
+        }
+
+        p.updateAnimation();
+    }
 };
 
 //------------------------------------------------------------------------------
 // INPUT
 //------------------------------------------------------------------------------
+
 runmysteriet.handler.PlayerHandler.prototype.updateInput = function() {
 
     for (var i = 0; i < this.players.length; i++) {
 
-        var player = this.players[i]; // Hämtar den aktuella spelare
-        
+        var player = this.players[i];
 
-        player.previousY = player.y; // spelarens y position innan rörelse
+        player.previousY = player.y;
+        player.isMoving = false;
 
-        player.isMoving = false; 
-
-        //skickar in player och index för att veta vilken gamepad som hör till vilken spelare
         this.handleInput(player, i);
     }
 };
@@ -130,42 +146,36 @@ runmysteriet.handler.PlayerHandler.prototype.updateCollisions = function() {
 
         var onPlatform = false;
 
-        // Plattformar
+        // PLATFORMER
         for (var j = 0; j < this.platforms.length; j++) {
 
             var platform = this.platforms[j];
 
-            if (Math.abs(platform.x - player.x) > 350) {
-                continue;
-            }
+            if (Math.abs(platform.x - player.x) > 350) continue;
 
             if (this.checkPlatform(player, platform)) {
                 onPlatform = true;
             }
         }
 
-        // Spelare på spelare
+        // PLAYER ON PLAYER (STÅ PÅ VARANDRA)
         for (var k = 0; k < this.players.length; k++) {
 
             var other = this.players[k];
 
-            if (player === other) {
-                continue;
-            }
+            if (player === other) continue;
 
             if (this.checkPlayerPlatform(player, other)) {
                 onPlatform = true;
             }
         }
 
-        // Mark
-        // if (player.y >= player.groundY && onPlatform === false) {
-        //     player.y = player.groundY;
-        //     player.velocityY = 0;
-        //     player.isOnGround = true;
-        // }
-
-        player.updateAnimation();
+        // GROUND
+        if (player.y >= player.groundY && !onPlatform) {
+            player.y = player.groundY;
+            player.velocityY = 0;
+            player.isOnGround = true;
+        }
     }
 };
 
@@ -175,16 +185,16 @@ runmysteriet.handler.PlayerHandler.prototype.updateCollisions = function() {
 
 runmysteriet.handler.PlayerHandler.prototype.checkPlatform = function(player, platform) {
 
-    if (!player.hitTestObject(platform)) {
-        return false;
-    }
+    if (!player.hitTestObject(platform)) return false;
 
     var wasAbove = player.previousY + player.height <= platform.y;
 
     if (player.velocityY >= 0 && wasAbove) {
+
         player.y = platform.y - player.height;
         player.velocityY = 0;
         player.isOnGround = true;
+
         return true;
     }
 
@@ -192,7 +202,7 @@ runmysteriet.handler.PlayerHandler.prototype.checkPlatform = function(player, pl
 };
 
 //------------------------------------------------------------------------------
-// PLAYER ON PLAYER COLLISION
+// PLAYER ON PLAYER (VIKTIG DEL)
 //------------------------------------------------------------------------------
 
 runmysteriet.handler.PlayerHandler.prototype.checkPlayerPlatform = function(player, other) {
@@ -208,60 +218,31 @@ runmysteriet.handler.PlayerHandler.prototype.checkPlayerPlatform = function(play
 
     var playerCenterX = player.x + player.width / 2;
 
-    var isOverOther = (
+    var isOverOther =
         playerCenterX >= otherLeft &&
-        playerCenterX <= otherRight
-    );
+        playerCenterX <= otherRight;
 
     var wasAbove = playerPreviousBottom <= otherTop;
 
     if (player.velocityY >= 0 && wasAbove && isOverOther) {
+
         player.y = otherTop - player.height;
         player.velocityY = 0;
         player.isOnGround = true;
+
         return true;
     }
 
     return false;
 };
-//------------------------------------------------------------------------------
-// GAMEPAD INPUT
-//------------------------------------------------------------------------------
-
-
-
-runmysteriet.handler.PlayerHandler.prototype.getGamepad = function(gamepadID) {
-
-    if (this.application === null || this.application === undefined) {
-        return null;
-    }
-
-    if (this.application.inputs === null || this.application.inputs === undefined) {
-        return null;
-    }
-
-    if (
-        this.application.inputs.gamepads === null ||
-        this.application.inputs.gamepads === undefined
-    ) {
-        return null;
-    }
-
-    return this.application.inputs.gamepads.get(gamepadID);
-};
 
 //------------------------------------------------------------------------------
-// INPUT
+// INPUT HANDLER
 //------------------------------------------------------------------------------
 
 runmysteriet.handler.PlayerHandler.prototype.handleInput = function(player, gamepadID) {
 
     var moving = false;
-    var gamepad = this.getGamepad(gamepadID);
-
-    //--------------------------------------------------------------------------
-    // TANGENTBORD
-    //--------------------------------------------------------------------------
 
     if (player.keyboard.pressed(player.controls.right)) {
         player.x += player.speed;
@@ -275,49 +256,26 @@ runmysteriet.handler.PlayerHandler.prototype.handleInput = function(player, game
         player.flippedX = true;
     }
 
-    if (
-        player.keyboard.justPressed(player.controls.jump) &&
-        player.isOnGround === true
-    ) {
+    if (player.keyboard.justPressed(player.controls.jump) && player.isOnGround) {
+
         player.velocityY = player.jumpPower;
         player.isOnGround = false;
 
-            if(this.jumpSound) {
-                this.jumpSound.play();
-
-            }
-    }
-
-    //--------------------------------------------------------------------------
-    // GAMEPAD
-    //--------------------------------------------------------------------------
-
-    if (gamepad !== null && gamepad !== undefined) {
-
-        if (gamepad.stickLeftRight) {
-            player.x += player.speed;
-            moving = true;
-            player.flippedX = false;
-        }
-
-        if (gamepad.stickLeftLeft) {
-            player.x -= player.speed;
-            moving = true;
-            player.flippedX = true;
-        }
-
-        if (
-            typeof gamepad.justPressed === "function" &&
-            gamepad.justPressed(0) &&
-            player.isOnGround === true
-        ) {
-            player.velocityY = player.jumpPower;
-            player.isOnGround = false;
-
-            if(this.jumpSound) {
-                this.jumpSound.play();}
-        }
+        if (this.jumpSound) this.jumpSound.play();
     }
 
     player.isMoving = moving;
+};
+
+//------------------------------------------------------------------------------
+// HP BAR
+//------------------------------------------------------------------------------
+
+runmysteriet.handler.PlayerHandler.prototype.createHpBar = function() {
+
+    var bar = new rune.display.Sprite(0, 0, 32, 4, "hpbar");
+    bar.anchorX = 0;
+    bar.scaleX = 1;
+
+    return bar;
 };

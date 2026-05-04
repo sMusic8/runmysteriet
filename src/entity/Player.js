@@ -32,8 +32,9 @@ runmysteriet.entity.Player = function(controls, spriteConfig) {
     this.isMoving = false;
     this.currentAnimation = "";
 
-    this.hp = 100;
+    this.isMoving = false
 
+       this.jumpSound = this.application.sounds.sound.get("sound_jump");
 };
 
 //------------------------------------------------------------------------------
@@ -87,6 +88,37 @@ runmysteriet.entity.Player.prototype.update = function(step) {
 };
 
 //------------------------------------------------------------------------------
+// INPUT
+//------------------------------------------------------------------------------
+
+runmysteriet.entity.Player.prototype.handleInput = function() {
+
+    var moving = false;
+
+    if (this.keyboard.pressed(this.controls.right)) {
+        this.x += this.speed;
+        moving = true;
+        this.flippedX = false;
+    }
+
+    if (this.keyboard.pressed(this.controls.left)) {
+        this.x -= this.speed;
+        moving = true;
+        this.flippedX = true;
+    }
+
+   // 🔥 ÄNDRING HÄR
+    if (this.keyboard.justPressed(this.controls.jump) && this.isOnGround === true) {
+        this.velocityY = this.jumpPower;
+        this.isOnGround = false;
+
+        // 🔊 Ljud triggas korrekt EN gång
+    this.jumpSound.play(true)
+    }
+ this.isMoving = moving;
+};
+
+//------------------------------------------------------------------------------
 // ANIMATION
 //------------------------------------------------------------------------------
 
@@ -112,11 +144,5 @@ runmysteriet.entity.Player.prototype.playAnimation = function(name) {
     if (this.currentAnimation !== name) {
         this.animation.gotoAndPlay(name);
         this.currentAnimation = name;
-    }
-};
-runmysteriet.entity.Player.prototype.die = function(){
-    if(this.hp <= 0){
-        console.log("Player död");
-        this.stage.removeChild(this);
     }
 };

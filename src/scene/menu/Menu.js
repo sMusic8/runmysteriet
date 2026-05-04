@@ -99,7 +99,7 @@ runmysteriet.scene.Menu.prototype.update = function(step) {
     var upIsPressed = false;
 
     if (gamepad !== null && gamepad !== undefined) {
-            console.log(gamepad);
+            //console.log(gamepad);
         if (typeof gamepad.justPressed === "function") {
 
             startIsPressed =
