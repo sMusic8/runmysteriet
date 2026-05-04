@@ -11,6 +11,7 @@ runmysteriet.scene.Game = function () {
     this.m_shieldHandler = null;
     this.m_cameraHandler = null;
     this.m_backgroundHandler = null;
+    this.m_kristen = null;
 
     this.m_isPaused = false;
     this.m_pauseText = null;
@@ -120,12 +121,18 @@ runmysteriet.scene.Game.prototype.init = function () {
   );
   this.m_shieldHandler.init();
 
-/*this.m_kristen = new runmysteriet.entity.Kristen(
-    this.stage,
-    this.application.spritesheets.get("spritesheet_kristen")
+this.m_kristen = new runmysteriet.entity.Kristen(
+  
+    "spritesheet_kristen"
 );
 
-this.m_kristen.init();*/
+this.m_kristen.x = 100;
+this.m_kristen.y = 100;
+
+this.stage.addChild(this.m_kristen);
+this.m_kristen.init();
+
+this.m_kristen.init();
 
 
 //text för paus ---OBS----låt ligga sist så den inte hamnar bakom bakgrund och molnen

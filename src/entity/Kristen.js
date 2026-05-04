@@ -1,4 +1,4 @@
-runmysteriet.entity.Kristen = function(stage, texture) {
+runmysteriet.entity.Kristen = function(texture) {
 
     rune.display.Sprite.call(
         this,
@@ -9,7 +9,6 @@ runmysteriet.entity.Kristen = function(stage, texture) {
         texture
     );
 
-    this.stage = stage;
 
     this.speed = 2;
     this.hp = 100;
@@ -29,24 +28,21 @@ runmysteriet.entity.Kristen.prototype.init = function() {
 
     rune.display.Sprite.prototype.init.call(this);
 
-    // Lägg till på stage (VIKTIGT annars syns hon inte)
-    this.stage.addChild(this);
-
     this.groundY = this.y;
 
     // Animation
     this.animation.create("start", [0, 1], 3, true);
 
     // ✅ FIX
-    this.animation.play("start");
+    this.animation.gotoAndPlay("start");
 };
 
 //------------------------------------------------------------------------------
 // UPDATE (valfri, men bra att ha)
 //------------------------------------------------------------------------------
 
-runmysteriet.entity.Kristen.prototype.update = function() {
-    rune.display.Sprite.prototype.update.call(this);
+runmysteriet.entity.Kristen.prototype.update = function(step) {
+    rune.display.Sprite.prototype.update.call(this, step);
 };
 
 //------------------------------------------------------------------------------
@@ -54,7 +50,7 @@ runmysteriet.entity.Kristen.prototype.update = function() {
 //------------------------------------------------------------------------------
 
 runmysteriet.entity.Kristen.prototype.fight = function(){
-    console.log("Kristen slåss");
+    console.log("Kristen slass");
 };
 
 //------------------------------------------------------------------------------
@@ -63,7 +59,8 @@ runmysteriet.entity.Kristen.prototype.fight = function(){
 
 runmysteriet.entity.Kristen.prototype.die = function(){
     if(this.hp <= 0){
-        console.log("Kristen död");
-        this.stage.removeChild(this);
+        console.log("Kristen dod");
+        this.visible = false;
+        this.active = false;
     }
 };
