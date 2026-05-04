@@ -159,11 +159,11 @@ runmysteriet.handler.PlayerHandler.prototype.updateCollisions = function() {
         }
 
         // Mark
-        if (player.y >= player.groundY && onPlatform === false) {
-            player.y = player.groundY;
-            player.velocityY = 0;
-            player.isOnGround = true;
-        }
+        // if (player.y >= player.groundY && onPlatform === false) {
+        //     player.y = player.groundY;
+        //     player.velocityY = 0;
+        //     player.isOnGround = true;
+        // }
 
         player.updateAnimation();
     }
