@@ -92,7 +92,7 @@ runmysteriet.scene.Game.prototype.init = function () {
   this.m_platformHandler.init();
 
   this.m_finishX = this.m_platformHandler.levelWidth - 50; 
-  this.m_timerText = new rune.text.BitmapField(" tid kvar: 60");
+  this.m_timerText = new rune.text.BitmapField("TID KVAR 60");
   this.m_timerText.x = 15;
   this.m_timerText.y = 15;
   this.stage.addChild(this.m_timerText);
@@ -246,7 +246,7 @@ runmysteriet.scene.Game.prototype.updateTimer = function(){
 
   if(this.allRunesColected()){
     if(this.m_timerText){
-        this.m_timerText.text = "Alla runor ar insamlade Ta dig till bAten!";
+        this.m_timerText.text = "ALLA RUNOR INSAMLADE TA DIG TILL BATEN";
 
         this.m_timerText.x = cameraX.viewport.x + 15;
         this.m_timerText.y = cameraX.viewport.y + 15;
@@ -258,7 +258,7 @@ if(this.m_timeLeft < 0){
     this.m_timeLeft = 0;
 }
 if (this.m_timerText){
-  this.m_timerText.text = "tid kvar; "  + Math.ceil(this.m_timeLeft);
+  this.m_timerText.text = "TID KVAR "  + Math.ceil(this.m_timeLeft);
   this.m_timerText.x = cameraX.viewport.x + 15;
   this.m_timerText.y = cameraX.viewport.y + 15;
 }
@@ -267,26 +267,28 @@ if (this.m_timerText){
 runmysteriet.scene.Game.prototype.checkLevelCompletion = function() {
     var players = this.m_playerHandler.players;
 
+    if (!players){
+          return;
+
+        }
     for (var i = 0; i < players.length; i++) {
         var player = players[i];
+
+       
 
         if (!player || player.isDead === true) {
             continue;
         }
 
         if (player.y > 360) {
-            player.isDead = true;
-            player.visible = false;
-            player.active = false;
-            player.velocityY = 0;
+            this.killPlayer(player, i);
 
-            console.log("PLAYER DEAD", i);
             continue;
         }
 
         if (player.x >= this.m_finishX) {
             if (this.allRunesColected()) {
-                this.winGame();
+                this.winGame(player);
                 return;
             }
         }
@@ -301,9 +303,29 @@ runmysteriet.scene.Game.prototype.checkLevelCompletion = function() {
         this.loseGame();
     }
 };
+runmysteriet.scene.Game.prototype.killPlayer = function(player, index){
 
+  if (!player || player.isDead === true){
+    return;
+  }
+
+            player.isDead = true;
+            player.visible = false;
+            player.active = false;
+            player.velocityY = 0;
+            player.isOnGround = false;
+
+            console.log("PLAYER DEAD", index);
+
+
+
+}
 runmysteriet.scene.Game.prototype.areAllPlayersDead = function() {
     var players = this.m_playerHandler.players;
+
+    if (!players || players.length === 0){
+      return false;
+    }
 
     for (var i = 0; i < players.length; i++) {
         if (players[i] && players[i].isDead !== true) {
@@ -319,10 +341,12 @@ runmysteriet.scene.Game.prototype.areAllPlayersDead = function() {
  * @returns
  * 
  */
-runmysteriet.scene.Game.prototype.winGame = function () {
+runmysteriet.scene.Game.prototype.winGame = function (winningPlayer) {
   if (this.m_gameEnd === true) {
     return;
   }
+
+  this.reviveDeadPlayers(winningPlayer);
 
   this.m_gameEnd = true;
 
@@ -334,11 +358,12 @@ runmysteriet.scene.Game.prototype.winGame = function () {
       this.backgroundMusic.pause();
     }
   }
+  var camera = this.cameras.getCameraAt(0);
 
   var winText = new rune.text.BitmapField("DU VANN");
   winText.autoSize = true;
-  winText.x = this.cameras.getCameraAt(0).viewport.x + 90;
-  winText.y = this.cameras.getCameraAt(0).viewport.y + 100;
+  winText.x = camera.viewport.x + 90;
+  winText.y = camera.viewport.y + 100;
 
   this.stage.addChild(winText);
 };
@@ -379,4 +404,41 @@ runmysteriet.scene.Game.prototype.allRunesColected = function() {
   }
 
   return this.m_shieldHandler.allRunesColected();
+}
+
+runmysteriet.scene.Game.prototype.reviveDeadPlayers =function(winningPlayer){
+
+  var players = this.m_playerHandler.players;
+
+  if (!players){
+          return;
+
+        }
+    for (var i = 0; i < players.length; i++) {
+        var player = players[i];
+
+       
+
+        if (!player || player.isDead === true) {
+            continue;
+        }
+        if( player.isDead === true ){ 
+            player.isDead = false; 
+            player.visible = true;
+            player.active = true;
+            player.velocityY = 0;
+            player.isOnGround = true; 
+
+            if (winningPlayer){
+              player.x = winningPlayer.x - 40 + i  * 40;
+              player.y = winningPlayer.y;
+            }
+            else{
+              player.x = this.m_finishX -80 + i * 40
+              player.y = player.groundY || 188;
+            }
+            console.log("PLAYER REVIVED", i)
+       };
+      }
+
 }

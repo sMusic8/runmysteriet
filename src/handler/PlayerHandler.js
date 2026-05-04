@@ -109,6 +109,9 @@ runmysteriet.handler.PlayerHandler.prototype.updateInput = function() {
     for (var i = 0; i < this.players.length; i++) {
 
         var player = this.players[i];
+        if (!player || player.isDead === true){
+            continue;
+        }
 
         player.previousY = player.y;
         player.isMoving = false;
@@ -127,6 +130,10 @@ runmysteriet.handler.PlayerHandler.prototype.updateMovement = function() {
 
         var player = this.players[i];
 
+        if (!player || player.isDead === true){
+            continue;
+        }
+
         player.velocityY += player.gravity;
         player.y += player.velocityY;
 
@@ -144,6 +151,9 @@ runmysteriet.handler.PlayerHandler.prototype.updateCollisions = function() {
 
         var player = this.players[i];
 
+        if (!player || player.isDead === true){
+            continue;
+        }
         var onPlatform = false;
 
         // PLATFORMER
