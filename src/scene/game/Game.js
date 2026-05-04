@@ -82,6 +82,12 @@ runmysteriet.scene.Game.prototype.init = function () {
   );
   this.m_shieldHandler.init();
 
+this.m_kristen = new runmysteriet.entity.Kristen(
+    this.stage,
+    this.application.spritesheets.get("spritesheet_kristen")
+);
+
+this.m_kristen.init();
 //text för paus ---OBS----låt ligga sist så den inte hamnar bakom bakgrund och molnen
     this.m_pauseText = new rune.text.BitmapField("SPELET AR PAUSAT");
     this.m_pauseText.autoSize = true;

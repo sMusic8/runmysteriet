@@ -32,6 +32,8 @@ runmysteriet.entity.Player = function(controls, spriteConfig) {
     this.isMoving = false;
     this.currentAnimation = "";
 
+    this.hp = 100;
+
 };
 
 //------------------------------------------------------------------------------
@@ -110,5 +112,11 @@ runmysteriet.entity.Player.prototype.playAnimation = function(name) {
     if (this.currentAnimation !== name) {
         this.animation.gotoAndPlay(name);
         this.currentAnimation = name;
+    }
+};
+runmysteriet.entity.Player.prototype.die = function(){
+    if(this.hp <= 0){
+        console.log("Player död");
+        this.stage.removeChild(this);
     }
 };
