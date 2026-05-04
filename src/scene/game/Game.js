@@ -110,7 +110,8 @@ runmysteriet.scene.Game.prototype.init = function () {
   //kamera
   this.m_cameraHandler = new runmysteriet.handler.CameraHandler(
     this.cameras.getCameraAt(0),
-    this.m_playerHandler
+    this.m_playerHandler,
+    this.m_platformHandler.levelWidth
   );
 
   // Sköldar
@@ -127,7 +128,7 @@ this.m_kristen = new runmysteriet.entity.Kristen(
 );
 
 this.m_kristen.x = 100;
-this.m_kristen.y = 100;
+this.m_kristen.y = 220;
 
 this.stage.addChild(this.m_kristen);
 this.m_kristen.init();
