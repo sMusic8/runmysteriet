@@ -64,7 +64,7 @@ runmysteriet.scene.Game.prototype.init = function () {
     
   //Musik
   this.backgroundMusic = this.application.sounds.sound.get("sound_music");
-  this.backgroundMusic.play(true);
+  //this.backgroundMusic.play(true);
       //console.log("kamera", this.camera.viewport);
 
   // Bakgrund
@@ -126,12 +126,10 @@ this.m_kristen = new runmysteriet.entity.Kristen(
     "spritesheet_kristen"
 );
 
-this.m_kristen.x = 100;
-this.m_kristen.y = 100;
+this.m_kristen.x = 250;
+this.m_kristen.y = 180;
 
 this.stage.addChild(this.m_kristen);
-this.m_kristen.init();
-
 this.m_kristen.init();
 
 
@@ -165,7 +163,10 @@ runmysteriet.scene.Game.prototype.update = function (step) {
   this.m_cloudHandler.update();
   this.m_playerHandler.update();
 
- 
+ // ✅ LÄGG TILL DENNA
+if (this.m_kristen) {
+    this.m_kristen.update(step, this.m_playerHandler.players);
+}
   
   if (this.m_shieldHandler) {
     this.m_shieldHandler.update(this.m_playerHandler.players);

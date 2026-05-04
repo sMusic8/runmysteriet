@@ -16,6 +16,9 @@ runmysteriet.entity.Player = function(controls, spriteConfig) {
         32,
         spriteConfig.texture
     );
+this.maxHp = 100;
+this.hitCooldown = 0;
+
 
     this.controls = controls;
     this.spriteConfig = spriteConfig;
