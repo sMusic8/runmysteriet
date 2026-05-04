@@ -91,7 +91,7 @@ runmysteriet.scene.Game.prototype.init = function () {
   this.m_platformHandler.init();
 
   this.m_finishX = this.m_platformHandler.levelWidth - 50; 
-  this.m_timerText = new rune.text.BitmapField("återstående tid: 60");
+  this.m_timerText = new rune.text.BitmapField(" tid kvar: 60");
   this.m_timerText.x = 15;
   this.m_timerText.y = 15;
   this.stage.addChild(this.m_timerText);
@@ -228,7 +228,7 @@ runmysteriet.scene.Game.prototype.updateTimer = function(){
 
   if(this.allRunesColected()){
     if(this.m_timerText){
-        this.m_timerText.text = "Alla runor är insamlade! Ta dig till båten!";
+        this.m_timerText.text = "Alla runor är insamlade Ta dig till bAten!";
 
         this.m_timerText.x = cameraX.viewport.x + 15;
         this.m_timerText.y = cameraX.viewport.y + 15;
@@ -260,7 +260,7 @@ runmysteriet.scene.Game.prototype.checkLevelCompletion = function(){
       continue;
 
     }
-  if(players.y > 350) { 
+  if(players.y > 360) { 
     this.loseGame();
     return;
   }
@@ -305,7 +305,7 @@ runmysteriet.scene.Game.prototype.winGame = function () {
     }
   }
 
-  var winText = new rune.text.BitmapField("DU VANN!");
+  var winText = new rune.text.BitmapField("DU VANN");
   winText.autoSize = true;
   winText.x = this.cameras.getCameraAt(0).viewport.x + 90;
   winText.y = this.cameras.getCameraAt(0).viewport.y + 100;
@@ -335,7 +335,7 @@ runmysteriet.scene.Game.prototype.loseGame = function () {
     }
   }
 
-  var loseText = new rune.text.BitmapField("DU FORLORADE!");
+  var loseText = new rune.text.BitmapField("DU FORLORADE");
   loseText.autoSize = true;
   loseText.x = this.cameras.getCameraAt(0).viewport.x + 90;
   loseText.y = this.cameras.getCameraAt(0).viewport.y + 100;

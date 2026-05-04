@@ -9,11 +9,11 @@ this.playerHandler = playerHandler;
 
 runmysteriet.handler.CameraHandler.prototype.update = function(){
 
-    if (this.camera === null || this.camera === undefined) {
+    if (!this.camera || !this.camera.viewport) {
         return;
     }
 
-    if (this.playerHandler === null || this.playerHandler === undefined) {
+    if (!this.playerHandler || !this.playerHandler.players) {
         return;
     }
 
@@ -25,10 +25,14 @@ runmysteriet.handler.CameraHandler.prototype.update = function(){
     }
     var player1 = players[0];
     var player2 = players[1];
+    if(!player1){
+        return;
 
-    var centerX = player1.x + player1.width / 2;
+    }
+    var playerWidth = 32;
+    var centerX = player1.x + playerWidth / 2;
 
-    if (player2!== null && player2 !== undefined){
+    if (player2){
         centerX = (player1.x + player1.width / 2 + player2.x + player2.width / 2 ) / 2;
 
     }
