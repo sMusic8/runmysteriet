@@ -14,6 +14,36 @@ runmysteriet.scene.Game = function () {
 
     this.m_isPaused = false;
     this.m_pauseText = null;
+
+    /**
+     * sekunder spelaren har på sig att klara level
+     * @type{number}
+     * 
+     */
+    this.m_timeLeft = 60;
+
+    /**
+     * text 
+     * @type{rune.text.BitmapField}
+     * 
+     */
+    this.m_timerText = null;
+
+    /**
+     * om spelet är slut 
+     * @type{boolean}
+     * 
+     */
+    this.m_gameEnd = false;
+
+    /**
+     * 
+     * x position för finish
+     * @type{number}
+     * 
+     */
+    this.m_finishX = 0;
+
 };
 
 //------------------------------------------------------------------------------
@@ -60,6 +90,13 @@ runmysteriet.scene.Game.prototype.init = function () {
 
   this.m_platformHandler.init();
 
+  this.m_finishX = this.m_platformHandler.levelWidth - 50; 
+  this.m_timerText = new rune.text.BitmapField("återstående tid: 60");
+  this.m_timerText.x = 15;
+  this.m_timerText.y = 15;
+  this.stage.addChild(this.m_timerText);
+
+
   // Spelare
   this.m_playerHandler = new runmysteriet.handler.PlayerHandler(
     this.stage,
@@ -78,7 +115,8 @@ runmysteriet.scene.Game.prototype.init = function () {
   // Sköldar
   this.m_shieldHandler = new runmysteriet.handler.ShieldHandler(
     this.stage,
-    this.application
+    this.application,
+    this.m_platformHandler.levelWidth
   );
   this.m_shieldHandler.init();
 
@@ -98,17 +136,29 @@ runmysteriet.scene.Game.prototype.update = function (step) {
   rune.scene.Scene.prototype.update.call(this, step);
 
   this.updatePauseInput();
+
   if(this.m_isPaused === true){
+    return;
+
+  }
+
+  if(this.m_gameEnd === true){
     return;
 
   }
 
   this.m_cloudHandler.update();
   this.m_playerHandler.update();
+
+ 
   
   if (this.m_shieldHandler) {
     this.m_shieldHandler.update(this.m_playerHandler.players);
   }
+
+  this.updateTimer();
+  this.checkLevelCompletion();
+
 
   //kameran uppdateras 
   if (this.m_cameraHandler) {
@@ -171,4 +221,132 @@ runmysteriet.scene.Game.prototype.updatePauseInput = function(){
   }
 
 
+}
+
+runmysteriet.scene.Game.prototype.updateTimer = function(){
+    var cameraX = this.cameras.getCameraAt(0);
+
+  if(this.allRunesColected()){
+    if(this.m_timerText){
+        this.m_timerText.text = "Alla runor är insamlade! Ta dig till båten!";
+
+        this.m_timerText.x = cameraX.viewport.x + 15;
+        this.m_timerText.y = cameraX.viewport.y + 15;
+    }
+    return;
+  }
+  this.m_timeLeft -= 1/30;
+if(this.m_timeLeft < 0){
+    this.m_timeLeft = 0;
+}
+if (this.m_timerText){
+  this.m_timerText.text = "tid kvar; "  + Math.ceil(this.m_timeLeft);
+  this.m_timerText.x = cameraX.viewport.x + 15;
+  this.m_timerText.y = cameraX.viewport.y + 15;
+}
+
+};
+runmysteriet.scene.Game.prototype.checkLevelCompletion = function(){
+  var players = this.m_playerHandler.players;
+
+  if(!player){ 
+    return;
+    }
+
+  for (var i = 0; i < players.length; i++) {
+    var player = players[i];
+
+    if(!player){ // säkerhetskoll om player inte finns, hoppa över för tillfällrt så det inte buggar
+      continue;
+
+    }
+  if(players.y > 350) { 
+    this.loseGame();
+    return;
+  }
+  if(players.x >= this.m_finishX){
+    if(this.allRunesColected()){
+
+      this.winGame();
+      return;
+    }
+    
+  
+  }
+
+  
+}
+    if (this.m_timeLeft <= 0 && this.allRunesColected() === false) {
+    this.loseGame();
+ }
+
+}
+
+
+
+/**
+ * 
+ * @returns
+ * 
+ */
+runmysteriet.scene.Game.prototype.winGame = function () {
+  if (this.m_gameEnd === true) {
+    return;
+  }
+
+  this.m_gameEnd = true;
+
+  if (this.backgroundMusic) {
+    if (typeof this.backgroundMusic.stop === "function") {
+      this.backgroundMusic.stop();
+    }
+    else if (typeof this.backgroundMusic.pause === "function") {
+      this.backgroundMusic.pause();
+    }
+  }
+
+  var winText = new rune.text.BitmapField("DU VANN!");
+  winText.autoSize = true;
+  winText.x = this.cameras.getCameraAt(0).viewport.x + 90;
+  winText.y = this.cameras.getCameraAt(0).viewport.y + 100;
+
+  this.stage.addChild(winText);
+};
+
+/**
+ * 
+ * @returns 
+ * 
+ */
+
+runmysteriet.scene.Game.prototype.loseGame = function () {
+  if (this.m_gameEnd === true) {
+    return;
+  }
+
+  this.m_gameEnd = true;
+
+  if (this.backgroundMusic) {
+    if (typeof this.backgroundMusic.stop === "function") {
+      this.backgroundMusic.stop();
+    }
+    else if (typeof this.backgroundMusic.pause === "function") {
+      this.backgroundMusic.pause();
+    }
+  }
+
+  var loseText = new rune.text.BitmapField("DU FORLORADE!");
+  loseText.autoSize = true;
+  loseText.x = this.cameras.getCameraAt(0).viewport.x + 90;
+  loseText.y = this.cameras.getCameraAt(0).viewport.y + 100;
+
+  this.stage.addChild(loseText);
+};
+
+runmysteriet.scene.Game.prototype.allRunesColected = function() {
+  if (!this.m_shieldHandler) {
+    return false;
+  }
+
+  return this.m_shieldHandler.allRunesColected();
 }

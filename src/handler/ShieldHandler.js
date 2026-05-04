@@ -8,10 +8,21 @@ runmysteriet.handler = runmysteriet.handler || {};
 //------------------------------------------------------------------------------
 // SHIELD HANDLER
 //------------------------------------------------------------------------------
-
-runmysteriet.handler.ShieldHandler = function (stage, application) {
+/**
+ * @constructor
+ * @param {*} stage 
+ * @param {*} application 
+ */
+runmysteriet.handler.ShieldHandler = function (stage, application, levelWidth) {
   this.m_stage = stage;
   this.application = application;
+
+  /**
+   * banas totala bredden
+   * @type{number}
+   */
+  this.m_levelWidth= levelWidth
+
   this.m_shields = [];
   this.m_collected = [];
   this.m_word = "";
@@ -24,9 +35,7 @@ runmysteriet.handler.ShieldHandler = function (stage, application) {
 //------------------------------------------------------------------------------
 
 runmysteriet.handler.ShieldHandler.prototype.init = function () {
-  var startX = 150;
-  var spacing = 55;
-
+  
   var words = [
     "apa",
     "fagel",
@@ -43,14 +52,23 @@ runmysteriet.handler.ShieldHandler.prototype.init = function () {
   var word = words[Math.floor(Math.random() * words.length)];
   this.m_word = word;
 
+  var startX = 300;
+  var endX= this.m_levelWidth - 300;
+  var spacing = 0;
+
+  if (word.length > 1){
+
+    spacing = (endX -startX) /(word.length - 1);
+  }
+
   console.log("WORD:", word);
 
-  // ⭐ SKAPA EXAKT LÄNGD SOM ORDET
+  //  SKAPA EXAKT LÄNGD SOM ORDET
   for (var i = 0; i < word.length; i++) {
     var shield = new runmysteriet.ui.Shield();
 
-    shield.x = startX + i * spacing;
-    shield.y = 140;
+    shield.x = startX + i * spacing; 
+    shield.y = 170;
 
     shield.__collected = false;
     shield.active = true;
@@ -117,4 +135,8 @@ runmysteriet.handler.ShieldHandler.prototype.collectShield = function (shield) {
 
 runmysteriet.handler.ShieldHandler.prototype.getCollected = function () {
   return this.m_collected;
+};
+
+runmysteriet.handler.ShieldHandler.prototype.allRunesColected = function () {
+  return this.m_word.length > 0 && this.m_collected.length >= this.m_word.length;
 };
