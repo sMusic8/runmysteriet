@@ -283,9 +283,19 @@ runmysteriet.handler.PlayerHandler.prototype.handleInput = function(player, game
 
 runmysteriet.handler.PlayerHandler.prototype.createHpBar = function() {
 
-    var bar = new rune.display.Sprite(0, 0, 32, 4, "hpbar");
+    var bar = new rune.display.Sprite(0, 0, 32, 4, "spritesheet_hpbar");
+
     bar.anchorX = 0;
-    bar.scaleX = 1;
+
+    // Animationer (EN frame per nivå)
+    bar.animation.create("full", [0], 0, false);
+    bar.animation.create("high", [1], 0, false);
+    bar.animation.create("medium", [2], 0, false);
+    bar.animation.create("low", [3], 0, false);
+
+    bar.animation.gotoAndStop("full");
+
+    bar.scaleX = 1; // start full
 
     return bar;
 };
