@@ -195,13 +195,14 @@ runmysteriet.handler.PlayerHandler.prototype.updateCollisions = function() {
 
 runmysteriet.handler.PlayerHandler.prototype.checkPlatform = function(player, platform) {
 
+    if (!player || !platform) return false;
+
     if (!player.hitTestObject(platform)) return false;
 
-    var wasAbove = player.previousY + player.height <= platform.y;
+    // bara landa om du faller nedåt
+    if (player.velocityY >= 0) {
 
-    if (player.velocityY >= 0 && wasAbove) {
-
-        player.y = platform.y - player.height;
+        player.y = platform.y - player.height / 2;
         player.velocityY = 0;
         player.isOnGround = true;
 
@@ -210,7 +211,6 @@ runmysteriet.handler.PlayerHandler.prototype.checkPlatform = function(player, pl
 
     return false;
 };
-
 //------------------------------------------------------------------------------
 // PLAYER ON PLAYER (VIKTIG DEL)
 //------------------------------------------------------------------------------

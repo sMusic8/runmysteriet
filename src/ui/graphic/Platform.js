@@ -2,17 +2,16 @@
 // PLATFORM
 //------------------------------------------------------------------------------
 
-runmysteriet.ui.Platform = function() {
+runmysteriet.ui.Platform = function(x, y, width, height, texture) {
 
     rune.display.Graphic.call(this,
-        0,
-        0,
-        268,
-        32,
-        "bana-gras1"
+        x || 0,
+        y || 0,
+        width || 268,
+        height || 32,
+        texture || "bana-gras1"
     );
 };
-
 // Inheritance
 runmysteriet.ui.Platform.prototype = Object.create(rune.display.Graphic.prototype);
 runmysteriet.ui.Platform.prototype.constructor = runmysteriet.ui.Platform;
