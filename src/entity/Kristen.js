@@ -36,7 +36,7 @@ runmysteriet.entity.Kristen.prototype.init = function() {
 
     this.flippedX = true;
 
-    this.animation.create("start", [0, 1], 3, true);
+    this.animation.create("start", [0, 1,2], 3, true);
     this.animation.gotoAndPlay("start");
 
     this.hpBar = new rune.display.Sprite(

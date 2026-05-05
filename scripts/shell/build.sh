@@ -12,6 +12,11 @@ npx google-closure-compiler \
 --js "./../../src/entity/Kristen.js" \
 --js "./../../src/entity/Player.js" \
 --js "./../../src/ui/graphic/Platform.js" \
+--js "./../../src/ui/graphic/Hole.js" \
+--js "./../../src/ui/graphic/Ground.js" \
+--js "./../../src/segments/Segment_1.js" \
+--js "./../../src/segments/Segment_2.js" \
+--js "./../../src/segments/Segment_3.js" \
 --js "./../../src/ui/graphic/Shield.js" \
 --js "./../../src/handler/MakeLevel.js" \
 --js "./../../src/handler/BackgroundHandler.js" \

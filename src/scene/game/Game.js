@@ -60,9 +60,9 @@ runmysteriet.scene.Game.prototype.constructor = runmysteriet.scene.Game;
 
 runmysteriet.scene.Game.prototype.init = function () {
     rune.scene.Scene.prototype.init.call(this);
-
-    
-  //Musik
+var gris = new runmysteriet.segments.Segment_1();
+gris.ground();
+//Musik
   this.backgroundMusic = this.application.sounds.sound.get("sound_music");
   //this.backgroundMusic.play(true);
       //console.log("kamera", this.camera.viewport);
