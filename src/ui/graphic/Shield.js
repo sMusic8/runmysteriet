@@ -78,7 +78,6 @@ runmysteriet.ui.Shield.prototype.setRune = function(letter) {
 
     this.m_text.text = letter;
 
-    // 🔥 centrera EFTER att texten satts
     this.centerText();
 
     console.log("Shield letter:", letter);
