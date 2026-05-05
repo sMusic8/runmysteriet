@@ -45,7 +45,7 @@ runmysteriet.entity.Kristen.prototype.init = function() {
     this.animation.create("start", [0, 1, 2], 3, true);
     this.animation.gotoAndPlay("start");
 
-    console.log("✅ Kristen init");
+    console.log(" Kristen init");
 
     this.hpBar = new rune.display.Sprite(
         0,
@@ -139,7 +139,7 @@ runmysteriet.entity.Kristen.prototype.die = function() {
 
     this.isDead = true;
 
-    console.log("💀 Kristen död");
+    console.log(" Kristen död");
 
     this.visible = false;
     this.active = false;

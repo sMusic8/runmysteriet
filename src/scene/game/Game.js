@@ -168,7 +168,7 @@ runmysteriet.scene.Game.prototype.update = function (step) {
   this.m_playerHandler.update();
  // this.m_platformHandler.updateHoles(this.m_playerHandler.players);
   var self = this;
-  this.m_platformHandler.updateHoles(this.m_playerHandler.players, function(player, hole){
+  this.m_platformHandler.updateHoles(this.m_playerHandler.players, function(player, index){
     self.killPlayer(player, index);
   });
 
