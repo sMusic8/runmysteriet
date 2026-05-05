@@ -33,7 +33,7 @@ runmysteriet.scene.Paus.prototype.init = function() {
 
     rune.scene.Scene.prototype.init.call(this);
 
-    console.log("Kor fran Paus");
+    console.log("PAUSAT");
 
     // Titel
     var title = new rune.text.BitmapField("SPELET AR PAUSAT");

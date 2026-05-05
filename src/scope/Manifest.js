@@ -87,6 +87,14 @@ var runmysteriet = function() {
      * @since 1.0
      */
     m_this.handler ={};
+
+    /**
+     * This package includes 
+     * @namespace segments
+     * @memberof runmysteriet
+     * @since 1.0
+     */
+    m_this.segments ={};
     
     /**
      * Public scope.
