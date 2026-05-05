@@ -1,8 +1,11 @@
+
+
+
 runmysteriet.ui.graphic.Hole = function(x, y, width, height, fallLimitY) {
     rune.display.DisplayObject.call(this, x, y, width, height);
 
     this.backgroundColor = "#000000";
-    this.fallLimitY = fallLimitY || 360;
+    this.fallLimitY = fallLimitY || 360;//spelaren dör först vid fall under360----- kan ändras/anpassas
 };
 
 runmysteriet.ui.graphic.Hole.prototype = Object.create(rune.display.DisplayObject.prototype);

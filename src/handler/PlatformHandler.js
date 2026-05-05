@@ -21,16 +21,43 @@ runmysteriet.handler.PlatformHandler.prototype.init = function() {
         new runmysteriet.segments.Segment_1()
     ];
 
-    var levelBuilder = new runmysteriet.handler.MakeLevel(this.stage);
-    var level = levelBuilder.build(segments);
+   var x = 0;
 
-    this.platforms = level.platforms;
-    this.holes = level.holes;
-    this.levelWidth = level.levelWidth;
+    for (var i = 0; i < segments.length; i++) {
+        var result = segments[i].ground(this.stage, x);
+
+        this.addPlatforms(result.platforms);
+        this.addHoles(result.holes);
+
+        x = result.endX;
+    }
+
+    this.levelWidth = x;
+};
+
+
+runmysteriet.handler.PlatformHandler.prototype.addPlatforms = function(platforms) {
+    if (!platforms) {
+        return;
+    }
+
+    for (var i = 0; i < platforms.length; i++) {
+        this.platforms.push(platforms[i]);
+    }
+};
+
+runmysteriet.handler.PlatformHandler.prototype.addHoles = function(holes) {
+    if (!holes) {
+        return;
+    }
+
+    for (var i = 0; i < holes.length; i++) {
+        this.holes.push(holes[i]);
+    }
 };
 
 runmysteriet.handler.PlatformHandler.prototype.updateHoles = function(players, onPlayerDead) {
-    if (!players || !onPlayerDead) {
+    if (!players) {
         return;
     }
 
@@ -45,7 +72,10 @@ runmysteriet.handler.PlatformHandler.prototype.updateHoles = function(players, o
             var hole = this.holes[j];
 
             if (hole.hasPlayerFallen(player)) {
-                onPlayerDead(player, i);
+                if (onPlayerDead) {
+                    onPlayerDead(player, i);
+                }
+
                 break;
             }
         }

@@ -18,7 +18,6 @@ npx google-closure-compiler \
 --js "./../../src/segments/Segment_2.js" \
 --js "./../../src/segments/Segment_3.js" \
 --js "./../../src/ui/graphic/Shield.js" \
---js "./../../src/handler/MakeLevel.js" \
 --js "./../../src/handler/BackgroundHandler.js" \
 --js "./../../src/handler/ShieldHandler.js" \
 --js "./../../src/handler/CameraHandler.js" \

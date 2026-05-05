@@ -137,7 +137,7 @@ runmysteriet.entity.Kristen.prototype.die = function() {
 
     this.isDead = true;
 
-    console.log("💀 Kristen död");
+    console.log(" Kristen död");
 
     this.visible = false;
     this.active = false;
