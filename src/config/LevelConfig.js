@@ -1,5 +1,8 @@
+
+
+//
 runmysteriet.config.LevelConfig = function(levelNumber) {
-    this.levelNumber = levelNumber || 1;
+    this.levelNumber = levelNumber || 1; //
 };
 
 runmysteriet.config.LevelConfig.prototype.getKristenCount = function() {

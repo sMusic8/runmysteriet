@@ -1,94 +1,65 @@
-//------------------------------------------------------------------------------
-// NAMESPACE SAFETY
-//------------------------------------------------------------------------------
-var runmysteriet = runmysteriet || {};
-runmysteriet.segments = runmysteriet.segments || {};
-runmysteriet.ui = runmysteriet.ui || {};
-runmysteriet.ui.graphic = runmysteriet.ui.graphic || {};
 
-//------------------------------------------------------------------------------
-// SEGMENT 1
-//------------------------------------------------------------------------------
-runmysteriet.segments.Segment_1 = function(stage) {
 
-    this.stage = stage;
 
-    this.platforms = [];
-    this.levelWidth = 0;
+runmysteriet.segments.Segment_1 = function() {
+    this.tileSize = 268;
+    this.groundY = 220;
+    this.holeHeight = 200;
 };
 
-//------------------------------------------------------------------------------
-// GROUND
-//------------------------------------------------------------------------------
-runmysteriet.segments.Segment_1.prototype.ground = function() {
+runmysteriet.segments.Segment_1.prototype.ground = function(stage, startX) {
+    var x = startX || 0;
 
-    console.log("gris");
+    var platforms = [];
+    var holes = [];
+    var enemySpawns = [];
 
-    this.groundObj = new runmysteriet.ui.graphic.Ground(
-        this.stage,
-        0,
-        350,
-        800,
-        25,
-        "rand"
+    var platform1 = new runmysteriet.ui.Platform();
+    platform1.x = x;
+    platform1.y = this.groundY;
+    stage.addChild(platform1);
+    platforms.push(platform1);
+
+    enemySpawns.push({
+        type: "kristen",
+        x: x + 120,
+        y: this.groundY - 40
+    });
+
+    x += this.tileSize;
+
+    var platform2 = new runmysteriet.ui.Platform();
+    platform2.x = x;
+    platform2.y = this.groundY;
+    stage.addChild(platform2);
+    platforms.push(platform2);
+
+    x += this.tileSize;
+
+    var hole = new runmysteriet.ui.graphic.Hole(
+        x,
+        this.groundY,
+        80,
+        this.holeHeight
     );
-};
 
-//------------------------------------------------------------------------------
-// PLATFORMS
-//------------------------------------------------------------------------------
-runmysteriet.segments.Segment_1.prototype.createPlatforms = function() {
+    stage.addChild(hole);
+    holes.push(hole);
 
-    var startX = 50;
-    var startY = 200; // flyttat upp så de syns säkert
+    x += hole.width;
 
-    var stepX = 35;
-    var stepY = 40;
+    var platform3 = new runmysteriet.ui.Platform();
+    platform3.x = x;
+    platform3.y = this.groundY;
+    stage.addChild(platform3);
+    platforms.push(platform3);
 
-    var width = 35;
-    var height = 20;
+    x += this.tileSize;
 
-    // 🔼 upp
-    for (var i = 0; i < 4; i++) {
-
-        var p = new runmysteriet.ui.Platform(
-            startX + (i * stepX),
-            startY - (i * stepY),
-            width,
-            height,
-            "bana-gras1"
-        );
-
-        this.stage.addChild(p);
-        p.init(); // 🔥 VIKTIG FIX
-        this.platforms.push(p);
-    }
-
-    // 🔽 ner
-    for (var j = 0; j < 4; j++) {
-
-        var p2 = new runmysteriet.ui.Platform(
-            startX + (4 * stepX) + (j * stepX),
-            startY - (4 * stepY) + (j * stepY),
-            width,
-            height,
-            "bana-gras1"
-        );
-
-        this.stage.addChild(p2);
-        p2.init(); // 🔥 VIKTIG FIX
-        this.platforms.push(p2);
-    }
-
-    var last = this.platforms[this.platforms.length - 1];
-    this.levelWidth = last.x + last.width;
-};
-
-//------------------------------------------------------------------------------
-// BUILD
-//------------------------------------------------------------------------------
-runmysteriet.segments.Segment_1.prototype.build = function() {
-
-    this.createPlatforms();
-    this.ground();
+    return {
+        platforms: platforms,
+        holes: holes,
+        enemySpawns: enemySpawns,
+        endX: x
+    };
 };

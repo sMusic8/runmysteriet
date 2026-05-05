@@ -3,12 +3,12 @@
 // KRISTEN
 //------------------------------------------------------------------------------
 
-runmysteriet.entity.Kristen = function(texture) {
+runmysteriet.entity.Kristen = function(texture, x, y) {
 
     rune.display.Sprite.call(
         this,
         x || 0,
-        y ||0,
+        y || 0,
         32,
         40,
         texture
@@ -71,16 +71,7 @@ runmysteriet.entity.Kristen.prototype.update = function(step) {
         this.stage.addChild(this.hpBar);
     }
 
-    // var objects = this.stage ? this.stage.getChildren() : [];
 
-    // for (var i = 0; i < objects.length; i++) {
-
-    //     var player = objects[i];
-
-    //     if (!player || player === this || player.hp === undefined) continue;
-
-    //     this.handleCollision(player);
-    // }
 
     // HP bar follow
     if (this.hpBar) {
@@ -119,7 +110,7 @@ runmysteriet.entity.Kristen.prototype.handleCollision = function(player) {
         return;
     }
 
-    if (this.hitColdown > 0) {
+    if (this.hitCooldown > 0) {
         return;
     }
 
@@ -176,6 +167,7 @@ runmysteriet.entity.Kristen.prototype.die = function() {
 
     if (this.hpBar && this.hpBar.stage) {
         this.hpBar.stage.removeChild(this.hpBar);
+        this.hpBar = null;
     }
 };
 

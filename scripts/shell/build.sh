@@ -9,6 +9,7 @@ npx google-closure-compiler \
 --js "./../../lib/rune.js" \
 --js "./../../src/scope/Manifest.js" \
 --js "./../../src/data/resource/Requests.js" \
+--js "./../../src/config/LevelConfig.js" \
 --js "./../../src/entity/Kristen.js" \
 --js "./../../src/entity/Player.js" \
 --js "./../../src/ui/graphic/Platform.js" \
@@ -23,6 +24,7 @@ npx google-closure-compiler \
 --js "./../../src/handler/CameraHandler.js" \
 --js "./../../src/handler/CloudHandler.js" \
 --js "./../../src/handler/PlatformHandler.js" \
+--js "./../../src/handler/EnemyHandler.js" \
 --js "./../../src/handler/PlayerHandler.js" \
 --js "./../../src/scene/menu/Paus.js" \
 --js "./../../src/scene/menu/More.js" \

@@ -3,7 +3,7 @@
 //------------------------------------------------------------------------------
 
 runmysteriet.scene.Game = function () {
-  rune.scene.Scene.call(this);
+    rune.scene.Scene.call(this);
 
     this.m_playerHandler = null;
     this.m_platformHandler = null;
@@ -11,149 +11,114 @@ runmysteriet.scene.Game = function () {
     this.m_shieldHandler = null;
     this.m_cameraHandler = null;
     this.m_backgroundHandler = null;
+
     this.m_levelConfig = null;
     this.m_levelNumber = 1;
     this.m_enemyHandler = null;
-    
 
     this.m_isPaused = false;
     this.m_pauseText = null;
 
-    /**
-     * sekunder spelaren har på sig att klara level
-     * @type{number}
-     * 
-     */
     this.m_timeLeft = 60;
-
-    /**
-     * text 
-     * @type{rune.text.BitmapField}
-     * 
-     */
     this.m_timerText = null;
 
-    /**
-     * om spelet är slut 
-     * @type{boolean}
-     * 
-     */
     this.m_gameEnd = false;
-
-    /**
-     * 
-     * x position för finish
-     * @type{number}
-     * 
-     */
     this.m_finishX = 0;
 
-  this.m_isPaused = false;
-  this.m_pauseText = null;
-
-  this.m_timeLeft = 60;
-  this.m_timerText = null;
-  this.m_gameEnd = false;
-
-  this.m_finishX = 0;
-
-  // SEGMENT
-  this.segment = null;
+    this.backgroundMusic = null;
 };
+
+//------------------------------------------------------------------------------
+// INHERITANCE
+//------------------------------------------------------------------------------
 
 runmysteriet.scene.Game.prototype = Object.create(rune.scene.Scene.prototype);
 runmysteriet.scene.Game.prototype.constructor = runmysteriet.scene.Game;
 
 //------------------------------------------------------------------------------
-// INIT (FIXAD – endast en version)
+// INIT
 //------------------------------------------------------------------------------
 
 runmysteriet.scene.Game.prototype.init = function () {
     rune.scene.Scene.prototype.init.call(this);
-// var gris = new runmysteriet.segments.Segment_1();
-// gris.ground();
-//Musik
-  this.backgroundMusic = this.application.sounds.sound.get("sound_music");
-  //this.backgroundMusic.play(true);
-      //console.log("kamera", this.camera.viewport);
 
-  // Bakgrund
-  /*this.m_backgroundHandler = new runmysteriet.handler.BackgroundHandler(
-    this.stage,
-    this.cameras.getCameraAt(0),
-    this.application.screen.width,
-    this.application.screen.height
-  );
-  this.m_backgroundHandler.init();*/
+    // Musik
+    this.backgroundMusic = this.application.sounds.sound.get("sound_music");
 
-  // Moln
-  this.m_cloudHandler = new runmysteriet.handler.CloudHandler(
-    this.stage,
-    this.application.screen.width
-  );
-  this.m_cloudHandler.init();
-  this.m_levelNumber = 1;
-  // Plattformar
-  this.m_platformHandler = new runmysteriet.handler.PlatformHandler(
-    this.stage,
-    this.application.screen.width
-  );
+    // Moln
+    this.m_cloudHandler = new runmysteriet.handler.CloudHandler(
+        this.stage,
+        this.application.screen.width
+    );
 
-  this.m_platformHandler.init();
+    this.m_cloudHandler.init();
 
-  this.m_levelConfig = new runmysteriet.config.LevelConfig(this.m_levelNumber);
+    // Level
+    this.m_levelNumber = 1;
 
-  this.m_enemyHandler = new runmysteriet.handler.EnemyHandler(this.stage);
+    // Plattformar / segment / holes / enemy spawnpoints
+    this.m_platformHandler = new runmysteriet.handler.PlatformHandler(
+        this.stage,
+        this.application.screen.width
+    );
 
-  this.m_enemyHandler.init(
-    this.m_levelConfig,
-    this.m_platformHandler.getEnemySpawns()
-);
+    this.m_platformHandler.init();
 
-  this.m_finishX = this.m_platformHandler.levelWidth - 50; 
-  this.m_timerText = new rune.text.BitmapField("TID KVAR 60");
-  this.m_timerText.x = 15;
-  this.m_timerText.y = 15;
-  this.stage.addChild(this.m_timerText);
+    this.m_finishX = this.m_platformHandler.levelWidth - 50;
 
+    // Spelare
+    this.m_playerHandler = new runmysteriet.handler.PlayerHandler(
+        this.stage,
+        this.m_platformHandler.platforms,
+        this.application
+    );
 
-  // Spelare
-  this.m_playerHandler = new runmysteriet.handler.PlayerHandler(
-    this.stage,
-    this.segment.platforms,
-    this.application
-  );
-  this.m_playerHandler.init();
+    this.m_playerHandler.init();
 
-  // Kamera
-  this.m_cameraHandler = new runmysteriet.handler.CameraHandler(
-    this.cameras.getCameraAt(0),
-    this.m_playerHandler,
-    this.segment.levelWidth
-  );
+    // Fiender
+    this.m_levelConfig = new runmysteriet.config.LevelConfig(this.m_levelNumber);
 
-  // Sköldar
-  this.m_shieldHandler = new runmysteriet.handler.ShieldHandler(
-    this.stage,
-    this.application,
-    this.segment.levelWidth
-  );
-  this.m_shieldHandler.init();
+    this.m_enemyHandler = new runmysteriet.handler.EnemyHandler(this.stage);
 
+    this.m_enemyHandler.init(
+        this.m_levelConfig,
+        this.m_platformHandler.getEnemySpawns()
+    );
 
-  // Pause text
-  this.m_pauseText = new rune.text.BitmapField("SPELET AR PAUSAT");
-  this.m_pauseText.autoSize = true;
-  this.m_pauseText.x = 90;
-  this.m_pauseText.y = 100;
-  this.m_pauseText.visible = false;
-  this.stage.addChild(this.m_pauseText);
+    // Kamera
+    this.m_cameraHandler = new runmysteriet.handler.CameraHandler(
+        this.cameras.getCameraAt(0),
+        this.m_playerHandler,
+        this.m_platformHandler.levelWidth
+    );
+
+    // Sköldar / runor
+    this.m_shieldHandler = new runmysteriet.handler.ShieldHandler(
+        this.stage,
+        this.application,
+        this.m_platformHandler.levelWidth
+    );
+
+    this.m_shieldHandler.init();
+
+    // Timer
+    this.m_timerText = new rune.text.BitmapField("TID KVAR 60");
+    this.m_timerText.x = 15;
+    this.m_timerText.y = 15;
+    this.stage.addChild(this.m_timerText);
+
+    // Paus-text
+    this.m_pauseText = new rune.text.BitmapField("SPELET AR PAUSAT");
+    this.m_pauseText.autoSize = true;
+    this.m_pauseText.x = 90;
+    this.m_pauseText.y = 100;
+    this.m_pauseText.visible = false;
+    this.stage.addChild(this.m_pauseText);
 };
 
 //------------------------------------------------------------------------------
-// UPDATE (oförändrad)
+// UPDATE
 //------------------------------------------------------------------------------
-
 
 runmysteriet.scene.Game.prototype.update = function (step) {
     rune.scene.Scene.prototype.update.call(this, step);
@@ -168,24 +133,30 @@ runmysteriet.scene.Game.prototype.update = function (step) {
         return;
     }
 
-    this.m_cloudHandler.update();
+    if (this.m_cloudHandler) {
+        this.m_cloudHandler.update();
+    }
 
-    this.m_playerHandler.update();
+    if (this.m_playerHandler) {
+        this.m_playerHandler.update();
+    }
 
     var self = this;
 
-    this.m_platformHandler.updateHoles(
-        this.m_playerHandler.players,
-        function(player, index) {
-            self.killPlayer(player, index);
-        }
-    );
+    if (this.m_platformHandler && this.m_playerHandler) {
+        this.m_platformHandler.updateHoles(
+            this.m_playerHandler.players,
+            function(player, index) {
+                self.killPlayer(player, index);
+            }
+        );
+    }
 
-    if (this.m_enemyHandler) {
+    if (this.m_enemyHandler && this.m_playerHandler) {
         this.m_enemyHandler.update(this.m_playerHandler.players);
     }
 
-    if (this.m_shieldHandler) {
+    if (this.m_shieldHandler && this.m_playerHandler) {
         this.m_shieldHandler.update(this.m_playerHandler.players);
     }
 
@@ -206,16 +177,31 @@ runmysteriet.scene.Game.prototype.update = function (step) {
 //------------------------------------------------------------------------------
 
 runmysteriet.scene.Game.prototype.updatePauseInput = function () {
-  if (this.keyboard.justPressed("P")) {
-    this.m_isPaused = !this.m_isPaused;
+    var camera = null;
 
-    if (this.m_pauseText) {
-      let cam = this.cameras.getCameraAt(0);
-      this.m_pauseText.visible = this.m_isPaused;
-      this.m_pauseText.x = cam.viewport.x + 90;
-      this.m_pauseText.y = cam.viewport.y + 100;
+    if (this.keyboard.justPressed("P")) {
+        this.m_isPaused = !this.m_isPaused;
+
+        if (this.m_pauseText) {
+            camera = this.cameras.getCameraAt(0);
+
+            this.m_pauseText.visible = this.m_isPaused;
+            this.m_pauseText.x = camera.viewport.x + 90;
+            this.m_pauseText.y = camera.viewport.y + 100;
+        }
+
+        if (this.backgroundMusic) {
+            if (this.m_isPaused === true) {
+                if (typeof this.backgroundMusic.pause === "function") {
+                    this.backgroundMusic.pause();
+                }
+            } else {
+                if (typeof this.backgroundMusic.play === "function") {
+                    this.backgroundMusic.play(true);
+                }
+            }
+        }
     }
-  }
 };
 
 //------------------------------------------------------------------------------
@@ -223,111 +209,241 @@ runmysteriet.scene.Game.prototype.updatePauseInput = function () {
 //------------------------------------------------------------------------------
 
 runmysteriet.scene.Game.prototype.updateTimer = function () {
-  let cam = this.cameras.getCameraAt(0);
+    var camera = this.cameras.getCameraAt(0);
 
-  this.m_timeLeft -= 1 / 30;
-  if (this.m_timeLeft < 0) this.m_timeLeft = 0;
+    if (this.allRunesColected()) {
+        if (this.m_timerText) {
+            this.m_timerText.text = "ALLA RUNOR INSAMLADE TA DIG TILL BATEN";
+            this.m_timerText.x = camera.viewport.x + 15;
+            this.m_timerText.y = camera.viewport.y + 15;
+        }
 
-  if (this.m_timerText) {
-    this.m_timerText.text = "TID KVAR " + Math.ceil(this.m_timeLeft);
-    this.m_timerText.x = cam.viewport.x + 15;
-    this.m_timerText.y = cam.viewport.y + 15;
-  }
+        return;
+    }
+
+    this.m_timeLeft -= 1 / 30;
+
+    if (this.m_timeLeft < 0) {
+        this.m_timeLeft = 0;
+    }
+
+    if (this.m_timerText) {
+        this.m_timerText.text = "TID KVAR " + Math.ceil(this.m_timeLeft);
+        this.m_timerText.x = camera.viewport.x + 15;
+        this.m_timerText.y = camera.viewport.y + 15;
+    }
+};
+
+//------------------------------------------------------------------------------
+// LEVEL COMPLETION
+//------------------------------------------------------------------------------
+
+runmysteriet.scene.Game.prototype.checkLevelCompletion = function () {
+    var players = null;
+    var player = null;
+    var i = 0;
+
+    if (!this.m_playerHandler) {
+        return;
+    }
+
+    players = this.m_playerHandler.players;
+
+    if (!players) {
+        return;
+    }
+
+    for (i = 0; i < players.length; i++) {
+        player = players[i];
+
+        if (!player || player.isDead === true) {
+            continue;
+        }
+
+        if (player.x >= this.m_finishX) {
+            if (this.allRunesColected()) {
+                this.winGame(player);
+                return;
+            }
+        }
+    }
+
+    if (this.areAllPlayersDead()) {
+        this.loseGame();
+        return;
+    }
+
+    if (this.m_timeLeft <= 0 && this.allRunesColected() === false) {
+        this.loseGame();
+    }
+};
+
+//------------------------------------------------------------------------------
+// PLAYER DEATH
+//------------------------------------------------------------------------------
+
+runmysteriet.scene.Game.prototype.killPlayer = function(player, index) {
+    if (!player || player.isDead === true) {
+        return;
+    }
+
+    player.isDead = true;
+    player.visible = false;
+    player.active = false;
+    player.velocityY = 0;
+    player.isOnGround = false;
+
+    console.log("PLAYER DEAD", index);
+};
+
+runmysteriet.scene.Game.prototype.areAllPlayersDead = function() {
+    var players = null;
+    var i = 0;
+
+    if (!this.m_playerHandler) {
+        return false;
+    }
+
+    players = this.m_playerHandler.players;
+
+    if (!players || players.length === 0) {
+        return false;
+    }
+
+    for (i = 0; i < players.length; i++) {
+        if (players[i] && players[i].isDead !== true) {
+            return false;
+        }
+    }
+
+    return true;
 };
 
 //------------------------------------------------------------------------------
 // WIN / LOSE
 //------------------------------------------------------------------------------
 
-runmysteriet.scene.Game.prototype.checkLevelCompletion = function () {
-  let players = this.m_playerHandler.players;
+runmysteriet.scene.Game.prototype.winGame = function (winningPlayer) {
+    var camera = null;
+    var winText = null;
 
-  if (!players) return;
-
-  for (let i = 0; i < players.length; i++) {
-    let player = players[i];
-
-    if (!player || player.isDead) continue;
-
-    if (player.x >= this.m_finishX) {
-      this.winGame();
-      return;
+    if (this.m_gameEnd === true) {
+        return;
     }
-  }
 
-  if (this.m_timeLeft <= 0) {
-    this.loseGame();
-  }
-};
+    this.reviveDeadPlayers(winningPlayer);
 
-runmysteriet.scene.Game.prototype.winGame = function () {
-  if (this.m_gameEnd) return;
+    this.m_gameEnd = true;
 
-  this.m_gameEnd = true;
+    if (this.backgroundMusic) {
+        if (typeof this.backgroundMusic.stop === "function") {
+            this.backgroundMusic.stop();
+        } else if (typeof this.backgroundMusic.pause === "function") {
+            this.backgroundMusic.pause();
+        }
+    }
 
-  let cam = this.cameras.getCameraAt(0);
+    camera = this.cameras.getCameraAt(0);
 
-  let text = new rune.text.BitmapField("DU VANN");
-  text.autoSize = true;
-  text.x = cam.viewport.x + 90;
-  text.y = cam.viewport.y + 100;
+    winText = new rune.text.BitmapField("DU VANN");
+    winText.autoSize = true;
+    winText.x = camera.viewport.x + 90;
+    winText.y = camera.viewport.y + 100;
 
-  this.stage.addChild(text);
+    this.stage.addChild(winText);
 };
 
 runmysteriet.scene.Game.prototype.loseGame = function () {
-  if (this.m_gameEnd) return;
+    var camera = null;
+    var loseText = null;
 
-  this.m_gameEnd = true;
+    if (this.m_gameEnd === true) {
+        return;
+    }
 
-  let cam = this.cameras.getCameraAt(0);
+    this.m_gameEnd = true;
 
-  let text = new rune.text.BitmapField("DU FORLORADE");
-  text.autoSize = true;
-  text.x = cam.viewport.x + 90;
-  text.y = cam.viewport.y + 100;
-
-  return this.m_shieldHandler.allRunesColected();
-}
-
-runmysteriet.scene.Game.prototype.reviveDeadPlayers =function(winningPlayer){
-
-  var players = this.m_playerHandler.players;
-
-  if (!players){
-          return;
-
+    if (this.backgroundMusic) {
+        if (typeof this.backgroundMusic.stop === "function") {
+            this.backgroundMusic.stop();
+        } else if (typeof this.backgroundMusic.pause === "function") {
+            this.backgroundMusic.pause();
         }
-    for (var i = 0; i < players.length; i++) {
-        var player = players[i];
+    }
 
-       
+    camera = this.cameras.getCameraAt(0);
+
+    loseText = new rune.text.BitmapField("DU FORLORADE");
+    loseText.autoSize = true;
+    loseText.x = camera.viewport.x + 90;
+    loseText.y = camera.viewport.y + 100;
+
+    this.stage.addChild(loseText);
+};
+
+//------------------------------------------------------------------------------
+// RUNES
+//------------------------------------------------------------------------------
+
+runmysteriet.scene.Game.prototype.allRunesColected = function() {
+    if (!this.m_shieldHandler) {
+        return false;
+    }
+
+    return this.m_shieldHandler.allRunesColected();
+};
+
+//------------------------------------------------------------------------------
+// REVIVE
+//------------------------------------------------------------------------------
+
+runmysteriet.scene.Game.prototype.reviveDeadPlayers = function(winningPlayer) {
+    var players = null;
+    var player = null;
+    var i = 0;
+
+    if (!this.m_playerHandler) {
+        return;
+    }
+
+    players = this.m_playerHandler.players;
+
+    if (!players) {
+        return;
+    }
+
+    for (i = 0; i < players.length; i++) {
+        player = players[i];
 
         if (!player) {
             continue;
         }
-        if( player.isDead === true ){ 
-            player.isDead = false; 
+
+        if (player.isDead === true) {
+            player.isDead = false;
             player.visible = true;
             player.active = true;
             player.velocityY = 0;
-            player.isOnGround = true; 
+            player.isOnGround = true;
 
-            if (winningPlayer){
-              player.x = winningPlayer.x - 40 + i  * 40;
-              player.y = winningPlayer.y;
+            if (winningPlayer) {
+                player.x = winningPlayer.x - 40 + i * 40;
+                player.y = winningPlayer.y;
+            } else {
+                player.x = this.m_finishX - 80 + i * 40;
+                player.y = player.groundY || 188;
             }
-            else{
-              player.x = this.m_finishX - 80 + i * 40
-              player.y = player.groundY || 188;
-            }
-            console.log("PLAYER REVIVED", i)
-       };
-      }
 
-}
+            console.log("PLAYER REVIVED", i);
+        }
+    }
+};
+
+//------------------------------------------------------------------------------
+// RESTART LEVEL
+//------------------------------------------------------------------------------
+
 runmysteriet.scene.Game.prototype.restartLevel = function() {
-
     if (this.m_enemyHandler) {
         this.m_enemyHandler.clear();
     }
@@ -340,4 +456,16 @@ runmysteriet.scene.Game.prototype.restartLevel = function() {
         this.m_levelConfig,
         this.m_platformHandler.getEnemySpawns()
     );
+};
+
+//------------------------------------------------------------------------------
+// DISPOSE
+//------------------------------------------------------------------------------
+
+runmysteriet.scene.Game.prototype.dispose = function () {
+    if (this.m_enemyHandler) {
+        this.m_enemyHandler.clear();
+    }
+
+    rune.scene.Scene.prototype.dispose.call(this);
 };

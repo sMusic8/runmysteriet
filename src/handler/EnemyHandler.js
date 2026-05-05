@@ -30,7 +30,7 @@ runmysteriet.handler.EnemyHandler.prototype.init = function(levelConfig, enemySp
 runmysteriet.handler.EnemyHandler.prototype.createKristen = function(spawn) {
 
     var kristen = new runmysteriet.entity.Kristen(
-        "kristen",
+        "spritesheet_kristen",
         spawn.x,
         spawn.y
     );
