@@ -61,7 +61,6 @@ runmysteriet.scene.Game.prototype.constructor = runmysteriet.scene.Game;
 runmysteriet.scene.Game.prototype.init = function () {
     rune.scene.Scene.prototype.init.call(this);
 
-    
   //Musik
   this.backgroundMusic = this.application.sounds.sound.get("sound_music");
   //this.backgroundMusic.play(true);
