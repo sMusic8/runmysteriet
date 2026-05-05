@@ -122,17 +122,20 @@ gris.ground();
   );
   this.m_shieldHandler.init();
 
-this.m_kristen = new runmysteriet.entity.Kristen(
-  
-    "spritesheet_kristen"
-);
+this.m_kristenArray = [];
 
-this.m_kristen.x = 250;
-this.m_kristen.y = 180;
+for (let i = 0; i < 10; i++) {
 
-this.stage.addChild(this.m_kristen);
-this.m_kristen.init();
+    let kristen = new runmysteriet.entity.Kristen("spritesheet_kristen");
 
+    kristen.x = 250 + i * 60; // ← avstånd i X-led
+    kristen.y = 180;
+
+    this.stage.addChild(kristen);
+    kristen.init();
+
+    this.m_kristenArray.push(kristen);
+}
 
 //text för paus ---OBS----låt ligga sist så den inte hamnar bakom bakgrund och molnen
     this.m_pauseText = new rune.text.BitmapField("SPELET AR PAUSAT");

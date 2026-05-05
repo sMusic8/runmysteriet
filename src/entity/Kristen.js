@@ -1,3 +1,4 @@
+
 //------------------------------------------------------------------------------
 // KRISTEN
 //------------------------------------------------------------------------------
@@ -19,12 +20,19 @@ runmysteriet.entity.Kristen = function(texture) {
     this.hitCooldown = 0;
 
     this.hpBar = null;
-
     this.isDead = false;
+
+    // 🔥 VIKTIGT: gör Kristen STABIL (kan inte flyttas av physics)
+    this.allowCollisions = rune.physics.Space.ANY;
+    this.immovable = true;
 };
 
-runmysteriet.entity.Kristen.prototype = Object.create(rune.display.Sprite.prototype);
-runmysteriet.entity.Kristen.prototype.constructor = runmysteriet.entity.Kristen;
+// inheritance
+runmysteriet.entity.Kristen.prototype =
+    Object.create(rune.display.Sprite.prototype);
+
+runmysteriet.entity.Kristen.prototype.constructor =
+    runmysteriet.entity.Kristen;
 
 //------------------------------------------------------------------------------
 // INIT
@@ -34,10 +42,10 @@ runmysteriet.entity.Kristen.prototype.init = function() {
 
     rune.display.Sprite.prototype.init.call(this);
 
-    this.flippedX = true;
-
-    this.animation.create("start", [0, 1,2], 3, true);
+    this.animation.create("start", [0, 1, 2], 3, true);
     this.animation.gotoAndPlay("start");
+
+    console.log("✅ Kristen init");
 
     this.hpBar = new rune.display.Sprite(
         0,
@@ -47,7 +55,6 @@ runmysteriet.entity.Kristen.prototype.init = function() {
         "hpbar"
     );
 
-    this.hpBar.scaleX = 1;
     this.hpBar.anchorX = 0;
 };
 
@@ -55,74 +62,69 @@ runmysteriet.entity.Kristen.prototype.init = function() {
 // UPDATE
 //------------------------------------------------------------------------------
 
-runmysteriet.entity.Kristen.prototype.update = function(step, players) {
+runmysteriet.entity.Kristen.prototype.update = function(step) {
 
     if (this.isDead) return;
 
     rune.display.Sprite.prototype.update.call(this, step);
 
-    // HP bar läggs bara till en gång
-    if (this.hpBar && this.stage && !this.hpBar.stage) {
-        this.stage.addChild(this.hpBar);
-    }
-
-    // cooldown
     if (this.hitCooldown > 0) {
         this.hitCooldown--;
     }
 
-    // collision
-    if (players) {
-        this.checkCollision(players);
+    // HP bar
+    if (this.hpBar && this.stage && !this.hpBar.stage) {
+        this.stage.addChild(this.hpBar);
     }
 
-    // HP bar position
+    var objects = this.stage ? this.stage.getChildren() : [];
+
+    for (var i = 0; i < objects.length; i++) {
+
+        var player = objects[i];
+
+        if (!player || player === this || player.hp === undefined) continue;
+
+        this.handleCollision(player);
+    }
+
+    // HP bar follow
     if (this.hpBar) {
 
         this.hpBar.x = this.x;
         this.hpBar.y = this.y - 10;
 
-        var hpPercent = this.hp / this.maxHp;
-        if (hpPercent < 0) hpPercent = 0;
+        var p = this.hp / this.maxHp;
+        if (p < 0) p = 0;
 
-        this.hpBar.scaleX = hpPercent;
+        this.hpBar.scaleX = p;
     }
 };
 
 //------------------------------------------------------------------------------
-// COLLISION
+// COLLISION (NO PUSH BUG VERSION)
 //------------------------------------------------------------------------------
 
-runmysteriet.entity.Kristen.prototype.checkCollision = function(players) {
+runmysteriet.entity.Kristen.prototype.handleCollision = function(player) {
 
-    for (var i = 0; i < players.length; i++) {
+    // 🔥 Viktigt: bara spelaren separeras (inte Kristen)
+    var hit = player.hitTestAndSeparate(this);
 
-        var player = players[i];
-        if (!player) continue;
+    if (!hit) return;
 
-        if (this.hitTestObject(player) && this.hitCooldown === 0) {
+    // -------------------------
+    // DAMAGE
+    // -------------------------
+    if (this.hitCooldown === 0) {
 
-            this.hitCooldown = 10;
+        this.hitCooldown = 10;
 
-            // 🔥 KRISTEN TAR SKADA
-            this.hp -= 1;
+        this.hp -= 1;
+        player.hp -= 1;
 
-            // 🔥 SPELARE TAR SKADA (NU FIXEN)
-            player.hp -= 1;
-
-            // clamp
-            if (this.hp < 0) this.hp = 0;
-            if (player.hp < 0) player.hp = 0;
-
-            // 🔥 DEBUG (DETTA KOMMER NU FUNKA)
-            console.log("Kristen HP:", this.hp);
-            console.log("Player HP:", player.hp);
-
-            // 🔥 OM KRISTEN DÖR
-            if (this.hp === 0) {
-                this.die();
-                return;
-            }
+        if (this.hp <= 0) {
+            this.die();
+            return;
         }
     }
 };
@@ -137,7 +139,7 @@ runmysteriet.entity.Kristen.prototype.die = function() {
 
     this.isDead = true;
 
-    console.log("Kristen död");
+    console.log("💀 Kristen död");
 
     this.visible = false;
     this.active = false;
