@@ -7,8 +7,8 @@ runmysteriet.entity.Kristen = function(texture) {
 
     rune.display.Sprite.call(
         this,
-        2025,
-        0,
+        x || 0,
+        y ||0,
         32,
         40,
         texture
@@ -18,7 +18,6 @@ runmysteriet.entity.Kristen = function(texture) {
     this.maxHp = 100;
 
     this.hitCooldown = 0;
-
     this.hpBar = null;
     this.isDead = false;
 
@@ -28,11 +27,8 @@ runmysteriet.entity.Kristen = function(texture) {
 };
 
 // inheritance
-runmysteriet.entity.Kristen.prototype =
-    Object.create(rune.display.Sprite.prototype);
-
-runmysteriet.entity.Kristen.prototype.constructor =
-    runmysteriet.entity.Kristen;
+runmysteriet.entity.Kristen.prototype = Object.create(rune.display.Sprite.prototype);
+runmysteriet.entity.Kristen.prototype.constructor = runmysteriet.entity.Kristen;
 
 //------------------------------------------------------------------------------
 // INIT
@@ -77,16 +73,16 @@ runmysteriet.entity.Kristen.prototype.update = function(step) {
         this.stage.addChild(this.hpBar);
     }
 
-    var objects = this.stage ? this.stage.getChildren() : [];
+    // var objects = this.stage ? this.stage.getChildren() : [];
 
-    for (var i = 0; i < objects.length; i++) {
+    // for (var i = 0; i < objects.length; i++) {
 
-        var player = objects[i];
+    //     var player = objects[i];
 
-        if (!player || player === this || player.hp === undefined) continue;
+    //     if (!player || player === this || player.hp === undefined) continue;
 
-        this.handleCollision(player);
-    }
+    //     this.handleCollision(player);
+    // }
 
     // HP bar follow
     if (this.hpBar) {
@@ -107,8 +103,44 @@ runmysteriet.entity.Kristen.prototype.update = function(step) {
 
 runmysteriet.entity.Kristen.prototype.handleCollision = function(player) {
 
-    // 🔥 Viktigt: bara spelaren separeras (inte Kristen)
+    if (!player) {
+        return;
+    }
+
+    if (player.isDead === true) {
+        return;
+    }
+
+    if (typeof player.hitTestAndSeparate !== "function") {
+        return;
+    }
+
     var hit = player.hitTestAndSeparate(this);
+
+    if (!hit) {
+        return;
+    }
+
+    if (this.hitColdown > 0) {
+        return;
+    }
+
+    this.hitCooldown = 10;
+
+    this.hp -= 1;
+
+    if (player.hp !== undefined) {
+        player.hp -= 1;
+    }
+
+    if (this.hp <= 0) {
+        this.die();
+    }
+};
+
+    
+    // 🔥 Viktigt: bara spelaren separeras (inte Kristen)
+  /*   var hit = player.hitTestAndSeparate(this);
 
     if (!hit) return;
 
@@ -126,8 +158,8 @@ runmysteriet.entity.Kristen.prototype.handleCollision = function(player) {
             this.die();
             return;
         }
-    }
-};
+    } 
+};*/
 
 //------------------------------------------------------------------------------
 // DIE
@@ -146,5 +178,17 @@ runmysteriet.entity.Kristen.prototype.die = function() {
 
     if (this.hpBar && this.hpBar.stage) {
         this.hpBar.stage.removeChild(this.hpBar);
+    }
+};
+
+
+runmysteriet.entity.Kristen.prototype.checkPlayerCollisions = function(players) {
+
+    if (!players) {
+        return;
+    }
+
+    for (var i = 0; i < players.length; i++) {
+        this.handleCollision(players[i]);
     }
 };

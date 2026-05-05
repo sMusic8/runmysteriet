@@ -79,7 +79,7 @@ var runmysteriet = function() {
     /**
      * Public scope.
      */
-    m_this.Shield ={};
+    m_this.Shield = {};
 
     /**
      * This package includes 
@@ -87,7 +87,7 @@ var runmysteriet = function() {
      * @memberof runmysteriet
      * @since 1.0
      */
-    m_this.handler ={};
+    m_this.handler = {};
 
     /**
      * This package includes 
@@ -95,8 +95,16 @@ var runmysteriet = function() {
      * @memberof runmysteriet
      * @since 1.0
      */
-    m_this.segments ={};
+    m_this.segments = {};
     
+
+     /**
+     * This package includes 
+     * @namespace config
+     * @memberof runmysteriet
+     * @since 1.0
+     */
+    m_this.config = {};
     /**
      * Public scope.
      */

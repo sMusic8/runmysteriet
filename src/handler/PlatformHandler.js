@@ -9,6 +9,7 @@ runmysteriet.handler.PlatformHandler = function(stage, screenWidth) {
 
     this.platforms = [];
     this.holes = [];
+    this.enemySpawns = [];
 
     this.levelWidth = 0;
 };
@@ -18,7 +19,9 @@ runmysteriet.handler.PlatformHandler.prototype.init = function() {
         new runmysteriet.segments.Segment_1(),
         new runmysteriet.segments.Segment_2(),
         new runmysteriet.segments.Segment_3(),
-        new runmysteriet.segments.Segment_1()
+        new runmysteriet.segments.Segment_1(),
+        new runmysteriet.segments.Segment_2(),
+
     ];
 
    var x = 0;
@@ -28,6 +31,7 @@ runmysteriet.handler.PlatformHandler.prototype.init = function() {
 
         this.addPlatforms(result.platforms);
         this.addHoles(result.holes);
+        this.addEnemySpawns(result.enemySpawns);
 
         x = result.endX;
     }
@@ -80,4 +84,19 @@ runmysteriet.handler.PlatformHandler.prototype.updateHoles = function(players, o
             }
         }
     }
+};
+
+runmysteriet.handler.PlatformHandler.prototype.addEnemySpawns = function(enemySpawns) {
+
+    if (!enemySpawns) {
+        return;
+    }
+
+    for (var i = 0; i < enemySpawns.length; i++) {
+        this.enemySpawns.push(enemySpawns[i]);
+    }
+};
+
+runmysteriet.handler.PlatformHandler.prototype.getEnemySpawns = function() {
+    return this.enemySpawns;
 };
