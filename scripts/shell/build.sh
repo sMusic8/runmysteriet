@@ -13,9 +13,9 @@ npx google-closure-compiler \
 --js "./../../src/entity/Player.js" \
 --js "./../../src/ui/graphic/Platform.js" \
 --js "./../../src/ui/graphic/Shield.js" \
+--js "./../../src/handler/MakeLevel.js" \
 --js "./../../src/handler/BackgroundHandler.js" \
 --js "./../../src/handler/ShieldHandler.js" \
---js "./../../src/handler/MakeLevel.js" \
 --js "./../../src/handler/CameraHandler.js" \
 --js "./../../src/handler/CloudHandler.js" \
 --js "./../../src/handler/PlatformHandler.js" \
@@ -23,9 +23,9 @@ npx google-closure-compiler \
 --js "./../../src/scene/menu/Paus.js" \
 --js "./../../src/scene/menu/More.js" \
 --js "./../../src/scene/menu/Credits.js" \
---js "./../../src/scene/segments/Segment_1.js" \
---js "./../../src/scene/segments/Segment_2.js" \
---js "./../../src/scene/segments/Segment_3.js" \
+--js "./../../src/segments/Segment_1.js" \
+--js "./../../src/segments/Segment_2.js" \
+--js "./../../src/segments/Segment_3.js" \
 --js "./../../src/scene/game/Game.js" \
 --js "./../../src/scene/menu/Menu.js" \
 --js "./../../src/system/Main.js" \

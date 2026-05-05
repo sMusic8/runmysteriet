@@ -163,6 +163,12 @@ runmysteriet.scene.Game.prototype.update = function (step) {
 
   this.m_cloudHandler.update();
   this.m_playerHandler.update();
+ // this.m_platformHandler.updateHoles(this.m_playerHandler.players);
+  var self = this;
+  this.m_platformHandler.updateHoles(this.m_playerHandler.players, function(player, hole){
+    self.killPlayer(player, index);
+  });
+
 
  //  LÄGG TILL DENNA
 if (this.m_kristen) {
@@ -280,11 +286,7 @@ runmysteriet.scene.Game.prototype.checkLevelCompletion = function() {
             continue;
         }
 
-        if (player.y > 360) {
-            this.killPlayer(player, i);
-
-            continue;
-        }
+      
 
         if (player.x >= this.m_finishX) {
             if (this.allRunesColected()) {
@@ -419,7 +421,7 @@ runmysteriet.scene.Game.prototype.reviveDeadPlayers =function(winningPlayer){
 
        
 
-        if (!player || player.isDead === true) {
+        if (!player) {
             continue;
         }
         if( player.isDead === true ){ 
@@ -434,7 +436,7 @@ runmysteriet.scene.Game.prototype.reviveDeadPlayers =function(winningPlayer){
               player.y = winningPlayer.y;
             }
             else{
-              player.x = this.m_finishX -80 + i * 40
+              player.x = this.m_finishX - 80 + i * 40
               player.y = player.groundY || 188;
             }
             console.log("PLAYER REVIVED", i)

@@ -74,6 +74,7 @@ var runmysteriet = function() {
      * @since 1.0
      */
     m_this.ui ={};
+    m_this.ui.graphic ={};
     
     /**
      * Public scope.
