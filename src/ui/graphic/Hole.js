@@ -30,4 +30,4 @@ runmysteriet.ui.graphic.Hole.prototype.hasPlayerFallen = function(player) {
         this.isPlayerInside(player) &&
         player.y > this.fallLimitY
     );
-}
+};

@@ -29,6 +29,11 @@ runmysteriet.handler.MakeLevel.prototype.build = function(segments) {
 };
 
 runmysteriet.handler.MakeLevel.prototype.buildSegment = function(segment, startX) {
+    if (!segment || !segment.parts) {
+        console.log("Fel segment:", segment);
+        return startX;
+    }
+
     var x = startX;
 
     for (var i = 0; i < segment.parts.length; i++) {
@@ -51,7 +56,7 @@ runmysteriet.handler.MakeLevel.prototype.buildSegment = function(segment, startX
         }
 
         else if (part.type === "hole") {
-            var width = part.width || 50;
+            var width = part.width || 60;
 
             var hole = new runmysteriet.ui.graphic.Hole(
                 x,
