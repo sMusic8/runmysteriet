@@ -1,6 +1,3 @@
-
-
-
 runmysteriet.segments.Segment_1 = function() {
     this.tileSize = 268;
     this.groundY = 220;
@@ -62,4 +59,15 @@ runmysteriet.segments.Segment_1.prototype.ground = function(stage, startX) {
         enemySpawns: enemySpawns,
         endX: x
     };
+
+    var airPlatform = new runmysteriet.ui.Platform(
+    x,
+    this.groundY - 120, // <-- högre upp
+    200,
+    32,
+    "stone"
+);
+
+stage.addChild(airPlatform);
+platforms.push(airPlatform);
 };
