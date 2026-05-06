@@ -1,10 +1,11 @@
-//------------------------------------------------------------------------------
-// SHIELD
-//------------------------------------------------------------------------------
-
 var runmysteriet = runmysteriet || {};
 runmysteriet.ui = runmysteriet.ui || {};
 
+/**
+ * Shield UI element.
+ * @constructor
+ * @extends {rune.display.Graphic}
+ */
 runmysteriet.ui.Shield = function() {
 
     rune.display.Graphic.call(this,
@@ -15,25 +16,33 @@ runmysteriet.ui.Shield = function() {
         "shield"
     );
 
+    /** @type {string} */
     this.rune = "";
+
+    /** @private @type {boolean} */
     this.__collected = false;
+
+    /** @type {boolean} */
     this.active = true;
 
-    //------------------------------------------------------------------------------ 
     // TEXT
-    //------------------------------------------------------------------------------
 
+    /** @type {rune.text.BitmapField} */
     this.m_text = new rune.text.BitmapField("");
+
     this.m_text.autoSize = true;
 
     this.addChild(this.m_text);
 
-    //------------------------------------------------------------------------------ 
-    // PULS
-    //------------------------------------------------------------------------------
+    // PULSE
 
+    /** @private @type {number} */
     this.m_baseScale = 1;
+
+    /** @private @type {number} */
     this.m_pulseSpeed = 0.05;
+
+    /** @private @type {number} */
     this.m_pulseValue = 0;
 };
 
@@ -41,10 +50,10 @@ runmysteriet.ui.Shield = function() {
 runmysteriet.ui.Shield.prototype = Object.create(rune.display.Graphic.prototype);
 runmysteriet.ui.Shield.prototype.constructor = runmysteriet.ui.Shield;
 
-//------------------------------------------------------------------------------
-// UPDATE
-//------------------------------------------------------------------------------
-
+/**
+ * Update loop.
+ * @return {void}
+ */
 runmysteriet.ui.Shield.prototype.update = function() {
 
     if (this.__collected) return;
@@ -57,21 +66,21 @@ runmysteriet.ui.Shield.prototype.update = function() {
     this.scaleY = scale;
 };
 
-//------------------------------------------------------------------------------
-// CENTER TEXT (VIKTIG FIX)
-//------------------------------------------------------------------------------
-
+/**
+ * Centers the text inside the shield.
+ * @return {void}
+ */
 runmysteriet.ui.Shield.prototype.centerText = function() {
 
-    // center baserat på textens storlek
     this.m_text.x = (this.width - this.m_text.width) / 2;
     this.m_text.y = (this.height - this.m_text.height) / 2;
 };
 
-//------------------------------------------------------------------------------
-// SET LETTER
-//------------------------------------------------------------------------------
-
+/**
+ * Sets the rune letter.
+ * @param {string} letter
+ * @return {void}
+ */
 runmysteriet.ui.Shield.prototype.setRune = function(letter) {
 
     this.rune = letter;

@@ -1,6 +1,11 @@
-
-
-
+/**
+ * English Boat entity.
+ *
+ * @constructor
+ * @extends {rune.display.Graphic}
+ * @param {number=} x
+ * @param {number=} y
+ */
 runmysteriet.entity.EnglishBoat = function(x, y) {
 
     rune.display.Graphic.call(
@@ -12,16 +17,35 @@ runmysteriet.entity.EnglishBoat = function(x, y) {
         "english_boat"
     );
 
+    /** @type {number} */
     this.width = 100;
+
+    /** @type {number} */
     this.height = 100;
 
+    /** @type {number} */
     this.damage = 999;
 };
+
+//------------------------------------------------------------------------------
+// INHERITANCE
+//------------------------------------------------------------------------------
 
 runmysteriet.entity.EnglishBoat.prototype = Object.create(rune.display.Graphic.prototype);
 runmysteriet.entity.EnglishBoat.prototype.constructor = runmysteriet.entity.EnglishBoat;
 
+//------------------------------------------------------------------------------
+// COLLISION
+//------------------------------------------------------------------------------
+
+/**
+ * Checks collision with player.
+ *
+ * @param {?Object} player
+ * @return {boolean}
+ */
 runmysteriet.entity.EnglishBoat.prototype.isTouchingPlayer = function(player) {
+
     if (!player || player.isDead === true) {
         return false;
     }

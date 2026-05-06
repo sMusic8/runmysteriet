@@ -1,8 +1,33 @@
+//------------------------------------------------------------------------------
+// ENEMY HANDLER
+//------------------------------------------------------------------------------
+
+/**
+ * Handles all enemies in the game world.
+ *
+ * @constructor
+ * @param {!rune.display.Stage} stage
+ */
 runmysteriet.handler.EnemyHandler = function(stage) {
+
+    /** @type {!rune.display.Stage} */
     this.stage = stage;
+
+    /** @type {!Array<!runmysteriet.entity.Kristen>} */
     this.enemies = [];
 };
 
+//------------------------------------------------------------------------------
+// INIT
+//------------------------------------------------------------------------------
+
+/**
+ * Initializes enemies for the level.
+ *
+ * @param {!runmysteriet.config.LevelConfig} levelConfig
+ * @param {!Array<!Object>} enemySpawns
+ * @return {void}
+ */
 runmysteriet.handler.EnemyHandler.prototype.init = function(levelConfig, enemySpawns) {
 
     this.clear();
@@ -27,6 +52,16 @@ runmysteriet.handler.EnemyHandler.prototype.init = function(levelConfig, enemySp
     }
 };
 
+//------------------------------------------------------------------------------
+// CREATE ENEMY
+//------------------------------------------------------------------------------
+
+/**
+ * Creates a Kristen enemy.
+ *
+ * @param {{x: number, y: number, type: string}} spawn
+ * @return {!runmysteriet.entity.Kristen}
+ */
 runmysteriet.handler.EnemyHandler.prototype.createKristen = function(spawn) {
 
     var kristen = new runmysteriet.entity.Kristen(
@@ -41,15 +76,23 @@ runmysteriet.handler.EnemyHandler.prototype.createKristen = function(spawn) {
     return kristen;
 };
 
+//------------------------------------------------------------------------------
+// UPDATE
+//------------------------------------------------------------------------------
+
+/**
+ * Updates all enemies.
+ *
+ * @param {!Array<!runmysteriet.entity.Player>} players
+ * @return {void}
+ */
 runmysteriet.handler.EnemyHandler.prototype.update = function(players) {
 
     for (var i = 0; i < this.enemies.length; i++) {
 
         var enemy = this.enemies[i];
 
-        if (!enemy || enemy.isDead === true) {
-            continue;
-        }
+        if (!enemy || enemy.isDead === true) continue;
 
         if (typeof enemy.checkPlayerCollisions === "function") {
             enemy.checkPlayerCollisions(players);
@@ -57,6 +100,15 @@ runmysteriet.handler.EnemyHandler.prototype.update = function(players) {
     }
 };
 
+//------------------------------------------------------------------------------
+// CLEAR
+//------------------------------------------------------------------------------
+
+/**
+ * Removes all enemies from stage.
+ *
+ * @return {void}
+ */
 runmysteriet.handler.EnemyHandler.prototype.clear = function() {
 
     for (var i = 0; i < this.enemies.length; i++) {

@@ -6,6 +6,14 @@
 // Den sköter bara om att rita spelaren och spela animationer.
 // Allt annat sköts av PlayerHandler.js 
 
+/**
+ * Player entity.
+ *
+ * @constructor
+ * @extends {rune.display.Sprite}
+ * @param {!Object} controls
+ * @param {!Object} spriteConfig
+ */
 runmysteriet.entity.Player = function(controls, spriteConfig) {
 
     rune.display.Sprite.call(
@@ -17,24 +25,40 @@ runmysteriet.entity.Player = function(controls, spriteConfig) {
         spriteConfig.texture
     );
 
+    /** @type {!Object} */
     this.controls = controls;
+
+    /** @type {!Object} */
     this.spriteConfig = spriteConfig;
 
+    /** @type {number} */
     this.speed = 2;
 
+    /** @type {number} */
     this.velocityY = 0;
+
+    /** @type {number} */
     this.gravity = 0.5;
+
+    /** @type {number} */
     this.jumpPower = -9;
 
+    /** @type {boolean} */
     this.isOnGround = false;
+
+    /** @type {number} */
     this.groundY = 0;
 
+    /** @type {boolean} */
     this.isMoving = false;
+
+    /** @type {string} */
     this.currentAnimation = "";
 
-    this.isMoving = false
+    this.isMoving = false;
 
-       this.jumpSound = this.application.sounds.sound.get("sound_jump");
+    /** @type {?Object} */
+    this.jumpSound = this.application.sounds.sound.get("sound_jump");
 };
 
 //------------------------------------------------------------------------------
@@ -48,6 +72,11 @@ runmysteriet.entity.Player.prototype.constructor = runmysteriet.entity.Player;
 // INIT
 //------------------------------------------------------------------------------
 
+/**
+ * Initializes player.
+ *
+ * @return {void}
+ */
 runmysteriet.entity.Player.prototype.init = function() {
 
     rune.display.Sprite.prototype.init.call(this);
@@ -72,6 +101,12 @@ runmysteriet.entity.Player.prototype.init = function() {
 // UPDATE
 //------------------------------------------------------------------------------
 
+/**
+ * Update loop.
+ *
+ * @param {number} step
+ * @return {void}
+ */
 runmysteriet.entity.Player.prototype.update = function(step) {
 
     rune.display.Sprite.prototype.update.call(this, step);
@@ -91,6 +126,11 @@ runmysteriet.entity.Player.prototype.update = function(step) {
 // ANIMATION
 //------------------------------------------------------------------------------
 
+/**
+ * Updates animation state.
+ *
+ * @return {void}
+ */
 runmysteriet.entity.Player.prototype.updateAnimation = function() {
 
     if (this.isOnGround === false) {
@@ -108,6 +148,12 @@ runmysteriet.entity.Player.prototype.updateAnimation = function() {
 // ANIMATION HELPER
 //------------------------------------------------------------------------------
 
+/**
+ * Plays animation if not already active.
+ *
+ * @param {string} name
+ * @return {void}
+ */
 runmysteriet.entity.Player.prototype.playAnimation = function(name) {
 
     if (this.currentAnimation !== name) {

@@ -1,7 +1,13 @@
-//------------------------------------------------------------------------------
-// GROUND
-//------------------------------------------------------------------------------
-
+/**
+ * @constructor
+ * @extends {rune.display.Sprite}
+ * @param {!Object} stage
+ * @param {number} x
+ * @param {number} y
+ * @param {number} width
+ * @param {number} height
+ * @param {string} texture
+ */
 runmysteriet.ui.graphic.Ground = function(stage, x, y, width, height, texture) {
 
     rune.display.Sprite.call(
@@ -13,9 +19,10 @@ runmysteriet.ui.graphic.Ground = function(stage, x, y, width, height, texture) {
         texture
     );
 
+    /** @type {!Object} */
     this.stage = stage;
 
-    // Viktigt för collision-systemet
+    /** @type {boolean} */
     this.solid = true;
 };
 
@@ -26,6 +33,10 @@ runmysteriet.ui.graphic.Ground.prototype.constructor = runmysteriet.ui.graphic.G
 // INIT
 //------------------------------------------------------------------------------
 
+/**
+ * Initializes ground object.
+ * @return {void}
+ */
 runmysteriet.ui.graphic.Ground.prototype.init = function() {
 
     rune.display.Sprite.prototype.init.call(this);
@@ -34,6 +45,6 @@ runmysteriet.ui.graphic.Ground.prototype.init = function() {
         this.stage.addChild(this);
     }
 
-    // 🔧 säkerställ korrekt hitbox (ibland behövs i Rune)
+    /** @type {boolean} */
     this.autoSize = false;
 };

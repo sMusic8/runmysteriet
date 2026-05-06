@@ -1,12 +1,8 @@
-//------------------------------------------------------------------------------
-// PAUSE SCENE
-//------------------------------------------------------------------------------
-
 /**
  * Pause scene.
  *
  * @constructor
- * @extends rune.scene.Scene
+ * @extends {rune.scene.Scene}
  */
 runmysteriet.scene.Paus = function() {
 
@@ -27,7 +23,7 @@ runmysteriet.scene.Paus.prototype.constructor = runmysteriet.scene.Paus;
 /**
  * Initializes the pause scene.
  *
- * @return {undefined}
+ * @return {void}
  */
 runmysteriet.scene.Paus.prototype.init = function() {
 
@@ -35,15 +31,17 @@ runmysteriet.scene.Paus.prototype.init = function() {
 
     console.log("PAUSAT");
 
-    // Titel
+    /** @type {!rune.text.BitmapField} */
     var title = new rune.text.BitmapField("SPELET AR PAUSAT");
     title.autoSize = true;
     title.center = this.application.screen.center;
     title.y -= 20;
     this.stage.addChild(title);
 
-    // Instruktion
-    var info = new rune.text.BitmapField("Tryck P eller START igen for att fortsatta");
+    /** @type {!rune.text.BitmapField} */
+    var info = new rune.text.BitmapField(
+        "Tryck P eller START igen for att fortsatta"
+    );
     info.autoSize = true;
     info.center = this.application.screen.center;
     info.y += 20;
@@ -59,15 +57,16 @@ runmysteriet.scene.Paus.prototype.init = function() {
  * Updates pause scene logic.
  *
  * @param {number} step Fixed time step.
- * @return {undefined}
+ * @return {void}
  */
 runmysteriet.scene.Paus.prototype.update = function(step) {
 
     rune.scene.Scene.prototype.update.call(this, step);
 
-    var gamepad = this.application.gamepads ? this.application.gamepads.get(0) : null;
-
-   
+    /** @type {?Object} */
+    var gamepad = this.application.gamepads
+        ? this.application.gamepads.get(0)
+        : null;
 };
 
 //------------------------------------------------------------------------------
@@ -77,7 +76,7 @@ runmysteriet.scene.Paus.prototype.update = function(step) {
 /**
  * Cleans up the pause scene before destruction.
  *
- * @return {undefined}
+ * @return {void}
  */
 runmysteriet.scene.Paus.prototype.dispose = function() {
 
