@@ -27,7 +27,7 @@ runmysteriet.handler.PlatformHandler.prototype.init = function(levelNumber) {
     this.levelWidth = 0;
 
     var segmentTypes = [
-        runmysteriet.segments.Segment_3,
+        runmysteriet.segments.Segment_Water,
         runmysteriet.segments.Segment_1,
         runmysteriet.segments.Segment_2,
         runmysteriet.segments.Segment_3

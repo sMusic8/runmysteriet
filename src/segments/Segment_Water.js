@@ -1,5 +1,6 @@
 
 
+
 runmysteriet.segments.Segment_Water = function() {
     this.tileSize = 268;
     this.groundY = 220;
@@ -18,32 +19,55 @@ runmysteriet.segments.Segment_Water.prototype.ground = function(stage, startX) {
     var movingPlatforms = [];
     var boats = [];
 
-
     /*
-     * vänster mark 
+     * Vänster mark
      */
     var platform1 = new runmysteriet.ui.Platform();
     platform1.x = x;
     platform1.y = this.groundY;
+
     stage.addChild(platform1);
     platforms.push(platform1);
 
     x += this.tileSize;
 
     /*
-     * vatten
+     * Vatten, 134 x 96
      */
     var water = new runmysteriet.ui.graphic.Water(
         x,
-        this.groundY -10 
+        this.groundY - 10
     );
 
     stage.addChild(water);
     waterAreas.push(water);
 
-    console.log("EnglishBoat:", runmysteriet.entity.EnglishBoat);
+    /*
+     * Flotte.
+     * Denna ska spelaren kunna stå på.
+     */
+    var raft = new runmysteriet.ui.graphic.Raft(
+        water.x + 10,
+        water.y - 12
+    );
 
- var boat = new runmysteriet.entity.EnglishBoat(
+    raft.minX = water.x + 5;
+    raft.maxX = water.x + this.waterWidth - raft.width - 5;
+
+    stage.addChild(raft);
+
+    /*
+     * Flotten läggs i platforms så spelaren kan stå på den.
+     * Den läggs också i movingPlatforms så den kan röra sig.
+     */
+    platforms.push(raft);
+    movingPlatforms.push(raft);
+
+    /*
+     * Engelsk båt.
+     * Denna är farlig. Vid collision ska spelaren dö.
+     */
+    var boat = new runmysteriet.entity.EnglishBoat(
         water.x + 35,
         water.y - 32
     );
@@ -52,12 +76,14 @@ runmysteriet.segments.Segment_Water.prototype.ground = function(stage, startX) {
     boats.push(boat);
 
     x += this.waterWidth;
+
     /*
-     * höger mark
+     * Höger mark
      */
     var platform2 = new runmysteriet.ui.Platform();
     platform2.x = x;
     platform2.y = this.groundY;
+
     stage.addChild(platform2);
     platforms.push(platform2);
 
