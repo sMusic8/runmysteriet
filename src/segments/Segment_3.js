@@ -8,7 +8,7 @@ runmysteriet.segments.Segment_3.prototype.ground = function(stage, startX) {
     var x = startX;
     var platforms = [];
     var holes = [];
-
+    var enemySpawns = [];
     for (var i = 0; i < 3; i++) {
         var platform = new runmysteriet.ui.Platform();
         platform.x = x;
@@ -22,7 +22,7 @@ runmysteriet.segments.Segment_3.prototype.ground = function(stage, startX) {
     var hole = new runmysteriet.ui.graphic.Hole(
         x,
         this.groundY,
-        120,
+        40,
         this.holeHeight
     );
 
@@ -30,6 +30,12 @@ runmysteriet.segments.Segment_3.prototype.ground = function(stage, startX) {
     holes.push(hole);
 
     x += hole.width;
+
+    enemySpawns.push({
+        type: "kristen",
+        x: x + 180,
+        y: this.groundY - 40
+    });
 
     var lastPlatform = new runmysteriet.ui.Platform();
     lastPlatform.x = x;
@@ -39,9 +45,10 @@ runmysteriet.segments.Segment_3.prototype.ground = function(stage, startX) {
 
     x += this.tileSize;
 
-    return {
-        platforms: platforms,
-        holes: holes,
-        endX: x
-    };
+ return {
+    platforms: platforms,
+    holes: holes,
+    enemySpawns: enemySpawns,
+    endX: x
+};
 };

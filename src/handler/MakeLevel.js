@@ -56,7 +56,7 @@ runmysteriet.handler.MakeLevel.prototype.buildSegment = function(segment, startX
         }
 
         else if (part.type === "hole") {
-            var width = part.width || 60;
+            var width = part.width || 40;
 
             var hole = new runmysteriet.ui.graphic.Hole(
                 x,

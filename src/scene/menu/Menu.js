@@ -13,16 +13,10 @@ runmysteriet.scene.Menu = function() {
     rune.scene.Scene.call(this);
 
     /**
-     * List of menu item bitmap fields.
-     * @type {Array<rune.text.BitmapField>}
+     * Reusable menu list.
+     * @type {runmysteriet.ui.MenuList}
      */
-    this.menuItems = [];
-
-    /**
-     * Currently selected menu index.
-     * @type {number}
-     */
-    this.selectedIndex = 0;
+    this.menuList = null;
 
     this.menuSound = null;
 };
@@ -59,21 +53,14 @@ runmysteriet.scene.Menu.prototype.init = function() {
     text2.flicker.start(750, 0.5);
     this.stage.addChild(text2);
 
-    var labels = ["Starta spelet", "Las mer", "Credits"];
-
-    for (var i = 0; i < labels.length; i++) {
-
-        var item = new rune.text.BitmapField(labels[i]);
-        item.autoSize = true;
-        item.center = this.application.screen.center;
-        item.y += 40 + (i * 15);
-        item.scale = 0.8;
-
-        this.stage.addChild(item);
-        this.menuItems.push(item);
-    }
-
-    this.updateMenu();
+    this.menuList = new runmysteriet.ui.MenuList(
+        this.stage,
+        this.application,
+        ["Starta spelet", "Las mer", "Credits"],
+        40,
+        15,
+        0.8
+    );
 };
 
 //------------------------------------------------------------------------------
@@ -84,112 +71,64 @@ runmysteriet.scene.Menu.prototype.update = function(step) {
 
     rune.scene.Scene.prototype.update.call(this, step);
 
-    var gamepad = null;
-
-    if (
-        this.application &&
-        this.application.inputs &&
-        this.application.inputs.gamepads
-    ) {
-        gamepad = this.application.inputs.gamepads.get(0);
+    if (!this.menuList || typeof this.menuList.readInput !== "function") {
+        return;
     }
 
-    var startIsPressed = false;
-    var downIsPressed = false;
-    var upIsPressed = false;
+    var input = this.menuList.readInput(this.keyboard);
 
-    if (gamepad !== null && gamepad !== undefined) {
-            //console.log(gamepad);
-        if (typeof gamepad.justPressed === "function") {
-
-            startIsPressed =
-                gamepad.justPressed("START") ||
-                gamepad.justPressed(9) ||
-                gamepad.justPressed(0);
-
-            downIsPressed =
-                gamepad.justPressed("DOWN") ||
-                gamepad.justPressed(13);
-
-            upIsPressed =
-                gamepad.justPressed("UP") ||
-                gamepad.justPressed(12);
-        }
-        
+    if (input.down) {
+        this.playMenuSound();
+        this.menuList.moveNext();
     }
 
-    if (this.keyboard.justPressed("DOWN") || downIsPressed) {
-
-        if (this.menuSound) {
-            this.menuSound.play();
-        }
-
-        this.selectedIndex++;
-
-        if (this.selectedIndex >= this.menuItems.length) {
-            this.selectedIndex = 0;
-        }
-
-        this.updateMenu();
+    if (input.up) {
+        this.playMenuSound();
+        this.menuList.movePrevious();
     }
 
-    if (this.keyboard.justPressed("UP") || upIsPressed) {
-
-        if (this.menuSound) {
-            this.menuSound.play();
-        }
-
-        this.selectedIndex--;
-
-        if (this.selectedIndex < 0) {
-            this.selectedIndex = this.menuItems.length - 1;
-        }
-
-        this.updateMenu();
+    if (input.choose) {
+        this.chooseSelected();
     }
-
-    if (
-        this.keyboard.justPressed("SPACE") ||
-        this.keyboard.justPressed("ENTER") ||
-        startIsPressed
-    ) {
-        if (this.selectedIndex === 0) {
-            this.application.scenes.load([
-                new runmysteriet.scene.Game()
-            ]);
-        }
-        else if (this.selectedIndex === 1) {
-            this.application.scenes.load([
-                new runmysteriet.scene.More()
-            ]);
-        }
-        else if (this.selectedIndex === 2) {
-            this.application.scenes.load([
-                new runmysteriet.scene.Credits()
-            ]);
-        }
-    }
-    
 };
 
 //------------------------------------------------------------------------------
-// Update menu UI
+// Choose selected
 //------------------------------------------------------------------------------
 
-runmysteriet.scene.Menu.prototype.updateMenu = function() {
+runmysteriet.scene.Menu.prototype.chooseSelected = function() {
 
-    for (var i = 0; i < this.menuItems.length; i++) {
+    if (!this.menuList || typeof this.menuList.getSelectedIndex !== "function") {
+        return;
+    }
 
-        var item = this.menuItems[i];
+    var selectedIndex = this.menuList.getSelectedIndex();
 
-        var text = item.text.replace("> ", "");
+    if (selectedIndex === 0) {
+        this.application.scenes.load([
+            new runmysteriet.scene.Game(1, 0)
+        ]);
+    }
+    else if (selectedIndex === 1) {
+        this.application.scenes.load([
+            new runmysteriet.scene.More()
+        ]);
+    }
+    else if (selectedIndex === 2) {
+        this.application.scenes.load([
+            new runmysteriet.scene.Credits()
+        ]);
+    }
+};
 
-        if (i === this.selectedIndex) {
-            item.text = "> " + text;
-        }
-        else {
-            item.text = text;
-        }
+//------------------------------------------------------------------------------
+// Sound
+//------------------------------------------------------------------------------
+
+runmysteriet.scene.Menu.prototype.playMenuSound = function() {
+
+    if (this.menuSound) {
+        this.menuSound.play();
     }
 };
 
@@ -198,6 +137,11 @@ runmysteriet.scene.Menu.prototype.updateMenu = function() {
 //------------------------------------------------------------------------------
 
 runmysteriet.scene.Menu.prototype.dispose = function() {
+
+    if (this.menuList) {
+        this.menuList.clear();
+        this.menuList = null;
+    }
 
     rune.scene.Scene.prototype.dispose.call(this);
 };

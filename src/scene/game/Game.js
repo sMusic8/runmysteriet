@@ -2,7 +2,7 @@
 // GAME SCENE
 //------------------------------------------------------------------------------
 
-runmysteriet.scene.Game = function () {
+runmysteriet.scene.Game = function (levelNumber, score) {
     rune.scene.Scene.call(this);
 
     this.m_playerHandler = null;
@@ -13,14 +13,17 @@ runmysteriet.scene.Game = function () {
     this.m_backgroundHandler = null;
 
     this.m_levelConfig = null;
-    this.m_levelNumber = 1;
+    this.m_levelNumber = levelNumber || 1;
     this.m_enemyHandler = null;
+    this.m_score = score || 0;
 
     this.m_isPaused = false;
     this.m_pauseText = null;
+    this.m_pauseMenu = null;
 
-    this.m_timeLeft = 60;
+    this.m_timeLeft = 200;
     this.m_timerText = null;
+    this.m_scoreText = null;
 
     this.m_gameEnd = false;
     this.m_finishX = 0;
@@ -45,6 +48,17 @@ runmysteriet.scene.Game.prototype.init = function () {
     // Musik
     this.backgroundMusic = this.application.sounds.sound.get("sound_music");
 
+
+    // Bakgrund
+this.m_backgroundHandler = new runmysteriet.handler.BackgroundHandler(
+    this.stage,
+    this.cameras.getCameraAt(0),
+    this.application.screen.width,
+    this.application.screen.height
+);
+
+this.m_backgroundHandler.init();
+
     // Moln
     this.m_cloudHandler = new runmysteriet.handler.CloudHandler(
         this.stage,
@@ -53,16 +67,13 @@ runmysteriet.scene.Game.prototype.init = function () {
 
     this.m_cloudHandler.init();
 
-    // Level
-    this.m_levelNumber = 1;
-
     // Plattformar / segment / holes / enemy spawnpoints
     this.m_platformHandler = new runmysteriet.handler.PlatformHandler(
         this.stage,
         this.application.screen.width
     );
 
-    this.m_platformHandler.init();
+    this.m_platformHandler.init(this.m_levelNumber);
 
     this.m_finishX = this.m_platformHandler.levelWidth - 50;
 
@@ -102,7 +113,7 @@ runmysteriet.scene.Game.prototype.init = function () {
     this.m_shieldHandler.init();
 
     // Timer
-    this.m_timerText = new rune.text.BitmapField("TID KVAR 60");
+    this.m_timerText = new rune.text.BitmapField("TID KVAR 200");
     this.m_timerText.x = 15;
     this.m_timerText.y = 15;
     this.stage.addChild(this.m_timerText);
@@ -177,33 +188,153 @@ runmysteriet.scene.Game.prototype.update = function (step) {
 //------------------------------------------------------------------------------
 
 runmysteriet.scene.Game.prototype.updatePauseInput = function () {
-    var camera = null;
+    var input = null;
 
-    if (this.keyboard.justPressed("P")) {
-        this.m_isPaused = !this.m_isPaused;
+    if (this.m_gameEnd === true) {
+        return;
+    }
 
-        if (this.m_pauseText) {
-            camera = this.cameras.getCameraAt(0);
-
-            this.m_pauseText.visible = this.m_isPaused;
-            this.m_pauseText.x = camera.viewport.x + 90;
-            this.m_pauseText.y = camera.viewport.y + 100;
+    if (this.isPauseButtonPressed()) {
+        if (this.m_isPaused === true) {
+            this.closePauseMenu();
+        } else {
+            this.openPauseMenu();
         }
 
-        if (this.backgroundMusic) {
-            if (this.m_isPaused === true) {
-                if (typeof this.backgroundMusic.pause === "function") {
-                    this.backgroundMusic.pause();
-                }
-            } else {
-                if (typeof this.backgroundMusic.play === "function") {
-                    this.backgroundMusic.play(true);
-                }
-            }
-        }
+        return;
+    }
+
+    if (this.m_isPaused !== true) {
+        return;
+    }
+
+    this.updatePauseMenuPosition();
+
+    input = this.m_pauseMenu.readInput(this.keyboard);
+
+    if (input.down) {
+        this.playMenuSound();
+        this.m_pauseMenu.moveNext();
+    }
+
+    if (input.up) {
+        this.playMenuSound();
+        this.m_pauseMenu.movePrevious();
+    }
+
+    if (input.choose) {
+        this.choosePauseSelected();
     }
 };
 
+runmysteriet.scene.Game.prototype.isPauseButtonPressed = function() {
+    var gamepad = null;
+    var startIsPressed = false;
+
+    if (this.application && this.application.inputs && this.application.inputs.gamepads) {
+        gamepad = this.application.inputs.gamepads.get(0);
+    }
+
+    if (gamepad !== null && gamepad !== undefined) {
+        if (typeof gamepad.justPressed === "function") {
+            startIsPressed =
+                gamepad.justPressed("START") ||
+                gamepad.justPressed(9);
+        }
+    }
+
+    return (
+        this.keyboard.justPressed("P") ||
+        this.keyboard.justPressed("ESCAPE") ||
+        startIsPressed
+    );
+};
+
+runmysteriet.scene.Game.prototype.openPauseMenu = function() {
+    this.m_isPaused = true;
+
+    this.updatePauseMenuPosition();
+
+    if (this.m_pauseTitle) {
+        this.m_pauseTitle.visible = true;
+    }
+
+    if (this.m_pauseMenu) {
+        this.m_pauseMenu.setVisible(true);
+    }
+
+    if (this.backgroundMusic && typeof this.backgroundMusic.pause === "function") {
+        this.backgroundMusic.pause();
+    }
+};
+
+runmysteriet.scene.Game.prototype.closePauseMenu = function() {
+    this.m_isPaused = false;
+
+    if (this.m_pauseTitle) {
+        this.m_pauseTitle.visible = false;
+    }
+
+    if (this.m_pauseMenu) {
+        this.m_pauseMenu.setVisible(false);
+    }
+
+    if (this.backgroundMusic && typeof this.backgroundMusic.play === "function") {
+        this.backgroundMusic.play(true);
+    }
+};
+
+runmysteriet.scene.Game.prototype.updatePauseMenuPosition = function() {
+    var camera = this.cameras.getCameraAt(0);
+
+    if (!camera) {
+        return;
+    }
+
+    if (this.m_pauseTitle) {
+        this.m_pauseTitle.x = camera.viewport.x + 80;
+        this.m_pauseTitle.y = camera.viewport.y + 85;
+    }
+
+    if (this.m_pauseMenu) {
+        this.m_pauseMenu.setCameraPosition(camera, 80, 115);
+    }
+};
+
+runmysteriet.scene.Game.prototype.choosePauseSelected = function() {
+    var selectedIndex = this.m_pauseMenu.getSelectedIndex();
+
+    if (selectedIndex === 0) {
+        this.closePauseMenu();
+        return;
+    }
+
+    this.quitToMenu();
+};
+
+runmysteriet.scene.Game.prototype.quitToMenu = function() {
+    this.m_gameEnd = true;
+
+    if (this.backgroundMusic) {
+        if (typeof this.backgroundMusic.stop === "function") {
+            this.backgroundMusic.stop();
+        } else if (typeof this.backgroundMusic.pause === "function") {
+            this.backgroundMusic.pause();
+        }
+    }
+
+    this.application.scenes.load([
+        new runmysteriet.scene.Menu()
+    ]);
+};
+
+runmysteriet.scene.Game.prototype.playMenuSound = function() {
+    var menuSound = this.application.sounds.sound.get("sound_menu");
+
+    if (menuSound) {
+        menuSound.play();
+    }
+};
 //------------------------------------------------------------------------------
 // TIMER
 //------------------------------------------------------------------------------
@@ -231,6 +362,11 @@ runmysteriet.scene.Game.prototype.updateTimer = function () {
         this.m_timerText.text = "TID KVAR " + Math.ceil(this.m_timeLeft);
         this.m_timerText.x = camera.viewport.x + 15;
         this.m_timerText.y = camera.viewport.y + 15;
+    }
+    if (this.m_scoreText) {
+        this.m_scoreText.text = "LEVEL " + this.m_levelNumber + "  POANG " + this.m_score;
+        this.m_scoreText.x = camera.viewport.x + 15;
+        this.m_scoreText.y = camera.viewport.y + 30;
     }
 };
 
@@ -292,6 +428,11 @@ runmysteriet.scene.Game.prototype.killPlayer = function(player, index) {
     player.active = false;
     player.velocityY = 0;
     player.isOnGround = false;
+   
+    if (player.hpBar) {
+    player.hpBar.visible = false;
+}
+    
 
     console.log("PLAYER DEAD", index);
 };
@@ -324,16 +465,22 @@ runmysteriet.scene.Game.prototype.areAllPlayersDead = function() {
 //------------------------------------------------------------------------------
 
 runmysteriet.scene.Game.prototype.winGame = function (winningPlayer) {
-    var camera = null;
-    var winText = null;
+    var earnedScore = 0;
+    var totalScore = 0;
 
     if (this.m_gameEnd === true) {
         return;
     }
 
-    this.reviveDeadPlayers(winningPlayer);
-
     this.m_gameEnd = true;
+
+    earnedScore = Math.ceil(this.m_timeLeft);
+
+    if (earnedScore < 0) {
+        earnedScore = 0;
+    }
+
+    totalScore = this.m_score + earnedScore;
 
     if (this.backgroundMusic) {
         if (typeof this.backgroundMusic.stop === "function") {
@@ -343,14 +490,13 @@ runmysteriet.scene.Game.prototype.winGame = function (winningPlayer) {
         }
     }
 
-    camera = this.cameras.getCameraAt(0);
-
-    winText = new rune.text.BitmapField("DU VANN");
-    winText.autoSize = true;
-    winText.x = camera.viewport.x + 90;
-    winText.y = camera.viewport.y + 100;
-
-    this.stage.addChild(winText);
+    this.application.scenes.load([
+        new runmysteriet.scene.LevelComplete(
+            this.m_levelNumber,
+            totalScore,
+            earnedScore
+        )
+    ]);
 };
 
 runmysteriet.scene.Game.prototype.loseGame = function () {
@@ -401,6 +547,10 @@ runmysteriet.scene.Game.prototype.reviveDeadPlayers = function(winningPlayer) {
     var players = null;
     var player = null;
     var i = 0;
+
+    if (player.hpBar) {
+    player.hpBar.visible = true;
+}
 
     if (!this.m_playerHandler) {
         return;
@@ -468,4 +618,106 @@ runmysteriet.scene.Game.prototype.dispose = function () {
     }
 
     rune.scene.Scene.prototype.dispose.call(this);
+};
+
+runmysteriet.scene.Game.prototype.createPauseMenu = function() {
+    if (this.m_pauseMenu) {
+        return;
+    }
+
+    this.m_pauseTitle = new rune.text.BitmapField("SPELET AR PAUSAT");
+    this.m_pauseTitle.autoSize = true;
+    this.m_pauseTitle.visible = false;
+    this.stage.addChild(this.m_pauseTitle);
+
+    this.m_pauseMenu = new runmysteriet.ui.MenuList(
+        this.stage,
+        this.application,
+        ["FORTSATT SPELET", "AVSLUTA SPELET"],
+        0,
+        20,
+        0.8
+    );
+
+    this.m_pauseMenu.setVisible(false);
+};
+
+runmysteriet.scene.Game.prototype.updatePauseInput = function () {
+    var input = null;
+
+    if (this.m_gameEnd === true) {
+        return;
+    }
+
+    if (this.isPauseButtonPressed()) {
+        if (this.m_isPaused === true) {
+            this.closePauseMenu();
+        }
+        else {
+            this.openPauseMenu();
+        }
+
+        return;
+    }
+
+    if (this.m_isPaused !== true) {
+        return;
+    }
+
+    this.createPauseMenu();
+
+    if (!this.m_pauseMenu || typeof this.m_pauseMenu.readInput !== "function") {
+        return;
+    }
+
+    this.updatePauseMenuPosition();
+
+    input = this.m_pauseMenu.readInput(this.keyboard);
+
+    if (input.down) {
+        this.playMenuSound();
+        this.m_pauseMenu.moveNext();
+    }
+
+    if (input.up) {
+        this.playMenuSound();
+        this.m_pauseMenu.movePrevious();
+    }
+
+    if (input.choose) {
+        this.choosePauseSelected();
+    }
+};
+runmysteriet.scene.Game.prototype.openPauseMenu = function() {
+    this.m_isPaused = true;
+
+    this.createPauseMenu();
+    this.updatePauseMenuPosition();
+
+    if (this.m_pauseTitle) {
+        this.m_pauseTitle.visible = true;
+    }
+
+    if (this.m_pauseMenu) {
+        this.m_pauseMenu.setVisible(true);
+    }
+
+    if (this.backgroundMusic && typeof this.backgroundMusic.pause === "function") {
+        this.backgroundMusic.pause();
+    }
+};
+runmysteriet.scene.Game.prototype.closePauseMenu = function() {
+    this.m_isPaused = false;
+
+    if (this.m_pauseTitle) {
+        this.m_pauseTitle.visible = false;
+    }
+
+    if (this.m_pauseMenu) {
+        this.m_pauseMenu.setVisible(false);
+    }
+
+    if (this.backgroundMusic && typeof this.backgroundMusic.play === "function") {
+        this.backgroundMusic.play(true);
+    }
 };

@@ -13,6 +13,7 @@ npx google-closure-compiler \
 --js "./../../src/entity/Kristen.js" \
 --js "./../../src/entity/Player.js" \
 --js "./../../src/ui/graphic/Platform.js" \
+--js "./../../src/ui/graphic/MenuList.js" \
 --js "./../../src/ui/graphic/Hole.js" \
 --js "./../../src/ui/graphic/Ground.js" \
 --js "./../../src/segments/Segment_1.js" \
@@ -29,9 +30,7 @@ npx google-closure-compiler \
 --js "./../../src/scene/menu/Paus.js" \
 --js "./../../src/scene/menu/More.js" \
 --js "./../../src/scene/menu/Credits.js" \
---js "./../../src/segments/Segment_1.js" \
---js "./../../src/segments/Segment_2.js" \
---js "./../../src/segments/Segment_3.js" \
+--js "./../../src/scene/menu/LevelComplete.js" \
 --js "./../../src/scene/game/Game.js" \
 --js "./../../src/scene/menu/Menu.js" \
 --js "./../../src/system/Main.js" \

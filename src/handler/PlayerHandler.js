@@ -10,6 +10,7 @@ runmysteriet.handler.PlayerHandler = function(stage, platforms, application) {
     this.application = application;
 
     this.players = [];
+    this.m_avatarPlatformOffsetY = 10;
     this.jumpSound = this.application.sounds.sound.get("sound_jump");
 };
 
@@ -29,11 +30,8 @@ runmysteriet.handler.PlayerHandler.prototype.init = function() {
         { texture: "spritesheet_thor_move", start: "idle" }
     );
 
-    player1.x = 0;
-    player1.y = 188;
-
-    player2.x = 100;
-    player2.y = 188;
+    this.placePlayerOnStartPlatform(player1, 0);
+    this.placePlayerOnStartPlatform(player2, 1);
 
     // HP INIT
     player1.hp = 100;
@@ -195,14 +193,16 @@ runmysteriet.handler.PlayerHandler.prototype.updateCollisions = function() {
 
 runmysteriet.handler.PlayerHandler.prototype.checkPlatform = function(player, platform) {
 
-    if (!player || !platform) return false;
+    if (!player || !platform) {
+        return false;
+    }
 
-    if (!player.hitTestObject(platform)) return false;
+    if (!player.hitTestObject(platform)) {
+        return false;
+    }
 
-    // bara landa om du faller nedåt
     if (player.velocityY >= 0) {
-
-        player.y = platform.y - player.height / 2;
+        player.y = this.getStandingY(player, platform);
         player.velocityY = 0;
         player.isOnGround = true;
 
@@ -298,4 +298,41 @@ runmysteriet.handler.PlayerHandler.prototype.createHpBar = function() {
     bar.scaleX = 1; // start full
 
     return bar;
+};
+
+runmysteriet.handler.PlayerHandler.prototype.placePlayerOnPlatform = function(player, platform, offsetX) {
+    if (!player || !platform) {
+        return;
+    }
+
+    player.x = platform.x + (offsetX || 0);
+    player.y = this.getStandingY(player, platform);
+};
+
+runmysteriet.handler.PlayerHandler.prototype.placePlayerOnStartPlatform = function(player, index) {
+    var startPlatform = null;
+    var offsetX = 0;
+
+    if (!player) {
+        return;
+    }
+
+    if (!this.platforms || this.platforms.length === 0) {
+        player.x = index * 100;
+        player.y = 188 - this.m_avatarPlatformOffsetY;
+        return;
+    }
+
+    startPlatform = this.platforms[0];
+    offsetX = 40 + index * 60;
+
+    this.placePlayerOnPlatform(player, startPlatform, offsetX);
+};
+
+runmysteriet.handler.PlayerHandler.prototype.getStandingY = function(player, platform) {
+    if (!player || !platform) {
+        return 0;
+    }
+
+    return platform.y - player.height / 2 - this.m_avatarPlatformOffsetY;
 };

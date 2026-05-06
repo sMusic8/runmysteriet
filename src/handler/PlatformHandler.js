@@ -14,20 +14,34 @@ runmysteriet.handler.PlatformHandler = function(stage, screenWidth) {
     this.levelWidth = 0;
 };
 
-runmysteriet.handler.PlatformHandler.prototype.init = function() {
-    var segments = [
-        new runmysteriet.segments.Segment_1(),
-        new runmysteriet.segments.Segment_2(),
-        new runmysteriet.segments.Segment_3(),
-        new runmysteriet.segments.Segment_1(),
-        new runmysteriet.segments.Segment_2(),
+runmysteriet.handler.PlatformHandler.prototype.init = function(levelNumber) {
+    levelNumber = levelNumber || 1;
 
+    this.platforms = [];
+    this.holes = [];
+    this.enemySpawns = [];
+    this.levelWidth = 0;
+
+    var segmentTypes = [
+        runmysteriet.segments.Segment_1,
+        runmysteriet.segments.Segment_2,
+        runmysteriet.segments.Segment_3
     ];
 
-   var x = 0;
+    var segmentCount = 3 + Math.floor((levelNumber - 1) / 5);
 
-    for (var i = 0; i < segments.length; i++) {
-        var result = segments[i].ground(this.stage, x);
+    if (segmentCount > 20) {
+        segmentCount = 20;
+    }
+
+    var x = 0;
+
+    for (var i = 0; i < segmentCount; i++) {
+        var segmentIndex = (levelNumber + i - 1) % segmentTypes.length;
+        var SegmentClass = segmentTypes[segmentIndex];
+        var segment = new SegmentClass();
+
+        var result = segment.ground(this.stage, x);
 
         this.addPlatforms(result.platforms);
         this.addHoles(result.holes);
