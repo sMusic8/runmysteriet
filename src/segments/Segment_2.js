@@ -29,7 +29,7 @@ runmysteriet.segments.Segment_2.prototype.ground = function(stage, startX) {
     var hole1 = new runmysteriet.ui.graphic.Hole(
         x,
         this.groundY,
-        40,
+        60,
         this.holeHeight
     );
 

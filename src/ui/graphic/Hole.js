@@ -25,12 +25,23 @@ runmysteriet.ui.graphic.Hole.prototype.isPlayerInside = function(player) {
 };
 
 runmysteriet.ui.graphic.Hole.prototype.hasPlayerFallen = function(player) {
+    var playerCenterX = 0;
+    var playerBottom = 0;
+    var insideHoleX = false;
+    var hasDroppedIntoHole = false;
+
     if (!player || player.isDead === true) {
         return false;
     }
 
-    return (
-        this.isPlayerInside(player) &&
-        player.y > this.fallLimitY
-    );
+    playerCenterX = player.x + player.width / 2;
+    playerBottom = player.y + player.height;
+
+    insideHoleX =
+        playerCenterX >= this.x &&
+        playerCenterX <= this.x + this.width;
+
+    hasDroppedIntoHole = playerBottom >= this.y + 20;
+
+    return insideHoleX && hasDroppedIntoHole;
 };

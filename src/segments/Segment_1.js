@@ -1,10 +1,13 @@
+
+//segment 1 - första del av bana
 runmysteriet.segments.Segment_1 = function() {
     this.tileSize = 268;
     this.groundY = 220;
     this.holeHeight = 200;
 };
-
+//grounden i segmentet där skapas alla plattformar hål och fiender
 runmysteriet.segments.Segment_1.prototype.ground = function(stage, startX) {
+    
     var x = startX || 0;
 
     var platforms = [];
@@ -36,7 +39,7 @@ runmysteriet.segments.Segment_1.prototype.ground = function(stage, startX) {
     var hole = new runmysteriet.ui.graphic.Hole(
         x,
         this.groundY,
-        40,
+        60,
         this.holeHeight
     );
 

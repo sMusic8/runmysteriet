@@ -6,7 +6,7 @@ runmysteriet.ui.graphic.Water = function(x, y, width, height) {
         y || 0,
         134,
         96,
-        "water"
+        "hpbar4"
     );
     this.width = 134;
     this.height = 96;

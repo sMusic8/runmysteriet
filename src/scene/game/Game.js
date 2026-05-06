@@ -29,6 +29,13 @@ runmysteriet.scene.Game = function (levelNumber, score) {
     this.m_finishX = 0;
 
     this.backgroundMusic = null;
+    this.m_gameOverActive = false;
+    this.m_gameOverTitle = null;
+    this.m_gameOverMenu = null;
+    this.menuSound = null;
+    
+
+
 };
 
 //------------------------------------------------------------------------------
@@ -47,7 +54,7 @@ runmysteriet.scene.Game.prototype.init = function () {
 
     // Musik
     this.backgroundMusic = this.application.sounds.sound.get("sound_music");
-
+    this.menuSound = this.application.sounds.sound.get("sound_menu");
 
     // Bakgrund
 this.m_backgroundHandler = new runmysteriet.handler.BackgroundHandler(
@@ -134,6 +141,11 @@ this.m_backgroundHandler.init();
 runmysteriet.scene.Game.prototype.update = function (step) {
     rune.scene.Scene.prototype.update.call(this, step);
 
+    if (this.m_gameOverActive === true) {
+    this.updateGameOverInput();
+    return;
+}    
+
     this.updatePauseInput();
 
     if (this.m_isPaused === true) {
@@ -146,6 +158,10 @@ runmysteriet.scene.Game.prototype.update = function (step) {
 
     if (this.m_cloudHandler) {
         this.m_cloudHandler.update();
+    }
+
+    if (this.m_platformHandler && typeof this.m_platformHandler.update === "function") {
+        this.m_platformHandler.update(step);
     }
 
     if (this.m_playerHandler) {
@@ -475,12 +491,13 @@ runmysteriet.scene.Game.prototype.winGame = function (winningPlayer) {
     this.m_gameEnd = true;
 
     earnedScore = Math.ceil(this.m_timeLeft);
+    totalScore = this.m_score + earnedScore;
+
 
     if (earnedScore < 0) {
         earnedScore = 0;
     }
 
-    totalScore = this.m_score + earnedScore;
 
     if (this.backgroundMusic) {
         if (typeof this.backgroundMusic.stop === "function") {
@@ -493,40 +510,48 @@ runmysteriet.scene.Game.prototype.winGame = function (winningPlayer) {
     this.application.scenes.load([
         new runmysteriet.scene.LevelComplete(
             this.m_levelNumber,
-            totalScore,
-            earnedScore
+            earnedScore,
+            totalScore
+            
         )
     ]);
 };
 
-runmysteriet.scene.Game.prototype.loseGame = function () {
-    var camera = null;
-    var loseText = null;
+runmysteriet.scene.Game.prototype.loseGame = function(reason) {
 
-    if (this.m_gameEnd === true) {
+    if (this.m_gameOverActive === true) {
         return;
     }
 
     this.m_gameEnd = true;
+    this.m_gameOverActive = true;
+
+    /*
+     * Viktigt:
+     * Ingen score delas ut här.
+     * Förlust i arkadspel betyder att rundan är över.
+     */
 
     if (this.backgroundMusic) {
         if (typeof this.backgroundMusic.stop === "function") {
             this.backgroundMusic.stop();
-        } else if (typeof this.backgroundMusic.pause === "function") {
+        }
+        else if (typeof this.backgroundMusic.pause === "function") {
             this.backgroundMusic.pause();
         }
     }
 
-    camera = this.cameras.getCameraAt(0);
+    this.createGameOverMenu(reason || "DU FORLORADE");
+    this.updateGameOverMenuPosition();
 
-    loseText = new rune.text.BitmapField("DU FORLORADE");
-    loseText.autoSize = true;
-    loseText.x = camera.viewport.x + 90;
-    loseText.y = camera.viewport.y + 100;
+    if (this.m_gameOverTitle) {
+        this.m_gameOverTitle.visible = true;
+    }
 
-    this.stage.addChild(loseText);
+    if (this.m_gameOverMenu) {
+        this.m_gameOverMenu.setVisible(true);
+    }
 };
-
 //------------------------------------------------------------------------------
 // RUNES
 //------------------------------------------------------------------------------
@@ -642,9 +667,7 @@ runmysteriet.scene.Game.prototype.createPauseMenu = function() {
     this.m_pauseMenu.setVisible(false);
 };
 
-runmysteriet.scene.Game.prototype.updatePauseInput = function () {
-    var input = null;
-
+runmysteriet.scene.Game.prototype.updatePauseInput = function() {
     if (this.m_gameEnd === true) {
         return;
     }
@@ -664,30 +687,21 @@ runmysteriet.scene.Game.prototype.updatePauseInput = function () {
         return;
     }
 
-    this.createPauseMenu();
-
-    if (!this.m_pauseMenu || typeof this.m_pauseMenu.readInput !== "function") {
-        return;
-    }
-
     this.updatePauseMenuPosition();
 
-    input = this.m_pauseMenu.readInput(this.keyboard);
-
-    if (input.down) {
-        this.playMenuSound();
-        this.m_pauseMenu.moveNext();
-    }
-
-    if (input.up) {
-        this.playMenuSound();
-        this.m_pauseMenu.movePrevious();
-    }
-
-    if (input.choose) {
-        this.choosePauseSelected();
-    }
+    this.handleMenuListInput(this.m_pauseMenu, function(selectedIndex) {
+        if (selectedIndex === 0) {
+            this.closePauseMenu();
+        }
+        else if (selectedIndex === 1) {
+            this.application.scenes.load([
+                new runmysteriet.scene.Menu()
+            ]);
+        }
+    });
 };
+
+
 runmysteriet.scene.Game.prototype.openPauseMenu = function() {
     this.m_isPaused = true;
 
@@ -719,5 +733,105 @@ runmysteriet.scene.Game.prototype.closePauseMenu = function() {
 
     if (this.backgroundMusic && typeof this.backgroundMusic.play === "function") {
         this.backgroundMusic.play(true);
+    }
+};
+
+runmysteriet.scene.Game.prototype.handleMenuListInput = function(menuList, onChoose) {
+    var input = null;
+
+    if (!menuList || typeof menuList.readInput !== "function") {
+        return;
+    }
+
+    input = menuList.readInput(this.keyboard);
+
+    if (input.down) {
+        this.playMenuSound();
+        menuList.moveNext();
+    }
+
+    if (input.up) {
+        this.playMenuSound();
+        menuList.movePrevious();
+    }
+
+    if (input.choose) {
+        onChoose.call(this, menuList.getSelectedIndex());
+    }
+};
+
+runmysteriet.scene.Game.prototype.updateGameOverInput = function() {
+
+    if (this.m_gameOverActive !== true) {
+        return;
+    }
+
+    this.updateGameOverMenuPosition();
+    
+
+    this.handleMenuListInput(this.m_gameOverMenu, function(selectedIndex) {
+
+        if (selectedIndex === 0) {
+
+            /*
+             * Arkadlogik:
+             * Starta helt nytt spel.
+             * Level 1.
+             * Score 0.
+             */
+            this.application.scenes.load([
+                new runmysteriet.scene.Game(1, 0)
+            ]);
+        }
+        else if (selectedIndex === 1) {
+
+            /*
+             * Tillbaka till huvudmenyn.
+             */
+            this.application.scenes.load([
+                new runmysteriet.scene.Menu()
+            ]);
+        }
+    });
+};
+
+runmysteriet.scene.Game.prototype.createGameOverMenu = function(reason) {
+
+    if (this.m_gameOverMenu) {
+        return;
+    }
+
+    this.m_gameOverTitle = new rune.text.BitmapField(reason || "DU FORLORADE");
+    this.m_gameOverTitle.autoSize = true;
+    this.m_gameOverTitle.visible = false;
+    this.stage.addChild(this.m_gameOverTitle);
+
+    this.m_gameOverMenu = new runmysteriet.ui.MenuList(
+        this.stage,
+        this.application,
+        ["Starta nytt spel", "Till huvudmeny"],
+        0,
+        20,
+        0.8
+    );
+
+    this.m_gameOverMenu.setVisible(false);
+};
+
+runmysteriet.scene.Game.prototype.updateGameOverMenuPosition = function() {
+
+    var camera = this.cameras.getCameraAt(0);
+
+    if (!camera) {
+        return;
+    }
+
+    if (this.m_gameOverTitle) {
+        this.m_gameOverTitle.x = camera.viewport.x + 70;
+        this.m_gameOverTitle.y = camera.viewport.y + 80;
+    }
+
+    if (this.m_gameOverMenu) {
+        this.m_gameOverMenu.setCameraPosition(camera, 75, 120);
     }
 };

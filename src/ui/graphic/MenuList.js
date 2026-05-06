@@ -105,7 +105,7 @@ runmysteriet.ui.MenuList.prototype.setVisible = function(value) {
 
 runmysteriet.ui.MenuList.prototype.setCameraPosition = function(camera, x, y) {
     var item = null;
-    var i = 0;
+    //var i = 0;
 
     if (!camera) {
         return;

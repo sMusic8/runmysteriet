@@ -35,7 +35,7 @@ runmysteriet.segments.Segment_Water.prototype.ground = function(stage, startX) {
      */
     var water = new runmysteriet.ui.graphic.Water(
         x,
-        this.groundY -10 //
+        this.groundY -10 
     );
 
     stage.addChild(water);
