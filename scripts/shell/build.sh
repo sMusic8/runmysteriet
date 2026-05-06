@@ -11,14 +11,17 @@ npx google-closure-compiler \
 --js "./../../src/data/resource/Requests.js" \
 --js "./../../src/config/LevelConfig.js" \
 --js "./../../src/entity/Kristen.js" \
+--js "./../../src/entity/EnglishBoat.js" \      
 --js "./../../src/entity/Player.js" \
 --js "./../../src/ui/graphic/Platform.js" \
 --js "./../../src/ui/graphic/MenuList.js" \
 --js "./../../src/ui/graphic/Hole.js" \
+--js "./../../src/ui/graphic/Water.js" \
 --js "./../../src/ui/graphic/Ground.js" \
 --js "./../../src/segments/Segment_1.js" \
 --js "./../../src/segments/Segment_2.js" \
 --js "./../../src/segments/Segment_3.js" \
+--js "./../../src/segments/Segment_Water.js" \
 --js "./../../src/ui/graphic/Shield.js" \
 --js "./../../src/handler/BackgroundHandler.js" \
 --js "./../../src/handler/ShieldHandler.js" \

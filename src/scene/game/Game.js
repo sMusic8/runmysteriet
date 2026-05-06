@@ -80,7 +80,7 @@ this.m_backgroundHandler.init();
     // Spelare
     this.m_playerHandler = new runmysteriet.handler.PlayerHandler(
         this.stage,
-        this.m_platformHandler.platforms,
+        this.m_platformHandler,
         this.application
     );
 

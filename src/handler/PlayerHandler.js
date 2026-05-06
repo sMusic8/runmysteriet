@@ -3,10 +3,11 @@
 //------------------------------------------------------------------------------
 
 //Klassen där alla spelare i spelet hanteras.
-runmysteriet.handler.PlayerHandler = function(stage, platforms, application) {
+runmysteriet.handler.PlayerHandler = function(stage, platformHandler, application) {
 
     this.stage = stage;
-    this.platforms = platforms;
+    this.platformHandler = platformHandler;
+    this.platforms = platformHandler.platforms;
     this.application = application;
 
     this.players = [];
@@ -178,6 +179,9 @@ console.log("HITTEST:", player.hitTestObject(this.platforms[0]));
                 onPlatform = true;
             }
         }
+               //vatten och båt kollisionskontrol
+        this.checkWaterDeath(player, i);
+        this.checkBoatDeath(player, i);
 
         // GROUND - - - - låt vara bortkommenterad- - - - - - - - 
         // if (player.y >= player.groundY && !onPlatform) {
@@ -336,4 +340,65 @@ runmysteriet.handler.PlayerHandler.prototype.getStandingY = function(player, pla
     }
 
     return platform.y - player.height / 2 - this.m_avatarPlatformOffsetY;
+};
+
+runmysteriet.handler.PlayerHandler.prototype.checkWaterDeath = function(player, index) {
+    var water = null;
+
+    if (!player || player.isDead === true) {
+        return;
+    }
+
+    if (!this.platformHandler || !this.platformHandler.waterAreas) {
+        return;
+    }
+
+    for (var i = 0; i < this.platformHandler.waterAreas.length; i++) {
+        water = this.platformHandler.waterAreas[i];
+
+        if (water && water.isTouchingPlayer(player)) {
+            this.killPlayer(player, index);
+            return;
+        }
+    }
+};
+
+runmysteriet.handler.PlayerHandler.prototype.checkBoatDeath = function(player, index) {
+    var boat = null;
+
+    if (!player || player.isDead === true) {
+        return;
+    }
+
+    if (!this.platformHandler || !this.platformHandler.boats) {
+        return;
+    }
+
+    for (var i = 0; i < this.platformHandler.boats.length; i++) {
+        boat = this.platformHandler.boats[i];
+
+        if (boat && boat.isTouchingPlayer(player)) {
+            this.killPlayer(player, index);
+            return;
+        }
+    }
+};
+
+
+runmysteriet.handler.PlayerHandler.prototype.killPlayer = function(player, index) {
+    if (!player) {
+        return;
+    }
+
+    player.isDead = true;
+    player.visible = false;
+    player.active = false;
+    player.velocityY = 0;
+    player.hp = 0;
+
+    if (player.hpBar) {
+        player.hpBar.visible = false;
+    }
+
+    console.log("Spelaren " + index + " dog");
 };

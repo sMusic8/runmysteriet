@@ -10,10 +10,14 @@ runmysteriet.handler.PlatformHandler = function(stage, screenWidth) {
     this.platforms = [];
     this.holes = [];
     this.enemySpawns = [];
+    this.waterAreas = [];
+    this.movingPlatforms = [];
+    this.boats = [];                                    
 
     this.levelWidth = 0;
 };
 
+//här initieras platformhandlern
 runmysteriet.handler.PlatformHandler.prototype.init = function(levelNumber) {
     levelNumber = levelNumber || 1;
 
@@ -24,18 +28,19 @@ runmysteriet.handler.PlatformHandler.prototype.init = function(levelNumber) {
 
     var segmentTypes = [
         runmysteriet.segments.Segment_1,
-        //runmysteriet.segments.Segment_2,
-        //runmysteriet.segments.Segment_3
+        runmysteriet.segments.Segment_2,
+        runmysteriet.segments.Segment_3,
+        runmysteriet.segments.Segment_Water
     ];
 
-    var segmentCount = 3 + Math.floor((levelNumber - 1) / 5);
+    var segmentCount = 4 + Math.floor((levelNumber - 1) / 5);
 
     if (segmentCount > 20) {
         segmentCount = 20;
     }
 
     var x = 0;
-
+//här loopar vi igenom segmenten och bygger upp leveln
     for (var i = 0; i < segmentCount; i++) {
         var segmentIndex = (levelNumber + i - 1) % segmentTypes.length;
         var SegmentClass = segmentTypes[segmentIndex];
@@ -46,7 +51,9 @@ runmysteriet.handler.PlatformHandler.prototype.init = function(levelNumber) {
         this.addPlatforms(result.platforms);
         this.addHoles(result.holes);
         this.addEnemySpawns(result.enemySpawns);
-
+        this.addWaterAreas(result.waterAreas || []);
+        this.addMovingPlatforms(result.movingPlatforms || []);
+        this.addBoats(result.boats || []);  
         x = result.endX;
     }
 console.log("segmentCount:", segmentCount);
@@ -114,4 +121,32 @@ runmysteriet.handler.PlatformHandler.prototype.addEnemySpawns = function(enemySp
 
 runmysteriet.handler.PlatformHandler.prototype.getEnemySpawns = function() {
     return this.enemySpawns;
+};
+
+///
+runmysteriet.handler.PlatformHandler.prototype.addWaterAreas = function(waterAreas) {
+    if(!this.waterAreas){
+        this.waterAreas = [];
+    }
+    
+    for (var i = 0; i < waterAreas.length; i++) {
+        this.waterAreas.push(waterAreas[i]);
+    }
+};
+
+
+runmysteriet.handler.PlatformHandler.prototype.addMovingPlatforms = function(movingPlatforms) {
+    for (var i = 0; i < movingPlatforms.length; i++) {
+        this.movingPlatforms.push(movingPlatforms[i]);
+    }
+};
+
+runmysteriet.handler.PlatformHandler.prototype.addBoats = function(boats) {
+    
+    if(!this.boats){
+        this.boats = [];
+    }
+    for (var i = 0; i < boats.length; i++) {
+        this.boats.push(boats[i]);
+    }
 };
