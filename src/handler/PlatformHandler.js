@@ -25,6 +25,7 @@ runmysteriet.handler.PlatformHandler.prototype.init = function(levelNumber) {
     this.holes = [];
     this.enemySpawns = [];
     this.levelWidth = 0;
+    this.boats = [];
 
     var segmentTypes = [
         runmysteriet.segments.Segment_Water,
@@ -149,5 +150,28 @@ runmysteriet.handler.PlatformHandler.prototype.addBoats = function(boats) {
     }
     for (var i = 0; i < boats.length; i++) {
         this.boats.push(boats[i]);
+    }
+};
+
+runmysteriet.handler.PlatformHandler.prototype.startBoatTweens = function(tweens) {
+    var boat = null;
+
+    if (!this.boats) {
+        console.log("No boat array");
+        return;
+    }
+        console.log("boat count", this.boats.length);
+
+    for (var i = 0; i < this.boats.length; i++) {
+        boat = this.boats[i];
+
+        if (boat && typeof boat.startTween === "function") {
+            boat.startTween(
+                tweens,
+                boat.minX,
+                boat.maxX
+            );
+            console.log("saknar startTween:", boat);
+        }
     }
 };

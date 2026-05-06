@@ -30,7 +30,7 @@ runmysteriet.handler.PlayerHandler = function(stage, platformHandler, applicatio
     this.players = [];
 
     /** @type {number} */
-    this.m_avatarPlatformOffsetY = 10;
+    this.m_avatarPlatformOffsetY = 14;
 
     /** @type {?Object} */
     this.jumpSound = this.application.sounds.sound.get("sound_jump");
@@ -126,7 +126,9 @@ runmysteriet.handler.PlayerHandler.prototype.updateInput = function() {
 
         var player = this.players[i];
 
-        if (!player || player.isDead === true) continue;
+        if (!player || player.isDead === true) {
+            continue;
+        }
 
         player.previousY = player.y;
         player.isMoving = false;
@@ -145,7 +147,9 @@ runmysteriet.handler.PlayerHandler.prototype.updateMovement = function() {
 
         var player = this.players[i];
 
-        if (!player || player.isDead === true) continue;
+        if (!player || player.isDead === true) {
+            continue;
+        }
 
         player.velocityY += player.gravity;
         player.y += player.velocityY;
@@ -163,9 +167,12 @@ runmysteriet.handler.PlayerHandler.prototype.updateCollisions = function() {
     for (var i = 0; i < this.players.length; i++) {
 
         var player = this.players[i];
-        if (!player || player.isDead === true) continue;
+        if (!player || player.isDead === true) {
+            continue;
+        }
 
         var onPlatform = false;
+        player.currentPlatform = null;  
 
         for (var j = 0; j < this.platforms.length; j++) {
 
@@ -199,14 +206,21 @@ runmysteriet.handler.PlayerHandler.prototype.updateCollisions = function() {
 
 runmysteriet.handler.PlayerHandler.prototype.checkPlatform = function(player, platform) {
 
-    if (!player || !platform) return false;
+    if (!player || !platform) {
+        return false;
+    }
 
-    if (!player.hitTestObject(platform)) return false;
+    if (!player.hitTestObject(platform)) {
+        return false;
+    }
 
     if (player.velocityY >= 0) {
         player.y = this.getStandingY(player, platform);
         player.velocityY = 0;
         player.isOnGround = true;
+
+        player.currentPlatform = platform;
+
         return true;
     }
 
@@ -346,10 +360,21 @@ runmysteriet.handler.PlayerHandler.prototype.getStandingY = function(player, pla
 runmysteriet.handler.PlayerHandler.prototype.checkWaterDeath = function(player, index) {
 
     var water = null;
+    
 
-    if (!player || player.isDead === true) return;
+    if (!player || player.isDead === true) {
+        return;
+    }
+    /*
+     * Om spelaren är på flotten ska vatten inte kunna döda.
+     */
+    if (player.currentPlatform && player.currentPlatform.isRaft === true) {
+        return;
+}
 
-    if (!this.platformHandler || !this.platformHandler.waterAreas) return;
+    if (!this.platformHandler || !this.platformHandler.waterAreas) {
+        return;
+    }
 
     for (var i = 0; i < this.platformHandler.waterAreas.length; i++) {
 
@@ -366,9 +391,13 @@ runmysteriet.handler.PlayerHandler.prototype.checkBoatDeath = function(player, i
 
     var boat = null;
 
-    if (!player || player.isDead === true) return;
+    if (!player || player.isDead === true) {
+        return;
+    }
 
-    if (!this.platformHandler || !this.platformHandler.boats) return;
+    if (!this.platformHandler || !this.platformHandler.boats) {
+        return;
+    }
 
     for (var i = 0; i < this.platformHandler.boats.length; i++) {
 
@@ -387,7 +416,9 @@ runmysteriet.handler.PlayerHandler.prototype.checkBoatDeath = function(player, i
 
 runmysteriet.handler.PlayerHandler.prototype.killPlayer = function(player, index) {
 
-    if (!player) return;
+    if (!player) {
+        return;
+    }
 
     player.isDead = true;
     player.visible = false;

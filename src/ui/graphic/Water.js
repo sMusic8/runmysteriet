@@ -14,7 +14,7 @@ runmysteriet.ui.graphic.Water = function(x, y, width, height) {
         y || 0,
         134,
         96,
-        "hpbar4"
+        "havet"
     );
 
     /** @type {number} */

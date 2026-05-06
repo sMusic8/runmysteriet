@@ -57,3 +57,28 @@ runmysteriet.entity.EnglishBoat.prototype.isTouchingPlayer = function(player) {
         player.y < this.y + this.height
     );
 };
+
+runmysteriet.entity.EnglishBoat.prototype.startTween = function(tweens, minX, maxX) {
+    if (!tweens) {
+        console.log("No tweens object for EnglishBoat");
+        return;
+    }
+
+    this.minX = minX;
+    this.maxX = maxX;
+
+    this.x = this.minX;
+
+    console.log("Starting boat tween:", this.minX, this.maxX);
+
+    this.m_tween = tweens.create({
+        target: this,
+        duration: 2500,
+        behavior: rune.tween.Tween.REVERSE,
+        cycles: 999999,
+        easing: rune.tween.Sine.easeInOut,
+        args: {
+            x: this.maxX
+        }
+    });
+};

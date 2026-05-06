@@ -81,6 +81,7 @@ this.m_backgroundHandler.init();
     );
 
     this.m_platformHandler.init(this.m_levelNumber);
+    this.m_platformHandler.startBoatTweens(this.tweens);
 
     this.m_finishX = this.m_platformHandler.levelWidth - 50;
 
@@ -767,7 +768,7 @@ runmysteriet.scene.Game.prototype.updateGameOverInput = function() {
     }
 
     this.updateGameOverMenuPosition();
-    
+
 
     this.handleMenuListInput(this.m_gameOverMenu, function(selectedIndex) {
 
