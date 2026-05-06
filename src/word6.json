@@ -1,0 +1,34 @@
+[
+    {
+        "word": "Skogen",
+        "Subword":["Troll", "Ur"] 
+    },
+     {
+        "word": "Staden",
+        "Subword":["Inne", "Huvud"]
+    },
+ {
+        "word": "Klocka",
+        "Subword": ["Vägg","Ägg"]
+    },
+    {
+        "word": "Stolen",
+        "Subword": ["Bar", "Kontor"]
+    },
+    {
+        "word": "Golvet",
+        "Subword": ["Trä","Sten"]
+    },
+    {
+        "word": "Skeden",
+        "Subword": ["Mat", "Slut"]
+    },
+    {
+        "word": "Planen",
+        "Subword": ["Tid", "Framttid"]
+    },
+    {
+        "word": "Spelet",
+        "Subword": ["Bräd", "Dator"]
+    }
+]
