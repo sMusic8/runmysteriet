@@ -1,3 +1,11 @@
+/**
+ * @constructor
+ * @extends {rune.display.Graphic}
+ * @param {number=} x
+ * @param {number=} y
+ * @param {number=} width
+ * @param {number=} height
+ */
 runmysteriet.ui.graphic.Water = function(x, y, width, height) {
 
     rune.display.Graphic.call(
@@ -8,15 +16,24 @@ runmysteriet.ui.graphic.Water = function(x, y, width, height) {
         96,
         "hpbar4"
     );
+
+    /** @type {number} */
     this.width = 134;
+
+    /** @type {number} */
     this.height = 96;
 };
 
 runmysteriet.ui.graphic.Water.prototype = Object.create(rune.display.Graphic.prototype);
 runmysteriet.ui.graphic.Water.prototype.constructor = runmysteriet.ui.graphic.Water;
 
-
+/**
+ * Checks if player is touching water.
+ * @param {?Object} player
+ * @return {boolean}
+ */
 runmysteriet.ui.graphic.Water.prototype.isTouchingPlayer = function(player) {
+
     if (!player || player.isDead === true) {
         return false;
     }

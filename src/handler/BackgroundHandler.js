@@ -1,55 +1,101 @@
+//------------------------------------------------------------------------------
+// BACKGROUND HANDLER
+//------------------------------------------------------------------------------
 
-
-
+/**
+ * Handles parallax / looping background layers.
+ *
+ * @constructor
+ * @param {!rune.display.Stage} stage
+ * @param {!rune.camera.Camera} camera
+ * @param {number} screenWidth
+ * @param {number} screenHeight
+ */
 runmysteriet.handler.BackgroundHandler = function(stage, camera, screenWidth, screenHeight) {
 
-    this.stage = stage; 
+    /** @type {!rune.display.Stage} */
+    this.stage = stage;
+
+    /** @type {!rune.camera.Camera} */
     this.camera = camera;
+
+    /** @type {number} */
     this.screenWidth = screenWidth;
+
+    /** @type {number} */
     this.screenHeight = screenHeight;
-   // this.levelWidth = this.screenWidth * this.backgrounds.length;
+
+    /** @type {!Array<!rune.display.Graphic>} */
     this.backgrounds = [];
-    this.backgroundTextures = ["background", "background1", "background2", "background3"];
-   
-this.backgroundCount = this.backgroundTextures.length;
-this.levelWidth = this.screenWidth * this.backgroundCount;
-}
 
-    runmysteriet.handler.BackgroundHandler.prototype.init = function() {
+    /** @type {!Array<string>} */
+    this.backgroundTextures = [
+        "background",
+        "background1",
+        "background2",
+        "background3"
+    ];
 
-        for(var i = 0; i < this.backgroundTextures.length; i++){
-            
-            var background = new rune.display.Graphic(
-                i * this.screenWidth,
-                0,
-                this.screenWidth,
-                this.screenHeight,
-                this.backgroundTextures[i]
-            );
-            this.backgrounds.push(background);
-            this.stage.addChild(background);
-        }
+    /** @type {number} */
+    this.backgroundCount = this.backgroundTextures.length;
+
+    /** @type {number} */
+    this.levelWidth = this.screenWidth * this.backgroundCount;
+};
+
+//------------------------------------------------------------------------------
+// INIT
+//------------------------------------------------------------------------------
+
+/**
+ * Creates background layers.
+ *
+ * @return {void}
+ */
+runmysteriet.handler.BackgroundHandler.prototype.init = function() {
+
+    for (var i = 0; i < this.backgroundTextures.length; i++) {
+
+        var background = new rune.display.Graphic(
+            i * this.screenWidth,
+            0,
+            this.screenWidth,
+            this.screenHeight,
+            this.backgroundTextures[i]
+        );
+
+        this.backgrounds.push(background);
+        this.stage.addChild(background);
     }
+};
 
+//------------------------------------------------------------------------------
+// UPDATE
+//------------------------------------------------------------------------------
+
+/**
+ * Updates infinite scrolling background.
+ *
+ * @return {void}
+ */
 runmysteriet.handler.BackgroundHandler.prototype.update = function() {
 
-if (this.camera === null || this.camera === undefined || this.camera.viewport === null || this.camera.viewport === undefined) {
+    if (!this.camera || !this.camera.viewport) {
+        return;
+    }
 
-    return;
-}
-var cameraX = this.camera.viewport.x;
+    var cameraX = this.camera.viewport.x;
 
-    for (var i = 0; i < this.backgrounds.length; i++){
+    for (var i = 0; i < this.backgrounds.length; i++) {
+
         var background = this.backgrounds[i];
-   
 
-    if (background.x + this.screenWidth < cameraX) {
-        background.x += this.levelWidth;
+        if (background.x + this.screenWidth < cameraX) {
+            background.x += this.levelWidth;
+        }
+
+        if (background.x > cameraX + this.screenWidth) {
+            background.x -= this.levelWidth;
+        }
     }
-    if (background.x > cameraX + this.screenWidth) {
-        background.x -= this.levelWidth;
-    }
-
- }
-
-}
+};

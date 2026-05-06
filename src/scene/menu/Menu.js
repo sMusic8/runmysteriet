@@ -1,12 +1,8 @@
-//------------------------------------------------------------------------------
-// Constructor scope
-//------------------------------------------------------------------------------
-
 /**
  * Menu scene constructor.
  *
  * @constructor
- * @extends rune.scene.Scene
+ * @extends {rune.scene.Scene}
  */
 runmysteriet.scene.Menu = function() {
 
@@ -14,30 +10,41 @@ runmysteriet.scene.Menu = function() {
 
     /**
      * Reusable menu list.
-     * @type {runmysteriet.ui.MenuList}
+     * @type {?runmysteriet.ui.MenuList}
      */
     this.menuList = null;
 
+    /**
+     * Menu sound instance.
+     * @type {?Object}
+     */
     this.menuSound = null;
 };
 
 //------------------------------------------------------------------------------
-// Inheritance
+// INHERITANCE
 //------------------------------------------------------------------------------
 
 runmysteriet.scene.Menu.prototype = Object.create(rune.scene.Scene.prototype);
 runmysteriet.scene.Menu.prototype.constructor = runmysteriet.scene.Menu;
 
 //------------------------------------------------------------------------------
-// Init
+// INIT
 //------------------------------------------------------------------------------
 
+/**
+ * Initializes menu scene.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.Menu.prototype.init = function() {
 
     rune.scene.Scene.prototype.init.call(this);
 
+    /** @type {?Object} */
     this.menuSound = this.application.sounds.sound.get("sound_menu");
 
+    /** @type {!rune.text.BitmapField} */
     var text = new rune.text.BitmapField("Valkommen till runmysteriet!");
     text.autoSize = true;
     text.center = this.application.screen.center;
@@ -45,7 +52,10 @@ runmysteriet.scene.Menu.prototype.init = function() {
     text.flicker.start(750, 0.5);
     this.stage.addChild(text);
 
-    var text2 = new rune.text.BitmapField("From battle to brain, earn the final word!");
+    /** @type {!rune.text.BitmapField} */
+    var text2 = new rune.text.BitmapField(
+        "From battle to brain, earn the final word!"
+    );
     text2.autoSize = true;
     text2.center = this.application.screen.center;
     text2.y -= 20;
@@ -53,6 +63,7 @@ runmysteriet.scene.Menu.prototype.init = function() {
     text2.flicker.start(750, 0.5);
     this.stage.addChild(text2);
 
+    /** @type {!runmysteriet.ui.MenuList} */
     this.menuList = new runmysteriet.ui.MenuList(
         this.stage,
         this.application,
@@ -64,9 +75,15 @@ runmysteriet.scene.Menu.prototype.init = function() {
 };
 
 //------------------------------------------------------------------------------
-// Update
+// UPDATE
 //------------------------------------------------------------------------------
 
+/**
+ * Updates menu logic.
+ *
+ * @param {number} step Fixed time step.
+ * @return {void}
+ */
 runmysteriet.scene.Menu.prototype.update = function(step) {
 
     rune.scene.Scene.prototype.update.call(this, step);
@@ -75,6 +92,7 @@ runmysteriet.scene.Menu.prototype.update = function(step) {
         return;
     }
 
+    /** @type {?Object} */
     var input = this.menuList.readInput(this.keyboard);
 
     if (input.down) {
@@ -93,9 +111,14 @@ runmysteriet.scene.Menu.prototype.update = function(step) {
 };
 
 //------------------------------------------------------------------------------
-// Choose selected
+// CHOOSE
 //------------------------------------------------------------------------------
 
+/**
+ * Handles selected menu item.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.Menu.prototype.chooseSelected = function() {
 
     if (!this.menuList || typeof this.menuList.getSelectedIndex !== "function") {
@@ -122,9 +145,14 @@ runmysteriet.scene.Menu.prototype.chooseSelected = function() {
 };
 
 //------------------------------------------------------------------------------
-// Sound
+// SOUND
 //------------------------------------------------------------------------------
 
+/**
+ * Plays menu navigation sound.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.Menu.prototype.playMenuSound = function() {
 
     if (this.menuSound) {
@@ -133,9 +161,14 @@ runmysteriet.scene.Menu.prototype.playMenuSound = function() {
 };
 
 //------------------------------------------------------------------------------
-// Dispose
+// DISPOSE
 //------------------------------------------------------------------------------
 
+/**
+ * Cleans up scene.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.Menu.prototype.dispose = function() {
 
     if (this.menuList) {

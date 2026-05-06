@@ -1,9 +1,36 @@
+//------------------------------------------------------------------------------
+// CAMERA HANDLER
+//------------------------------------------------------------------------------
+
+/**
+ * Handles camera following logic.
+ *
+ * @constructor
+ * @param {!rune.camera.Camera} camera
+ * @param {!runmysteriet.handler.PlayerHandler} playerHandler
+ * @param {number} levelWidth
+ */
 runmysteriet.handler.CameraHandler = function(camera, playerHandler, levelWidth) {
+
+    /** @type {!rune.camera.Camera} */
     this.camera = camera;
+
+    /** @type {!runmysteriet.handler.PlayerHandler} */
     this.playerHandler = playerHandler;
+
+    /** @type {number} */
     this.levelWidth = levelWidth;
 };
 
+//------------------------------------------------------------------------------
+// UPDATE
+//------------------------------------------------------------------------------
+
+/**
+ * Updates camera position based on living players.
+ *
+ * @return {void}
+ */
 runmysteriet.handler.CameraHandler.prototype.update = function() {
 
     if (!this.camera || !this.camera.viewport) {
@@ -18,6 +45,7 @@ runmysteriet.handler.CameraHandler.prototype.update = function() {
     var livingPlayers = [];
 
     for (var i = 0; i < players.length; i++) {
+
         if (players[i] && players[i].isDead !== true) {
             livingPlayers.push(players[i]);
         }

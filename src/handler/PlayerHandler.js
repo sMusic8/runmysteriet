@@ -3,15 +3,36 @@
 //------------------------------------------------------------------------------
 
 //Klassen där alla spelare i spelet hanteras.
+
+/**
+ * Handles all players in the game.
+ *
+ * @constructor
+ * @param {!rune.display.Stage} stage
+ * @param {!Object} platformHandler
+ * @param {!Object} application
+ */
 runmysteriet.handler.PlayerHandler = function(stage, platformHandler, application) {
 
+    /** @type {!rune.display.Stage} */
     this.stage = stage;
+
+    /** @type {!Object} */
     this.platformHandler = platformHandler;
+
+    /** @type {!Array<!Object>} */
     this.platforms = platformHandler.platforms;
+
+    /** @type {!Object} */
     this.application = application;
 
+    /** @type {!Array<!runmysteriet.entity.Player>} */
     this.players = [];
+
+    /** @type {number} */
     this.m_avatarPlatformOffsetY = 10;
+
+    /** @type {?Object} */
     this.jumpSound = this.application.sounds.sound.get("sound_jump");
 };
 
@@ -34,14 +55,12 @@ runmysteriet.handler.PlayerHandler.prototype.init = function() {
     this.placePlayerOnStartPlatform(player1, 0);
     this.placePlayerOnStartPlatform(player2, 1);
 
-    // HP INIT
     player1.hp = 100;
     player1.maxHp = 100;
 
     player2.hp = 100;
     player2.maxHp = 100;
 
-    // PHYSICS INIT
     player1.previousY = player1.y;
     player2.previousY = player2.y;
 
@@ -57,7 +76,6 @@ runmysteriet.handler.PlayerHandler.prototype.init = function() {
     this.players.push(player1);
     this.players.push(player2);
 
-    // HP BARS
     player1.hpBar = this.createHpBar();
     player2.hpBar = this.createHpBar();
 
@@ -83,7 +101,6 @@ runmysteriet.handler.PlayerHandler.prototype.update = function() {
 
         var p = this.players[i];
 
-        // HP BAR UPDATE
         if (p.hpBar) {
 
             p.hpBar.x = p.x;
@@ -108,9 +125,8 @@ runmysteriet.handler.PlayerHandler.prototype.updateInput = function() {
     for (var i = 0; i < this.players.length; i++) {
 
         var player = this.players[i];
-        if (!player || player.isDead === true){
-            continue;
-        }
+
+        if (!player || player.isDead === true) continue;
 
         player.previousY = player.y;
         player.isMoving = false;
@@ -129,9 +145,7 @@ runmysteriet.handler.PlayerHandler.prototype.updateMovement = function() {
 
         var player = this.players[i];
 
-        if (!player || player.isDead === true){
-            continue;
-        }
+        if (!player || player.isDead === true) continue;
 
         player.velocityY += player.gravity;
         player.y += player.velocityY;
@@ -149,14 +163,10 @@ runmysteriet.handler.PlayerHandler.prototype.updateCollisions = function() {
     for (var i = 0; i < this.players.length; i++) {
 
         var player = this.players[i];
-console.log("PLATFORMS:", this.platforms.length);
-console.log("HITTEST:", player.hitTestObject(this.platforms[0]));
-        if (!player || player.isDead === true){
-            continue;
-        }
+        if (!player || player.isDead === true) continue;
+
         var onPlatform = false;
 
-        // PLATFORMER
         for (var j = 0; j < this.platforms.length; j++) {
 
             var platform = this.platforms[j];
@@ -168,27 +178,18 @@ console.log("HITTEST:", player.hitTestObject(this.platforms[0]));
             }
         }
 
-        // PLAYER ON PLAYER (STÅ PÅ VARANDRA)
         for (var k = 0; k < this.players.length; k++) {
 
             var other = this.players[k];
-
             if (player === other) continue;
 
             if (this.checkPlayerPlatform(player, other)) {
                 onPlatform = true;
             }
         }
-               //vatten och båt kollisionskontrol
+
         this.checkWaterDeath(player, i);
         this.checkBoatDeath(player, i);
-
-        // GROUND - - - - låt vara bortkommenterad- - - - - - - - 
-        // if (player.y >= player.groundY && !onPlatform) {
-        //     player.y = player.groundY;
-        //     player.velocityY = 0;
-        //     player.isOnGround = true;
-        //}
     }
 };
 
@@ -198,26 +199,22 @@ console.log("HITTEST:", player.hitTestObject(this.platforms[0]));
 
 runmysteriet.handler.PlayerHandler.prototype.checkPlatform = function(player, platform) {
 
-    if (!player || !platform) {
-        return false;
-    }
+    if (!player || !platform) return false;
 
-    if (!player.hitTestObject(platform)) {
-        return false;
-    }
+    if (!player.hitTestObject(platform)) return false;
 
     if (player.velocityY >= 0) {
         player.y = this.getStandingY(player, platform);
         player.velocityY = 0;
         player.isOnGround = true;
-
         return true;
     }
 
     return false;
 };
+
 //------------------------------------------------------------------------------
-// PLAYER ON PLAYER (VIKTIG DEL)
+// PLAYER ON PLAYER
 //------------------------------------------------------------------------------
 
 runmysteriet.handler.PlayerHandler.prototype.checkPlayerPlatform = function(player, other) {
@@ -255,7 +252,7 @@ runmysteriet.handler.PlayerHandler.prototype.checkPlayerPlatform = function(play
 // INPUT HANDLER
 //------------------------------------------------------------------------------
 
-runmysteriet.handler.PlayerHandler.prototype.handleInput = function(player, gamepadID) {
+runmysteriet.handler.PlayerHandler.prototype.handleInput = function(player) {
 
     var moving = false;
 
@@ -292,7 +289,6 @@ runmysteriet.handler.PlayerHandler.prototype.createHpBar = function() {
 
     bar.anchorX = 0;
 
-    // Animationer (EN frame per nivå)
     bar.animation.create("full", [0], 0, false);
     bar.animation.create("high", [1], 0, false);
     bar.animation.create("medium", [2], 0, false);
@@ -300,27 +296,29 @@ runmysteriet.handler.PlayerHandler.prototype.createHpBar = function() {
 
     bar.animation.gotoAndStop("full");
 
-    bar.scaleX = 1; // start full
+    bar.scaleX = 1;
 
     return bar;
 };
 
+//------------------------------------------------------------------------------
+// PLACEMENT
+//------------------------------------------------------------------------------
+
 runmysteriet.handler.PlayerHandler.prototype.placePlayerOnPlatform = function(player, platform, offsetX) {
-    if (!player || !platform) {
-        return;
-    }
+
+    if (!player || !platform) return;
 
     player.x = platform.x + (offsetX || 0);
     player.y = this.getStandingY(player, platform);
 };
 
 runmysteriet.handler.PlayerHandler.prototype.placePlayerOnStartPlatform = function(player, index) {
+
     var startPlatform = null;
     var offsetX = 0;
 
-    if (!player) {
-        return;
-    }
+    if (!player) return;
 
     if (!this.platforms || this.platforms.length === 0) {
         player.x = index * 100;
@@ -335,25 +333,26 @@ runmysteriet.handler.PlayerHandler.prototype.placePlayerOnStartPlatform = functi
 };
 
 runmysteriet.handler.PlayerHandler.prototype.getStandingY = function(player, platform) {
-    if (!player || !platform) {
-        return 0;
-    }
+
+    if (!player || !platform) return 0;
 
     return platform.y - player.height / 2 - this.m_avatarPlatformOffsetY;
 };
 
+//------------------------------------------------------------------------------
+// DEATH CHECKS
+//------------------------------------------------------------------------------
+
 runmysteriet.handler.PlayerHandler.prototype.checkWaterDeath = function(player, index) {
+
     var water = null;
 
-    if (!player || player.isDead === true) {
-        return;
-    }
+    if (!player || player.isDead === true) return;
 
-    if (!this.platformHandler || !this.platformHandler.waterAreas) {
-        return;
-    }
+    if (!this.platformHandler || !this.platformHandler.waterAreas) return;
 
     for (var i = 0; i < this.platformHandler.waterAreas.length; i++) {
+
         water = this.platformHandler.waterAreas[i];
 
         if (water && water.isTouchingPlayer(player)) {
@@ -364,17 +363,15 @@ runmysteriet.handler.PlayerHandler.prototype.checkWaterDeath = function(player, 
 };
 
 runmysteriet.handler.PlayerHandler.prototype.checkBoatDeath = function(player, index) {
+
     var boat = null;
 
-    if (!player || player.isDead === true) {
-        return;
-    }
+    if (!player || player.isDead === true) return;
 
-    if (!this.platformHandler || !this.platformHandler.boats) {
-        return;
-    }
+    if (!this.platformHandler || !this.platformHandler.boats) return;
 
     for (var i = 0; i < this.platformHandler.boats.length; i++) {
+
         boat = this.platformHandler.boats[i];
 
         if (boat && boat.isTouchingPlayer(player)) {
@@ -384,11 +381,13 @@ runmysteriet.handler.PlayerHandler.prototype.checkBoatDeath = function(player, i
     }
 };
 
+//------------------------------------------------------------------------------
+// KILL PLAYER
+//------------------------------------------------------------------------------
 
 runmysteriet.handler.PlayerHandler.prototype.killPlayer = function(player, index) {
-    if (!player) {
-        return;
-    }
+
+    if (!player) return;
 
     player.isDead = true;
     player.visible = false;
