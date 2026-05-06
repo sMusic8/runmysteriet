@@ -148,7 +148,8 @@ runmysteriet.handler.PlayerHandler.prototype.updateCollisions = function() {
     for (var i = 0; i < this.players.length; i++) {
 
         var player = this.players[i];
-
+console.log("PLATFORMS:", this.platforms.length);
+console.log("HITTEST:", player.hitTestObject(this.platforms[0]));
         if (!player || player.isDead === true){
             continue;
         }

@@ -1,73 +1,40 @@
 runmysteriet.segments.Segment_1 = function() {
-    this.tileSize = 268;
     this.groundY = 220;
-    this.holeHeight = 200;
 };
 
 runmysteriet.segments.Segment_1.prototype.ground = function(stage, startX) {
-    var x = startX || 0;
 
-    var platforms = [];
-    var holes = [];
-    var enemySpawns = [];
+    var ground = new runmysteriet.ui.Platform();
+    ground.x = 0;
+    ground.y = this.groundY;
+    ground.width = 4000;   // gör den lång
+    stage.addChild(ground);
 
-    var platform1 = new runmysteriet.ui.Platform();
-    platform1.x = x;
-    platform1.y = this.groundY;
-    stage.addChild(platform1);
-    platforms.push(platform1);
-
-    enemySpawns.push({
-        type: "kristen",
-        x: x + 120,
-        y: this.groundY - 40
-    });
-
-    x += this.tileSize;
-
-    var platform2 = new runmysteriet.ui.Platform();
-    platform2.x = x;
-    platform2.y = this.groundY;
-    stage.addChild(platform2);
-    platforms.push(platform2);
-
-    x += this.tileSize;
-
-    var hole = new runmysteriet.ui.graphic.Hole(
-        x,
-        this.groundY,
-        40,
-        this.holeHeight
-    );
-
-    stage.addChild(hole);
-    holes.push(hole);
-
-    x += hole.width;
-
-    var platform3 = new runmysteriet.ui.Platform();
-    platform3.x = x;
-    platform3.y = this.groundY;
-    stage.addChild(platform3);
-    platforms.push(platform3);
-
-    x += this.tileSize;
-
-    return {
-        platforms: platforms,
-        holes: holes,
-        enemySpawns: enemySpawns,
-        endX: x
-    };
-
-    var airPlatform = new runmysteriet.ui.Platform(
-    x,
-    this.groundY - 120, // <-- högre upp
-    200,
+   var platform = new runmysteriet.ui.Platform(
+    50,
+    180,
+    100,
     32,
     "stone"
 );
 
-stage.addChild(airPlatform);
-platforms.push(airPlatform);
+stage.addChild(platform);
+
+    return {
+        platforms: [ground],
+        holes: [],
+        enemySpawns: [],
+        endX: 4000
+    };
+};
+runmysteriet.segments.Segment_1.prototype.platforms = function(stage, startX) {
+
+
+
+    return {
+        platforms: [platform],
+        holes: [],
+        enemySpawns: [],
+        endX: x + 268
+    };
 };

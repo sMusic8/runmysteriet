@@ -24,8 +24,8 @@ runmysteriet.handler.PlatformHandler.prototype.init = function(levelNumber) {
 
     var segmentTypes = [
         runmysteriet.segments.Segment_1,
-        runmysteriet.segments.Segment_2,
-        runmysteriet.segments.Segment_3
+        //runmysteriet.segments.Segment_2,
+        //runmysteriet.segments.Segment_3
     ];
 
     var segmentCount = 3 + Math.floor((levelNumber - 1) / 5);
@@ -49,7 +49,8 @@ runmysteriet.handler.PlatformHandler.prototype.init = function(levelNumber) {
 
         x = result.endX;
     }
-
+console.log("segmentCount:", segmentCount);
+console.log("segmentTypes:", segmentTypes);
     this.levelWidth = x;
 };
 
