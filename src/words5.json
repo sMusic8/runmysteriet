@@ -1,0 +1,106 @@
+[
+{
+    "word": "Knapp",
+    "Subword":["start", "nål"]
+},
+{
+    "word": "Sjuka",
+    "Subword":["Sjö", "Åk"]
+},
+{
+    "word": "Lampa",
+    "Subword":["Tak", "Bord"]
+},
+{
+    "word": "Skola",
+    "Subword":["Hög", "Grund"]
+},
+{
+    "word": "Matta",
+    "Subword":["Dörr", "Yoga"]
+},
+{
+    "word": "Karta",
+    "Subword":["Stad", "Värld"]
+},
+{
+    "word": "Skiva",
+    "Subword":["Lp", "Glas"]
+},
+{
+    "word": "Tryck",
+    "Subword":["Blod", "Luft"]
+},
+{
+    "word": "Drift",
+    "Subword":["Motor", "Batteri"]
+},
+{
+    "word": "Lista",
+    "Subword":["Inköp", "Gäst"]
+},
+{
+    "word": "Värme",
+    "Subword":["Kropp", "Fjärr"]
+},
+{
+    "word": "Lager",
+    "Subword":["Reserv", "Kul"]
+},
+{
+    "word": "Foder",
+    "Subword":["Jack", "Djur"]
+},
+{
+    "word": "Linje",
+    "Subword":["Buss", "Mitt"]
+},
+{
+    "word": "Start",
+    "Subword":["Om", "Ny"]
+},
+{
+    "word": "Växel",
+    "Subword":["Varm", "Telefon"]
+},
+{
+    "word": "Tanke",
+    "Subword":["Om", "Efter"]
+},
+{
+    "word": "Plats",
+    "Subword":["Pakering", "Monterat"]
+},
+{
+    "word": "Märke",
+    "Subword":["Bil", "Varu"]
+},
+{
+    "word": "Gräns",
+    "Subword":["Ålder", "Land"]
+},
+{
+    "word": "Bilar",
+    "Subword":["Polis", "Last"]
+},
+{
+    "word": "Orten",
+    "Subword":["Hem", "För"]
+},
+{
+    "word": "Skede",
+    "Subword":["Slut", "Inledning"]
+},
+{
+    "word": "Sikte",
+    "Subword":["Mål", "Kikar"]
+},
+{
+    "word": "Skydd",
+    "Subword":["Sol", "Hörsel"]
+},
+{
+        "word": "Sidan",
+        "Subword": ["Fram", "Webb"]
+    }
+]

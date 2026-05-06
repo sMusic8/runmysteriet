@@ -57,7 +57,8 @@ runmysteriet.handler.PlatformHandler.prototype.init = function(levelNumber) {
         this.addBoats(result.boats || []);  
         x = result.endX;
     }
-
+console.log("segmentCount:", segmentCount);
+console.log("segmentTypes:", segmentTypes);
     this.levelWidth = x;
 };
 
