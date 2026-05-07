@@ -52,6 +52,15 @@ runmysteriet.scene.Game.prototype.constructor = runmysteriet.scene.Game;
 runmysteriet.scene.Game.prototype.init = function () {
     rune.scene.Scene.prototype.init.call(this);
 console.log(this.cameras.getCameraAt(0));
+
+    //score text
+    this.m_scoreText = new rune.text.BitmapField("");
+    this.m_scoreText.x = 15;
+    this.m_scoreText.y = 30;
+    this.stage.addChild(this.m_scoreText);
+
+
+
     // Musik
     this.backgroundMusic = this.application.sounds.sound.get("sound_music");
     this.menuSound = this.application.sounds.sound.get("sound_menu");
@@ -123,12 +132,23 @@ this.m_shieldHandler.display();
 // CAMERA
 this.camera = this.cameras.getCameraAt(0);
 
-// HUD object
-this.gris = new runmysteriet.handler.TestShield();
-this.stage.addChild(this.gris);
 
-this.grisText = new rune.text.BitmapField("");
-this.stage.addChild(this.grisText);
+// // HUD object
+this.createHUD();
+
+var self = this;
+
+this.m_shieldHandler.onCollectedChanged = function(text) {
+    if (self.grisText) {
+        self.grisText.text = text;
+    }
+};
+
+// this.gris = new runmysteriet.handler.TestShield();
+// this.stage.addChild(this.gris);
+
+// this.grisText = new rune.text.BitmapField("");
+// this.stage.addChild(this.grisText);
 
 // position
 this.gris.x = this.camera.viewport.x + 100;
@@ -874,5 +894,38 @@ runmysteriet.scene.Game.prototype.updateGameOverMenuPosition = function() {
 
     if (this.m_gameOverMenu) {
         this.m_gameOverMenu.setCameraPosition(camera, 75, 120);
+    }
+};
+
+runmysteriet.scene.Game.prototype.createHUD = function() {
+    this.camera = this.cameras.getCameraAt(0);
+
+    this.gris = new runmysteriet.handler.TestShield();
+    this.stage.addChild(this.gris);
+
+    this.grisText = new rune.text.BitmapField("");
+    this.stage.addChild(this.grisText);
+
+    this.grisText.text = "";
+
+    this.updateHUD();
+};
+
+
+runmysteriet.scene.Game.prototype.updateHUD = function() {
+    var camera = this.cameras.getCameraAt(0);
+
+    if (!camera) {
+        return;
+    }
+
+    if (this.gris) {
+        this.gris.x = camera.viewport.x + 100;
+        this.gris.y = camera.viewport.y + 100;
+    }
+
+    if (this.grisText) {
+        this.grisText.x = camera.viewport.x + 110;
+        this.grisText.y = camera.viewport.y + 110;
     }
 };
