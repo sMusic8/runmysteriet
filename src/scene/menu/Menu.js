@@ -91,13 +91,15 @@ runmysteriet.scene.Menu.prototype.chooseSelected = function() {
 
     var selectedIndex = this.menuList.getSelectedIndex();
 
-    if (selectedIndex === 0) {
+  if (selectedIndex === 0) {
 
-        this.application.scenes.load([
-            new runmysteriet.scene.TextInputView()
-        ]);
+    this.application.scenes.load([
+        new runmysteriet.scene.TextInputView(function() {
+            return "Anvand pilar for att valja bokstav. SPACE = lagg till. BACKSPACE = ta bort";
+        })
+    ]);
 
-    }
+}
     else if (selectedIndex === 1) {
 
         this.application.scenes.load([
