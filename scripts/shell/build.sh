@@ -34,6 +34,7 @@ npx google-closure-compiler \
 --js "./../../src/scene/menu/More.js" \
 --js "./../../src/scene/menu/Credits.js" \
 --js "./../../src/scene/menu/LevelComplete.js" \
+--js "./../../src/scene/menu/GuessWord.js" \
 --js "./../../src/scene/game/Game.js" \
 --js "./../../src/segments/Segment_1.js" \
 --js "./../../src/segments/Segment_2.js" \
