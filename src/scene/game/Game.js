@@ -658,7 +658,7 @@ runmysteriet.scene.Game.prototype.winGame = function(winningPlayer) {
     }
 
     this.application.scenes.load([
-        new runmysteriet.scene.LevelComplete(
+        new runmysteriet.scene.GuessWord(
             this.m_levelNumber,
             earnedScore,
             totalScore
