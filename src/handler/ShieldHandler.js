@@ -42,6 +42,8 @@ runmysteriet.handler.ShieldHandler = function (stage, application, levelWidth) {
 
   /** @type {?Object} */
   this.catchSound = this.application.sounds.sound.get("sound_catch");
+
+  this.box = null
 };
 
 //------------------------------------------------------------------------------
@@ -187,4 +189,13 @@ runmysteriet.handler.ShieldHandler.prototype.getCollected = function () {
 runmysteriet.handler.ShieldHandler.prototype.allRunesColected = function () {
   return this.m_word.length > 0 &&
          this.m_collected.length >= this.m_word.length;
+};
+runmysteriet.handler.ShieldHandler.prototype.display = function () {
+
+    this.box = new rune.display.Graphic(10, 10, 100, 100);
+    this.box.backgroundColor = "#ffffff";
+   //this.display.DisplayObjectContainer.addChild(this.box);
+  
+
+  
 };

@@ -22,6 +22,7 @@ npx google-closure-compiler \
 --js "./../../src/ui/graphic/Shield.js" \
 --js "./../../src/handler/BackgroundHandler.js" \
 --js "./../../src/handler/ShieldHandler.js" \
+--js "./../../src/handler/TestShield.js" \
 --js "./../../src/handler/CameraHandler.js" \
 --js "./../../src/handler/CloudHandler.js" \
 --js "./../../src/handler/PlatformHandler.js" \

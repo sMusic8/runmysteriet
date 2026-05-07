@@ -116,9 +116,14 @@ this.m_backgroundHandler.init();
         this.application,
         this.m_platformHandler.levelWidth
     );
-
+  
     this.m_shieldHandler.init();
+this.m_shieldHandler.display();
 
+this.gris = new runmysteriet.handler.TestShield(
+
+)
+this.gris.init()
     // Timer
     this.m_timerText = new rune.text.BitmapField("TID KVAR 200");
     this.m_timerText.x = 15;
