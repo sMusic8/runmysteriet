@@ -38,18 +38,18 @@ runmysteriet.scene.TextInputView.prototype.init = function() {
 
     this.helpText = new rune.text.BitmapField(String(textValue));
     this.helpText.autoSize = true;
-    this.helpText.x = 40;
-    this.helpText.y = 40;
     this.stage.addChild(this.helpText);
 
     // aktuell bokstav
     this.letterText = new rune.text.BitmapField("a");
+    this.letterText.autoSize = true;
     this.letterText.x = 100;
     this.letterText.y = 120;
     this.stage.addChild(this.letterText);
 
     // ord
     this.wordText = new rune.text.BitmapField("");
+    this.letterText.autoSize = true;
     this.wordText.x = 100;
     this.wordText.y = 180;
     this.stage.addChild(this.wordText);
@@ -76,10 +76,12 @@ runmysteriet.scene.TextInputView.prototype.update = function(step) {
     // --------------------------
     if (this.keyboard.justPressed("UP")) {
         this.focus = 1;
+        this.backgroundColor = "#ffffff";
     }
 
     if (this.keyboard.justPressed("DOWN")) {
         this.focus = 0;
+        this.backgroundColor = "#ffffff";
     }
 
     // --------------------------
