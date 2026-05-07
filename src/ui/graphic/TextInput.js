@@ -29,11 +29,13 @@ runmysteriet.ui.TextInput.prototype.update = function(keyboard) {
     var left = keyboard && keyboard.justPressed("LEFT");
     var right = keyboard && keyboard.justPressed("RIGHT");
 
-    var gpLeft = gamepad && gamepad.justPressed("LEFT");
-    var gpRight = gamepad && gamepad.justPressed("RIGHT");
-
     var choose = keyboard && keyboard.justPressed("ENTER");
     var back = keyboard && keyboard.justPressed("BACKSPACE");
+
+    var space = keyboard && keyboard.justPressed("SPACE");
+
+    var gpLeft = gamepad && gamepad.justPressed("LEFT");
+    var gpRight = gamepad && gamepad.justPressed("RIGHT");
 
     var gpChoose = gamepad && gamepad.justPressed("A");
     var gpBack = gamepad && gamepad.justPressed("B");
@@ -52,6 +54,7 @@ runmysteriet.ui.TextInput.prototype.update = function(keyboard) {
     return {
         letter: this.letters[this.index],
         choose: choose,
-        back: back
+        back: back,
+        space: space
     };
 };

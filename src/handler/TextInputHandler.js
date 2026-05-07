@@ -5,7 +5,8 @@ runmysteriet.ui.TextInputHandler = function(application) {
 
     this.input = new runmysteriet.ui.TextInput(application);
 
-    this.word = [];
+    this.words = ["", ""];
+    this.currentIndex = 0;
 };
 
 runmysteriet.ui.TextInputHandler.prototype.update = function(keyboard) {
@@ -14,21 +15,33 @@ runmysteriet.ui.TextInputHandler.prototype.update = function(keyboard) {
 
     if (!data) return data;
 
-    // ➕ lägg till bokstav
-    if (data.choose) {
-        this.word.push(data.letter);
-        console.log("WORD:", this.word.join(""));
+    // ➡️ SPACE = byt till ord 2
+    if (data.space) {
+        this.currentIndex = 1;
+        console.log("➡️ byter till WORD2");
+        return data;
     }
 
-    // ➖ ta bort bokstav
+    // ➕ välj bokstav
+    if (data.choose) {
+        this.words[this.currentIndex] += data.letter;
+
+        console.log("WORD1:", this.words[0], "WORD2:", this.words[1]);
+    }
+
+    // ➖ backspace
     if (data.back) {
-        this.word.pop();
-        console.log("WORD:", this.word.join(""));
+        this.words[this.currentIndex] =
+            this.words[this.currentIndex].slice(0, -1);
     }
 
     return data;
 };
 
 runmysteriet.ui.TextInputHandler.prototype.getWord = function() {
-    return this.word.join("");
+    return this.words.join(" ");
+};
+
+runmysteriet.ui.TextInputHandler.prototype.getWords = function() {
+    return this.words;
 };
