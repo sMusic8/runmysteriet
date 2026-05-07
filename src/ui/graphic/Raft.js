@@ -15,7 +15,7 @@ runmysteriet.ui.graphic.Raft = function(x, y) {
     this.maxX = this.startX + 100;
 
     this.speed = 0.7;
-    this.direction = -1;
+    this.direction = 1;
 
     this.previousX = this.x;
     this.deltaX = 0;
@@ -23,9 +23,9 @@ runmysteriet.ui.graphic.Raft = function(x, y) {
      /*
      * Flotten ska inte röra sig direkt.
      */
-    this.hasStarted = false;
-    this.hasArrived = false;    
-    this.isRaft = true;
+    //this.hasStarted = false;
+   // this.hasArrived = false;    
+   // this.isRaft = true;
 };
 
 
@@ -55,7 +55,7 @@ runmysteriet.ui.graphic.Raft.prototype.update = function(step) {
 
     if (this.x <= this.minX) {
         this.x = this.minX;
-        this.direction = 1;
+        this.direction = -1;
     }
 
   if (this.x >= this.maxX) {

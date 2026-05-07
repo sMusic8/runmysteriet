@@ -12,16 +12,16 @@ runmysteriet.ui.graphic.Water = function(x, y, width, height) {
         this,
         x || 0,
         y || 0,
-        134,
-        96,
-        "water"
+        402,
+        32,
+        "havet"
     );
 
     /** @type {number} */
-    this.width = 134;
+    this.width = 402;
 
     /** @type {number} */
-    this.height = 96;
+    this.height = 32;
 };
 
 runmysteriet.ui.graphic.Water.prototype = Object.create(rune.display.Graphic.prototype);
