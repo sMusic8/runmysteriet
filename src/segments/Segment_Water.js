@@ -77,8 +77,8 @@ runmysteriet.segments.Segment_Water.prototype.ground = function(stage, startX) {
      * Rörelseområde för tween.
      * Om båten knappt rör sig, öka dessa värden.
      */
-    boat.minX = water.x - 40;
-    boat.maxX = water.x + this.waterWidth + 40;
+    boat.minX = water.x - 5;
+    boat.maxX = water.x + this.waterWidth + 5;
 
     stage.addChild(boat);
     boats.push(boat);
