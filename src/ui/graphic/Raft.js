@@ -23,9 +23,9 @@ runmysteriet.ui.graphic.Raft = function(x, y) {
      /*
      * Flotten ska inte röra sig direkt.
      */
-    //this.hasStarted = false;
-   // this.hasArrived = false;    
-   // this.isRaft = true;
+    this.hasStarted = false;
+    this.hasArrived = false;    
+    this.isRaft = true;
 };
 
 

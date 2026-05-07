@@ -28,14 +28,14 @@ runmysteriet.handler.PlatformHandler.prototype.init = function(levelNumber) {
     this.boats = [];
 
     var segmentTypes = [
-        runmysteriet.segments.Segment_Water,
+       // runmysteriet.segments.Segment_Water,
         runmysteriet.segments.Segment_1,
         runmysteriet.segments.Segment_2,
         runmysteriet.segments.Segment_3
     ];
 
     //
-    var segmentCount = 4 + Math.floor((levelNumber - 1) / 5);
+    var segmentCount = 3 + Math.floor((levelNumber - 1) / 5);
 
     if (segmentCount > 20) {
         segmentCount = 20;

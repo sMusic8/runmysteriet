@@ -243,8 +243,8 @@ runmysteriet.handler.PlayerHandler.prototype.checkPlatform = function(player, pl
         player.velocityY = 0;
         player.isOnGround = true;
 
-        if (platform.isRaft === true) {
-            player.x += platform.deltaX || 0;
+        if (platform.isRaft === true) {// Om spelaren är på flotten ska den följa med i dess rörelse.
+            player.x += platform.deltaX || 0; // Detta gör att spelaren rör sig i x-led lika mycket som flotten.
 }
 
         player.currentPlatform = platform;
