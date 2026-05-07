@@ -15,7 +15,7 @@ npx google-closure-compiler \
 --js "./../../src/entity/EnglishBoat.js" \
 --js "./../../src/entity/Player.js" \
 --js "./../../src/ui/graphic/Platform.js" \
---js "./../../src/ui/MenuList.js" \
+--js "./../../src/ui/graphic/MenuList.js" \
 --js "./../../src/ui/graphic/Hole.js" \
 --js "./../../src/ui/graphic/Water.js" \
 --js "./../../src/ui/graphic/Ground.js" \

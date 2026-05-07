@@ -656,7 +656,7 @@ runmysteriet.scene.Game.prototype.createPauseMenu = function() {
     this.m_pauseTitle.visible = false;
     this.stage.addChild(this.m_pauseTitle);
 
-    this.m_pauseMenu = new runmysteriet.ui.MenuList(
+    this.m_pauseMenu = new runmysteriet.ui.graphic.MenuList(
         this.stage,
         this.application,
         ["FORTSATT SPELET", "AVSLUTA SPELET"],
@@ -807,7 +807,7 @@ runmysteriet.scene.Game.prototype.createGameOverMenu = function(reason) {
     this.m_gameOverTitle.visible = false;
     this.stage.addChild(this.m_gameOverTitle);
 
-    this.m_gameOverMenu = new runmysteriet.ui.MenuList(
+    this.m_gameOverMenu = new runmysteriet.ui.graphic.MenuList(
         this.stage,
         this.application,
         ["Starta nytt spel", "Till huvudmeny"],

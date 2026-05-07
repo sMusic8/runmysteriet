@@ -10,7 +10,7 @@ runmysteriet.scene.Menu = function() {
 
     /**
      * Reusable menu list.
-     * @type {?runmysteriet.ui.MenuList}
+     * @type {?runmysteriet.ui.graphic.MenuList}
      */
     this.menuList = null;
 
@@ -63,8 +63,8 @@ runmysteriet.scene.Menu.prototype.init = function() {
     text2.flicker.start(750, 0.5);
     this.stage.addChild(text2);
 
-    /** @type {!runmysteriet.ui.MenuList} */
-    this.menuList = new runmysteriet.ui.MenuList(
+    /** @type {!runmysteriet.ui.graphic.MenuList} */
+    this.menuList = new runmysteriet.ui.graphic.MenuList(
         this.stage,
         this.application,
         ["Starta spelet", "Las mer", "Credits"],

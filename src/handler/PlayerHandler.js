@@ -122,6 +122,8 @@ runmysteriet.handler.PlayerHandler.prototype.update = function() {
 
 runmysteriet.handler.PlayerHandler.prototype.updateInput = function() {
 
+
+    
     for (var i = 0; i < this.players.length; i++) {
 
         var player = this.players[i];
@@ -156,6 +158,28 @@ runmysteriet.handler.PlayerHandler.prototype.updateMovement = function() {
 
         player.isOnGround = false;
     }
+};
+//------------------------------------------------------------------------------
+// GAMEPAD
+//------------------------------------------------------------------------------
+runmysteriet.handler.PlayerHandler.prototype.getGamepad = function(gamepadID) {
+
+    if (this.application === null || this.application === undefined) {
+        return null;
+    }
+
+    if (this.application.inputs === null || this.application.inputs === undefined) {
+        return null;
+    }
+
+    if (
+        this.application.inputs.gamepads === null ||
+        this.application.inputs.gamepads === undefined
+    ) {
+        return null;
+    }
+
+    return this.application.inputs.gamepads.get(gamepadID);
 };
 
 //------------------------------------------------------------------------------
@@ -219,7 +243,14 @@ runmysteriet.handler.PlayerHandler.prototype.checkPlatform = function(player, pl
         player.velocityY = 0;
         player.isOnGround = true;
 
+        if (platform.isRaft === true) {
+            player.x += platform.deltaX || 0;
+}
+
         player.currentPlatform = platform;
+        if (platform.isRaft === true && typeof platform.start === "function") {
+            platform.start();
+}
 
         return true;
     }
@@ -263,12 +294,34 @@ runmysteriet.handler.PlayerHandler.prototype.checkPlayerPlatform = function(play
 };
 
 //------------------------------------------------------------------------------
+// GAMEPAD
+//------------------------------------------------------------------------------    
+runmysteriet.handler.PlayerHandler.prototype.getGamepad = function(gamepadID) {
+
+    if (!this.application) {
+        return null;
+    }
+
+    if (!this.application.inputs) {
+        return null;
+    }
+
+    if (!this.application.inputs.gamepads) {
+        return null;
+    }
+
+    return this.application.inputs.gamepads.get(gamepadID);
+};
+
+
+//------------------------------------------------------------------------------
 // INPUT HANDLER
 //------------------------------------------------------------------------------
 
-runmysteriet.handler.PlayerHandler.prototype.handleInput = function(player) {
+runmysteriet.handler.PlayerHandler.prototype.handleInput = function(player, gamepadID) {
 
     var moving = false;
+    var gamepad = this.getGamepad(gamepadID);
 
     if (player.keyboard.pressed(player.controls.right)) {
         player.x += player.speed;
@@ -289,6 +342,35 @@ runmysteriet.handler.PlayerHandler.prototype.handleInput = function(player) {
 
         if (this.jumpSound) this.jumpSound.play();
     }
+    // gamepad -------OBS ta inte bort-----------
+    if (gamepad !== null && gamepad !== undefined) {
+
+        if (gamepad.stickLeftRight) {
+            player.x += player.speed;
+            moving = true;
+            player.flippedX = false;
+        }
+
+        if (gamepad.stickLeftLeft) {
+            player.x -= player.speed;
+            moving = true;
+            player.flippedX = true;
+        }
+
+        if (
+            typeof gamepad.justPressed === "function" &&
+            gamepad.justPressed(0) &&
+            player.isOnGround === true
+        ) {
+            player.velocityY = player.jumpPower;
+            player.isOnGround = false;
+
+            if (this.jumpSound) {
+                this.jumpSound.play();
+            }
+        }
+    }
+
 
     player.isMoving = moving;
 };
@@ -432,3 +514,4 @@ runmysteriet.handler.PlayerHandler.prototype.killPlayer = function(player, index
 
     console.log("Spelaren " + index + " dog");
 };
+

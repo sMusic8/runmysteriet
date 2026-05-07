@@ -57,8 +57,6 @@ runmysteriet.entity.Player = function(controls, spriteConfig) {
 
     this.isMoving = false;
 
-    /** @type {?Object} */
-    this.jumpSound = this.application.sounds.sound.get("sound_jump");
 };
 
 //------------------------------------------------------------------------------

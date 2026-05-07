@@ -11,7 +11,7 @@ runmysteriet.ui = runmysteriet.ui || {};
  * @param {number=} spacing
  * @param {number=} scale
  */
-runmysteriet.ui.MenuList = function(stage, application, labels, yOffset, spacing, scale) {
+runmysteriet.ui.graphic.MenuList = function(stage, application, labels, yOffset, spacing, scale) {
 
     /** @type {!Object} */
     this.stage = stage;
@@ -52,7 +52,7 @@ runmysteriet.ui.MenuList = function(stage, application, labels, yOffset, spacing
  * Creates menu items.
  * @return {void}
  */
-runmysteriet.ui.MenuList.prototype.create = function() {
+runmysteriet.ui.graphic.MenuList.prototype.create = function() {
     /** @type {?rune.text.BitmapField} */
     var item = null;
 
@@ -80,7 +80,7 @@ runmysteriet.ui.MenuList.prototype.create = function() {
  * Move selection down.
  * @return {void}
  */
-runmysteriet.ui.MenuList.prototype.moveNext = function() {
+runmysteriet.ui.graphic.MenuList.prototype.moveNext = function() {
     if (this.items.length <= 0) return;
 
     this.selectedIndex++;
@@ -96,7 +96,7 @@ runmysteriet.ui.MenuList.prototype.moveNext = function() {
  * Move selection up.
  * @return {void}
  */
-runmysteriet.ui.MenuList.prototype.movePrevious = function() {
+runmysteriet.ui.graphic.MenuList.prototype.movePrevious = function() {
     if (this.items.length <= 0) return;
 
     this.selectedIndex--;
@@ -112,7 +112,7 @@ runmysteriet.ui.MenuList.prototype.movePrevious = function() {
  * Updates visual selection.
  * @return {void}
  */
-runmysteriet.ui.MenuList.prototype.updateSelection = function() {
+runmysteriet.ui.graphic.MenuList.prototype.updateSelection = function() {
 
     /** @type {?rune.text.BitmapField} */
     var item = null;
@@ -137,7 +137,7 @@ runmysteriet.ui.MenuList.prototype.updateSelection = function() {
 /**
  * @return {number}
  */
-runmysteriet.ui.MenuList.prototype.getSelectedIndex = function() {
+runmysteriet.ui.graphic.MenuList.prototype.getSelectedIndex = function() {
     return this.selectedIndex;
 };
 
@@ -149,7 +149,7 @@ runmysteriet.ui.MenuList.prototype.getSelectedIndex = function() {
  * @param {boolean} value
  * @return {void}
  */
-runmysteriet.ui.MenuList.prototype.setVisible = function(value) {
+runmysteriet.ui.graphic.MenuList.prototype.setVisible = function(value) {
 
     var i = 0;
 
@@ -166,7 +166,7 @@ runmysteriet.ui.MenuList.prototype.setVisible = function(value) {
  * @param {number} y
  * @return {void}
  */
-runmysteriet.ui.MenuList.prototype.setCameraPosition = function(camera, x, y) {
+runmysteriet.ui.graphic.MenuList.prototype.setCameraPosition = function(camera, x, y) {
 
     /** @type {?rune.text.BitmapField} */
     var item = null;
@@ -190,7 +190,7 @@ runmysteriet.ui.MenuList.prototype.setCameraPosition = function(camera, x, y) {
  * Removes all items.
  * @return {void}
  */
-runmysteriet.ui.MenuList.prototype.clear = function() {
+runmysteriet.ui.graphic.MenuList.prototype.clear = function() {
 
     /** @type {?rune.text.BitmapField} */
     var item = null;
@@ -217,7 +217,7 @@ runmysteriet.ui.MenuList.prototype.clear = function() {
  * @param {?Object} keyboard
  * @return {{up:boolean, down:boolean, choose:boolean}}
  */
-runmysteriet.ui.MenuList.prototype.readInput = function(keyboard) {
+runmysteriet.ui.graphic.MenuList.prototype.readInput = function(keyboard) {
 
     /** @type {?Object} */
     var gamepad = null;

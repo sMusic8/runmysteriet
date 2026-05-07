@@ -8,7 +8,6 @@ runmysteriet.ui.graphic.Raft = function(x, y) {
         20,
         "flotte"
     );
-
     this.isRaft = true; 
     
     this.startX = x || 0;
@@ -25,6 +24,7 @@ runmysteriet.ui.graphic.Raft = function(x, y) {
      * Flotten ska inte röra sig direkt.
      */
     this.hasStarted = false;
+    this.hasArrived = false;    
     this.isRaft = true;
 };
 
@@ -33,12 +33,17 @@ runmysteriet.ui.graphic.Raft.prototype = Object.create(rune.display.Graphic.prot
 runmysteriet.ui.graphic.Raft.prototype.constructor = runmysteriet.ui.graphic.Raft;
 
 runmysteriet.ui.graphic.Raft.prototype.start = function() {
+     if (this.hasArrived === true) {
+        return;
+    }
+
     this.hasStarted = true;
 };
 
 runmysteriet.ui.graphic.Raft.prototype.update = function(step) {
     rune.display.Graphic.prototype.update.call(this, step);
-
+    
+    
     this.previousX = this.x;
     this.deltaX = 0;
 
@@ -53,10 +58,11 @@ runmysteriet.ui.graphic.Raft.prototype.update = function(step) {
         this.direction = 1;
     }
 
-    if (this.x >= this.maxX) {
-        this.x = this.maxX;
-        this.direction = -1;
-    }
+  if (this.x >= this.maxX) {
+    this.x = this.maxX;
+    this.hasStarted = false;
+    this.hasArrived = true;
+}
 
     this.deltaX = this.x - this.previousX;
 };
