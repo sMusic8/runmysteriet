@@ -17,6 +17,7 @@ npx google-closure-compiler \
 --js "./../../src/ui/graphic/Platform.js" \
 --js "./../../src/ui/graphic/MenuList.js" \
 --js "./../../src/ui/graphic/Hole.js" \
+--js "./../../src/ui/graphic/TextInput.js" \
 --js "./../../src/ui/graphic/Water.js" \
 --js "./../../src/ui/graphic/Ground.js" \
 --js "./../../src/ui/graphic/Shield.js" \
@@ -25,6 +26,7 @@ npx google-closure-compiler \
 --js "./../../src/handler/TestShield.js" \
 --js "./../../src/handler/CameraHandler.js" \
 --js "./../../src/handler/CloudHandler.js" \
+--js "./../../src/handler/TextInputHandler.js" \
 --js "./../../src/handler/PlatformHandler.js" \
 --js "./../../src/handler/EnemyHandler.js" \
 --js "./../../src/handler/PlayerHandler.js" \
@@ -37,6 +39,7 @@ npx google-closure-compiler \
 --js "./../../src/segments/Segment_2.js" \
 --js "./../../src/segments/Segment_3.js" \
 --js "./../../src/segments/Segment_Water.js" \
+--js "./../../src/scene/menu/TextInputView.js" \
 --js "./../../src/scene/menu/Menu.js" \
 --js "./../../src/system/Main.js" \
 --js "./../../src/scope/Alias.js" \
