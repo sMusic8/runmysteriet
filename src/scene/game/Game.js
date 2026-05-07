@@ -164,10 +164,6 @@ this.grisText.y = this.gris.y;
 // initial text
 this.grisText.text = "";
 
-// LIVE UPDATE
-this.m_shieldHandler.onCollectedChanged = (text) => {
-    this.grisText.text = text;
-};
 
 // follow camera
 this.updateHUD = () => {
