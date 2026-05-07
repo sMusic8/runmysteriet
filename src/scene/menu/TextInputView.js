@@ -5,10 +5,6 @@ runmysteriet.scene.TextInputView = function(getHelpText) {
 
     rune.scene.Scene.call(this);
 
-    /**
-     * Callback som returnerar text
-     * (kan vara funktion eller fallback string)
-     */
     this.getHelpText = getHelpText || function() {
         return "No help text provided";
     };
@@ -18,6 +14,10 @@ runmysteriet.scene.TextInputView = function(getHelpText) {
     this.letterText = null;
     this.wordText = null;
     this.helpText = null;
+
+    // 🔥 NYTT
+    this.startText = null;
+    this.focus = 0; // 0 = bokstav, 1 = start knapp
 };
 
 runmysteriet.scene.TextInputView.prototype =
@@ -34,7 +34,6 @@ runmysteriet.scene.TextInputView.prototype.init = function() {
 
     this.handler = new runmysteriet.ui.TextInputHandler(this.application);
 
-    // 🔥 HÄR används callbacken
     var textValue = this.getHelpText();
 
     this.helpText = new rune.text.BitmapField(String(textValue));
@@ -43,15 +42,24 @@ runmysteriet.scene.TextInputView.prototype.init = function() {
     this.helpText.y = 40;
     this.stage.addChild(this.helpText);
 
+    // aktuell bokstav
     this.letterText = new rune.text.BitmapField("a");
     this.letterText.x = 100;
     this.letterText.y = 120;
     this.stage.addChild(this.letterText);
 
+    // ord
     this.wordText = new rune.text.BitmapField("");
     this.wordText.x = 100;
     this.wordText.y = 180;
     this.stage.addChild(this.wordText);
+
+    // 🔥 START KNAPP
+    this.startText = new rune.text.BitmapField("STARTA SPEL");
+    this.startText.autoSize = true;
+    this.startText.x = 250; // till höger om bokstav
+    this.startText.y = 120;
+    this.stage.addChild(this.startText);
 };
 
 
@@ -63,6 +71,49 @@ runmysteriet.scene.TextInputView.prototype.update = function(step) {
     var data = this.handler.update(this.keyboard);
     if (!data) return;
 
+    // --------------------------
+    // NAVIGATION 
+    // --------------------------
+    if (this.keyboard.justPressed("UP")) {
+        this.focus = 1;
+    }
+
+    if (this.keyboard.justPressed("DOWN")) {
+        this.focus = 0;
+    }
+
+    // --------------------------
+    // UI MARKERING
+    // --------------------------
+    if (this.focus === 0) {
+        this.letterText.scale = 1.5;
+        this.startText.scale = 1.0;
+    } else {
+        this.letterText.scale = 1.0;
+        this.startText.scale = 1.5;
+    }
+
+    // --------------------------
+    // UPDATE TEXT
+    // --------------------------
     this.letterText.text = String(data.letter || "");
     this.wordText.text = String(this.handler.getWord() || "");
+
+    // --------------------------
+    // SELECT / ENTER
+    // --------------------------
+    if (this.keyboard.justPressed("SPACE") || this.keyboard.justPressed("ENTER")) {
+
+        // om START är vald → byt scene
+        if (this.focus === 1) {
+
+            this.application.scenes.load([
+                new runmysteriet.scene.Game(1, 0)
+            ]);
+
+            return;
+        }
+
+        // annars → låt handlern lägga till bokstav (det gör den redan)
+    }
 };
