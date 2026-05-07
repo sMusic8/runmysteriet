@@ -5,7 +5,7 @@ runmysteriet.segments.Segment_Water = function() {
     this.tileSize = 268; 
     this.groundY = 220; 
 
-    this.waterWidth = 134;
+    this.waterWidth = 402;
     this.waterHeight = 96;
 };
 
@@ -36,7 +36,7 @@ runmysteriet.segments.Segment_Water.prototype.ground = function(stage, startX) {
      */
     var water = new runmysteriet.ui.graphic.Water(
         x,
-        this.groundY - 36
+        this.groundY + 3
     );
 
     stage.addChild(water);

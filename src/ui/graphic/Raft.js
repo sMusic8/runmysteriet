@@ -15,7 +15,7 @@ runmysteriet.ui.graphic.Raft = function(x, y) {
     this.maxX = this.startX + 100;
 
     this.speed = 0.7;
-    this.direction = 1;
+    this.direction = -1;
 
     this.previousX = this.x;
     this.deltaX = 0;
