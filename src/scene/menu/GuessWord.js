@@ -10,6 +10,7 @@ runmysteriet.scene.GuessWord = function(application) {
 
     // 👉 sparar ordet som skrivs
     this.word = "";
+    console.log("kanelbulle")
 };
 
 runmysteriet.scene.GuessWord.prototype.init = function() {
