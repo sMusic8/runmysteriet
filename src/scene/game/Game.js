@@ -81,6 +81,7 @@ this.m_backgroundHandler.init();
     );
 
     this.m_platformHandler.init(this.m_levelNumber);
+    this.m_platformHandler.startBoatTweens(this.tweens);
 
     this.m_finishX = this.m_platformHandler.levelWidth - 50;
 
@@ -660,7 +661,7 @@ runmysteriet.scene.Game.prototype.createPauseMenu = function() {
     this.m_pauseTitle.visible = false;
     this.stage.addChild(this.m_pauseTitle);
 
-    this.m_pauseMenu = new runmysteriet.ui.MenuList(
+    this.m_pauseMenu = new runmysteriet.ui.graphic.MenuList(
         this.stage,
         this.application,
         ["FORTSATT SPELET", "AVSLUTA SPELET"],
@@ -772,7 +773,7 @@ runmysteriet.scene.Game.prototype.updateGameOverInput = function() {
     }
 
     this.updateGameOverMenuPosition();
-    
+
 
     this.handleMenuListInput(this.m_gameOverMenu, function(selectedIndex) {
 
@@ -811,7 +812,7 @@ runmysteriet.scene.Game.prototype.createGameOverMenu = function(reason) {
     this.m_gameOverTitle.visible = false;
     this.stage.addChild(this.m_gameOverTitle);
 
-    this.m_gameOverMenu = new runmysteriet.ui.MenuList(
+    this.m_gameOverMenu = new runmysteriet.ui.graphic.MenuList(
         this.stage,
         this.application,
         ["Starta nytt spel", "Till huvudmeny"],
