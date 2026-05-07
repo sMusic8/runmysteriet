@@ -1,73 +1,37 @@
 //------------------------------------------------------------------------------
-// NAMESPACE
+// SHIELD HANDLER
 //------------------------------------------------------------------------------
 
 var runmysteriet = runmysteriet || {};
 runmysteriet.handler = runmysteriet.handler || {};
 
-//------------------------------------------------------------------------------
-// SHIELD HANDLER
-//------------------------------------------------------------------------------
-
-/**
- * Handles shield word collection logic.
- *
- * @constructor
- * @param {!rune.display.Stage} stage
- * @param {!Object} application
- * @param {number} levelWidth
- */
 runmysteriet.handler.ShieldHandler = function (stage, application, levelWidth) {
 
-  /** @type {!rune.display.Stage} */
   this.m_stage = stage;
-
-  /** @type {!Object} */
   this.application = application;
-
-  /**
-   * Banans totala bredd.
-   * @type {number}
-   */
   this.m_levelWidth = levelWidth;
 
-  /** @type {!Array<!runmysteriet.ui.Shield>} */
   this.m_shields = [];
-
-  /** @type {!Array<!runmysteriet.ui.Shield>} */
   this.m_collected = [];
-
-  /** @type {string} */
   this.m_word = "";
 
-  /** @type {?Object} */
   this.catchSound = this.application.sounds.sound.get("sound_catch");
 
-  this.box = null
+  this.box = null;
+
+  // callback till UI
+  this.onCollectedChanged = null;
 };
 
-//------------------------------------------------------------------------------
+//-------------------------
 // INIT
-//------------------------------------------------------------------------------
+//-------------------------
 
-/**
- * Initializes shields and generates word.
- *
- * @return {void}
- */
 runmysteriet.handler.ShieldHandler.prototype.init = function () {
 
   var words = [
-    "apa",
-    "fagel",
-    "tiger",
-    "lejon",
-    "bjorn",
-    "ratta",
-    "varg",
-    "orm",
-    "hare",
-    "uggla",
+    "apa", "fagel", "tiger", "lejon", "bjorn",
+    "ratta", "varg", "orm", "hare", "uggla"
   ];
 
   var word = words[Math.floor(Math.random() * words.length)];
@@ -76,18 +40,14 @@ runmysteriet.handler.ShieldHandler.prototype.init = function () {
   var startX = 300;
   var endX = this.m_levelWidth - 300;
 
-  /** @type {number} */
-  var spacing = 0;
-
-  if (word.length > 1) {
-    spacing = (endX - startX) / (word.length - 1);
-  }
+  var spacing = (word.length > 1)
+    ? (endX - startX) / (word.length - 1)
+    : 0;
 
   console.log("WORD:", word);
 
   for (var i = 0; i < word.length; i++) {
 
-    /** @type {!runmysteriet.ui.Shield} */
     var shield = new runmysteriet.ui.Shield();
 
     shield.x = startX + i * spacing;
@@ -103,16 +63,10 @@ runmysteriet.handler.ShieldHandler.prototype.init = function () {
   }
 };
 
-//------------------------------------------------------------------------------
+//-------------------------
 // UPDATE
-//------------------------------------------------------------------------------
+//-------------------------
 
-/**
- * Updates shield collisions.
- *
- * @param {!Array<!Object>} players
- * @return {void}
- */
 runmysteriet.handler.ShieldHandler.prototype.update = function (players) {
 
   for (var i = this.m_shields.length - 1; i >= 0; i--) {
@@ -135,16 +89,10 @@ runmysteriet.handler.ShieldHandler.prototype.update = function (players) {
   }
 };
 
-//------------------------------------------------------------------------------
+//-------------------------
 // COLLECT
-//------------------------------------------------------------------------------
+//-------------------------
 
-/**
- * Collects a shield.
- *
- * @param {!runmysteriet.ui.Shield} shield
- * @return {void}
- */
 runmysteriet.handler.ShieldHandler.prototype.collectShield = function (shield) {
 
   if (!shield || shield.__collected) return;
@@ -154,48 +102,55 @@ runmysteriet.handler.ShieldHandler.prototype.collectShield = function (shield) {
 
   this.catchSound.play(true);
 
-  console.log("Letter on pickup:", shield.rune);
-
   this.m_stage.removeChild(shield);
 
   var index = this.m_shields.indexOf(shield);
-
-  if (index !== -1) {
-    this.m_shields.splice(index, 1);
-  }
+  if (index !== -1) this.m_shields.splice(index, 1);
 
   this.m_collected.push(shield);
 
-  console.log("Collected shield:", shield);
-  console.log("Total collected:", this.m_collected.length);
+  console.log("Collected:", shield.rune);
+
+  // 🔥 UPDATE UI
+  if (this.onCollectedChanged) {
+    this.onCollectedChanged(this.getRuneString());
+  }
 };
 
-//------------------------------------------------------------------------------
-// GETTERS
-//------------------------------------------------------------------------------
+//-------------------------
+// STRING BUILDER (FIXAD)
+//-------------------------
 
-/**
- * @return {!Array<!runmysteriet.ui.Shield>}
- */
+runmysteriet.handler.ShieldHandler.prototype.getRuneString = function () {
+
+  var result = "";
+
+  for (var i = 0; i < this.m_collected.length; i++) {
+    result += this.m_collected[i].rune;
+  }
+
+  return result;
+};
+
+//-------------------------
+// GETTERS
+//-------------------------
+
 runmysteriet.handler.ShieldHandler.prototype.getCollected = function () {
   return this.m_collected;
 };
 
-/**
- * Checks if all runes are collected.
- *
- * @return {boolean}
- */
 runmysteriet.handler.ShieldHandler.prototype.allRunesColected = function () {
   return this.m_word.length > 0 &&
          this.m_collected.length >= this.m_word.length;
 };
+
+//-------------------------
+// DISPLAY
+//-------------------------
+
 runmysteriet.handler.ShieldHandler.prototype.display = function () {
 
-    this.box = new rune.display.Graphic(10, 10, 100, 100);
-    this.box.backgroundColor = "#ffffff";
-   //this.display.DisplayObjectContainer.addChild(this.box);
-  
-
-  
+  this.box = new rune.display.Graphic(10, 10, 100, 100);
+  this.box.backgroundColor = "#ffffff";
 };

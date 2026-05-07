@@ -104,27 +104,59 @@ this.m_backgroundHandler.init();
         this.m_platformHandler.getEnemySpawns()
     );
 
-    // Kamera
-    this.m_cameraHandler = new runmysteriet.handler.CameraHandler(
-        this.cameras.getCameraAt(0),
-        this.m_playerHandler,
-        this.m_platformHandler.levelWidth
-    );
+// Kamera
+this.m_cameraHandler = new runmysteriet.handler.CameraHandler(
+    this.cameras.getCameraAt(0),
+    this.m_playerHandler,
+    this.m_platformHandler.levelWidth
+);
+// Sköldar
+this.m_shieldHandler = new runmysteriet.handler.ShieldHandler(
+    this.stage,
+    this.application,
+    this.m_platformHandler.levelWidth
+);
 
-    // Sköldar / runor
-    this.m_shieldHandler = new runmysteriet.handler.ShieldHandler(
-        this.stage,
-        this.application,
-        this.m_platformHandler.levelWidth
-    );
-  
-    this.m_shieldHandler.init();
+this.m_shieldHandler.init();
 this.m_shieldHandler.display();
 
+// CAMERA
+this.camera = this.cameras.getCameraAt(0);
+
+// HUD object
 this.gris = new runmysteriet.handler.TestShield();
-this.gris.x = 100;
-this.gris.y = 100;
 this.stage.addChild(this.gris);
+
+this.grisText = new rune.text.BitmapField("");
+this.stage.addChild(this.grisText);
+
+// position
+this.gris.x = this.camera.viewport.x + 100;
+this.gris.y = this.camera.viewport.y + 100;
+
+this.grisText.x = this.gris.x;
+this.grisText.y = this.gris.y;
+
+// initial text
+this.grisText.text = "";
+
+// LIVE UPDATE
+this.m_shieldHandler.onCollectedChanged = (text) => {
+    this.grisText.text = text;
+};
+
+// follow camera
+this.updateHUD = () => {
+
+    var cam = this.camera;
+
+    this.gris.x = cam.viewport.x + 100;
+    this.gris.y = cam.viewport.y + 100;
+
+    this.grisText.x = this.gris.x;
+    this.grisText.y = this.gris.y;
+};
+
     // Timer
     this.m_timerText = new rune.text.BitmapField("TID KVAR 200");
     this.m_timerText.x = 15;
@@ -203,6 +235,9 @@ runmysteriet.scene.Game.prototype.update = function (step) {
     if (this.m_backgroundHandler) {
         this.m_backgroundHandler.update();
     }
+    if (this.updateHUD) {
+    this.updateHUD();
+}
 };
 
 //------------------------------------------------------------------------------

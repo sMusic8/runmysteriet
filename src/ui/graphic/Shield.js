@@ -91,3 +91,6 @@ runmysteriet.ui.Shield.prototype.setRune = function(letter) {
 
     console.log("Shield letter:", letter);
 };
+runmysteriet.ui.Shield.prototype.getRune = function () {
+    return this.rune;
+};
