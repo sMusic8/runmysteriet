@@ -1,6 +1,3 @@
-var runmysteriet = runmysteriet || {};
-runmysteriet.ui = runmysteriet.ui || {};
-
 runmysteriet.ui.TextInputHandler = function(application) {
 
     this.input = new runmysteriet.ui.TextInput(application);

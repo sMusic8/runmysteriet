@@ -1,6 +1,3 @@
-var runmysteriet = runmysteriet || {};
-runmysteriet.ui = runmysteriet.ui || {};
-
 runmysteriet.ui.TextInput = function(application) {
 
     this.application = application;
