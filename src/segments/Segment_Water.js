@@ -47,8 +47,8 @@ runmysteriet.segments.Segment_Water.prototype.ground = function(stage, startX) {
      * Denna ska spelaren kunna stå på.
      */
     var raft = new runmysteriet.ui.graphic.Raft(
-        water.x - 15,
-        water.y + 20
+        water.x +35,
+        water.y - 5
     ); 
 
     raft.minX = water.x -10;

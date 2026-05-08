@@ -224,6 +224,38 @@ runmysteriet.handler.PlayerHandler.prototype.updateCollisions = function() {
     }
 };
 
+
+//------------------------------------------------------------------------------
+// ALL PLAYERS ON PLATFORM
+//------------------------------------------------------------------------------    
+
+runmysteriet.handler.PlayerHandler.prototype.areAllActivePlayersOnPlatform = function(platform) {
+    var player = null;
+    var i = 0;
+
+    for (i = 0; i < this.players.length; i++) {
+        player = this.players[i];
+
+        /*
+         * hoppa över spelare som inte finns eller är döda
+         */
+        if (!player || player.isDead === true) {
+            continue;
+        }
+
+        /*
+         * om levande spelare INTE står på plattform,
+         * då ska flotten inte starta
+         */
+        if (player.currentPlatform !== platform) {
+            return false;
+        }
+    }
+
+    return true;
+};
+
+
 //------------------------------------------------------------------------------
 // PLATFORM COLLISION
 //------------------------------------------------------------------------------
@@ -240,23 +272,32 @@ runmysteriet.handler.PlayerHandler.prototype.checkPlatform = function(player, pl
 
     if (player.velocityY >= 0) {
         player.y = this.getStandingY(player, platform);
-        player.velocityY = 0;
+        player.velocityY = 0; //står still i y led
         player.isOnGround = true;
+        player.currentPlatform = platform;
 
-        if (platform.isRaft === true) {// Om spelaren är på flotten ska den följa med i dess rörelse.
-            player.x += platform.deltaX || 0; // Detta gör att spelaren rör sig i x-led lika mycket som flotten.
-}
+        if (platform.isRaft === true) {//om spelaren är på flotten ska den följa med
+                if (this.areAllActivePlayersOnPlatform(platform)) {
+                    if (typeof platform.start === "function") {
+                         platform.start();
+        }
+    }
+        player.x += platform.deltaX || 0; //spelaren rör sig i x-led lika snabbt som flotte
+
+
+        }
 
         player.currentPlatform = platform;
-        if (platform.isRaft === true && typeof platform.start === "function") {
-            platform.start();
-}
+//         if (platform.isRaft === true && typeof platform.start === "function") {
+//             platform.start();
+// }
 
         return true;
     }
 
     return false;
 };
+
 
 //------------------------------------------------------------------------------
 // PLAYER ON PLAYER
