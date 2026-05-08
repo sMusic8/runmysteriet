@@ -69,6 +69,11 @@ runmysteriet.scene.Game.prototype.init = function() {
      */
     this.backgroundMusic = this.application.sounds.sound.get("sound_music");
     this.menuSound = this.application.sounds.sound.get("sound_menu");
+    if (this.backgroundMusic) {
+        this.backgroundMusic.play(true);
+    }
+
+     
 
     /*
      * Bakgrund

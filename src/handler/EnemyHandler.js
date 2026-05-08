@@ -37,7 +37,7 @@ runmysteriet.handler.EnemyHandler.prototype.init = function(levelConfig, enemySp
     }
 
     var kristenCount = levelConfig.getKristenCount();
-    var created = 0;
+    var created = 0; 
 
     for (var i = 0; i < enemySpawns.length; i++) {
 
