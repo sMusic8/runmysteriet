@@ -9,12 +9,18 @@ runmysteriet.scene.GuessWord = function(application) {
     this.textInput = new runmysteriet.ui.TextInput(application);
 
     // 👉 sparar ordet som skrivs
+    
     this.word = "";
+    console.log("kanelbulle")
+
+    rune.scene.Scene.call(this)
 };
 
 runmysteriet.scene.GuessWord.prototype.init = function() {
     console.log("GuessWord startad");
 };
+runmysteriet.scene.GuessWord.prototype = Object.create(rune.scene.Scene.prototype);
+runmysteriet.scene.GuessWord.prototype.constructor = runmysteriet.scene.GuessWord;
 
 runmysteriet.scene.GuessWord.prototype.update = function() {
 

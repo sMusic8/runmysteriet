@@ -15,7 +15,7 @@
  * @param {!Object} spriteConfig
  */
 runmysteriet.entity.Player = function(controls, spriteConfig) {
-
+//Superpanrop
     rune.display.Sprite.call(
         this,
         0,
