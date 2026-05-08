@@ -143,7 +143,7 @@ runmysteriet.scene.Game.prototype.init = function() {
     /*
      * Sköldar / runor
      */
-    this.m_shieldHandler = new runmysteriet.handler.ShieldHandler(
+    this.m_shieldHandler = new runmysteriet.handler.ShieldHandler( //
         this.stage,
         this.application,
         this.m_platformHandler.levelWidth

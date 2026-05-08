@@ -33,8 +33,12 @@ runmysteriet.entity.Kristen = function(texture, x, y) {
     /** @type {boolean} */
     this.isDead = false;
 
-    // physics flags (engine-specific → behöver externs)
+    if (rune.physics && rune.physics.Space) {
     this.allowCollisions = rune.physics.Space.ANY;
+}
+
+    // physics flags (engine-specific → behöver externs)
+   // this.allowCollisions = rune.physics.Space.ANY;
     this.immovable = true;
 };
 
@@ -96,7 +100,7 @@ runmysteriet.entity.Kristen.prototype.update = function(step) {
     if (this.hpBar) {
 
         this.hpBar.x = this.x;
-        this.hpBar.y = this.y - 10;
+        this.hpBar.y = this.y - 8;
 
         var p = this.hp / this.maxHp;
         if (p < 0) p = 0;
@@ -125,9 +129,9 @@ runmysteriet.entity.Kristen.prototype.handleCollision = function(player) {
 
     if (this.hitCooldown > 0) return;
 
-    this.hitCooldown = 10;
+    this.hitCooldown = 5; //
 
-    this.hp -= 1;
+    this.hp -= 35;// 35 är skada per träff, kan justeras
 
     if (player.hp !== undefined) {
         player.hp -= 1;
