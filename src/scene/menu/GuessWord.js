@@ -1,5 +1,3 @@
-
-
 //------------------------------------------------------------------------------
 // GUESS WORD SCENE
 //------------------------------------------------------------------------------
@@ -12,42 +10,70 @@
  * @param {number=} levelNumber
  * @param {number=} earnedScore
  * @param {number=} totalScore
- * @param {string=} word
+ * @param {Object|string=} wordData
  */
-runmysteriet.scene.GuessWord = function(levelNumber, earnedScore, totalScore, word) {
+runmysteriet.scene.GuessWord = function(levelNumber, earnedScore, totalScore, wordData) {
 
     rune.scene.Scene.call(this);
 
+    /*
+     * Information från spelet.
+     */
+    this.m_gameInput = null;
     this.m_levelNumber = levelNumber || 1;
     this.m_earnedScore = earnedScore || 0;
     this.m_totalScore = totalScore || 0;
 
     /*
-     * Ordet som spelaren samlade ihop med runorna.
-     * Exempel: "tiger"
+     * Sparar poängen som spelaren hade innan denna level.
+     * Detta gör att tips kan dra från earnedScore utan att totalScore blir konstig.
      */
-    this.m_word = String(word || "apa").toLowerCase();
+    this.m_scoreBeforeLevel = this.m_totalScore - this.m_earnedScore;
+
+    if (this.m_scoreBeforeLevel < 0) {
+        this.m_scoreBeforeLevel = 0;
+    }
 
     /*
-     * Vilken position i ordet som ska döljas.
-     * Exempel: tiger → ti_er
+     * Om Game råkar skicka bara en string, t.ex. "Button",
+     * gör vi om den till samma format som JSON.
+     */
+    if (typeof wordData === "string") {
+        wordData = {
+            word: wordData,
+            Subword: []
+        };
+    }
+
+    /*
+     * Om inget wordData skickas in används ett reservord.
+     */
+    this.m_wordData = wordData || {
+        word: "Button",
+        Subword: ["Start", "Needle"]
+    };
+
+    /*
+     * Ordet som ska gissas.
+     * Exempel: "Button" blir "button".
+     */
+    this.m_word = String(this.m_wordData.word || "Button").toLowerCase();
+
+    /*
+     * Ledtrådar från JSON.
+     * Exempel: ["Start", "Needle"]
+     */
+    this.m_hints = this.m_wordData.Subword || [];
+
+    /*
+     * Vilken bokstav som saknas.
      */
     this.m_missingIndex = 0;
-
-    /*
-     * Själva bokstaven som saknas.
-     * Exempel: "g"
-     */
     this.m_missingLetter = "";
-
-    /*
-     * Ordet som visas för spelaren med en lucka.
-     * Exempel: "ti_er"
-     */
     this.m_maskedWord = "";
 
     /*
-     * TextInput används för att välja bokstav med höger/vänster + enter.
+     * TextInput används för att välja bokstav med vänster/höger + enter.
      */
     this.m_textInput = null;
 
@@ -57,7 +83,15 @@ runmysteriet.scene.GuessWord = function(levelNumber, earnedScore, totalScore, wo
     this.m_titleText = null;
     this.m_wordText = null;
     this.m_letterText = null;
+    this.m_hintText = null;
+    this.m_scoreText = null;
     this.m_messageText = null;
+
+    /*
+     * Tips-system.
+     */
+    this.m_currentHintIndex = 0;
+    this.m_hintCost = 20;
 
     /*
      * Blir true när spelaren har gissat rätt.
@@ -86,8 +120,10 @@ runmysteriet.scene.GuessWord.prototype.init = function() {
     rune.scene.Scene.prototype.init.call(this);
 
     console.log("GuessWord startad");
+    console.log("WORD DATA:", this.m_wordData);
     console.log("ORD ATT GISSA:", this.m_word);
-
+    console.log("LEDTRADAR:", this.m_hints);
+    this.m_gameInput = new runmysteriet.input.GameInput(this.application);
     this.m_textInput = new runmysteriet.ui.TextInput(this.application);
 
     this.createMissingLetter();
@@ -108,12 +144,12 @@ runmysteriet.scene.GuessWord.prototype.createMissingLetter = function() {
     var i = 0;
 
     if (!this.m_word || this.m_word.length <= 0) {
-        this.m_word = "apa";
+        this.m_word = "button";
     }
 
     /*
-     * Väljer slumpmässig position i ordet.
-     * Om ordet är "tiger" kan den välja t.ex. index 2.
+     * Slumpar vilken position i ordet som ska döljas.
+     * Exempel: button → bu_ton
      */
     this.m_missingIndex = Math.floor(Math.random() * this.m_word.length);
 
@@ -123,8 +159,8 @@ runmysteriet.scene.GuessWord.prototype.createMissingLetter = function() {
     this.m_missingLetter = this.m_word.charAt(this.m_missingIndex);
 
     /*
-     * Bygger ordet som ska visas.
-     * På den saknade positionen läggs "_" istället för bokstaven.
+     * Bygger ordet som visas på skärmen.
+     * Den saknade bokstaven ersätts med "_".
      */
     this.m_maskedWord = "";
 
@@ -152,30 +188,44 @@ runmysteriet.scene.GuessWord.prototype.createMissingLetter = function() {
  */
 runmysteriet.scene.GuessWord.prototype.createText = function() {
 
-    this.m_titleText = new rune.text.BitmapField("GISSA SAKNAD BOKSTAV");
+    this.m_titleText = new rune.text.BitmapField("GUESS MISSING LETTER");
     this.m_titleText.autoSize = true;
     this.m_titleText.center = this.application.screen.center;
-    this.m_titleText.y -= 70;
+    this.m_titleText.y -= 85;
     this.stage.addChild(this.m_titleText);
 
     this.m_wordText = new rune.text.BitmapField(this.m_maskedWord.toUpperCase());
     this.m_wordText.autoSize = true;
     this.m_wordText.center = this.application.screen.center;
-    this.m_wordText.y -= 25;
+    this.m_wordText.y -= 40;
     this.m_wordText.scale = 1.5;
     this.stage.addChild(this.m_wordText);
 
-    this.m_letterText = new rune.text.BitmapField("VALD BOKSTAV: A");
+    this.m_letterText = new rune.text.BitmapField("LETTER: A");
     this.m_letterText.autoSize = true;
     this.m_letterText.center = this.application.screen.center;
-    this.m_letterText.y += 25;
+    this.m_letterText.y += 10;
     this.stage.addChild(this.m_letterText);
 
-    this.m_messageText = new rune.text.BitmapField("HOGER/VANSTER = BYT, ENTER = GISSA");
+    this.m_hintText = new rune.text.BitmapField("HINT: PRESS T, COSTS 20 POINTS");
+    this.m_hintText.autoSize = true;
+    this.m_hintText.center = this.application.screen.center;
+    this.m_hintText.y += 40;
+    this.m_hintText.scale = 0.8;
+    this.stage.addChild(this.m_hintText);
+
+    this.m_scoreText = new rune.text.BitmapField("SCORE: " + this.m_totalScore);
+    this.m_scoreText.autoSize = true;
+    this.m_scoreText.center = this.application.screen.center;
+    this.m_scoreText.y += 65;
+    this.m_scoreText.scale = 0.8;
+    this.stage.addChild(this.m_scoreText);
+
+    this.m_messageText = new rune.text.BitmapField("LEFT/RIGHT = CHANGE, ENTER = GUESS");
     this.m_messageText.autoSize = true;
     this.m_messageText.center = this.application.screen.center;
-    this.m_messageText.y += 65;
-    this.m_messageText.scale = 0.8;
+    this.m_messageText.y += 90;
+    this.m_messageText.scale = 0.7;
     this.stage.addChild(this.m_messageText);
 };
 
@@ -191,11 +241,31 @@ runmysteriet.scene.GuessWord.prototype.createText = function() {
  */
 runmysteriet.scene.GuessWord.prototype.update = function(step) {
 
-    rune.scene.Scene.prototype.update.call(this, step);
+    var input = this.m_gameInput.read(this.keyboard);
 
+if (input.hint) {
+    this.buyHint();
+    return;
+}
+
+if (input.up) {
+    this.m_alphabetSelector.previous();
+    this.updateLetterBoxes();
+}
+
+if (input.down) {
+    this.m_alphabetSelector.next();
+    this.updateLetterBoxes();
+}
+
+if (input.choose) {
+    this.checkAnswer(this.m_alphabetSelector.getLetter());
+}
     var keyboard = this.keyboard;
     var data = null;
     var typedLetter = "";
+
+    rune.scene.Scene.prototype.update.call(this, step);
 
     /*
      * Om spelaren redan har svarat rätt väntar vi på ENTER/SPACE
@@ -207,6 +277,17 @@ runmysteriet.scene.GuessWord.prototype.update = function(step) {
             this.goToLevelComplete();
         }
 
+        return;
+    }
+
+    /*
+     * T köper en ledtråd.
+     */
+    if (keyboard &&
+        typeof keyboard.justPressed === "function" &&
+        keyboard.justPressed("T")) {
+
+        this.buyHint();
         return;
     }
 
@@ -224,7 +305,7 @@ runmysteriet.scene.GuessWord.prototype.update = function(step) {
      * Uppdaterar vald bokstav på skärmen.
      */
     if (this.m_letterText) {
-        this.m_letterText.text = "VALD BOKSTAV: " + String(data.letter).toUpperCase();
+        this.m_letterText.text = "LETTER: " + String(data.letter).toUpperCase();
     }
 
     /*
@@ -245,6 +326,82 @@ runmysteriet.scene.GuessWord.prototype.update = function(step) {
     if (data.choose) {
         this.checkAnswer(data.letter);
         return;
+    }
+};
+
+//------------------------------------------------------------------------------
+// BUY HINT
+//------------------------------------------------------------------------------
+
+/**
+ * Köper och visar nästa ledtråd.
+ *
+ * @return {void}
+ */
+runmysteriet.scene.GuessWord.prototype.buyHint = function() {
+
+    var hint = "";
+
+    /*
+     * Finns det fler ledtrådar?
+     */
+    if (this.m_currentHintIndex >= this.m_hints.length) {
+
+        if (this.m_messageText) {
+            this.m_messageText.text = "NO MORE HINTS";
+        }
+
+        return;
+    }
+
+    /*
+     * Har spelaren råd med tips?
+     */
+    if (this.m_earnedScore < this.m_hintCost) {
+
+        if (this.m_messageText) {
+            this.m_messageText.text = "NOT ENOUGH POINTS FOR HINT";
+        }
+
+        return;
+    }
+
+    /*
+     * Dra 20 poäng från level-poängen.
+     */
+    this.m_earnedScore -= this.m_hintCost;
+
+    if (this.m_earnedScore < 0) {
+        this.m_earnedScore = 0;
+    }
+
+    /*
+     * Räkna om totalpoängen.
+     */
+    this.m_totalScore = this.m_scoreBeforeLevel + this.m_earnedScore;
+
+    /*
+     * Hämta nästa tips.
+     */
+    hint = this.m_hints[this.m_currentHintIndex];
+    this.m_currentHintIndex++;
+
+    /*
+     * Visa tipset.
+     */
+    if (this.m_hintText) {
+        this.m_hintText.text = "HINT " + this.m_currentHintIndex + ": " + String(hint).toUpperCase();
+    }
+
+    /*
+     * Uppdatera poängen på skärmen.
+     */
+    if (this.m_scoreText) {
+        this.m_scoreText.text = "SCORE: " + this.m_totalScore;
+    }
+
+    if (this.m_messageText) {
+        this.m_messageText.text = "HINT COST 20 POINTS";
     }
 };
 
@@ -308,14 +465,14 @@ runmysteriet.scene.GuessWord.prototype.checkAnswer = function(letter) {
         }
 
         if (this.m_messageText) {
-            this.m_messageText.text = "RATT! TRYCK ENTER FOR ATT FORTSATTA";
+            this.m_messageText.text = "RIGHT! PRESS ENTER TO CONTINUE";
         }
 
         return;
     }
 
     if (this.m_messageText) {
-        this.m_messageText.text = "FEL BOKSTAV. FORSOK IGEN.";
+        this.m_messageText.text = "WRONG LETTER. TRY AGAIN.";
     }
 };
 

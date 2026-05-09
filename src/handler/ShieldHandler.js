@@ -2,18 +2,19 @@
 // SHIELD HANDLER
 //------------------------------------------------------------------------------
 
-var runmysteriet = runmysteriet || {};
-runmysteriet.handler = runmysteriet.handler || {};
-
-runmysteriet.handler.ShieldHandler = function (stage, application, levelWidth) {
+runmysteriet.handler.ShieldHandler = function (stage, application, levelWidth, levelNumber) {
 
   this.m_stage = stage;
   this.application = application;
   this.m_levelWidth = levelWidth;
+  this.m_levelNumber = levelNumber || 1;
 
   this.m_shields = [];
   this.m_collected = [];
   this.m_word = "";
+
+  this.m_wordData = null;
+  this.m_hints = [];
 
   this.catchSound = this.application.sounds.sound.get("sound_catch");
 
@@ -21,7 +22,62 @@ runmysteriet.handler.ShieldHandler = function (stage, application, levelWidth) {
 
   // callback till UI
   this.onCollectedChanged = null;
+
 };
+
+
+//------------------------------------------------------------------------------
+// GET WORD DATA FOR LEVEL
+//------------------------------------------------------------------------------
+
+runmysteriet.handler.ShieldHandler.prototype.getWordDataForLevel = function() {
+
+    var resource = null;
+    var data = null;
+    var index = 0;
+
+    if (!this.application || !this.application.resources) {
+        console.log("No application resources found.");
+        return null;
+    }
+
+    resource = this.application.resources.get("words5");
+
+    if (!resource) {
+        console.log("Could not find resource: words5");
+        return null;
+    }
+
+    data = resource.data;
+
+    if (typeof data === "string") {
+        try {
+            data = JSON.parse(data);
+        } catch (error) {
+            console.log("Could not parse words5 JSON:", error);
+            return null;
+        }
+    }
+
+    if (!data || !data.length) {
+        console.log("words5 JSON is empty or wrong format.");
+        return null;
+    }
+
+    /*
+     * Level 1 tar första ordet.
+     * Level 2 tar andra ordet.
+     * Level 3 tar tredje ordet.
+     */
+    index = (this.m_levelNumber - 1) % data.length;
+
+    console.log("LEVEL:", this.m_levelNumber);
+    console.log("WORD INDEX:", index);
+    console.log("WORD DATA:", data[index]);
+
+    return data[index];
+};
+
 
 //-------------------------
 // INIT
@@ -29,38 +85,108 @@ runmysteriet.handler.ShieldHandler = function (stage, application, levelWidth) {
 
 runmysteriet.handler.ShieldHandler.prototype.init = function () {
 
-  var words = [
-    "apa", "fagel", "tiger", "lejon", "bjorn",
-    "ratta", "varg", "orm", "hare", "uggla"
-  ];
+var wordData = this.getWordDataForLevel();
+    var word = "";
+    var startX = 150; // starta en bit in i banan, inte direkt vid början
+    var endX = this.m_levelWidth - 150; //
+    var spacing = 0;
+    var i = 0;
+    var shield = null;
 
-  var word = words[Math.floor(Math.random() * words.length)];
-  this.m_word = word;
+    if (wordData) {
+        word = String(wordData.word || "").toLowerCase();
 
-  var startX = 300;
-  var endX = this.m_levelWidth - 300;
+        this.m_wordData = wordData;
+        this.m_word = word;
+        this.m_hints = wordData.Subword || [];
+    } else {
+        word = "button";
 
-  var spacing = (word.length > 1)
-    ? (endX - startX) / (word.length - 1)
-    : 0;
+        this.m_wordData = {
+            word: "Button",
+            Subword: ["Start", "Needle"]
+        };
 
-  console.log("WORD:", word);
+        this.m_word = word;
+        this.m_hints = this.m_wordData.Subword;
+    }
 
-  for (var i = 0; i < word.length; i++) {
+    spacing = (word.length > 1)
+        ? (endX - startX) / (word.length - 1)
+        : 0;
 
-    var shield = new runmysteriet.ui.Shield();
+    console.log("WORD:", word);
+    console.log("WORD DATA:", this.m_wordData);
+    console.log("HINTS:", this.m_hints);
 
-    shield.x = startX + i * spacing;
-    shield.y = 140;
+    for (i = 0; i < word.length; i++) {
 
-    shield.__collected = false;
-    shield.active = true;
+        shield = new runmysteriet.ui.Shield();
 
-    shield.setRune(word[i]);
+        shield.x = startX + i * spacing;
+        shield.y = 140;
 
-    this.m_shields.push(shield);
-    this.m_stage.addChild(shield);
-  }
+        shield.__collected = false;
+        shield.active = true;
+
+        shield.setRune(word[i]);
+
+        this.m_shields.push(shield);
+        this.m_stage.addChild(shield);
+    }
+};
+
+//------------------------------------------------------------------------------
+// GET RANDOM WORD DATA
+//------------------------------------------------------------------------------
+
+runmysteriet.handler.ShieldHandler.prototype.getRandomWordData = function() {
+
+    var resource = null;
+    var data = null;
+    var index = 0;
+
+    if (!this.application || !this.application.resources) {
+        console.log("No application resources found.");
+        return null;
+    }
+
+    /*
+     * OBS: "words5" måste vara samma namn som du har i Requests.js.
+     */
+    resource = this.application.resources.get("words5", "word6");
+
+    if (!resource) {
+        console.log("Could not find resource: words5");
+        return null;
+    }
+
+    data = resource.data;
+
+    /*
+     * om JSON kommer som text, gör om den till riktig array.
+     */
+    if (typeof data === "string") {
+        try {
+            data = JSON.parse(data);
+        } catch (error) {
+            console.log("Could not parse words5 JSON:", error);
+            return null;
+        }
+    }
+
+    if (!data || !data.length) {
+        console.log("words5 JSON is empty or wrong format.");
+        return null;
+    }
+
+    index = (this.m_levelNumber - 1) % data.length;
+
+    console.log("LEVEL:", this.m_levelNumber);
+    console.log("WORD INDEX:", index);
+    console.log("WORD DATA:", data[index]);
+
+    return data[index];
 };
 
 //-------------------------
@@ -136,8 +262,12 @@ runmysteriet.handler.ShieldHandler.prototype.getRuneString = function () {
 // GETTERS
 //-------------------------
 
-runmysteriet.handler.ShieldHandler.prototype.getWord = function () {
+runmysteriet.handler.ShieldHandler.prototype.getWord = function() {
     return this.m_word;
+};
+
+runmysteriet.handler.ShieldHandler.prototype.getHints = function() {
+    return this.m_hints;
 };
 
 runmysteriet.handler.ShieldHandler.prototype.getCollected = function () {
@@ -147,6 +277,10 @@ runmysteriet.handler.ShieldHandler.prototype.getCollected = function () {
 runmysteriet.handler.ShieldHandler.prototype.allRunesColected = function () {
   return this.m_word.length > 0 &&
          this.m_collected.length >= this.m_word.length;
+};
+
+runmysteriet.handler.ShieldHandler.prototype.getWordData = function() {
+    return this.m_wordData;
 };
 
 //-------------------------
