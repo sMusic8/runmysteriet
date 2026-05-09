@@ -11,6 +11,7 @@ npx google-closure-compiler \
 --js "./../../src/data/resource/Requests.js" \
 --js "./../../src/ui/graphic/Raft.js" \
 --js "./../../src/config/LevelConfig.js" \
+--js "./../../src/config/GameInput.js" \
 --js "./../../src/entity/Kristen.js" \
 --js "./../../src/entity/EnglishBoat.js" \
 --js "./../../src/entity/Player.js" \
@@ -34,6 +35,9 @@ npx google-closure-compiler \
 --js "./../../src/scene/menu/More.js" \
 --js "./../../src/scene/menu/Credits.js" \
 --js "./../../src/scene/menu/LevelComplete.js" \
+--js "./../../src/logic/GuessAlphabetSelector.js" \
+--js "./../../src/logic/GuessLetterBox.js" \
+--js "./../../src/logic/GuessWordPuzzle.js" \
 --js "./../../src/scene/menu/GuessWord.js" \
 --js "./../../src/scene/game/Game.js" \
 --js "./../../src/segments/Segment_1.js" \

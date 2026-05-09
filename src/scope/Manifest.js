@@ -106,6 +106,13 @@ var runmysteriet = function() {
      */
     m_this.config = {};
     /**
+    * This package includes 
+    * @namespace logic
+    * @memberof runmysteriet
+    * @since 1.0
+    */
+    m_this.logic = {};
+    /**
      * Public scope.
      */
     return m_this;

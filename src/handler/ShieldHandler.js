@@ -15,6 +15,8 @@ runmysteriet.handler.ShieldHandler = function (stage, application, levelWidth, l
 
   this.m_wordData = null;
   this.m_hints = [];
+  this.m_collectedMap = [];
+  this.m_hiddenIndex = -1;
 
   this.catchSound = this.application.sounds.sound.get("sound_catch");
 
@@ -110,6 +112,15 @@ var wordData = this.getWordDataForLevel();
         this.m_word = word;
         this.m_hints = this.m_wordData.Subword;
     }
+    this.m_hiddenIndex = Math.floor(Math.random() * word.length);
+
+this.m_collectedMap = [];
+
+for (i = 0; i < word.length; i++) {
+    this.m_collectedMap.push(false);
+}
+
+console.log("HIDDEN INDEX:", this.m_hiddenIndex);
 
     spacing = (word.length > 1)
         ? (endX - startX) / (word.length - 1)
@@ -121,13 +132,21 @@ var wordData = this.getWordDataForLevel();
 
     for (i = 0; i < word.length; i++) {
 
-        shield = new runmysteriet.ui.Shield();
+    /*
+     * En bokstav ska inte placeras ut.
+     * Den blir en tom box i GuessWord.
+     */
+    if (i === this.m_hiddenIndex) {
+        continue;
+    }
 
+    shield = new runmysteriet.ui.Shield();
         shield.x = startX + i * spacing;
         shield.y = 140;
 
         shield.__collected = false;
         shield.active = true;
+        shield.wordIndex = i;
 
         shield.setRune(word[i]);
 
@@ -234,10 +253,13 @@ runmysteriet.handler.ShieldHandler.prototype.collectShield = function (shield) {
   if (index !== -1) this.m_shields.splice(index, 1);
 
   this.m_collected.push(shield);
+  if (shield.wordIndex !== undefined && shield.wordIndex !== null) {
+    this.m_collectedMap[shield.wordIndex] = true;
+}
 
   console.log("Collected:", shield.rune);
 
-  // 🔥 UPDATE UI
+  //  UPDATE UI
   if (this.onCollectedChanged) {
     this.onCollectedChanged(this.getRuneString());
   }
@@ -258,6 +280,25 @@ runmysteriet.handler.ShieldHandler.prototype.getRuneString = function () {
   return result;
 };
 
+runmysteriet.handler.ShieldHandler.prototype.allRunesColected = function () {
+    var placedRuneCount = 0;
+
+    if (!this.m_word || this.m_word.length <= 0) {
+        return false;
+    }
+
+    placedRuneCount = this.m_word.length;
+
+    /*
+     * En bokstav placeras inte ut.
+     * Därför kan spelaren bara samla word.length - 1 runor.
+     */
+    if (this.m_hiddenIndex >= 0) {
+        placedRuneCount--;
+    }
+
+    return this.m_collected.length >= placedRuneCount;
+};
 //-------------------------
 // GETTERS
 //-------------------------
@@ -281,6 +322,15 @@ runmysteriet.handler.ShieldHandler.prototype.allRunesColected = function () {
 
 runmysteriet.handler.ShieldHandler.prototype.getWordData = function() {
     return this.m_wordData;
+};
+
+runmysteriet.handler.ShieldHandler.prototype.getGuessData = function() {
+    return {
+        word: this.m_word,
+        Subword: this.m_hints,
+        collectedMap: this.m_collectedMap,
+        hiddenIndex: this.m_hiddenIndex
+    };
 };
 
 //-------------------------

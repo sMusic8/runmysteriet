@@ -65,23 +65,17 @@ runmysteriet.scene.GuessWord = function(levelNumber, earnedScore, totalScore, wo
      */
     this.m_hints = this.m_wordData.Subword || [];
 
-    /*
-     * Vilken bokstav som saknas.
-     */
-    this.m_missingIndex = 0;
-    this.m_missingLetter = "";
-    this.m_maskedWord = "";
+/*
+ * Objekt som används av GuessWord.
+ */
+    this.m_puzzle = null;
+    this.m_alphabetSelector = null;
+    this.m_letterBoxes = [];
 
-    /*
-     * TextInput används för att välja bokstav med vänster/höger + enter.
-     */
-    this.m_textInput = null;
-
-    /*
-     * Textobjekt på skärmen.
-     */
+/*
+ * Textobjekt på skärmen.
+ */
     this.m_titleText = null;
-    this.m_wordText = null;
     this.m_letterText = null;
     this.m_hintText = null;
     this.m_scoreText = null;
@@ -123,58 +117,16 @@ runmysteriet.scene.GuessWord.prototype.init = function() {
     console.log("WORD DATA:", this.m_wordData);
     console.log("ORD ATT GISSA:", this.m_word);
     console.log("LEDTRADAR:", this.m_hints);
+    
+    
     this.m_gameInput = new runmysteriet.input.GameInput(this.application);
-    this.m_textInput = new runmysteriet.ui.TextInput(this.application);
-
-    this.createMissingLetter();
+    this.m_puzzle = new runmysteriet.logic.GuessWordPuzzle(this.m_wordData);
+    this.m_alphabetSelector = new runmysteriet.logic.GuessAlphabetSelector();
+   
+   
     this.createText();
-};
-
-//------------------------------------------------------------------------------
-// CREATE MISSING LETTER
-//------------------------------------------------------------------------------
-
-/**
- * Väljer en bokstav i ordet som ska döljas.
- *
- * @return {void}
- */
-runmysteriet.scene.GuessWord.prototype.createMissingLetter = function() {
-
-    var i = 0;
-
-    if (!this.m_word || this.m_word.length <= 0) {
-        this.m_word = "button";
-    }
-
-    /*
-     * Slumpar vilken position i ordet som ska döljas.
-     * Exempel: button → bu_ton
-     */
-    this.m_missingIndex = Math.floor(Math.random() * this.m_word.length);
-
-    /*
-     * Sparar rätt bokstav.
-     */
-    this.m_missingLetter = this.m_word.charAt(this.m_missingIndex);
-
-    /*
-     * Bygger ordet som visas på skärmen.
-     * Den saknade bokstaven ersätts med "_".
-     */
-    this.m_maskedWord = "";
-
-    for (i = 0; i < this.m_word.length; i++) {
-
-        if (i === this.m_missingIndex) {
-            this.m_maskedWord += "_";
-        } else {
-            this.m_maskedWord += this.m_word.charAt(i);
-        }
-    }
-
-    console.log("MASKAT ORD:", this.m_maskedWord);
-    console.log("SAKNAD BOKSTAV:", this.m_missingLetter);
+    this.createLetterBoxes();
+    this.updateLetterBoxes();
 };
 
 //------------------------------------------------------------------------------
@@ -188,18 +140,11 @@ runmysteriet.scene.GuessWord.prototype.createMissingLetter = function() {
  */
 runmysteriet.scene.GuessWord.prototype.createText = function() {
 
-    this.m_titleText = new rune.text.BitmapField("GUESS MISSING LETTER");
+    this.m_titleText = new rune.text.BitmapField("GUESS MISSING LETTERS");
     this.m_titleText.autoSize = true;
     this.m_titleText.center = this.application.screen.center;
     this.m_titleText.y -= 85;
     this.stage.addChild(this.m_titleText);
-
-    this.m_wordText = new rune.text.BitmapField(this.m_maskedWord.toUpperCase());
-    this.m_wordText.autoSize = true;
-    this.m_wordText.center = this.application.screen.center;
-    this.m_wordText.y -= 40;
-    this.m_wordText.scale = 1.5;
-    this.stage.addChild(this.m_wordText);
 
     this.m_letterText = new rune.text.BitmapField("LETTER: A");
     this.m_letterText.autoSize = true;
@@ -221,12 +166,86 @@ runmysteriet.scene.GuessWord.prototype.createText = function() {
     this.m_scoreText.scale = 0.8;
     this.stage.addChild(this.m_scoreText);
 
-    this.m_messageText = new rune.text.BitmapField("LEFT/RIGHT = CHANGE, ENTER = GUESS");
+    this.m_messageText = new rune.text.BitmapField("UP/DOWN = CHANGE LETTER, ENTER = GUESS");    
     this.m_messageText.autoSize = true;
     this.m_messageText.center = this.application.screen.center;
     this.m_messageText.y += 90;
     this.m_messageText.scale = 0.7;
     this.stage.addChild(this.m_messageText);
+};
+
+
+
+//------------------------------------------------------------------------------
+// CREATE LETTER BOXES
+//------------------------------------------------------------------------------
+
+/**
+ * Skapar en box per bokstav.
+ *
+ * @return {void}
+ */
+runmysteriet.scene.GuessWord.prototype.createLetterBoxes = function() {
+
+    var word = this.m_puzzle.getWord();
+    var boxWidth = 28;
+    var spacing = 10;
+    var totalWidth = word.length * boxWidth + (word.length - 1) * spacing;
+    var startX = this.application.screen.center.x - Math.floor(totalWidth / 2);
+    var y = this.application.screen.center.y - 35;
+    var i = 0;
+    var box = null;
+
+    this.m_letterBoxes = [];
+
+    for (i = 0; i < word.length; i++) {
+
+        box = new runmysteriet.logic.GuessLetterBox(
+            startX + i * (boxWidth + spacing),
+            y,
+            i
+        );
+
+        box.create(this.stage);
+
+        this.m_letterBoxes.push(box);
+    }
+};
+
+//------------------------------------------------------------------------------
+// UPDATE LETTER BOXES
+//------------------------------------------------------------------------------
+
+/**
+ * Uppdaterar boxarna.
+ *
+ * @return {void}
+ */
+runmysteriet.scene.GuessWord.prototype.updateLetterBoxes = function() {
+
+    var word = this.m_puzzle.getWord();
+    var revealedMap = this.m_puzzle.getRevealedMap();
+    var currentIndex = this.m_puzzle.getCurrentMissingIndex();
+    var selectedLetter = this.m_alphabetSelector.getLetter();
+    var i = 0;
+
+    for (i = 0; i < word.length; i++) {
+
+        if (revealedMap[i] === true) {
+            this.m_letterBoxes[i].setLetter(word.charAt(i));
+            this.m_letterBoxes[i].setActive(false);
+        } else if (i === currentIndex) {
+            this.m_letterBoxes[i].setPreviewLetter(selectedLetter);
+            this.m_letterBoxes[i].setActive(true);
+        } else {
+            this.m_letterBoxes[i].clear();
+            this.m_letterBoxes[i].setActive(false);
+        }
+    }
+
+    if (this.m_letterText) {
+        this.m_letterText.text = "LETTER: " + selectedLetter.toUpperCase();
+    }
 };
 
 //------------------------------------------------------------------------------
@@ -241,36 +260,10 @@ runmysteriet.scene.GuessWord.prototype.createText = function() {
  */
 runmysteriet.scene.GuessWord.prototype.update = function(step) {
 
-    var input = this.m_gameInput.read(this.keyboard);
-
-if (input.hint) {
-    this.buyHint();
-    return;
-}
-
-if (input.up) {
-    this.m_alphabetSelector.previous();
-    this.updateLetterBoxes();
-}
-
-if (input.down) {
-    this.m_alphabetSelector.next();
-    this.updateLetterBoxes();
-}
-
-if (input.choose) {
-    this.checkAnswer(this.m_alphabetSelector.getLetter());
-}
-    var keyboard = this.keyboard;
-    var data = null;
-    var typedLetter = "";
+    var input = null;
 
     rune.scene.Scene.prototype.update.call(this, step);
 
-    /*
-     * Om spelaren redan har svarat rätt väntar vi på ENTER/SPACE
-     * för att gå vidare till LevelComplete.
-     */
     if (this.m_answeredCorrect === true) {
 
         if (this.isConfirmPressed()) {
@@ -280,55 +273,34 @@ if (input.choose) {
         return;
     }
 
-    /*
-     * T köper en ledtråd.
-     */
-    if (keyboard &&
-        typeof keyboard.justPressed === "function" &&
-        keyboard.justPressed("T")) {
+    if (!this.m_gameInput || !this.m_alphabetSelector || !this.m_puzzle) {
+        return;
+    }
 
+    input = this.m_gameInput.read(this.keyboard);
+
+    if (input.hint) {
         this.buyHint();
         return;
     }
 
-    if (!this.m_textInput) {
+    if (input.up) {
+        this.m_alphabetSelector.previous();
+        this.updateLetterBoxes();
         return;
     }
 
-    data = this.m_textInput.update(keyboard);
-
-    if (!data) {
+    if (input.down) {
+        this.m_alphabetSelector.next();
+        this.updateLetterBoxes();
         return;
     }
 
-    /*
-     * Uppdaterar vald bokstav på skärmen.
-     */
-    if (this.m_letterText) {
-        this.m_letterText.text = "LETTER: " + String(data.letter).toUpperCase();
-    }
-
-    /*
-     * Alternativ 1:
-     * Spelaren skriver en bokstav direkt på tangentbordet.
-     */
-    typedLetter = this.getTypedKeyboardLetter(keyboard);
-
-    if (typedLetter !== "") {
-        this.checkAnswer(typedLetter);
-        return;
-    }
-
-    /*
-     * Alternativ 2:
-     * Spelaren väljer bokstav med ENTER/gamepad.
-     */
-    if (data.choose) {
-        this.checkAnswer(data.letter);
+    if (input.choose) {
+        this.checkAnswer(this.m_alphabetSelector.getLetter());
         return;
     }
 };
-
 //------------------------------------------------------------------------------
 // BUY HINT
 //------------------------------------------------------------------------------
@@ -406,66 +378,44 @@ runmysteriet.scene.GuessWord.prototype.buyHint = function() {
 };
 
 //------------------------------------------------------------------------------
-// GET TYPED KEYBOARD LETTER
-//------------------------------------------------------------------------------
-
-/**
- * Kollar om spelaren tryckte på en bokstav på tangentbordet.
- *
- * @param {?Object} keyboard
- * @return {string}
- */
-runmysteriet.scene.GuessWord.prototype.getTypedKeyboardLetter = function(keyboard) {
-
-    var letters = "abcdefghijklmnopqrstuvwxyz";
-    var i = 0;
-    var letter = "";
-    var upper = "";
-
-    if (!keyboard || typeof keyboard.justPressed !== "function") {
-        return "";
-    }
-
-    for (i = 0; i < letters.length; i++) {
-
-        letter = letters.charAt(i);
-        upper = letter.toUpperCase();
-
-        if (keyboard.justPressed(upper)) {
-            return letter;
-        }
-    }
-
-    return "";
-};
-
-//------------------------------------------------------------------------------
 // CHECK ANSWER
 //------------------------------------------------------------------------------
 
 /**
- * Jämför spelarens bokstav med rätt saknad bokstav.
+ * Kontrollerar vald bokstav mot aktuell tom box.
  *
  * @param {string} letter
  * @return {void}
  */
 runmysteriet.scene.GuessWord.prototype.checkAnswer = function(letter) {
 
+    var correct = false;
+
+    if (!this.m_puzzle) {
+        return;
+    }
+
     letter = String(letter || "").toLowerCase();
 
-    console.log("GISSAD BOKSTAV:", letter);
-    console.log("RATT BOKSTAV:", this.m_missingLetter);
+    correct = this.m_puzzle.checkLetter(letter);
 
-    if (letter === this.m_missingLetter.toLowerCase()) {
+    if (correct === true) {
 
-        this.m_answeredCorrect = true;
+        this.m_alphabetSelector.reset();
+        this.updateLetterBoxes();
 
-        if (this.m_wordText) {
-            this.m_wordText.text = this.m_word.toUpperCase();
+        if (this.m_puzzle.isComplete()) {
+            this.m_answeredCorrect = true;
+
+            if (this.m_messageText) {
+                this.m_messageText.text = "RIGHT! PRESS ENTER TO CONTINUE";
+            }
+
+            return;
         }
 
         if (this.m_messageText) {
-            this.m_messageText.text = "RIGHT! PRESS ENTER TO CONTINUE";
+            this.m_messageText.text = "RIGHT! NEXT LETTER";
         }
 
         return;
@@ -475,7 +425,6 @@ runmysteriet.scene.GuessWord.prototype.checkAnswer = function(letter) {
         this.m_messageText.text = "WRONG LETTER. TRY AGAIN.";
     }
 };
-
 //------------------------------------------------------------------------------
 // CONFIRM
 //------------------------------------------------------------------------------

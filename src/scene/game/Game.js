@@ -35,6 +35,8 @@ runmysteriet.scene.Game = function(levelNumber, score) {
     this.m_gameOverTitle = null;
     this.m_gameOverMenu = null;
 
+    this.m_gameInput = null;
+
     this.camera = null;
 
     /*
@@ -59,6 +61,8 @@ runmysteriet.scene.Game.prototype.constructor = runmysteriet.scene.Game;
 
 runmysteriet.scene.Game.prototype.init = function() {
     rune.scene.Scene.prototype.init.call(this);
+
+    this.m_gameInput = new runmysteriet.input.GameInput(this.application);
 
     this.camera = this.cameras.getCameraAt(0);
 
@@ -650,9 +654,10 @@ runmysteriet.scene.Game.prototype.areAllPlayersDead = function() {
 //------------------------------------------------------------------------------
 
 runmysteriet.scene.Game.prototype.winGame = function(winningPlayer) {
+    
     var earnedScore = 0;
     var totalScore = 0;
-    var wordData = null;
+    var guessData = null;
 
     if (this.m_gameEnd === true) {
         return;
@@ -676,24 +681,22 @@ runmysteriet.scene.Game.prototype.winGame = function(winningPlayer) {
         }
     }
 
-   var wordData = null;
+    if (this.m_shieldHandler &&
+        typeof this.m_shieldHandler.getGuessData === "function") {
 
-if (this.m_shieldHandler &&
-    typeof this.m_shieldHandler.getWordData === "function") {
+        guessData = this.m_shieldHandler.getGuessData();
+    }
 
-    wordData = this.m_shieldHandler.getWordData();
-}
+    console.log("GUESS DATA TILL GUESSWORD:", guessData);
 
-console.log("WORD DATA TILL GUESSWORD:", wordData);
-
-this.application.scenes.load([
-    new runmysteriet.scene.GuessWord(
-        this.m_levelNumber,
-        earnedScore,
-        totalScore,
-        wordData
-    )
-]);
+    this.application.scenes.load([
+        new runmysteriet.scene.GuessWord(
+            this.m_levelNumber,
+            earnedScore,
+            totalScore,
+            guessData
+        )
+    ]);
 };
 
 runmysteriet.scene.Game.prototype.loseGame = function(reason) {
