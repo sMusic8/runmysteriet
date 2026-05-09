@@ -1,106 +1,106 @@
 [
-{
-    "word": "Knapp",
-    "Subword":["start", "nål"]
-},
-{
-    "word": "Sjuka",
-    "Subword":["Sjö", "Åk"]
-},
-{
-    "word": "Lampa",
-    "Subword":["Tak", "Bord"]
-},
-{
-    "word": "Skola",
-    "Subword":["Hög", "Grund"]
-},
-{
-    "word": "Matta",
-    "Subword":["Dörr", "Yoga"]
-},
-{
-    "word": "Karta",
-    "Subword":["Stad", "Värld"]
-},
-{
-    "word": "Skiva",
-    "Subword":["Lp", "Glas"]
-},
-{
-    "word": "Tryck",
-    "Subword":["Blod", "Luft"]
-},
-{
-    "word": "Drift",
-    "Subword":["Motor", "Batteri"]
-},
-{
-    "word": "Lista",
-    "Subword":["Inköp", "Gäst"]
-},
-{
-    "word": "Värme",
-    "Subword":["Kropp", "Fjärr"]
-},
-{
-    "word": "Lager",
-    "Subword":["Reserv", "Kul"]
-},
-{
-    "word": "Foder",
-    "Subword":["Jack", "Djur"]
-},
-{
-    "word": "Linje",
-    "Subword":["Buss", "Mitt"]
-},
-{
-    "word": "Start",
-    "Subword":["Om", "Ny"]
-},
-{
-    "word": "Växel",
-    "Subword":["Varm", "Telefon"]
-},
-{
-    "word": "Tanke",
-    "Subword":["Om", "Efter"]
-},
-{
-    "word": "Plats",
-    "Subword":["Pakering", "Monterat"]
-},
-{
-    "word": "Märke",
-    "Subword":["Bil", "Varu"]
-},
-{
-    "word": "Gräns",
-    "Subword":["Ålder", "Land"]
-},
-{
-    "word": "Bilar",
-    "Subword":["Polis", "Last"]
-},
-{
-    "word": "Orten",
-    "Subword":["Hem", "För"]
-},
-{
-    "word": "Skede",
-    "Subword":["Slut", "Inledning"]
-},
-{
-    "word": "Sikte",
-    "Subword":["Mål", "Kikar"]
-},
-{
-    "word": "Skydd",
-    "Subword":["Sol", "Hörsel"]
-},
-{
-        "word": "Sidan",
-        "Subword": ["Fram", "Webb"]
+    {
+        "word": "Button",
+        "Subword": ["Start", "Needle"]
+    },
+    {
+        "word": "Sickness",
+        "Subword": ["Sea", "Motion"]
+    },
+    {
+        "word": "Lamp",
+        "Subword": ["Ceiling", "Table"]
+    },
+    {
+        "word": "School",
+        "Subword": ["High", "Primary"]
+    },
+    {
+        "word": "Mat",
+        "Subword": ["Door", "Yoga"]
+    },
+    {
+        "word": "Map",
+        "Subword": ["City", "World"]
+    },
+    {
+        "word": "Disc",
+        "Subword": ["LP", "Glass"]
+    },
+    {
+        "word": "Pressure",
+        "Subword": ["Blood", "Air"]
+    },
+    {
+        "word": "Drive",
+        "Subword": ["Motor", "Battery"]
+    },
+    {
+        "word": "List",
+        "Subword": ["Shopping", "Guest"]
+    },
+    {
+        "word": "Heat",
+        "Subword": ["Body", "Remote"]
+    },
+    {
+        "word": "Bearing",
+        "Subword": ["Spare", "Ball"]
+    },
+    {
+        "word": "Lining",
+        "Subword": ["Jacket", "Animal"]
+    },
+    {
+        "word": "Line",
+        "Subword": ["Bus", "Center"]
+    },
+    {
+        "word": "Start",
+        "Subword": ["Re", "New"]
+    },
+    {
+        "word": "Gear",
+        "Subword": ["Warm", "Telephone"]
+    },
+    {
+        "word": "Thought",
+        "Subword": ["Re", "After"]
+    },
+    {
+        "word": "Place",
+        "Subword": ["Parking", "Mounted"]
+    },
+    {
+        "word": "Brand",
+        "Subword": ["Car", "Product"]
+    },
+    {
+        "word": "Border",
+        "Subword": ["Age", "Country"]
+    },
+    {
+        "word": "Cars",
+        "Subword": ["Police", "Cargo"]
+    },
+    {
+        "word": "Town",
+        "Subword": ["Home", "Suburban"]
+    },
+    {
+        "word": "Stage",
+        "Subword": ["Final", "Introduction"]
+    },
+    {
+        "word": "Sight",
+        "Subword": ["Target", "Scope"]
+    },
+    {
+        "word": "Protection",
+        "Subword": ["Sun", "Hearing"]
+    },
+    {
+        "word": "Side",
+        "Subword": ["Front", "Web"]
     }
 ]

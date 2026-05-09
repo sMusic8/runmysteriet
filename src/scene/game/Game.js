@@ -35,6 +35,8 @@ runmysteriet.scene.Game = function(levelNumber, score) {
     this.m_gameOverTitle = null;
     this.m_gameOverMenu = null;
 
+    this.m_gameInput = null;
+
     this.camera = null;
 
     /*
@@ -60,6 +62,8 @@ runmysteriet.scene.Game.prototype.constructor = runmysteriet.scene.Game;
 runmysteriet.scene.Game.prototype.init = function() {
     rune.scene.Scene.prototype.init.call(this);
 
+    this.m_gameInput = new runmysteriet.input.GameInput(this.application);
+
     this.camera = this.cameras.getCameraAt(0);
 
     console.log(this.camera);
@@ -69,6 +73,11 @@ runmysteriet.scene.Game.prototype.init = function() {
      */
     this.backgroundMusic = this.application.sounds.sound.get("sound_music");
     this.menuSound = this.application.sounds.sound.get("sound_menu");
+    if (this.backgroundMusic) {
+        this.backgroundMusic.play(true);
+    }
+
+     
 
     /*
      * Bakgrund
@@ -143,10 +152,11 @@ runmysteriet.scene.Game.prototype.init = function() {
     /*
      * Sköldar / runor
      */
-    this.m_shieldHandler = new runmysteriet.handler.ShieldHandler(
+    this.m_shieldHandler = new runmysteriet.handler.ShieldHandler( //
         this.stage,
         this.application,
-        this.m_platformHandler.levelWidth
+        this.m_platformHandler.levelWidth,
+        this.m_levelNumber
     );
 
     this.m_shieldHandler.init();
@@ -499,7 +509,7 @@ runmysteriet.scene.Game.prototype.handleMenuListInput = function(menuList, onCho
         return;
     }
 
-    input = menuList.readInput(this.keyboard);
+var input = this.m_gameInput.read(this.keyboard);
 
     if (input.down) {
         this.playMenuSound();
@@ -523,7 +533,7 @@ runmysteriet.scene.Game.prototype.handleMenuListInput = function(menuList, onCho
 runmysteriet.scene.Game.prototype.updateTimer = function() {
     if (this.allRunesColected()) {
         if (this.m_timerText) {
-            this.m_timerText.text = "ALLA RUNOR INSAMLADE TA DIG TILL BATEN";
+        this.m_timerText.text = "LEVEL IS COMPLETED GO GUESS THE WORD!";
         }
 
         if (this.m_scoreText) {
@@ -552,6 +562,10 @@ runmysteriet.scene.Game.prototype.updateTimer = function() {
 // LEVEL COMPLETION
 //------------------------------------------------------------------------------
 
+//------------------------------------------------------------------------------
+// LEVEL COMPLETION
+//------------------------------------------------------------------------------
+
 runmysteriet.scene.Game.prototype.checkLevelCompletion = function() {
     var players = null;
     var player = null;
@@ -567,6 +581,11 @@ runmysteriet.scene.Game.prototype.checkLevelCompletion = function() {
         return;
     }
 
+    /*
+     * om någon levande spelare når slutet av leveln
+     * ska spelet gå vidare till GuessWord.
+     *  det spelar ingen roll om alla runor är insamlade man ska försöka gissa ordet
+     */
     for (i = 0; i < players.length; i++) {
         player = players[i];
 
@@ -575,23 +594,26 @@ runmysteriet.scene.Game.prototype.checkLevelCompletion = function() {
         }
 
         if (player.x >= this.m_finishX) {
-            if (this.allRunesColected()) {
-                this.winGame(player);
-                return;
-            }
+            this.winGame(player);
+            return;
         }
     }
 
+    /*
+     * Om alla spelare är döda förlorar man.
+     */
     if (this.areAllPlayersDead()) {
         this.loseGame("ALLA SPELARE DOG");
         return;
     }
 
-    if (this.m_timeLeft <= 0 && this.allRunesColected() === false) {
+    /*
+     * Om tiden tar slut förlorar man.
+     */
+    if (this.m_timeLeft <= 0) {
         this.loseGame("TIDEN TOG SLUT");
     }
 };
-
 //------------------------------------------------------------------------------
 // PLAYER DEATH
 //------------------------------------------------------------------------------
@@ -642,8 +664,10 @@ runmysteriet.scene.Game.prototype.areAllPlayersDead = function() {
 //------------------------------------------------------------------------------
 
 runmysteriet.scene.Game.prototype.winGame = function(winningPlayer) {
+    
     var earnedScore = 0;
     var totalScore = 0;
+    var guessData = null;
 
     if (this.m_gameEnd === true) {
         return;
@@ -666,22 +690,21 @@ runmysteriet.scene.Game.prototype.winGame = function(winningPlayer) {
             this.backgroundMusic.pause();
         }
     }
-new runmysteriet.scene.GuessWord(this.application, this.m_shieldHandler)
-this.application.scenes.load([
-    new runmysteriet.scene.GuessWord(
-        this.m_shieldHandler.getResult()
-    )
-]);
-console.log("Handler:", this.m_shieldHandler);
-console.log("Collected:", this.m_shieldHandler ? this.m_shieldHandler.m_collected : null);
 
-console.log("SHIELD BEFORE SWITCH WORD:", this.m_shieldHandler.getRuneString());
-console.log("SHIELD COLLECTED:", this.m_shieldHandler.getCollected());
-   /* this.application.scenes.load([
+    if (this.m_shieldHandler &&
+        typeof this.m_shieldHandler.getGuessData === "function") {
+
+        guessData = this.m_shieldHandler.getGuessData();
+    }
+
+    console.log("GUESS DATA TILL GUESSWORD:", guessData);
+
+    this.application.scenes.load([
         new runmysteriet.scene.GuessWord(
             this.m_levelNumber,
             earnedScore,
-            totalScore
+            totalScore,
+            guessData
         )
     ]);*/
 };

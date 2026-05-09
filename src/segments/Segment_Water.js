@@ -36,7 +36,7 @@ runmysteriet.segments.Segment_Water.prototype.ground = function(stage, startX) {
      */
     var water = new runmysteriet.ui.graphic.Water(
         x,
-        this.groundY - 10
+        this.groundY - 11
     );
 
     stage.addChild(water);
@@ -47,8 +47,8 @@ runmysteriet.segments.Segment_Water.prototype.ground = function(stage, startX) {
      * Denna ska spelaren kunna stå på.
      */
     var raft = new runmysteriet.ui.graphic.Raft(
-        water.x - 15,
-        water.y + 20
+        water.x +5,
+        water.y - 8
     ); 
 
     raft.minX = water.x -10;
@@ -69,16 +69,16 @@ runmysteriet.segments.Segment_Water.prototype.ground = function(stage, startX) {
      * ska åckså ligga ovan flotte och cirkulera
      */
     var boat = new runmysteriet.entity.EnglishBoat(
-        water.x + 20,
-        water.y - 150
+        water.x + 60, /// 20 är avståndet mellan båten och flotten, kan justeras
+        water.y - 120// 150 är avståndet mellan båten och vattnet, kan justeras
     );
 
     /*
-     * Rörelseområde för tween.
+     * Rörelseområde för tween. 
      * Om båten knappt rör sig, öka dessa värden.
      */
-    boat.minX = water.x - 5;
-    boat.maxX = water.x + this.waterWidth + 5;
+    boat.minX = water.x - 160;
+    boat.maxX = water.x + this.waterWidth - boat.width - 120;
 
     stage.addChild(boat);
     boats.push(boat);

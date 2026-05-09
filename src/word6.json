@@ -1,34 +1,34 @@
 [
     {
-        "word": "Skogen",
-        "Subword":["Troll", "Ur"] 
-    },
-     {
-        "word": "Staden",
-        "Subword":["Inne", "Huvud"]
-    },
- {
-        "word": "Klocka",
-        "Subword": ["Vägg","Ägg"]
+        "word": "Forest",
+        "Subword": ["Troll", "Primeval"]
     },
     {
-        "word": "Stolen",
-        "Subword": ["Bar", "Kontor"]
+        "word": "City",
+        "Subword": ["Inner", "Capital"]
     },
     {
-        "word": "Golvet",
-        "Subword": ["Trä","Sten"]
+        "word": "Clock",
+        "Subword": ["Wall", "Egg"]
     },
     {
-        "word": "Skeden",
-        "Subword": ["Mat", "Slut"]
+        "word": "Chair",
+        "Subword": ["Bar", "Office"]
     },
     {
-        "word": "Planen",
-        "Subword": ["Tid", "Framttid"]
+        "word": "Floor",
+        "Subword": ["Wood", "Stone"]
     },
     {
-        "word": "Spelet",
-        "Subword": ["Bräd", "Dator"]
+        "word": "Spoon",
+        "Subword": ["Food", "Final"]
+    },
+    {
+        "word": "Plan",
+        "Subword": ["Time", "Future"]
+    },
+    {
+        "word": "Game",
+        "Subword": ["Board", "Computer"]
     }
 ]
