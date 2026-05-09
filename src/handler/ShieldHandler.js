@@ -2,9 +2,6 @@
 // SHIELD HANDLER
 //------------------------------------------------------------------------------
 
-var runmysteriet = runmysteriet || {};
-runmysteriet.handler = runmysteriet.handler || {};
-
 runmysteriet.handler.ShieldHandler = function (stage, application, levelWidth) {
 
   this.m_stage = stage;
@@ -19,7 +16,6 @@ runmysteriet.handler.ShieldHandler = function (stage, application, levelWidth) {
 
   this.box = null;
 
-  // callback till UI
   this.onCollectedChanged = null;
 };
 
@@ -111,14 +107,13 @@ runmysteriet.handler.ShieldHandler.prototype.collectShield = function (shield) {
 
   console.log("Collected:", shield.rune);
 
-  // 🔥 UPDATE UI
   if (this.onCollectedChanged) {
     this.onCollectedChanged(this.getRuneString());
   }
 };
 
 //-------------------------
-// STRING BUILDER (FIXAD)
+// STRING (HELA ORDET)
 //-------------------------
 
 runmysteriet.handler.ShieldHandler.prototype.getRuneString = function () {
@@ -126,31 +121,59 @@ runmysteriet.handler.ShieldHandler.prototype.getRuneString = function () {
   var result = "";
 
   for (var i = 0; i < this.m_collected.length; i++) {
-    result += this.m_collected[i].rune;
+    if (this.m_collected[i] && this.m_collected[i].rune) {
+      result += this.m_collected[i].rune;
+    }
   }
 
   return result;
 };
 
 //-------------------------
-// GETTERS
+// ARRAY (RUNOR)
+//-------------------------
+
+runmysteriet.handler.ShieldHandler.prototype.getCollectedRunes = function () {
+
+  var result = [];
+
+  for (var i = 0; i < this.m_collected.length; i++) {
+    if (this.m_collected[i]) {
+      result.push(this.m_collected[i].rune);
+    }
+  }
+
+  return result;
+};
+
+//-------------------------
+// RAW OBJECTS
 //-------------------------
 
 runmysteriet.handler.ShieldHandler.prototype.getCollected = function () {
-  return this.m_collected;
-};
-
-runmysteriet.handler.ShieldHandler.prototype.allRunesColected = function () {
-  return this.m_word.length > 0 &&
-         this.m_collected.length >= this.m_word.length;
+  return this.m_collected || [];
 };
 
 //-------------------------
-// DISPLAY
+// RESULT
 //-------------------------
 
-runmysteriet.handler.ShieldHandler.prototype.display = function () {
+runmysteriet.handler.ShieldHandler.prototype.getResult = function () {
 
-  this.box = new rune.display.Graphic(10, 10, 100, 100);
-  this.box.backgroundColor = "#ffffff";
+  return {
+    word: this.m_word,
+    collected: this.getCollectedRunes()
+  };
+};
+
+runmysteriet.handler.ShieldHandler.prototype.allRunesColected = function() {
+
+  if (!this.m_word) {
+    return false;
+  }
+
+  return this.m_collected.length >= this.m_word.length;
+};
+runmysteriet.handler.ShieldHandler.prototype.getWord = function () {
+  return this.m_word;
 };

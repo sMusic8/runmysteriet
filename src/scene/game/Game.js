@@ -150,7 +150,7 @@ runmysteriet.scene.Game.prototype.init = function() {
     );
 
     this.m_shieldHandler.init();
-    this.m_shieldHandler.display();
+   // this.m_shieldHandler.display();
 
     /*
      * HUD
@@ -168,6 +168,17 @@ runmysteriet.scene.Game.prototype.init = function() {
 
 runmysteriet.scene.Game.prototype.update = function(step) {
     rune.scene.Scene.prototype.update.call(this, step);
+
+    // 🔥 DEBUG: hoppa direkt till GuessWord med K PLOCKA BORT SEN
+    if (this.keyboard.justPressed("K")) {
+        console.log("DEBUG: hoppar till GuessWord"); //Här finns ordet
+console.log("Vad är objektet shhieldhandler", this.m_shieldHandler)
+        this.application.scenes.load([
+            new runmysteriet.scene.GuessWord(this.application, this.m_shieldHandler)
+        ]);
+
+        return;
+    }
 
     if (this.m_gameOverActive === true) {
         this.updateGameOverInput();
@@ -215,7 +226,6 @@ runmysteriet.scene.Game.prototype.update = function(step) {
     this.updateTimer();
     this.updateHUD();
 };
-
 //------------------------------------------------------------------------------
 // HUD
 //------------------------------------------------------------------------------
@@ -656,14 +666,24 @@ runmysteriet.scene.Game.prototype.winGame = function(winningPlayer) {
             this.backgroundMusic.pause();
         }
     }
+new runmysteriet.scene.GuessWord(this.application, this.m_shieldHandler)
+this.application.scenes.load([
+    new runmysteriet.scene.GuessWord(
+        this.m_shieldHandler.getResult()
+    )
+]);
+console.log("Handler:", this.m_shieldHandler);
+console.log("Collected:", this.m_shieldHandler ? this.m_shieldHandler.m_collected : null);
 
-    this.application.scenes.load([
+console.log("SHIELD BEFORE SWITCH WORD:", this.m_shieldHandler.getRuneString());
+console.log("SHIELD COLLECTED:", this.m_shieldHandler.getCollected());
+   /* this.application.scenes.load([
         new runmysteriet.scene.GuessWord(
             this.m_levelNumber,
             earnedScore,
             totalScore
         )
-    ]);
+    ]);*/
 };
 
 runmysteriet.scene.Game.prototype.loseGame = function(reason) {

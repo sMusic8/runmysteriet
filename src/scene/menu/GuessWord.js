@@ -1,64 +1,82 @@
 var runmysteriet = runmysteriet || {};
 runmysteriet.scene = runmysteriet.scene || {};
 
-runmysteriet.scene.GuessWord = function(application) {
+runmysteriet.scene.GuessWord = function(application, shieldHandler) {
+
+    rune.scene.Scene.call(this);
 
     this.application = application;
+    this.shieldHandler = shieldHandler;
 
-    // 👉 skapar input-systemet
+    // Hämta data direkt från ShieldHandler
+    this.m_word = shieldHandler.getWord(); // ← rätt ord direkt
+    console.log("Kanelbullen", this.m_word)
+    this.m_collected = shieldHandler ? shieldHandler.getCollectedRunes() : [];
+
+    console.log("START WORD:", this.m_word);
+    console.log("Collected array:", this.m_collected);
+
     this.textInput = new runmysteriet.ui.TextInput(application);
-
-    // 👉 sparar ordet som skrivs
-    
-    this.word = "";
-    console.log("kanelbulle")
-
-    rune.scene.Scene.call(this)
 };
 
-runmysteriet.scene.GuessWord.prototype.init = function() {
-    console.log("GuessWord startad");
-};
 runmysteriet.scene.GuessWord.prototype = Object.create(rune.scene.Scene.prototype);
 runmysteriet.scene.GuessWord.prototype.constructor = runmysteriet.scene.GuessWord;
+
+//----------------------------------------------------
+// INIT
+//----------------------------------------------------
+
+runmysteriet.scene.GuessWord.prototype.init = function() {
+
+    console.log("GuessWord startad");
+
+    if (!this.shieldHandler) {
+        console.log("❌ Ingen shieldHandler");
+        return;
+    }
+
+    this.m_word = this.shieldHandler.getRuneString();
+
+    console.log("INIT WORD:", this.m_word);
+    console.log("Collected runes:", this.shieldHandler.getCollectedRunes());
+};
+
+//----------------------------------------------------
+// UPDATE
+//----------------------------------------------------
 
 runmysteriet.scene.GuessWord.prototype.update = function() {
 
     var keyboard = this.application.inputs.keyboard;
-
     var data = this.textInput.update(keyboard);
+
+    // 🔄 Uppdatera om spelaren samlar fler runor (live sync)
+    if (this.shieldHandler) {
+
+        var current = this.shieldHandler.getRuneString();
+
+        if (current !== this.m_word) {
+            this.m_word = current;
+            console.log("UPDATED WORD FROM GAME:", this.m_word);
+        }
+    }
 
     if (!data) return;
 
-    // ➕ välj bokstav
+    // ➕ Lägg till bokstav
     if (data.choose) {
-        this.word += data.letter;
-        console.log("WORD:", this.word);
+        this.m_word += data.letter;
+        console.log("WORD:", this.m_word);
     }
 
-    // ➖ backspace
+    // ⬅️ Ta bort bokstav
     if (data.back) {
-        this.word = this.word.slice(0, -1);
-        console.log("WORD:", this.word);
+        this.m_word = this.m_word.slice(0, -1);
+        console.log("WORD:", this.m_word);
     }
 
-    // (valfritt) space = avsluta ord / logga
+    // ✅ Bekräfta ord
     if (data.space) {
-        console.log("FINAL WORD:", this.word);
+        console.log("FINAL WORD:", this.m_word);
     }
 };
-
-runmysteriet.scene.GuessWord.prototype.shield = function (){
-    this.box =  new rune.display.Graphic.call(this,
-        0,
-        0,
-        40,
-        40,
-    );
-    this.box.backgroundColor = "#ffffff";
-   this.stage.addChild(this.box);
-
-   this.colected = runmysteriet.handler.ShieldHandler.prototype.getCollected();
-   this.text = new rune.text.BitmapField(colected);
-   this.box.addChild(this.text)
-}

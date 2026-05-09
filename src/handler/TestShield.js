@@ -1,7 +1,6 @@
 runmysteriet.handler.TestShield = function () {
     rune.display.Graphic.call(this, 0, 0, 40, 40);
     this.backgroundColor = "#ffffff";
-    console.log("gris")
 };
 
 // inheritance
