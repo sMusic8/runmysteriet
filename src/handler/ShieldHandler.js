@@ -136,6 +136,10 @@ runmysteriet.handler.ShieldHandler.prototype.getRuneString = function () {
 // GETTERS
 //-------------------------
 
+runmysteriet.handler.ShieldHandler.prototype.getWord = function () {
+    return this.m_word;
+};
+
 runmysteriet.handler.ShieldHandler.prototype.getCollected = function () {
   return this.m_collected;
 };

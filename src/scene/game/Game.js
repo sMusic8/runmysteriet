@@ -662,11 +662,19 @@ runmysteriet.scene.Game.prototype.winGame = function(winningPlayer) {
         }
     }
 
-    this.application.scenes.load([
-        new runmysteriet.scene.GuessWord(
-            this.m_levelNumber,
-            earnedScore,
-            totalScore
+    var word = "";
+
+if (this.m_shieldHandler && typeof this.m_shieldHandler.getWord === "function") {
+    word = this.m_shieldHandler.getWord();
+}
+
+this.application.scenes.load([
+    new runmysteriet.scene.GuessWord(
+        this.m_levelNumber,
+        earnedScore,
+        totalScore,
+        word
+    
         )
     ]);
 };
