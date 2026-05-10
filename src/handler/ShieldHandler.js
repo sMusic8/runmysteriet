@@ -26,68 +26,13 @@ runmysteriet.handler.ShieldHandler = function (stage, application, levelWidth, l
   this.onCollectedChanged = null;
 
 };
-
-
-//------------------------------------------------------------------------------
-// GET WORD DATA FOR LEVEL
-//------------------------------------------------------------------------------
-
-runmysteriet.handler.ShieldHandler.prototype.getWordDataForLevel = function() {
-
-    var resource = null;
-    var data = null;
-    var index = 0;
-
-    if (!this.application || !this.application.resources) {
-        console.log("No application resources found.");
-        return null;
-    }
-
-    resource = this.application.resources.get("words5");
-
-    if (!resource) {
-        console.log("Could not find resource: words5");
-        return null;
-    }
-
-    data = resource.data;
-
-    if (typeof data === "string") {
-        try {
-            data = JSON.parse(data);
-        } catch (error) {
-            console.log("Could not parse words5 JSON:", error);
-            return null;
-        }
-    }
-
-    if (!data || !data.length) {
-        console.log("words5 JSON is empty or wrong format.");
-        return null;
-    }
-
-    /*
-     * Level 1 tar första ordet.
-     * Level 2 tar andra ordet.
-     * Level 3 tar tredje ordet.
-     */
-    index = (this.m_levelNumber - 1) % data.length;
-
-    console.log("LEVEL:", this.m_levelNumber);
-    console.log("WORD INDEX:", index);
-    console.log("WORD DATA:", data[index]);
-
-    return data[index];
-};
-
-
 //-------------------------
 // INIT
 //-------------------------
 
 runmysteriet.handler.ShieldHandler.prototype.init = function () {
 
-var wordData = this.getWordDataForLevel();
+    var wordData = this.getRandomWordData();
     var word = "";
     var startX = 150; // starta en bit in i banan, inte direkt vid början
     var endX = this.m_levelWidth - 150; //
@@ -108,7 +53,7 @@ var wordData = this.getWordDataForLevel();
             word: "Button",
             Subword: ["Start", "Needle"]
         };
-
+        var wordData = this.getRandomWordData();
         this.m_word = word;
         this.m_hints = this.m_wordData.Subword;
     }
@@ -148,12 +93,13 @@ console.log("HIDDEN INDEX:", this.m_hiddenIndex);
         shield.active = true;
         shield.wordIndex = i;
 
-        shield.setRune(word[i]);
-
+        shield.setRune(word.charAt(i));
         this.m_shields.push(shield);
         this.m_stage.addChild(shield);
     }
 };
+
+
 
 //------------------------------------------------------------------------------
 // GET RANDOM WORD DATA
@@ -171,9 +117,10 @@ runmysteriet.handler.ShieldHandler.prototype.getRandomWordData = function() {
     }
 
     /*
-     * OBS: "words5" måste vara samma namn som du har i Requests.js.
+     * Namnet måste matcha Requests.js:
+     * this.add("words5", "...")
      */
-    resource = this.application.resources.get("words5", "word6");
+    resource = this.application.resources.get("words5");
 
     if (!resource) {
         console.log("Could not find resource: words5");
@@ -183,7 +130,7 @@ runmysteriet.handler.ShieldHandler.prototype.getRandomWordData = function() {
     data = resource.data;
 
     /*
-     * om JSON kommer som text, gör om den till riktig array.
+     * Om JSON kommer som text gör vi om den till array.
      */
     if (typeof data === "string") {
         try {
@@ -199,15 +146,16 @@ runmysteriet.handler.ShieldHandler.prototype.getRandomWordData = function() {
         return null;
     }
 
-    index = (this.m_levelNumber - 1) % data.length;
+    /*
+     * Här sker slumpen.
+     */
+    index = Math.floor(Math.random() * data.length);
 
-    console.log("LEVEL:", this.m_levelNumber);
-    console.log("WORD INDEX:", index);
-    console.log("WORD DATA:", data[index]);
+    console.log("RANDOM WORD INDEX:", index);
+    console.log("RANDOM WORD DATA:", data[index]);
 
     return data[index];
 };
-
 //-------------------------
 // UPDATE
 //-------------------------
@@ -245,8 +193,9 @@ runmysteriet.handler.ShieldHandler.prototype.collectShield = function (shield) {
   shield.__collected = true;
   shield.active = false;
 
-  this.catchSound.play(true);
-
+if (this.catchSound) {
+    this.catchSound.play(true);
+}
   this.m_stage.removeChild(shield);
 
   var index = this.m_shields.indexOf(shield);
@@ -266,7 +215,7 @@ runmysteriet.handler.ShieldHandler.prototype.collectShield = function (shield) {
 };
 
 //-------------------------
-// STRING BUILDER (FIXAD)
+// STRING BUILDER (för UI)
 //-------------------------
 
 runmysteriet.handler.ShieldHandler.prototype.getRuneString = function () {
@@ -315,10 +264,10 @@ runmysteriet.handler.ShieldHandler.prototype.getCollected = function () {
   return this.m_collected;
 };
 
-runmysteriet.handler.ShieldHandler.prototype.allRunesColected = function () {
-  return this.m_word.length > 0 &&
-         this.m_collected.length >= this.m_word.length;
-};
+// runmysteriet.handler.ShieldHandler.prototype.allRunesColected = function () {
+//   return this.m_word.length > 0 &&
+//          this.m_collected.length >= this.m_word.length;
+// };
 
 runmysteriet.handler.ShieldHandler.prototype.getWordData = function() {
     return this.m_wordData;
