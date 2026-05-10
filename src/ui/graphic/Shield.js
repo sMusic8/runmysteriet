@@ -29,8 +29,8 @@ runmysteriet.ui.Shield = function() {
         this.addChild(this.runeGraphic);
 
         // centrera i 40x40 sköld
-        this.runeGraphic.x = (40 - this.runeGraphic.width) / 2;
-        this.runeGraphic.y = (40 - this.runeGraphic.height) / 2;
+        this.runeGraphic.x = (30 - this.runeGraphic.width) / 2;
+        this.runeGraphic.y = (20 - this.runeGraphic.height) / 2;
     }
 
     /** @type {string} */
@@ -52,8 +52,8 @@ runmysteriet.ui.Shield = function() {
     this.addChild(this.m_text);
 
     // PULSE
-    this.m_baseScale = 1;
-    this.m_pulseSpeed = 0.05;
+    this.m_baseScale = 1.7;
+    this.m_pulseSpeed = 0.08;
     this.m_pulseValue = 0;
 };
 
