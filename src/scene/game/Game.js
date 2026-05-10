@@ -74,10 +74,9 @@ runmysteriet.scene.Game.prototype.init = function() {
     this.backgroundMusic = this.application.sounds.sound.get("sound_music");
     this.menuSound = this.application.sounds.sound.get("sound_menu");
     if (this.backgroundMusic) {
-        this.backgroundMusic.play(true);
-    }
-
-     
+    this.backgroundMusic.loop = true;
+    this.backgroundMusic.play();
+}
 
     /*
      * Bakgrund
@@ -160,7 +159,7 @@ runmysteriet.scene.Game.prototype.init = function() {
     );
 
     this.m_shieldHandler.init();
-    this.m_shieldHandler.display();
+   // this.m_shieldHandler.display();
 
     /*
      * HUD
@@ -178,6 +177,17 @@ runmysteriet.scene.Game.prototype.init = function() {
 
 runmysteriet.scene.Game.prototype.update = function(step) {
     rune.scene.Scene.prototype.update.call(this, step);
+
+    // 🔥 DEBUG: hoppa direkt till GuessWord med K PLOCKA BORT SEN
+    if (this.keyboard.justPressed("K")) {
+        console.log("DEBUG: hoppar till GuessWord"); //Här finns ordet
+console.log("Vad är objektet shhieldhandler", this.m_shieldHandler)
+        this.application.scenes.load([
+            new runmysteriet.scene.GuessWord(this.application, this.m_shieldHandler)
+        ]);
+
+        return;
+    }
 
     if (this.m_gameOverActive === true) {
         this.updateGameOverInput();
@@ -225,7 +235,6 @@ runmysteriet.scene.Game.prototype.update = function(step) {
     this.updateTimer();
     this.updateHUD();
 };
-
 //------------------------------------------------------------------------------
 // HUD
 //------------------------------------------------------------------------------

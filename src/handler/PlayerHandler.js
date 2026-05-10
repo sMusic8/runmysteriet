@@ -486,6 +486,7 @@ runmysteriet.handler.PlayerHandler.prototype.checkWaterDeath = function(player, 
     
 
     if (!player || player.isDead === true) {
+         this.dedSound = this.application.sounds.sound.get("ded");
         return;
     }
     /*

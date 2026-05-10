@@ -22,7 +22,6 @@ runmysteriet.handler.ShieldHandler = function (stage, application, levelWidth, l
 
   this.box = null;
 
-  // callback till UI
   this.onCollectedChanged = null;
 
 };
@@ -32,7 +31,10 @@ runmysteriet.handler.ShieldHandler = function (stage, application, levelWidth, l
 
 runmysteriet.handler.ShieldHandler.prototype.init = function () {
 
-    var wordData = this.getRandomWordData();
+  //Test
+  this.runes = new runmysteriet.ui.Rune();
+  
+var wordData = this.getWordDataForLevel();
     var word = "";
     var startX = 150; // starta en bit in i banan, inte direkt vid början
     var endX = this.m_levelWidth - 150; //
@@ -216,6 +218,7 @@ if (this.catchSound) {
 
 //-------------------------
 // STRING BUILDER (för UI)
+// STRING (HELA ORDET)
 //-------------------------
 
 runmysteriet.handler.ShieldHandler.prototype.getRuneString = function () {
@@ -283,11 +286,25 @@ runmysteriet.handler.ShieldHandler.prototype.getGuessData = function() {
 };
 
 //-------------------------
-// DISPLAY
+// RESULT
 //-------------------------
 
-runmysteriet.handler.ShieldHandler.prototype.display = function () {
+runmysteriet.handler.ShieldHandler.prototype.getResult = function () {
 
-  this.box = new rune.display.Graphic(10, 10, 100, 100);
-  this.box.backgroundColor = "#ffffff";
+  return {
+    word: this.m_word,
+    collected: this.getCollectedRunes()
+  };
+};
+
+runmysteriet.handler.ShieldHandler.prototype.allRunesColected = function() {
+
+  if (!this.m_word) {
+    return false;
+  }
+
+  return this.m_collected.length >= this.m_word.length;
+};
+runmysteriet.handler.ShieldHandler.prototype.getWord = function () {
+  return this.m_word;
 };
