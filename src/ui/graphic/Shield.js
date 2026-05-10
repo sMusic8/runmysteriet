@@ -1,6 +1,3 @@
-var runmysteriet = runmysteriet || {};
-runmysteriet.ui = runmysteriet.ui || {};
-
 /**
  * Shield UI element.
  * @constructor
@@ -15,6 +12,26 @@ runmysteriet.ui.Shield = function() {
         40,
         "shield"
     );
+
+    // Rune manager
+    this.runes = new runmysteriet.ui.Rune();
+
+    this.runes.makeAllRunes();
+
+    var randomRune = this.runes.getOneRune();
+    console.log("Slumpad rune:", randomRune);
+
+    // Spara runan
+    this.runeGraphic = randomRune;
+
+    // Lägg till som child om den finns
+    if (this.runeGraphic) {
+        this.addChild(this.runeGraphic);
+
+        // centrera i 40x40 sköld
+        this.runeGraphic.x = (40 - this.runeGraphic.width) / 2;
+        this.runeGraphic.y = (40 - this.runeGraphic.height) / 2;
+    }
 
     /** @type {string} */
     this.rune = "";
@@ -35,14 +52,8 @@ runmysteriet.ui.Shield = function() {
     this.addChild(this.m_text);
 
     // PULSE
-
-    /** @private @type {number} */
     this.m_baseScale = 1;
-
-    /** @private @type {number} */
     this.m_pulseSpeed = 0.05;
-
-    /** @private @type {number} */
     this.m_pulseValue = 0;
 };
 
@@ -52,7 +63,6 @@ runmysteriet.ui.Shield.prototype.constructor = runmysteriet.ui.Shield;
 
 /**
  * Update loop.
- * @return {void}
  */
 runmysteriet.ui.Shield.prototype.update = function() {
 
@@ -68,7 +78,6 @@ runmysteriet.ui.Shield.prototype.update = function() {
 
 /**
  * Centers the text inside the shield.
- * @return {void}
  */
 runmysteriet.ui.Shield.prototype.centerText = function() {
 
@@ -78,8 +87,6 @@ runmysteriet.ui.Shield.prototype.centerText = function() {
 
 /**
  * Sets the rune letter.
- * @param {string} letter
- * @return {void}
  */
 runmysteriet.ui.Shield.prototype.setRune = function(letter) {
 
@@ -89,6 +96,7 @@ runmysteriet.ui.Shield.prototype.setRune = function(letter) {
 
     this.centerText();
 };
+
 runmysteriet.ui.Shield.prototype.getRune = function () {
     return this.rune;
 };

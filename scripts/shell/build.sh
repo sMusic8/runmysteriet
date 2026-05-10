@@ -20,6 +20,7 @@ npx google-closure-compiler \
 --js "./../../src/ui/graphic/Hole.js" \
 --js "./../../src/ui/graphic/TextInput.js" \
 --js "./../../src/ui/graphic/Water.js" \
+--js "./../../src/ui/graphic/Rune.js" \
 --js "./../../src/ui/graphic/Ground.js" \
 --js "./../../src/ui/graphic/Shield.js" \
 --js "./../../src/handler/BackgroundHandler.js" \

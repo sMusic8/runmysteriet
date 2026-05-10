@@ -86,6 +86,11 @@ runmysteriet.handler.ShieldHandler.prototype.getWordDataForLevel = function() {
 
 runmysteriet.handler.ShieldHandler.prototype.init = function () {
 
+  //Test
+  this.runes = new runmysteriet.ui.Rune();
+ console.log(this.runes.makeAllRunes()); 
+
+
 var wordData = this.getWordDataForLevel();
     var word = "";
     var startX = 150; // starta en bit in i banan, inte direkt vid början
