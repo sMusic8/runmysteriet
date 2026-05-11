@@ -89,7 +89,7 @@ runmysteriet.scene.Credits.prototype.m_initBackground = function () {
         0,
         this.application.screen.width,
         this.application.screen.height,
-        "background1"
+        "background_menu"
     );
 
     this.stage.addChild(this.m_background);

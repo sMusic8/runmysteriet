@@ -14,6 +14,9 @@ runmysteriet.scene.More = function() {
 
     /** @private */
     this.m_text = null;
+
+    // ✔ FIX: background
+    this.m_background = null;
 };
 
 //------------------------------------------------------------------------------
@@ -31,7 +34,18 @@ runmysteriet.scene.More.prototype.init = function() {
 
     rune.scene.Scene.prototype.init.call(this);
 
-    //----------------------------------------------------------------------
+    // ✔ FIX: BACKGROUND ONLY
+    this.m_background = new rune.display.Graphic(
+        0,
+        0,
+        this.application.screen.width,
+        this.application.screen.height,
+        "background_menu"
+    );
+
+    this.stage.addChild(this.m_background);
+
+    //----------------------------------------------------------------------  
     // BOX
     //----------------------------------------------------------------------
 
@@ -47,8 +61,8 @@ runmysteriet.scene.More.prototype.init = function() {
 
     this.stage.addChild(box);
 
-    //----------------------------------------------------------------------
-    // TEXT (inkl. instruktion för att gå tillbaka)
+    //----------------------------------------------------------------------  
+    // TEXT
     //----------------------------------------------------------------------
 
     this.m_text = new rune.text.BitmapField(
@@ -76,8 +90,8 @@ runmysteriet.scene.More.prototype.init = function() {
     this.m_text.x = box.x + (boxWidth - this.m_text.width) / 2;
     this.m_text.y = box.y + (boxHeight - this.m_text.height) / 2;
 
-    //----------------------------------------------------------------------
-    // BACK BUTTON (visuell förstärkning)
+    //----------------------------------------------------------------------  
+    // BACK BUTTON
     //----------------------------------------------------------------------
 
     this.m_backButton = new rune.text.BitmapField("BACK");
@@ -100,7 +114,6 @@ runmysteriet.scene.More.prototype.update = function(step) {
     var keyboard = this.keyboard;
     var gamepad = this.gamepads.get(0);
 
-    // Keyboard
     if (
         keyboard &&
         (
@@ -112,12 +125,11 @@ runmysteriet.scene.More.prototype.update = function(step) {
         this.goToMenu();
     }
 
-    // Gamepad
     if (
         gamepad &&
         (
-            gamepad.justPressed(9) ||  // Start
-            gamepad.justPressed(0)     // X
+            gamepad.justPressed(9) ||
+            gamepad.justPressed(0)
         )
     ) {
         this.goToMenu();
