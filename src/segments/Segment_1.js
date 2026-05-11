@@ -44,6 +44,12 @@ runmysteriet.segments.Segment_1.prototype.ground = function(stage, startX) {
         y: this.groundY - 40
     });
 
+    enemySpawns.push({
+        type: "kristen",
+        x: x + 210,
+        y: this.groundY - 40
+    });
+
     x += this.tileSize;
 
     //--------------------------------------------------------------------------

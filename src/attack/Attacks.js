@@ -12,7 +12,7 @@
  */
 runmysteriet.attack.Attack = function(player) {
 
-    var width = 32;
+    var width = 32; 
     var height = 32;
     var x = 0;
     var y = 0;
@@ -31,7 +31,7 @@ runmysteriet.attack.Attack = function(player) {
         y,
         width,
         height,
-        "shield"
+        "attack_effect"
     );
 
     /**
@@ -46,7 +46,7 @@ runmysteriet.attack.Attack = function(player) {
      *
      * @type {number}
      */
-    this.damage = 1;
+    this.damage = 25;
 
     /**
      * Hur länge attacken syns.

@@ -63,6 +63,12 @@ runmysteriet.handler.PlayerHandler.prototype.init = function() {
         { texture: "spritesheet_thor_move", start: "idle" }
     );
 
+    player1.direction = 1;
+    player1.flippedX = false;
+
+    player2.direction = 1;
+    player2.flippedX = false;
+
     this.placePlayerOnStartPlatform(player1, 0);
     this.placePlayerOnStartPlatform(player2, 1);
 
@@ -186,28 +192,6 @@ runmysteriet.handler.PlayerHandler.prototype.updateMovement = function() {
 
         player.isOnGround = false;
     }
-};
-//------------------------------------------------------------------------------
-// GAMEPAD
-//------------------------------------------------------------------------------
-runmysteriet.handler.PlayerHandler.prototype.getGamepad = function(gamepadID) {
-
-    if (this.application === null || this.application === undefined) {
-        return null;
-    }
-
-    if (this.application.inputs === null || this.application.inputs === undefined) {
-        return null;
-    }
-
-    if (
-        this.application.inputs.gamepads === null ||
-        this.application.inputs.gamepads === undefined
-    ) {
-        return null;
-    }
-
-    return this.application.inputs.gamepads.get(gamepadID);
 };
 
 //------------------------------------------------------------------------------
@@ -389,18 +373,30 @@ runmysteriet.handler.PlayerHandler.prototype.getGamepad = function(gamepadID) {
 
 runmysteriet.handler.PlayerHandler.prototype.handleInput = function(player, index) {
 
-     var input = this.input.readPlayer(this.keyboard, index);
+    var input = this.input.readPlayer(this.keyboard, index);
 
     if (input.left) {
         player.x -= player.speed;
         player.isMoving = true;
+
+        /*
+         * direction används av attacken.
+         * flippedX vänder bilden.
+         */
         player.direction = -1;
+        player.flippedX = true;
     }
 
     if (input.right) {
         player.x += player.speed;
         player.isMoving = true;
+
+        /*
+         * direction används av attacken.
+         * flippedX vänder bilden.
+         */
         player.direction = 1;
+        player.flippedX = false;
     }
 
     if (input.jump && player.isOnGround === true) {
@@ -413,10 +409,9 @@ runmysteriet.handler.PlayerHandler.prototype.handleInput = function(player, inde
     }
 
     if (input.attack && player.canAttack()) {
-    this.createAttack(player);
-    player.resetAttackCooldown();
-}
-
+        this.createAttack(player);
+        player.resetAttackCooldown();
+    }
 };
 //------------------------------------------------------------------------------
 // HP BAR

@@ -23,9 +23,16 @@ runmysteriet.segments.Segment_2.prototype.ground = function(stage, startX) {
 
     enemySpawns.push({
     type: "kristen",
-    x: x + 180,
-    y: this.groundY - 40
+    x: x + 90,
+    y: this.groundY - 35
 });
+
+
+    enemySpawns.push({
+        type: "kristen",
+        x: x + 210,
+        y: this.groundY - 40
+    });
     var hole1 = new runmysteriet.ui.graphic.Hole(
         x,
         this.groundY,

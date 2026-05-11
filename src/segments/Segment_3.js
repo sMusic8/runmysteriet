@@ -33,7 +33,14 @@ runmysteriet.segments.Segment_3.prototype.ground = function(stage, startX) {
 
     enemySpawns.push({
         type: "kristen",
-        x: x + 180,
+        x: x + 140,
+        y: this.groundY - 40
+    });
+
+
+    enemySpawns.push({
+        type: "kristen",
+        x: x + 210,
         y: this.groundY - 40
     });
 
