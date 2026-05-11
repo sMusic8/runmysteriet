@@ -48,7 +48,7 @@ runmysteriet.scene.TextInputView.prototype.init = function() {
     this.stage.addChild(this.letterText);
 
     // ord
-    this.wordText = new rune.text.BitmapField("");
+    this.wordText = new rune.text.BitmapField(" ");
     this.letterText.autoSize = true;
     this.wordText.x = 100;
     this.wordText.y = 180;

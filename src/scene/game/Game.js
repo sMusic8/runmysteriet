@@ -116,11 +116,17 @@ runmysteriet.scene.Game.prototype.init = function() {
     /*
      * Spelare
      */
-    this.m_playerHandler = new runmysteriet.handler.PlayerHandler(
-        this.stage,
-        this.m_platformHandler,
-        this.application
-    );
+
+    //
+    this.m_input = new runmysteriet.input.GameInput(this.application);
+
+this.m_playerHandler = new runmysteriet.handler.PlayerHandler(
+    this.stage,
+    this.m_platformHandler,
+    this.application,
+    this.m_input,
+    this.keyboard
+);
 
     this.m_playerHandler.init();
 
@@ -253,7 +259,7 @@ runmysteriet.scene.Game.prototype.createHUD = function() {
     /*
      * Score / level
      */
-    this.m_scoreText = new rune.text.BitmapField("");
+    this.m_scoreText = new rune.text.BitmapField(" ");
     this.m_scoreText.x = 15;
     this.m_scoreText.y = 30;
     this.stage.addChild(this.m_scoreText);
@@ -264,7 +270,7 @@ runmysteriet.scene.Game.prototype.createHUD = function() {
     this.gris = new runmysteriet.handler.TestShield();
     this.stage.addChild(this.gris);
 
-    this.grisText = new rune.text.BitmapField("");
+    this.grisText = new rune.text.BitmapField(" ");
     this.stage.addChild(this.grisText);
 
     /*

@@ -12,7 +12,7 @@
  * @param {!Object} platformHandler
  * @param {!Object} application
  */
-runmysteriet.handler.PlayerHandler = function(stage, platformHandler, application) {
+runmysteriet.handler.PlayerHandler = function(stage, platformHandler, application, input,keyboard) {
 
     /** @type {!rune.display.Stage} */
     this.stage = stage;
@@ -31,6 +31,12 @@ runmysteriet.handler.PlayerHandler = function(stage, platformHandler, applicatio
 
     /** @type {number} */
     this.m_avatarPlatformOffsetY = 14;
+
+    /** @type {!runmysteriet.input.GameInput} */
+    this.input = input;
+
+    /** @type {!Object} */
+    this.keyboard = keyboard;
 
     /** @type {?Object} */
     this.jumpSound = this.application.sounds.sound.get("sound_jump");
@@ -101,21 +107,32 @@ runmysteriet.handler.PlayerHandler.prototype.update = function() {
 
         var p = this.players[i];
 
+        if (!p) {
+            continue;
+        }
+
         if (p.hpBar) {
 
             p.hpBar.x = p.x;
             p.hpBar.y = p.y - 12;
 
             var hpPercent = p.hp / p.maxHp;
-            if (hpPercent < 0) hpPercent = 0;
+
+            if (hpPercent < 0) {
+                hpPercent = 0;
+            }
 
             p.hpBar.scaleX = hpPercent;
+        }
+
+        if (p.hp <= 0 && p.isDead !== true) {
+            this.killPlayer(p, i);
+            continue;
         }
 
         p.updateAnimation();
     }
 };
-
 //------------------------------------------------------------------------------
 // INPUT
 //------------------------------------------------------------------------------
@@ -359,63 +376,35 @@ runmysteriet.handler.PlayerHandler.prototype.getGamepad = function(gamepadID) {
 // INPUT HANDLER
 //------------------------------------------------------------------------------
 
-runmysteriet.handler.PlayerHandler.prototype.handleInput = function(player, gamepadID) {
+runmysteriet.handler.PlayerHandler.prototype.handleInput = function(player, index) {
 
-    var moving = false;
-    var gamepad = this.getGamepad(gamepadID);
+     var input = this.input.readPlayer(this.keyboard, index);
 
-    if (player.keyboard.pressed(player.controls.right)) {
-        player.x += player.speed;
-        moving = true;
-        player.flippedX = false;
-    }
-
-    if (player.keyboard.pressed(player.controls.left)) {
+    if (input.left) {
         player.x -= player.speed;
-        moving = true;
-        player.flippedX = true;
+        player.isMoving = true;
+        player.direction = -1;
     }
 
-    if (player.keyboard.justPressed(player.controls.jump) && player.isOnGround) {
+    if (input.right) {
+        player.x += player.speed;
+        player.isMoving = true;
+        player.direction = 1;
+    }
 
+    if (input.jump && player.isOnGround === true) {
         player.velocityY = player.jumpPower;
         player.isOnGround = false;
 
-        if (this.jumpSound) this.jumpSound.play();
-    }
-    // gamepad -------OBS ta inte bort-----------
-    if (gamepad !== null && gamepad !== undefined) {
-
-        if (gamepad.stickLeftRight) {
-            player.x += player.speed;
-            moving = true;
-            player.flippedX = false;
-        }
-
-        if (gamepad.stickLeftLeft) {
-            player.x -= player.speed;
-            moving = true;
-            player.flippedX = true;
-        }
-
-        if (
-            typeof gamepad.justPressed === "function" &&
-            gamepad.justPressed(0) &&
-            player.isOnGround === true
-        ) {
-            player.velocityY = player.jumpPower;
-            player.isOnGround = false;
-
-            if (this.jumpSound) {
-                this.jumpSound.play();
-            }
+        if (this.jumpSound) {
+            this.jumpSound.play();
         }
     }
 
-
-    player.isMoving = moving;
+    if (input.attack && typeof player.attack === "function") {
+        player.attack();
+    }
 };
-
 //------------------------------------------------------------------------------
 // HP BAR
 //------------------------------------------------------------------------------

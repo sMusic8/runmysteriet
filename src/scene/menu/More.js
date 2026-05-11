@@ -53,9 +53,28 @@ runmysteriet.scene.More.prototype.update = function(step) {
     /** @type {?Object} */
     var keyboard = this.keyboard;
 
+    /** @type {?Object} */
+    var gamepad = this.gamepads.get(0);
+
     if (
         keyboard &&
-        (keyboard.justPressed("ESCAPE") || keyboard.justPressed("ENTER"))
+        (
+            keyboard.justPressed("ESCAPE") ||
+            keyboard.justPressed("ENTER") ||
+            keyboard.justPressed("SPACE")
+        )
+    ) {
+        this.application.scenes.load([
+            new runmysteriet.scene.Menu()
+        ]);
+    }
+
+    if (
+        gamepad &&
+        (
+            gamepad.justPressed(9) ||  // Options / Start
+            gamepad.justPressed(0)     // X-knappen
+        )
     ) {
         this.application.scenes.load([
             new runmysteriet.scene.Menu()

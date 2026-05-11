@@ -112,6 +112,16 @@ var runmysteriet = function() {
     * @since 1.0
     */
     m_this.logic = {};
+
+
+    /**
+     * This package includes 
+     * @namespace attack
+     * @memberof runmysteriet
+     * @since 1.0
+     */
+
+    m_this.attack = {};
     /**
      * Public scope.
      */
