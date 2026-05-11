@@ -9,6 +9,13 @@ runmysteriet.ui.graphic.Raft = function(x, y) {
         "flotte"
     );
     this.isRaft = true; 
+    /*
+     * Gör att spelaren kan följa med flotten
+     * när spelaren står ovanpå den.
+     */
+    this.sticky = true;
+    this.immovable = true;
+
     
     this.startX = x || 0;
     this.minX = this.startX;
@@ -25,7 +32,6 @@ runmysteriet.ui.graphic.Raft = function(x, y) {
      */
     this.hasStarted = false;
     this.hasArrived = false;    
-    this.isRaft = true;
 };
 
 

@@ -45,7 +45,7 @@ runmysteriet.ui.Shield = function() {
     // TEXT
 
     /** @type {rune.text.BitmapField} */
-    this.m_text = new rune.text.BitmapField("");
+    this.m_text = new rune.text.BitmapField(" ");
 
     this.m_text.autoSize = true;
 

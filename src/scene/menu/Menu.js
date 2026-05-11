@@ -95,8 +95,8 @@ runmysteriet.scene.Menu.prototype.chooseSelected = function() {
 
     this.application.scenes.load([
         new runmysteriet.scene.TextInputView(function() {
-            return "Anvand pilar for att valja bokstav. SPACE = lagg till. BACKSPACE = ta bort";
-        })
+
+            return "Anvand pilar for att valja bokstav. SPACE = lagg till";        })
     ]);
 
 }
