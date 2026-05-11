@@ -29,7 +29,7 @@ runmysteriet.scene.More.prototype.init = function() {
     rune.scene.Scene.prototype.init.call(this);
 
     /** @type {!rune.text.BitmapField} */
-    var text = new rune.text.BitmapField("MER OM SPELET SKRIVER VI HAR");
+    var text = new rune.text.BitmapField("This is the game where you help the Vikings reach their home ship while avoiding numerous obstacles. Jump across platforms, fight Christian priests, and avoid being captured by the English. To board the ship and sail on to the next level, you must guess the secret password. Collect the shields marked with runes along the way.");
     text.autoSize = true;
     text.center = this.application.screen.center;
 
