@@ -40,6 +40,9 @@ runmysteriet.handler.PlayerHandler = function(stage, platformHandler, applicatio
 
     /** @type {?Object} */
     this.jumpSound = this.application.sounds.sound.get("sound_jump");
+
+    /** @type {!Array<!runmysteriet.attack.Attack>} */
+    this.attacks = [];
 };
 
 //------------------------------------------------------------------------------
@@ -102,6 +105,8 @@ runmysteriet.handler.PlayerHandler.prototype.update = function() {
     this.updateInput();
     this.updateMovement();
     this.updateCollisions();
+    this.updateAttacks();
+
 
     for (var i = 0; i < this.players.length; i++) {
 
@@ -109,6 +114,10 @@ runmysteriet.handler.PlayerHandler.prototype.update = function() {
 
         if (!p) {
             continue;
+        }
+       
+        if (typeof p.updateAttackCooldown === "function") {
+            p.updateAttackCooldown();
         }
 
         if (p.hpBar) {
@@ -401,9 +410,11 @@ runmysteriet.handler.PlayerHandler.prototype.handleInput = function(player, inde
         }
     }
 
-    if (input.attack && typeof player.attack === "function") {
-        player.attack();
-    }
+    if (input.attack && player.canAttack()) {
+    this.createAttack(player);
+    player.resetAttackCooldown();
+}
+
 };
 //------------------------------------------------------------------------------
 // HP BAR
@@ -546,3 +557,50 @@ runmysteriet.handler.PlayerHandler.prototype.killPlayer = function(player, index
     console.log("Spelaren " + index + " dog");
 };
 
+/**
+ * Skapar en attack framför spelaren.
+ *
+ * @param {!runmysteriet.entity.Player} player
+ * @return {undefined}
+ */
+runmysteriet.handler.PlayerHandler.prototype.createAttack = function(player) {
+
+    var attack = new runmysteriet.attack.Attack(player);
+
+    this.stage.addChild(attack);
+
+    if (!this.attacks) {
+        this.attacks = [];
+    }
+
+    this.attacks.push(attack);
+};
+
+/**
+ * Uppdaterar attacker och tar bort gamla attacker.
+ *
+ * @return {undefined}
+ */
+runmysteriet.handler.PlayerHandler.prototype.updateAttacks = function() {
+
+    var i = 0;
+    var attack = null;
+
+    if (!this.attacks) {
+        this.attacks = [];
+    }
+
+    for (i = this.attacks.length - 1; i >= 0; i--) {
+
+        attack = this.attacks[i];
+
+        if (!attack) {
+            this.attacks.splice(i, 1);
+            continue;
+        }
+
+        if (attack.life <= 0 || !attack.parent) {
+            this.attacks.splice(i, 1);
+        }
+    }
+};

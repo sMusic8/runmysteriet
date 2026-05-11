@@ -9,6 +9,7 @@ npx google-closure-compiler \
 --js "./../../lib/rune.js" \
 --js "./../../src/scope/Manifest.js" \
 --js "./../../src/data/resource/Requests.js" \
+--js "./../../src/attack/Attacks.js" \
 --js "./../../src/ui/graphic/Raft.js" \
 --js "./../../src/config/LevelConfig.js" \
 --js "./../../src/config/GameInput.js" \
@@ -48,7 +49,6 @@ npx google-closure-compiler \
 --js "./../../src/scene/menu/TextInputView.js" \
 --js "./../../src/scene/menu/Menu.js" \
 --js "./../../src/scene/menu/Credits.js" \
---js "./../../src/attack/Attacks.js" \
 --js "./../../src/system/Main.js" \
 --js "./../../src/scope/Alias.js" \
 --js_output_file "./../../dist/runmysteriet.js";
