@@ -53,9 +53,13 @@ runmysteriet.entity.Player = function(controls, spriteConfig) {
     this.isMoving = false;
 
     /** @type {string} */
-    this.currentAnimation = "";
+    this.currentAnimation = " ";
 
     this.isMoving = false;
+
+    this.direction = 1;
+    this.attackCooldown = 0;
+    this.attackCooldownMax = 20;
 
 };
 
@@ -157,5 +161,37 @@ runmysteriet.entity.Player.prototype.playAnimation = function(name) {
     if (this.currentAnimation !== name) {
         this.animation.gotoAndPlay(name);
         this.currentAnimation = name;
+    }
+};
+
+/**
+ * Kollar om spelaren kan attackera.
+ *
+ * @return {boolean}
+ */
+runmysteriet.entity.Player.prototype.canAttack = function() {
+
+    return this.attackCooldown <= 0;
+};
+
+/**
+ * Startar attack cooldown.
+ *
+ * @return {undefined}
+ */
+runmysteriet.entity.Player.prototype.resetAttackCooldown = function() {
+
+    this.attackCooldown = this.attackCooldownMax;
+};
+
+/**
+ * Uppdaterar attack cooldown.
+ *
+ * @return {undefined}
+ */
+runmysteriet.entity.Player.prototype.updateAttackCooldown = function() {
+
+    if (this.attackCooldown > 0) {
+        this.attackCooldown--;
     }
 };
