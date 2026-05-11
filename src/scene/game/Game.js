@@ -144,6 +144,9 @@ this.m_playerHandler = new runmysteriet.handler.PlayerHandler(
         this.m_levelConfig,
         this.m_platformHandler.getEnemySpawns()
     );
+    
+    //kopplas ihop enemy-handlern med playerhandlern så att fienderna kan skada spelaren och spelaren kan attackera fienderna.
+    this.m_playerHandler.setEnemyHandler(this.m_enemyHandler);
 
     /*
      * Kamera
