@@ -1,34 +1,54 @@
 [
-    {
-        "word": "Forest",
-        "Subword": ["Troll", "Primeval"]
-    },
-    {
-        "word": "City",
-        "Subword": ["Inner", "Capital"]
-    },
-    {
-        "word": "Clock",
-        "Subword": ["Wall", "Egg"]
-    },
-    {
-        "word": "Chair",
-        "Subword": ["Bar", "Office"]
-    },
-    {
-        "word": "Floor",
-        "Subword": ["Wood", "Stone"]
-    },
-    {
-        "word": "Spoon",
-        "Subword": ["Food", "Final"]
-    },
-    {
-        "word": "Plan",
-        "Subword": ["Time", "Future"]
-    },
-    {
-        "word": "Game",
-        "Subword": ["Board", "Computer"]
-    }
+  {
+    "word": "office",
+    "Subword": ["post", "space"]
+  },
+  {
+    "word": "market",
+    "Subword": ["place", "stock"]
+  },
+  {
+    "word": "silver",
+    "Subword": ["fish", "coin"]
+  },
+  {
+    "word": "orange",
+    "Subword": ["Bar", "tree"]
+  },
+  {
+    "word": "summer",
+    "Subword": ["house", "time"]
+  },
+  {
+    "word": "winter",
+    "Subword": ["coat", "sport"]
+  },
+  {
+    "word": "garden",
+    "Subword": ["hose", "work"]
+  },
+  {
+    "word": "Game",
+    "Subword": ["Board", "Computer"]
+  },
+  {
+    "word": "school",
+    "Subword": ["bus", "book"]
+  },
+  {
+    "word": "window",
+    "Subword": ["frame", "shop"]
+  },
+  {
+    "word": "bottle",
+    "Subword": ["cap", "glass"]
+  },
+  {
+    "word": "hammer",
+    "Subword": ["head", "stone"]
+  },
+  {
+    "word": "candle",
+    "Subword": ["light", "wax"]
+  }
 ]

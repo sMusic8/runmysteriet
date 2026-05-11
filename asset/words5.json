@@ -1,106 +1,82 @@
 [
     {
-        "word": "Button",
-        "Subword": ["Start", "Needle"]
+        "word": "table",
+        "Subword": ["saw", "spoon"]
     },
     {
-        "word": "Sickness",
-        "Subword": ["Sea", "Motion"]
+        "word": "chair",
+        "Subword": ["arm", "wheel"]
     },
     {
-        "word": "Lamp",
-        "Subword": ["Ceiling", "Table"]
+        "word": "paper",
+        "Subword": ["work", "clip"]
     },
     {
-        "word": "School",
-        "Subword": ["High", "Primary"]
+        "word": "school",
+        "Subword": ["high", "primary"]
     },
     {
-        "word": "Mat",
-        "Subword": ["Door", "Yoga"]
+        "word": "mat",
+        "Subword": ["door", "yoga"]
     },
     {
-        "word": "Map",
-        "Subword": ["City", "World"]
+        "word": "stone",
+        "Subword": ["wall", "work"]
     },
     {
-        "word": "Disc",
-        "Subword": ["LP", "Glass"]
+        "word": "light",
+        "Subword": ["house", "bulb"]
     },
     {
-        "word": "Pressure",
-        "Subword": ["Blood", "Air"]
+        "word": "pressure",
+        "Subword": ["blood", "air"]
     },
     {
-        "word": "Drive",
-        "Subword": ["Motor", "Battery"]
+        "word": "water",
+        "Subword": ["line", "proof"]
     },
     {
-        "word": "List",
-        "Subword": ["Shopping", "Guest"]
+        "word": "list",
+        "Subword": ["shopping", "guest"]
     },
     {
-        "word": "Heat",
-        "Subword": ["Body", "Remote"]
+        "word": "heart",
+        "Subword": ["beat", "less"]
     },
     {
-        "word": "Bearing",
-        "Subword": ["Spare", "Ball"]
+        "word": "sound",
+        "Subword": ["wave", "track"]
     },
     {
-        "word": "Lining",
-        "Subword": ["Jacket", "Animal"]
+        "word": "apple",
+        "Subword": ["pie", "tree"]
     },
     {
-        "word": "Line",
-        "Subword": ["Bus", "Center"]
+        "word": "bread",
+        "Subword": ["box", "fruit"]
     },
     {
-        "word": "Start",
-        "Subword": ["Re", "New"]
+        "word": "candy",
+        "Subword": ["shop", "bar"]
     },
     {
-        "word": "Gear",
-        "Subword": ["Warm", "Telephone"]
+        "word": "house",
+        "Subword": ["plant", "boat"]
     },
     {
-        "word": "Thought",
-        "Subword": ["Re", "After"]
+        "word": "money",
+        "Subword": ["bag", "tree"]
     },
     {
-        "word": "Place",
-        "Subword": ["Parking", "Mounted"]
+        "word": "town",
+        "Subword": ["home", "down"]
     },
     {
-        "word": "Brand",
-        "Subword": ["Car", "Product"]
+        "word": "protection",
+        "Subword": ["sun", "hearing"]
     },
     {
-        "word": "Border",
-        "Subword": ["Age", "Country"]
-    },
-    {
-        "word": "Cars",
-        "Subword": ["Police", "Cargo"]
-    },
-    {
-        "word": "Town",
-        "Subword": ["Home", "Suburban"]
-    },
-    {
-        "word": "Stage",
-        "Subword": ["Final", "Introduction"]
-    },
-    {
-        "word": "Sight",
-        "Subword": ["Target", "Scope"]
-    },
-    {
-        "word": "Protection",
-        "Subword": ["Sun", "Hearing"]
-    },
-    {
-        "word": "Side",
-        "Subword": ["Front", "Web"]
+        "word": "side",
+        "Subword": ["front", "web"]
     }
 ]
