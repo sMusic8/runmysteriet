@@ -48,6 +48,7 @@ npx google-closure-compiler \
 --js "./../../src/scene/menu/TextInputView.js" \
 --js "./../../src/scene/menu/Menu.js" \
 --js "./../../src/scene/menu/Credits.js" \
+--js "./../../src/attack/Attacks.js" \
 --js "./../../src/system/Main.js" \
 --js "./../../src/scope/Alias.js" \
 --js_output_file "./../../dist/runmysteriet.js";
