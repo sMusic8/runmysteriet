@@ -119,23 +119,50 @@ runmysteriet.entity.Kristen.prototype.update = function(step) {
  */
 runmysteriet.entity.Kristen.prototype.handleCollision = function(player) {
 
-    if (!player || player.isDead === true) return;
+    if (!player || player.isDead === true) {
+        return;
+    }
 
-    if (typeof player.hitTestAndSeparate !== "function") return;
+    if (typeof player.hitTestAndSeparate !== "function") {
+        return;
+    }
 
     var hit = player.hitTestAndSeparate(this);
 
-    if (!hit) return;
+    if (!hit) {
+        return;
+    }
 
-    if (this.hitCooldown > 0) return;
+    /*
+     * När spelaren nuddar fienden ska SPELAREN ta skada.
+     * Fienden ska INTE ta skada här.
+     */
+    if (this.hitCooldown > 0) {
+        return;
+    }
 
-    this.hitCooldown = 5; //
-
-    this.hp -= 35;// 35 är skada per träff, kan justeras
+    this.hitCooldown = 20;
 
     if (player.hp !== undefined) {
-        player.hp -= 1;
+        player.hp -= 10;
     }
+};
+
+/**
+ * Fienden tar skada från spelarens attack.
+ *
+ * @param {number} damage
+ * @return {void}
+ */
+runmysteriet.entity.Kristen.prototype.takeDamage = function(damage) {
+
+    if (this.isDead === true) {
+        return;
+    }
+
+    this.hp -= damage;
+
+    console.log("Kristen tog skada:", damage, "HP kvar:", this.hp);
 
     if (this.hp <= 0) {
         this.die();

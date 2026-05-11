@@ -40,8 +40,10 @@ runmysteriet.handler.PlayerHandler = function(stage, platformHandler, applicatio
 
     /** @type {?Object} */
     this.jumpSound = this.application.sounds.sound.get("sound_jump");
+    /** @type {?runmysteriet.handler.EnemyHandler} */
+    this.enemyHandler = null;
 
-    /** @type {!Array<!runmysteriet.attack.Attack>} */
+    /** @type {!Array<!Object>} */
     this.attacks = [];
 };
 
@@ -564,6 +566,8 @@ runmysteriet.handler.PlayerHandler.prototype.killPlayer = function(player, index
  * @return {undefined}
  */
 runmysteriet.handler.PlayerHandler.prototype.createAttack = function(player) {
+       
+    console.log("Attack skapas");
 
     var attack = new runmysteriet.attack.Attack(player);
 
@@ -577,17 +581,24 @@ runmysteriet.handler.PlayerHandler.prototype.createAttack = function(player) {
 };
 
 /**
- * Uppdaterar attacker och tar bort gamla attacker.
+ * Uppdaterar attacker och kollar om de träffar fiender.
  *
- * @return {undefined}
+ * @return {void}
  */
 runmysteriet.handler.PlayerHandler.prototype.updateAttacks = function() {
 
     var i = 0;
+    var j = 0;
     var attack = null;
+    var enemy = null;
+    var enemies = [];
 
     if (!this.attacks) {
         this.attacks = [];
+    }
+
+    if (this.enemyHandler && this.enemyHandler.enemies) {
+        enemies = this.enemyHandler.enemies;
     }
 
     for (i = this.attacks.length - 1; i >= 0; i--) {
@@ -599,8 +610,51 @@ runmysteriet.handler.PlayerHandler.prototype.updateAttacks = function() {
             continue;
         }
 
-        if (attack.life <= 0 || !attack.parent) {
+        /*
+         * Kolla träff mot alla fiender.
+         */
+        for (j = enemies.length - 1; j >= 0; j--) {
+
+            enemy = enemies[j];
+
+            if (!enemy || enemy.isDead === true) {
+                continue;
+            }
+
+            if (attack.hitTestObject(enemy)) {
+
+                console.log("Attack träffade Kristen");
+
+                if (typeof enemy.takeDamage === "function") {
+                    enemy.takeDamage(attack.damage);
+                }
+
+                attack.hasHit = true;
+
+                if (typeof attack.remove === "function") {
+                    attack.remove();
+                }
+
+                this.attacks.splice(i, 1);
+                break;
+            }
+        }
+
+        /*
+         * Ta bort gamla attacker.
+         */
+        if (attack && (attack.life <= 0 || !attack.parent)) {
             this.attacks.splice(i, 1);
         }
     }
+};
+/**
+ * kopplar enemy handler till player handler.
+ *
+ * @param {!runmysteriet.handler.EnemyHandler} enemyHandler
+ * @return {void}
+ */
+runmysteriet.handler.PlayerHandler.prototype.setEnemyHandler = function(enemyHandler) {
+
+    this.enemyHandler = enemyHandler;
 };
