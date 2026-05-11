@@ -7,6 +7,9 @@ runmysteriet.scene.Menu = function () {
 
   this.menuList = null;
   this.menuSound = null;
+
+  // ✔ FIX: background reference
+  this.m_background = null;
 };
 
 //------------------------------------------------------------------------------
@@ -25,7 +28,18 @@ runmysteriet.scene.Menu.prototype.init = function () {
 
   this.menuSound = this.application.sounds.sound.get("sound_menu");
 
-  //----------------------------------------------------------------------
+  // ✔ FIX: BACKGROUND ONLY
+  this.m_background = new rune.display.Graphic(
+    0,
+    0,
+    this.application.screen.width,
+    this.application.screen.height,
+    "background_menu"
+  );
+
+  this.stage.addChild(this.m_background);
+
+  //----------------------------------------------------------------------  
   // MAIN TITLE (STÖRRE)
   //----------------------------------------------------------------------
 
@@ -41,7 +55,7 @@ runmysteriet.scene.Menu.prototype.init = function () {
 
   this.stage.addChild(text);
 
-  //----------------------------------------------------------------------
+  //----------------------------------------------------------------------  
   // SUBTITLE (MINDRE)
   //----------------------------------------------------------------------
 
@@ -53,14 +67,12 @@ runmysteriet.scene.Menu.prototype.init = function () {
   text2.center = this.application.screen.center;
   text2.y -= 45;
   text2.x -= 10;
-  //text2.scaleX = 0.8;
-  //text2.scaleY = 0.8;
 
   text2.flicker.start(750, 0.5);
 
   this.stage.addChild(text2);
 
-  //----------------------------------------------------------------------
+  //----------------------------------------------------------------------  
   // MENU (LAGOM STOR)
   //----------------------------------------------------------------------
 
@@ -70,8 +82,9 @@ runmysteriet.scene.Menu.prototype.init = function () {
     ["Play game", "Read more", "Credits"],
     40,
     15,
-    1, // ← var 0.8, nu lite större
+    1,
   );
+
   this.menuList.scaleX = 2.5;
   this.menuList.scaleY = 2.5;
 };
