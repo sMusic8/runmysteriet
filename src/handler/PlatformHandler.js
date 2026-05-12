@@ -50,7 +50,7 @@ runmysteriet.handler.PlatformHandler.prototype.init = function(levelNumber) {
 
         var result = segment.ground(this.stage, x);
 
-        this.addPlatforms(result.platforms);
+        //this.addPlatforms(result.platforms);
         this.addHoles(result.holes);
         this.addEnemySpawns(result.enemySpawns);
         this.addWaterAreas(result.waterAreas || []);

@@ -2,9 +2,6 @@
 // CLOUD HANDLER
 //------------------------------------------------------------------------------
 
-//moln handler
-// Klassen som skapar moln och hanterar dess rörelse
-
 /**
  * Handles cloud spawning and movement.
  *
@@ -14,54 +11,50 @@
  */
 runmysteriet.handler.CloudHandler = function(stage, screenWidth) {
 
-    /** @type {!rune.display.Stage} */
     this.stage = stage;
-
-    /** @type {number} */
     this.screenWidth = screenWidth;
+    this.levelWidth = screenWidth * 4;
 
-    /** @type {number} */
-    this.levelWidth = screenWidth * 4; //då vi tänkt göra 4 segment till att börja med
-
-    /** @type {!Array<!rune.display.Graphic & {speed:number}>} */
     this.clouds = [];
 
-    /** @type {!Array<string>} */
-    this.cloudResources = ["moln1", "moln2", "moln3"];
+    this.cloudResources = [
+        "moln1",
+        "moln2",
+        "moln3",
+        "moln4",
+        "moln5",
+        "moln6",
+        "moln7",
+        "moln8",
+        "moln9"
+    ];
 };
 
 //------------------------------------------------------------------------------
 // INIT
 //------------------------------------------------------------------------------
 
-//Init-funktionen skapar moln med hjälp av en loop. 
-//Loopen placerar ut molnen med ett visst avstånd (spacing) och ger dem en slupmässig y-positon och en slumpmässig hastighet. 
-//Molnen läggs sedan till på scenen.
-
-/**
- * Initializes clouds.
- *
- * @return {void}
- */
 runmysteriet.handler.CloudHandler.prototype.init = function() {
 
-    var startX = 0;
-    var spacing = 160;
+    var cloudCount = 20;     // 🔥 fler moln
+    var spacing = 80;        // 🔥 tätare mellanrum
 
-    for (var i = 0; i < 8; i++) {
+    for (var i = 0; i < cloudCount; i++) {
 
         var randomIndex = Math.floor(Math.random() * this.cloudResources.length);
 
+        // 🔥 slumpa storlek för variation
+        var scale = 0.7 + Math.random() * 0.8;
+
         var cloud = new rune.display.Graphic(
-            startX + (i * spacing),
-            20 + Math.random() * 70,
-            100,
-            60,
+            Math.random() * this.levelWidth,          // 🔥 sprid över hela banan
+            20 + Math.random() * 100,
+            100 * scale,
+            60 * scale,
             this.cloudResources[randomIndex]
         );
 
-        /** @type {number} */
-        cloud.speed = 0.5 + Math.random() * 0.3;
+        cloud.speed = 0.3 + Math.random() * 0.5;
 
         this.clouds.push(cloud);
         this.stage.addChild(cloud);
@@ -72,13 +65,6 @@ runmysteriet.handler.CloudHandler.prototype.init = function() {
 // UPDATE
 //------------------------------------------------------------------------------
 
-//Uppdaterar molnens position och slumpar ny position för samma när molnen är utanför screenWidth.
-
-/**
- * Updates cloud movement.
- *
- * @return {void}
- */
 runmysteriet.handler.CloudHandler.prototype.update = function() {
 
     for (var i = 0; i < this.clouds.length; i++) {
@@ -87,10 +73,10 @@ runmysteriet.handler.CloudHandler.prototype.update = function() {
 
         cloud.x += cloud.speed;
 
-        if (cloud.x > this.levelWidth + 150) {
+        if (cloud.x > this.levelWidth + 200) {
 
-            cloud.x = -150;
-            cloud.y = 20 + Math.random() * 70;
+            cloud.x = -200;
+            cloud.y = 20 + Math.random() * 100;
         }
     }
 };
