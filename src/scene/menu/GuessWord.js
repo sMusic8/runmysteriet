@@ -155,8 +155,7 @@ runmysteriet.scene.GuessWord.prototype.createText = function() {
     this.m_letterText.y += 10;
     this.stage.addChild(this.m_letterText);
 
-    this.m_hintText = new rune.text.BitmapField("HINT: PRESS T, COSTS 20 POINTS");
-    this.m_hintText.autoSize = true;
+    this.m_hintText = new rune.text.BitmapField("HINT: PRESS T / TRIANGLE, COSTS 20 POINTS");    this.m_hintText.autoSize = true;
     this.m_hintText.center = this.application.screen.center;
     this.m_hintText.y += 40;
     this.m_hintText.scale = 0.8;
@@ -171,8 +170,7 @@ runmysteriet.scene.GuessWord.prototype.createText = function() {
 
 
     //
-    this.m_messageText = new rune.text.BitmapField("UP/DOWN = LETTER, ENTER = GUESS, WRONG = -10");    
-    this.m_messageText.autoSize = true;
+    this.m_messageText = new rune.text.BitmapField("UP/DOWN = LETTER, ENTER/CROSS = GUESS, T/TRIANGLE = HINT");    this.m_messageText.autoSize = true;
     this.m_messageText.center = this.application.screen.center;
     this.m_messageText.y += 90;
     this.m_messageText.scale = 0.7;

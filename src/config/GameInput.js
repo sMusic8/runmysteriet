@@ -110,6 +110,11 @@ runmysteriet.input.GameInput.prototype.read = function(keyboard) {
         input.right = input.right ||
             gamepad.justPressed("RIGHT") ||
             gamepad.justPressed(15);
+
+        input.hint = input.hint ||
+            gamepad.justPressed("Y") ||
+            gamepad.justPressed("TRIANGLE") ||
+            gamepad.justPressed(3);
     }
 
     /*

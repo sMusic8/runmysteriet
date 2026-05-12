@@ -16,7 +16,7 @@ runmysteriet.handler.PlatformHandler = function(stage, screenWidth) {
     this.levelWidth = 0;
 };
 
-//här initieras platformhandlern
+//här initieras platformhandlern och bygger upp leveln genom att loopa igenom segmenten och lägga till plattformar, hål, fiendespawns, vattenområden och båtar.
 runmysteriet.handler.PlatformHandler.prototype.init = function(levelNumber) {
     levelNumber = levelNumber || 1;
 
