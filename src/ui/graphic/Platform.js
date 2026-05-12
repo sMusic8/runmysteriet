@@ -9,10 +9,10 @@
  */
 runmysteriet.ui.Platform = function(x, y, width, height, texture) {
 
-    rune.display.Graphic.call(
+     rune.display.Graphic.call(
         this,
-        x || 200,
-        y || 200,
+        (x !== undefined ? x : 200),
+        (y !== undefined ? y : 200),
         width || 268,
         height || 32,
         texture || "bana-gras1"

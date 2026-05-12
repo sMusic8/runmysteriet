@@ -28,10 +28,10 @@ runmysteriet.handler.PlatformHandler.prototype.init = function(levelNumber) {
     this.boats = [];
 
     var segmentTypes = [
-        runmysteriet.segments.Segment_Water,
+        //runmysteriet.segments.Segment_Water,
         runmysteriet.segments.Segment_1,
-        runmysteriet.segments.Segment_2,
-        runmysteriet.segments.Segment_3
+       // runmysteriet.segments.Segment_2,
+        //runmysteriet.segments.Segment_3
     ];
 
     //
@@ -64,15 +64,7 @@ console.log("segmentTypes:", segmentTypes);
 };
 
 
-runmysteriet.handler.PlatformHandler.prototype.addPlatforms = function(platforms) {
-    if (!platforms) {
-        return;
-    }
 
-    for (var i = 0; i < platforms.length; i++) {
-        this.platforms.push(platforms[i]);
-    }
-};
 
 runmysteriet.handler.PlatformHandler.prototype.addHoles = function(holes) {
     if (!holes) {
