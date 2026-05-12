@@ -73,13 +73,6 @@ runmysteriet.segments.Segment_Water.prototype.ground = function(stage, startX) {
         water.y - 120// 150 är avståndet mellan båten och vattnet, kan justeras
     );
 
-
-
-    enemySpawns.push({
-        type: "kristen",
-        x: x + 310,
-        y: this.groundY - 40
-    });
     /*
      * Rörelseområde för tween. 
      * Om båten knappt rör sig, öka dessa värden.

@@ -6,9 +6,9 @@
 //------------------------------------------------------------------------------
 
 runmysteriet.segments.Segment_1 = function() {
-    this.tileSize = 268;
-    this.groundY = 220;
-    this.holeHeight = 200;
+    this.tileSize = 268; // Storleken på en "tile" i segmentet. Används för att positionera plattformar och annat.
+    this.groundY = 220; // Y-positionen för marken i segmentet. Används för att positionera plattformar och fiender på rätt höjd.
+    this.holeHeight = 200; // Höjden på hålet i marken. Används för att skapa hålet som spelaren måste hoppa över.
 };
 
 //------------------------------------------------------------------------------
@@ -17,14 +17,15 @@ runmysteriet.segments.Segment_1 = function() {
 //grounden i segmentet där skapas alla plattformar hål och fiender
 
 runmysteriet.segments.Segment_1.prototype.ground = function(stage, startX) {
-    var x = startX || 0;
+    
+    var x = startX || 0; // Start-X för segmentet, används för att positionera plattformar och annat på rätt plats i världen.
 
     var platforms = [];
     var holes = [];
-    var enemySpawns = [];
+    var enemySpawns = []; //kristna fiender som spawnar på marken
     var waterAreas = [];
-    var movingPlatforms = [];
-    var boats = [];
+    var movingPlatforms = []; //rörliga plattformar, används i vattensegmentet
+    var boats = []; //båtar som spelaren kan stå på, används i vattensegmentet
 
     //--------------------------------------------------------------------------
     // FÖRSTA PLATTFORMEN
