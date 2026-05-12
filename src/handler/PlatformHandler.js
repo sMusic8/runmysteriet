@@ -23,14 +23,15 @@ runmysteriet.handler.PlatformHandler.prototype.init = function(levelNumber) {
     this.platforms = [];
     this.holes = [];
     this.enemySpawns = [];
+    this.waterAreas = [];
     this.levelWidth = 0;
     this.boats = [];
 
     var segmentTypes = [
-        //runmysteriet.segments.Segment_Water,
+        runmysteriet.segments.Segment_Water,
         runmysteriet.segments.Segment_1,
-       // runmysteriet.segments.Segment_2,
-        //runmysteriet.segments.Segment_3
+        runmysteriet.segments.Segment_2,
+        runmysteriet.segments.Segment_3
     ];
 
     //
@@ -49,7 +50,7 @@ runmysteriet.handler.PlatformHandler.prototype.init = function(levelNumber) {
 
         var result = segment.ground(this.stage, x);
 
-        //this.addPlatforms(result.platforms);
+        this.addPlatforms(result.platforms);
         this.addHoles(result.holes);
         this.addEnemySpawns(result.enemySpawns);
         this.addWaterAreas(result.waterAreas || []);
@@ -61,6 +62,16 @@ console.log("segmentTypes:", segmentTypes);
     this.levelWidth = x;
 };
 
+
+runmysteriet.handler.PlatformHandler.prototype.addPlatforms = function(platforms) {
+    if (!platforms) {
+        return;
+    }
+
+    for (var i = 0; i < platforms.length; i++) {
+        this.platforms.push(platforms[i]);
+    }
+};
 
 
 
