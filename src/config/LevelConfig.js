@@ -35,7 +35,7 @@ runmysteriet.config.LevelConfig.prototype.getMaxLevel = function() {
 runmysteriet.config.LevelConfig.prototype.getKristenCount = function() {
 
     /** @type {number} */
-    var count = 1 + Math.floor((this.levelNumber - 1) / 3);
+    var count = 1 + Math.floor((this.levelNumber - 1) / 2);
 
     if (count > 25) {
         count = 25;

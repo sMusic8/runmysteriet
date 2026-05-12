@@ -24,6 +24,7 @@ npx google-closure-compiler \
 --js "./../../src/ui/graphic/Rune.js" \
 --js "./../../src/ui/graphic/Ground.js" \
 --js "./../../src/ui/graphic/Shield.js" \
+--js "./../../src/ui/graphic/HighscoreHud.js" \
 --js "./../../src/handler/BackgroundHandler.js" \
 --js "./../../src/handler/ShieldHandler.js" \
 --js "./../../src/handler/TestShield.js" \
@@ -37,10 +38,12 @@ npx google-closure-compiler \
 --js "./../../src/scene/menu/More.js" \
 --js "./../../src/scene/menu/Credits.js" \
 --js "./../../src/scene/menu/LevelComplete.js" \
+--js "./../../src/logic/NameInput.js" \
+--js "./../../src/logic/HighscoreEntry.js" \
+--js "./../../src/logic/HighscoreManager.js" \
 --js "./../../src/logic/GuessAlphabetSelector.js" \
 --js "./../../src/logic/GuessLetterBox.js" \
 --js "./../../src/logic/GuessWordPuzzle.js" \
---js "./../../src/scene/menu/GuessWord.js" \
 --js "./../../src/scene/game/Game.js" \
 --js "./../../src/segments/Segment_1.js" \
 --js "./../../src/segments/Segment_2.js" \
@@ -48,7 +51,9 @@ npx google-closure-compiler \
 --js "./../../src/segments/Segment_Water.js" \
 --js "./../../src/scene/menu/TextInputView.js" \
 --js "./../../src/scene/menu/Menu.js" \
+--js "./../../src/scene/menu/GameOver.js" \
 --js "./../../src/scene/menu/Credits.js" \
+--js "./../../src/scene/menu/GuessWord.js" \
 --js "./../../src/system/Main.js" \
 --js "./../../src/scope/Alias.js" \
 --js_output_file "./../../dist/runmysteriet.js";

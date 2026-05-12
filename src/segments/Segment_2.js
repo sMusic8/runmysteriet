@@ -51,6 +51,17 @@ runmysteriet.segments.Segment_2.prototype.ground = function(stage, startX) {
     stage.addChild(platform2);
     platforms.push(platform2);
 
+    enemySpawns.push({
+    type: "kristen",
+    x: x + 100,
+    y: this.groundY - 40
+});
+
+    enemySpawns.push({
+    type: "kristen",
+    x: x + 190,
+    y: this.groundY - 40
+});
     x += this.tileSize;
 
     var platform3 = new runmysteriet.ui.Platform();
@@ -58,6 +69,12 @@ runmysteriet.segments.Segment_2.prototype.ground = function(stage, startX) {
     platform3.y = this.groundY;
     stage.addChild(platform3);
     platforms.push(platform3);
+
+    enemySpawns.push({
+    type: "kristen",
+    x: x + 140,
+    y: this.groundY - 40
+});
 
     x += this.tileSize;
 

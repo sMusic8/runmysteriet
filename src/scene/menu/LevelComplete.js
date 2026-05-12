@@ -7,7 +7,7 @@
  * @param {number=} totalScore
  * @param {number=} earnedScore
  */
-runmysteriet.scene.LevelComplete = function(levelNumber, totalScore, earnedScore) {
+runmysteriet.scene.LevelComplete = function(levelNumber, totalScore, earnedScore, playerName) {
 
     rune.scene.Scene.call(this);
 
@@ -246,7 +246,8 @@ runmysteriet.scene.LevelComplete.prototype.chooseSelected = function() {
         this.application.scenes.load([
             new runmysteriet.scene.Game(
                 this.levelNumber + 1,
-                this.totalScore
+                this.totalScore,
+                this.playerName
             )
         ]);
 

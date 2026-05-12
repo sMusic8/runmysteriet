@@ -2,7 +2,7 @@
 // GAME SCENE
 //------------------------------------------------------------------------------
 
-runmysteriet.scene.Game = function(levelNumber, score) {
+runmysteriet.scene.Game = function(levelNumber, score, playerName) {
     rune.scene.Scene.call(this);
 
     this.m_playerHandler = null;
@@ -16,7 +16,7 @@ runmysteriet.scene.Game = function(levelNumber, score) {
     this.m_levelConfig = null;
     this.m_levelNumber = levelNumber || 1;
     this.m_score = score || 0;
-
+    this.m_playerName = playerName || "PLAYER";
     this.m_isPaused = false;
     this.m_pauseTitle = null;
     this.m_pauseMenu = null;
@@ -38,6 +38,7 @@ runmysteriet.scene.Game = function(levelNumber, score) {
     this.m_gameInput = null;
 
     this.camera = null;
+    this.m_highscoreHud = null;
 
     /*
      * Tillfällig HUD för runor/test.
@@ -124,7 +125,7 @@ this.m_playerHandler = new runmysteriet.handler.PlayerHandler(
     this.stage,
     this.m_platformHandler,
     this.application,
-    this.m_input,
+    this.m_gameInput,
     this.keyboard
 );
 
@@ -267,6 +268,15 @@ runmysteriet.scene.Game.prototype.createHUD = function() {
     this.m_scoreText.y = 30;
     this.stage.addChild(this.m_scoreText);
 
+
+    /**
+    * Highscore högst upp på scenen.
+    */
+    this.m_highscoreHud = new runmysteriet.ui.graphic.HighscoreHud(this.application);
+    this.m_highscoreHud.x = 15;
+    this.m_highscoreHud.y = 45;
+    this.stage.addChild(this.m_highscoreHud);
+
     /*
      * Test-ruta / run-HUD
      */
@@ -310,6 +320,14 @@ runmysteriet.scene.Game.prototype.updateHUD = function() {
         this.m_scoreText.x = camera.viewport.x + 15;
         this.m_scoreText.y = camera.viewport.y + 30;
     }
+    /**
+     * Highscore följer kameran så att den alltid är synlig högst upp på skärmen.
+     */
+
+    if (this.m_highscoreHud) {
+        this.m_highscoreHud.x = camera.viewport.x + 15;
+        this.m_highscoreHud.y = camera.viewport.y + 45;
+}
 
     /*
      * Test-HUD.
@@ -712,7 +730,8 @@ runmysteriet.scene.Game.prototype.winGame = function(winningPlayer) {
             this.m_levelNumber,
             earnedScore,
             totalScore,
-            guessData
+            guessData,
+            this.m_playerName
         )
     ]);
 };
@@ -887,6 +906,10 @@ runmysteriet.scene.Game.prototype.restartLevel = function() {
         this.m_levelConfig,
         this.m_platformHandler.getEnemySpawns()
     );
+
+    if (this.m_playerHandler) {
+        this.m_playerHandler.setEnemyHandler(this.m_enemyHandler);
+    }
 };
 
 //------------------------------------------------------------------------------

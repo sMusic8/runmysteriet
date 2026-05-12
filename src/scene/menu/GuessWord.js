@@ -12,7 +12,7 @@
  * @param {number=} totalScore
  * @param {Object|string=} wordData
  */
-runmysteriet.scene.GuessWord = function(levelNumber, earnedScore, totalScore, wordData) {
+runmysteriet.scene.GuessWord = function(levelNumber, earnedScore, totalScore, wordData,playerName) {
 
     rune.scene.Scene.call(this);
 
@@ -23,6 +23,8 @@ runmysteriet.scene.GuessWord = function(levelNumber, earnedScore, totalScore, wo
     this.m_levelNumber = levelNumber || 1;
     this.m_earnedScore = earnedScore || 0;
     this.m_totalScore = totalScore || 0;
+    this.m_playerName = playerName || "PLAYER";
+    this.m_wrongGuessPenalty = 10;
 
     /*
      * Sparar poängen som spelaren hade innan denna level.
@@ -86,6 +88,7 @@ runmysteriet.scene.GuessWord = function(levelNumber, earnedScore, totalScore, wo
      */
     this.m_currentHintIndex = 0;
     this.m_hintCost = 20;
+    this.m_wrongGuessPenalty = 10; 
 
     /*
      * Blir true när spelaren har gissat rätt.
@@ -166,7 +169,9 @@ runmysteriet.scene.GuessWord.prototype.createText = function() {
     this.m_scoreText.scale = 0.8;
     this.stage.addChild(this.m_scoreText);
 
-    this.m_messageText = new rune.text.BitmapField("UP/DOWN = CHANGE LETTER, ENTER = GUESS");    
+
+    //
+    this.m_messageText = new rune.text.BitmapField("UP/DOWN = LETTER, ENTER = GUESS, WRONG = -10");    
     this.m_messageText.autoSize = true;
     this.m_messageText.center = this.application.screen.center;
     this.m_messageText.y += 90;
@@ -377,6 +382,31 @@ runmysteriet.scene.GuessWord.prototype.buyHint = function() {
     }
 };
 
+
+//------------------------------------------------------------------------------
+// WRONG GUESS PENALTY
+//------------------------------------------------------------------------------
+
+/**
+ * Drar poäng när spelaren gissar fel bokstav.
+ *
+ * @return {void}
+ */
+runmysteriet.scene.GuessWord.prototype.applyWrongGuessPenalty = function() {
+
+    this.m_earnedScore -= this.m_wrongGuessPenalty;
+
+    if (this.m_earnedScore < 0) {
+        this.m_earnedScore = 0;
+    }
+
+    this.m_totalScore = this.m_scoreBeforeLevel + this.m_earnedScore;
+
+    if (this.m_scoreText) {
+        this.m_scoreText.text = "SCORE: " + this.m_totalScore;
+    }
+};
+
 //------------------------------------------------------------------------------
 // CHECK ANSWER
 //------------------------------------------------------------------------------
@@ -421,8 +451,10 @@ runmysteriet.scene.GuessWord.prototype.checkAnswer = function(letter) {
         return;
     }
 
+    this.applyWrongGuessPenalty();
+
     if (this.m_messageText) {
-        this.m_messageText.text = "WRONG LETTER. TRY AGAIN.";
+        this.m_messageText.text = "WRONG LETTER. -10 POINTS.";
     }
 };
 //------------------------------------------------------------------------------
@@ -484,7 +516,57 @@ runmysteriet.scene.GuessWord.prototype.goToLevelComplete = function() {
         new runmysteriet.scene.LevelComplete(
             this.m_levelNumber,
             this.m_totalScore,
-            this.m_earnedScore
+            this.m_earnedScore,
+            this.m_playerName
         )
     ]);
+};
+runmysteriet.scene.GuessWord.prototype.applyWrongGuessPenalty = function() {
+
+    this.m_earnedScore -= this.m_wrongGuessPenalty;
+
+    if (this.m_earnedScore < 0) {
+        this.m_earnedScore = 0;
+    }
+
+    this.m_totalScore = this.m_scoreBeforeLevel + this.m_earnedScore;
+
+    if (this.m_scoreText) {
+        this.m_scoreText.text = "SCORE: " + this.m_totalScore;
+    }
+
+    if (this.m_earnedScore <= 0) {
+        this.saveHighscore();
+        this.goToGameOver();
+    }
+};
+
+//------------------------------------------------------------------------------
+// GO TO GAME OVER
+//------------------------------------------------------------------------------
+
+/**
+ * Går till GameOver när poängen är slut.
+ *
+ * @return {void}
+ */
+runmysteriet.scene.GuessWord.prototype.goToGameOver = function() {
+
+    this.application.scenes.load([
+        new runmysteriet.scene.GameOver(
+            this.m_playerName,
+            this.m_totalScore
+        )
+    ]);
+};
+runmysteriet.scene.GuessWord.prototype.saveHighscore = function() {
+
+    var entry = new runmysteriet.logic.HighscoreEntry(
+        this.m_playerName,
+        this.m_totalScore
+    );
+
+    var manager = new runmysteriet.logic.HighscoreManager(this.application);
+
+    manager.save(entry);
 };
