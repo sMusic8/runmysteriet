@@ -6,7 +6,7 @@
  * @param {number} width
  * @param {number} height
  * @param {number=} fallLimitY
- */
+ */ 
 runmysteriet.ui.graphic.Hole = function(x, y, width, height, fallLimitY) {
     rune.display.DisplayObject.call(this, x, y, width, height);
 

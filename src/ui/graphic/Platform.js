@@ -22,7 +22,7 @@ runmysteriet.ui.Platform = function(x, y, width, height, texture) {
 // Inheritance
 runmysteriet.ui.Platform.prototype = Object.create(rune.display.Graphic.prototype);
 runmysteriet.ui.Platform.prototype.constructor = runmysteriet.ui.Platform;
-
+ 
 //------------------------------------------------------------------------------
 // INIT
 //------------------------------------------------------------------------------
