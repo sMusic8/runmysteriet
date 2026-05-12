@@ -120,8 +120,6 @@ runmysteriet.segments.Segment_1.prototype.ground = function(stage, startX) {
         platforms: platforms,
         holes: holes,
         enemySpawns: enemySpawns,
-        waterAreas: waterAreas,
-        boats: boats,
         endX: x
     };
 };
