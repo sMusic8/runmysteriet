@@ -39,7 +39,7 @@ npx google-closure-compiler \
 --js "./../../src/scene/menu/Credits.js" \
 --js "./../../src/scene/menu/LevelComplete.js" \
 --js "./../../src/logic/NameInput.js" \
---js "./../../src/logic/HighscoreEntry.js" \
+--js "./../../src/logic/HighScoreEntry.js" \
 --js "./../../src/logic/HighscoreManager.js" \
 --js "./../../src/logic/GuessAlphabetSelector.js" \
 --js "./../../src/logic/GuessLetterBox.js" \
@@ -52,7 +52,6 @@ npx google-closure-compiler \
 --js "./../../src/scene/menu/TextInputView.js" \
 --js "./../../src/scene/menu/Menu.js" \
 --js "./../../src/scene/menu/GameOver.js" \
---js "./../../src/scene/menu/Credits.js" \
 --js "./../../src/scene/menu/GuessWord.js" \
 --js "./../../src/system/Main.js" \
 --js "./../../src/scope/Alias.js" \

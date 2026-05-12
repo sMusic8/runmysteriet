@@ -6,6 +6,7 @@
  * @param {number=} levelNumber
  * @param {number=} totalScore
  * @param {number=} earnedScore
+ * @param {string=} playerName
  */
 runmysteriet.scene.LevelComplete = function(levelNumber, totalScore, earnedScore, playerName) {
 
@@ -19,6 +20,9 @@ runmysteriet.scene.LevelComplete = function(levelNumber, totalScore, earnedScore
 
     /** @type {number} */
     this.earnedScore = earnedScore || 0;
+
+    /** @type {string} */
+    this.playerName = playerName || "PLAYER";
 
     /** @type {!runmysteriet.config.LevelConfig} */
     this.levelConfig = new runmysteriet.config.LevelConfig(this.levelNumber);
@@ -34,6 +38,9 @@ runmysteriet.scene.LevelComplete = function(levelNumber, totalScore, earnedScore
 
     /** @type {?Object} */
     this.menuSound = null;
+
+    /** @type {boolean} */
+    this.m_hasSavedHighscore = false;
 };
 
 //------------------------------------------------------------------------------
@@ -54,45 +61,96 @@ runmysteriet.scene.LevelComplete.prototype.constructor = runmysteriet.scene.Leve
  */
 runmysteriet.scene.LevelComplete.prototype.init = function() {
 
+    var titleText = "LEVEL " + this.levelNumber + " KLAR";
+    var title = null;
+    var earned = null;
+    var total = null;
+    var nameText = null;
+    var savedText = null;
+
     rune.scene.Scene.prototype.init.call(this);
 
     this.menuSound = this.application.sounds.sound.get("sound_menu");
-
-    var titleText = "LEVEL " + this.levelNumber + " KLAR";
 
     if (this.levelNumber >= this.maxLevel) {
         titleText = "DU VANN HELA SPELET";
     }
 
-    /** @type {!rune.text.BitmapField} */
-    var title = new rune.text.BitmapField(titleText);
+    title = new rune.text.BitmapField(titleText);
     title.autoSize = true;
     title.center = this.application.screen.center;
-    title.y -= 65;
+    title.y -= 75;
     this.stage.addChild(title);
 
-    /** @type {!rune.text.BitmapField} */
-    var earned = new rune.text.BitmapField(
+    nameText = new rune.text.BitmapField("NAMN " + this.playerName);
+    nameText.autoSize = true;
+    nameText.center = this.application.screen.center;
+    nameText.y -= 50;
+    nameText.scale = 0.75;
+    this.stage.addChild(nameText);
+
+    earned = new rune.text.BitmapField(
         "TIDSPOANG +" + this.earnedScore
     );
     earned.autoSize = true;
     earned.center = this.application.screen.center;
-    earned.y -= 35;
+    earned.y -= 25;
     earned.scale = 0.8;
     this.stage.addChild(earned);
 
-    /** @type {!rune.text.BitmapField} */
-    var total = new rune.text.BitmapField(
+    total = new rune.text.BitmapField(
         "TOTAL POANG " + this.totalScore
     );
     total.autoSize = true;
     total.center = this.application.screen.center;
-    total.y -= 15;
+    total.y -= 5;
     total.scale = 0.8;
     this.stage.addChild(total);
 
+    if (this.saveHighscore() >= 0) {
+        savedText = new rune.text.BitmapField("HIGHSCORE SPARAD");
+    } else {
+        savedText = new rune.text.BitmapField("HIGHSCORE OFORANDRAD");
+    }
+
+    savedText.autoSize = true;
+    savedText.center = this.application.screen.center;
+    savedText.y += 18;
+    savedText.scale = 0.7;
+    this.stage.addChild(savedText);
+
     this.createMenu();
     this.updateMenu();
+};
+
+//------------------------------------------------------------------------------
+// HIGHSCORE
+//------------------------------------------------------------------------------
+
+/**
+ * Sparar totalpoängen när spelaren klarat en level.
+ *
+ * @return {number}
+ */
+runmysteriet.scene.LevelComplete.prototype.saveHighscore = function() {
+
+    var entry = null;
+    var manager = null;
+
+    if (this.m_hasSavedHighscore === true) {
+        return -1;
+    }
+
+    this.m_hasSavedHighscore = true;
+
+    entry = new runmysteriet.logic.HighscoreEntry(
+        this.playerName,
+        this.totalScore
+    );
+
+    manager = new runmysteriet.logic.HighscoreManager(this.application);
+
+    return manager.save(entry);
 };
 
 //------------------------------------------------------------------------------
@@ -108,6 +166,7 @@ runmysteriet.scene.LevelComplete.prototype.createMenu = function() {
 
     var labels = [];
     var item = null;
+    var i = 0;
 
     if (this.levelNumber < this.maxLevel) {
         labels = ["NASTA LEVEL", "TILLBAKA TILL STARTMENY"];
@@ -115,12 +174,12 @@ runmysteriet.scene.LevelComplete.prototype.createMenu = function() {
         labels = ["TILLBAKA TILL STARTMENY"];
     }
 
-    for (var i = 0; i < labels.length; i++) {
+    for (i = 0; i < labels.length; i++) {
 
         item = new rune.text.BitmapField(labels[i]);
         item.autoSize = true;
         item.center = this.application.screen.center;
-        item.y += 35 + i * 20;
+        item.y += 50 + i * 20;
         item.scale = 0.8;
 
         this.stage.addChild(item);
@@ -137,8 +196,9 @@ runmysteriet.scene.LevelComplete.prototype.updateMenu = function() {
 
     var item = null;
     var text = "";
+    var i = 0;
 
-    for (var i = 0; i < this.menuItems.length; i++) {
+    for (i = 0; i < this.menuItems.length; i++) {
 
         item = this.menuItems[i];
         text = item.text.replace("> ", "");
@@ -165,9 +225,7 @@ runmysteriet.scene.LevelComplete.prototype.update = function(step) {
 
     rune.scene.Scene.prototype.update.call(this, step);
 
-    /** @type {?Object} */
     var gamepad = null;
-
     var startIsPressed = false;
     var downIsPressed = false;
     var upIsPressed = false;

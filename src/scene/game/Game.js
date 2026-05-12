@@ -39,6 +39,7 @@ runmysteriet.scene.Game = function(levelNumber, score, playerName) {
 
     this.camera = null;
     this.m_highscoreHud = null;
+    this.m_highscoreSaved = false;
 
     /*
      * Tillfällig HUD för runor/test.
@@ -686,6 +687,36 @@ runmysteriet.scene.Game.prototype.areAllPlayersDead = function() {
 };
 
 //------------------------------------------------------------------------------
+// HIGHSCORE
+//------------------------------------------------------------------------------
+
+/**
+ * Sparar nuvarande score i highscore-listan.
+ *
+ * @return {number}
+ */
+runmysteriet.scene.Game.prototype.saveHighscore = function() {
+
+    var entry = null;
+    var manager = null;
+
+    if (this.m_highscoreSaved === true) {
+        return -1;
+    }
+
+    this.m_highscoreSaved = true;
+
+    entry = new runmysteriet.logic.HighscoreEntry(
+        this.m_playerName,
+        this.m_score
+    );
+
+    manager = new runmysteriet.logic.HighscoreManager(this.application);
+
+    return manager.save(entry);
+};
+
+//------------------------------------------------------------------------------
 // WIN / LOSE
 //------------------------------------------------------------------------------
 
@@ -752,6 +783,12 @@ runmysteriet.scene.Game.prototype.loseGame = function(reason) {
         }
     }
 
+    this.saveHighscore();
+
+    if (this.m_highscoreHud && typeof this.m_highscoreHud.reload === "function") {
+        this.m_highscoreHud.reload();
+    }
+
     this.createGameOverMenu(reason || "DU FORLORADE");
     this.updateGameOverMenuPosition();
 
@@ -800,7 +837,7 @@ runmysteriet.scene.Game.prototype.updateGameOverInput = function() {
     this.handleMenuListInput(this.m_gameOverMenu, function(selectedIndex) {
         if (selectedIndex === 0) {
             this.application.scenes.load([
-                new runmysteriet.scene.Game(1, 0)
+                new runmysteriet.scene.Game(1, 0, this.m_playerName)
             ]);
         } else if (selectedIndex === 1) {
             this.application.scenes.load([

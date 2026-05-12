@@ -3,18 +3,20 @@
 //------------------------------------------------------------------------------
 
 /**
- * Hanterar spelarens namn.
+ * Hanterar ett spelarnamn med fast antal bokstäver.
  *
  * @constructor
+ * @param {number=} maxLength
  */
-
-//------------------------------------------------------------------------------
-// NAME INPUT
-//------------------------------------------------------------------------------
-
 runmysteriet.logic.NameInput = function(maxLength) {
+
+    /** @type {!runmysteriet.logic.GuessAlphabetSelector} */
     this.m_selector = new runmysteriet.logic.GuessAlphabetSelector();
+
+    /** @type {string} */
     this.m_name = "";
+
+    /** @type {number} */
     this.m_maxLength = maxLength || 4;
 };
 
@@ -48,6 +50,38 @@ runmysteriet.logic.NameInput.prototype.removeLastLetter = function() {
     this.m_name = this.m_name.slice(0, -1);
 };
 
+/**
+ * Namnet exakt som spelaren har skrivit det, utan PLAYER-standard.
+ *
+ * @return {string}
+ */
+runmysteriet.logic.NameInput.prototype.getRawName = function() {
+    return this.m_name.toUpperCase();
+};
+
+/**
+ * Antal bokstäver som är skrivna.
+ *
+ * @return {number}
+ */
+runmysteriet.logic.NameInput.prototype.getLength = function() {
+    return this.m_name.length;
+};
+
+/**
+ * Kollar om namnet är färdigt.
+ *
+ * @return {boolean}
+ */
+runmysteriet.logic.NameInput.prototype.isComplete = function() {
+    return this.m_name.length >= this.m_maxLength;
+};
+
+/**
+ * Namnet som ska sparas.
+ *
+ * @return {string}
+ */
 runmysteriet.logic.NameInput.prototype.getName = function() {
 
     if (this.m_name.length <= 0) {
