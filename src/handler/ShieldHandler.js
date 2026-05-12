@@ -34,7 +34,7 @@ runmysteriet.handler.ShieldHandler.prototype.init = function () {
 
     var wordData = null;
     var word = "";
-    var startX = 150;
+    var startX = 150; 
     var endX = this.m_levelWidth - 150;
     var spacing = 0;
     var i = 0;
@@ -47,7 +47,7 @@ runmysteriet.handler.ShieldHandler.prototype.init = function () {
 
     if (wordData && wordData.word) {
 
-        word = String(wordData.word || "").toLowerCase();
+        word = String(wordData.word || "").toUpperCase();
 
         this.m_wordData = wordData;
         this.m_word = word;
@@ -96,7 +96,7 @@ runmysteriet.handler.ShieldHandler.prototype.init = function () {
 
         shield = new runmysteriet.ui.Shield();
         shield.x = startX + i * spacing;
-        shield.y = 140;
+        shield.y = 150; //
 
         shield.__collected = false;
         shield.active = true;

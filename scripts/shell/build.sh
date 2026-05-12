@@ -10,6 +10,7 @@ npx google-closure-compiler \
 --js "./../../src/scope/Manifest.js" \
 --js "./../../src/data/resource/Requests.js" \
 --js "./../../src/attack/Attacks.js" \
+--js "./../../src/attack/AttackParticle.js" \
 --js "./../../src/ui/graphic/Raft.js" \
 --js "./../../src/config/LevelConfig.js" \
 --js "./../../src/config/GameInput.js" \

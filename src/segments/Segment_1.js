@@ -7,7 +7,7 @@
 runmysteriet.segments.Segment_1 = function() {
     console.log("Bacon")
     this.tileSize = 268;
-    this.groundY = 220;
+    this.groundY = 200;
     this.holeHeight = 200;
 };
 

@@ -2,11 +2,11 @@
 
 
 runmysteriet.segments.Segment_Water = function() {
-    this.tileSize = 268; //
-    this.groundY = 220; 
+    this.tileSize = 280; //
+    this.groundY = 200; 
 
     this.waterWidth = 402;
-    this.waterHeight = 32;
+    this.waterHeight = 32; //
 };
 
 runmysteriet.segments.Segment_Water.prototype.ground = function(stage, startX) {
@@ -35,7 +35,7 @@ runmysteriet.segments.Segment_Water.prototype.ground = function(stage, startX) {
      */
     var water = new runmysteriet.ui.graphic.Water(
         x,
-        this.groundY - 11
+        this.groundY - 8
     );
 
     stage.addChild(water);
@@ -46,12 +46,12 @@ runmysteriet.segments.Segment_Water.prototype.ground = function(stage, startX) {
      * Denna ska spelaren kunna stå på.
      */
     var raft = new runmysteriet.ui.graphic.Raft(
-        water.x +5,
+        water.x +5, 
         water.y - 8
     ); 
 
-    raft.minX = water.x -10;
-    raft.maxX = water.x + this.waterWidth - raft.width + 10;
+    raft.minX = water.x -5; //
+    raft.maxX = water.x + this.waterWidth - raft.width + 20; //
 
     stage.addChild(raft);
 

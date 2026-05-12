@@ -29,7 +29,7 @@ runmysteriet.ui.Shield = function() {
         this.addChild(this.runeGraphic);
 
         // centrera i 40x40 sköld
-        this.runeGraphic.x = (30 - this.runeGraphic.width) / 2;
+        this.runeGraphic.x = (22 - this.runeGraphic.width) / 2;
         this.runeGraphic.y = (20 - this.runeGraphic.height) / 2;
     }
 

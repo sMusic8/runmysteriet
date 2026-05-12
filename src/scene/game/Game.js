@@ -322,8 +322,13 @@ runmysteriet.scene.Game.prototype.updateHUD = function() {
         this.m_highscoreHud.x = camera.viewport.x + 15;
         this.m_highscoreHud.y = camera.viewport.y + 45;
 }
-};
 
+
+    if (this.m_runeText) {
+        this.m_runeText.x = camera.viewport.x + 15;
+        this.m_runeText.y = camera.viewport.y + 65;
+    }
+};
 //------------------------------------------------------------------------------
 // UPDATE HELPERS
 //------------------------------------------------------------------------------

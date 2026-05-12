@@ -18,8 +18,8 @@ runmysteriet.ui.Rune.prototype.makeAllRunes = function () {
         var runeSprite = new rune.display.Graphic(
             0,
             0,
+            14,
             20,
-            13,
             spriteName
         );
 

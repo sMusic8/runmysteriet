@@ -601,6 +601,7 @@ runmysteriet.handler.PlayerHandler.prototype.updateAttacks = function() {
             }
 
             if (attack.hitTestObject(enemy)) {
+                this.createAttackEmitter(enemy.x, enemy.y);
 
                 console.log("Attack träffade Kristen");
 
@@ -636,4 +637,41 @@ runmysteriet.handler.PlayerHandler.prototype.updateAttacks = function() {
 runmysteriet.handler.PlayerHandler.prototype.setEnemyHandler = function(enemyHandler) {
 
     this.enemyHandler = enemyHandler;
+};
+//------------------------------------------------------------------------------
+// ATTACK EMITTER
+//------------------------------------------------------------------------------    
+runmysteriet.handler.PlayerHandler.prototype.createAttackEmitter = function(x, y) {
+
+    var emitter = new rune.particle.Emitter(
+        x,
+        y,
+        20,
+        20,
+        {
+            capacity: 12,
+
+            minVelocityX: -2,
+            maxVelocityX: 2,
+
+            minVelocityY: -2,
+            maxVelocityY: 1,
+
+            accelerationY: 0.1,
+
+            minLifespan: 200,
+            maxLifespan: 500,
+
+            minRotation: -0.2,
+            maxRotation: 0.2,
+
+            particles: [
+                runmysteriet.particle.AttackParticle
+            ]
+        }
+    );
+
+    this.stage.addChild(emitter);
+
+    emitter.emit(10);
 };
