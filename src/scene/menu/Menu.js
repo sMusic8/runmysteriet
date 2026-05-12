@@ -37,6 +37,17 @@ runmysteriet.scene.Menu.prototype.init = function() {
 
     this.stage.addChild(this.m_background);
 
+ this.m_controller = new rune.display.Graphic(
+        250,
+        110,
+        128,
+        100,
+        "testing"
+    );
+this.m_controller.rotation = 0;
+
+    this.stage.addChild(this.m_controller);
+   
     var text = new rune.text.BitmapField("Welcome to the Rune Mystery");
     text.autoSize = true;
     text.center = this.application.screen.center;
