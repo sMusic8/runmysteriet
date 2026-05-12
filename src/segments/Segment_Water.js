@@ -16,7 +16,6 @@ runmysteriet.segments.Segment_Water.prototype.ground = function(stage, startX) {
     var holes = [];
     var enemySpawns = [];
     var waterAreas = [];
-    var movingPlatforms = [];
     var boats = [];
 
     /*
@@ -61,7 +60,6 @@ runmysteriet.segments.Segment_Water.prototype.ground = function(stage, startX) {
      * Den läggs också i movingPlatforms så den kan röra sig.
      */
     platforms.push(raft);
-    movingPlatforms.push(raft);
 
     /*
      * Engelsk båt.
@@ -102,7 +100,6 @@ runmysteriet.segments.Segment_Water.prototype.ground = function(stage, startX) {
         holes: holes,
         enemySpawns: enemySpawns,
         waterAreas: waterAreas,
-        movingPlatforms: movingPlatforms,
         boats: boats,
         endX: x
     };

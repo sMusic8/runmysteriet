@@ -11,7 +11,6 @@ runmysteriet.handler.PlatformHandler = function(stage, screenWidth) {
     this.holes = [];
     this.enemySpawns = [];
     this.waterAreas = [];
-    this.movingPlatforms = [];
     this.boats = [];                                    
 
     this.levelWidth = 0;
@@ -54,7 +53,6 @@ runmysteriet.handler.PlatformHandler.prototype.init = function(levelNumber) {
         this.addHoles(result.holes);
         this.addEnemySpawns(result.enemySpawns);
         this.addWaterAreas(result.waterAreas || []);
-        this.addMovingPlatforms(result.movingPlatforms || []);
         this.addBoats(result.boats || []);  
         x = result.endX;
     }
@@ -128,12 +126,6 @@ runmysteriet.handler.PlatformHandler.prototype.addWaterAreas = function(waterAre
     }
 };
 
-
-runmysteriet.handler.PlatformHandler.prototype.addMovingPlatforms = function(movingPlatforms) {
-    for (var i = 0; i < movingPlatforms.length; i++) {
-        this.movingPlatforms.push(movingPlatforms[i]);
-    }
-};
 
 runmysteriet.handler.PlatformHandler.prototype.addBoats = function(boats) {
     

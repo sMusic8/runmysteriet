@@ -22,9 +22,7 @@ runmysteriet.segments.Segment_1.prototype.ground = function(stage, startX) {
     var platforms = [];
     var holes = [];
     var enemySpawns = [];
-    var waterAreas = [];
-    var movingPlatforms = [];
-    var boats = [];
+
 
     //--------------------------------------------------------------------------
     // FÖRSTA PLATTFORMEN
@@ -123,7 +121,6 @@ runmysteriet.segments.Segment_1.prototype.ground = function(stage, startX) {
         holes: holes,
         enemySpawns: enemySpawns,
         waterAreas: waterAreas,
-        movingPlatforms: movingPlatforms,
         boats: boats,
         endX: x
     };

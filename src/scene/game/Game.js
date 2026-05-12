@@ -41,15 +41,7 @@ runmysteriet.scene.Game = function(levelNumber, score, playerName) {
     this.m_highscoreHud = null;
     this.m_highscoreSaved = false;
 
-    /*
-     * Tillfällig HUD för runor/test.
-     * Byt gärna namn senare från gris/grisText till något tydligare,
-     * till exempel m_runeBox och m_runeText.
-     */
-    this.gris = null;
-    this.grisText = null;
-};
-
+ 
 //------------------------------------------------------------------------------
 // INHERITANCE
 //------------------------------------------------------------------------------
@@ -118,10 +110,7 @@ runmysteriet.scene.Game.prototype.init = function() {
     /*
      * Spelare
      */
-
-    //
-    this.m_input = new runmysteriet.input.GameInput(this.application);
-
+    // PlayerHandler initieras efter PlatformHandler så att den kan få referenser till plattformar, hål och fiendespawns.
 this.m_playerHandler = new runmysteriet.handler.PlayerHandler(
     this.stage,
     this.m_platformHandler,
@@ -188,17 +177,6 @@ this.m_playerHandler = new runmysteriet.handler.PlayerHandler(
 
 runmysteriet.scene.Game.prototype.update = function(step) {
     rune.scene.Scene.prototype.update.call(this, step);
-
-    // 🔥 DEBUG: hoppa direkt till GuessWord med K PLOCKA BORT SEN
-    if (this.keyboard.justPressed("K")) {
-        console.log("DEBUG: hoppar till GuessWord"); //Här finns ordet
-console.log("Vad är objektet shhieldhandler", this.m_shieldHandler)
-        this.application.scenes.load([
-            new runmysteriet.scene.GuessWord(this.application, this.m_shieldHandler)
-        ]);
-
-        return;
-    }
 
     if (this.m_gameOverActive === true) {
         this.updateGameOverInput();
@@ -279,25 +257,21 @@ runmysteriet.scene.Game.prototype.createHUD = function() {
     this.stage.addChild(this.m_highscoreHud);
 
     /*
-     * Test-ruta / run-HUD
-     */
-    this.gris = new runmysteriet.handler.TestShield();
-    this.stage.addChild(this.gris);
-
-    this.grisText = new rune.text.BitmapField(" ");
-    this.stage.addChild(this.grisText);
-
-    /*
      * När ShieldHandler säger att texten ändrats,
      * uppdaterar vi texten i HUD.
      */
+    this.m_runeText = new rune.text.BitmapField("RUNOR: ");
+    this.m_runeText.x = 15;
+    this.m_runeText.y = 65;
+    this.stage.addChild(this.m_runeText);
+
     if (this.m_shieldHandler) {
-        this.m_shieldHandler.onCollectedChanged = function(text) {
-            if (self.grisText) {
-                self.grisText.text = text;
-            }
-        };
-    }
+    this.m_shieldHandler.onCollectedChanged = function(text) {
+        if (self.m_runeText) {
+            self.m_runeText.text = "RUNOR: " + text;
+        }
+    };
+}
 
     this.updateHUD();
 };
@@ -960,3 +934,4 @@ runmysteriet.scene.Game.prototype.dispose = function() {
 
     rune.scene.Scene.prototype.dispose.call(this);
 };
+}
