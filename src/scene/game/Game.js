@@ -40,8 +40,8 @@ runmysteriet.scene.Game = function(levelNumber, score, playerName) {
     this.camera = null;
     this.m_highscoreHud = null;
     this.m_highscoreSaved = false;
-
- 
+};
+    
 //------------------------------------------------------------------------------
 // INHERITANCE
 //------------------------------------------------------------------------------
@@ -60,7 +60,6 @@ runmysteriet.scene.Game.prototype.init = function() {
 
     this.camera = this.cameras.getCameraAt(0);
 
-    console.log(this.camera);
 
     /*
      * Musik
@@ -303,20 +302,6 @@ runmysteriet.scene.Game.prototype.updateHUD = function() {
         this.m_highscoreHud.x = camera.viewport.x + 15;
         this.m_highscoreHud.y = camera.viewport.y + 45;
 }
-
-    /*
-     * Test-HUD.
-     * Den följer kameran precis som timer-texten.
-     */
-    if (this.gris) {
-        this.gris.x = camera.viewport.x + 100;
-        this.gris.y = camera.viewport.y + 100;
-    }
-
-    if (this.grisText) {
-        this.grisText.x = camera.viewport.x + 110;
-        this.grisText.y = camera.viewport.y + 110;
-    }
 };
 
 //------------------------------------------------------------------------------
@@ -330,11 +315,12 @@ runmysteriet.scene.Game.prototype.updateHoles = function() {
         this.m_platformHandler.updateHoles(
             this.m_playerHandler.players,
             function(player, index) {
-                self.killPlayer(player, index);
+                self.m_playerHandler.killPlayer(player, index);
             }
         );
     }
 };
+
 
 runmysteriet.scene.Game.prototype.updateEnemies = function() {
     if (this.m_enemyHandler && this.m_playerHandler) {
@@ -506,11 +492,11 @@ runmysteriet.scene.Game.prototype.playMenuSound = function() {
 runmysteriet.scene.Game.prototype.handleMenuListInput = function(menuList, onChoose) {
     var input = null;
 
-    if (!menuList || typeof menuList.readInput !== "function") {
+    if (!menuList) {
         return;
     }
 
-var input = this.m_gameInput.read(this.keyboard);
+    input = this.m_gameInput.read(this.keyboard);
 
     if (input.down) {
         this.playMenuSound();
@@ -526,7 +512,6 @@ var input = this.m_gameInput.read(this.keyboard);
         onChoose.call(this, menuList.getSelectedIndex());
     }
 };
-
 //------------------------------------------------------------------------------
 // TIMER
 //------------------------------------------------------------------------------
@@ -562,11 +547,6 @@ runmysteriet.scene.Game.prototype.updateTimer = function() {
 //------------------------------------------------------------------------------
 // LEVEL COMPLETION
 //------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
-// LEVEL COMPLETION
-//------------------------------------------------------------------------------
-
 runmysteriet.scene.Game.prototype.checkLevelCompletion = function() {
     var players = null;
     var player = null;
@@ -618,24 +598,6 @@ runmysteriet.scene.Game.prototype.checkLevelCompletion = function() {
 //------------------------------------------------------------------------------
 // PLAYER DEATH
 //------------------------------------------------------------------------------
-
-runmysteriet.scene.Game.prototype.killPlayer = function(player, index) {
-    if (!player || player.isDead === true) {
-        return;
-    }
-
-    player.isDead = true;
-    player.visible = false;
-    player.active = false;
-    player.velocityY = 0;
-    player.isOnGround = false;
-
-    if (player.hpBar) {
-        player.hpBar.visible = false;
-    }
-
-    console.log("PLAYER DEAD", index);
-};
 
 runmysteriet.scene.Game.prototype.areAllPlayersDead = function() {
     var players = null;
@@ -727,8 +689,6 @@ runmysteriet.scene.Game.prototype.winGame = function(winningPlayer) {
 
         guessData = this.m_shieldHandler.getGuessData();
     }
-
-    console.log("GUESS DATA TILL GUESSWORD:", guessData);
 
     this.application.scenes.load([
         new runmysteriet.scene.GuessWord(
@@ -894,8 +854,6 @@ runmysteriet.scene.Game.prototype.reviveDeadPlayers = function(winningPlayer) {
                 player.x = this.m_finishX - 80 + i * 40;
                 player.y = player.groundY || 188;
             }
-
-            console.log("PLAYER REVIVED", i);
         }
     }
 };
@@ -934,4 +892,3 @@ runmysteriet.scene.Game.prototype.dispose = function() {
 
     rune.scene.Scene.prototype.dispose.call(this);
 };
-}

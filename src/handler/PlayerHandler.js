@@ -203,40 +203,43 @@ runmysteriet.handler.PlayerHandler.prototype.updateCollisions = function() {
     for (var i = 0; i < this.players.length; i++) {
 
         var player = this.players[i];
+
         if (!player || player.isDead === true) {
             continue;
         }
 
-        var onPlatform = false;
-        player.currentPlatform = null;  
+        player.currentPlatform = null;
 
         for (var j = 0; j < this.platforms.length; j++) {
 
             var platform = this.platforms[j];
 
-            if (Math.abs(platform.x - player.x) > 350) continue;
-
-            if (this.checkPlatform(player, platform)) {
-                onPlatform = true;
+            if (!platform) {
+                continue;
             }
+
+            if (Math.abs(platform.x - player.x) > 350) {
+                continue;
+            }
+
+            this.checkPlatform(player, platform);
         }
 
         for (var k = 0; k < this.players.length; k++) {
 
             var other = this.players[k];
-            if (player === other) continue;
 
-            if (this.checkPlayerPlatform(player, other)) {
-                onPlatform = true;
+            if (!other || player === other || other.isDead === true) {
+                continue;
             }
+
+            this.checkPlayerPlatform(player, other);
         }
 
         this.checkWaterDeath(player, i);
         this.checkBoatDeath(player, i);
     }
 };
-
-
 //------------------------------------------------------------------------------
 // ALL PLAYERS ON PLATFORM
 //------------------------------------------------------------------------------    
@@ -267,12 +270,15 @@ runmysteriet.handler.PlayerHandler.prototype.areAllActivePlayersOnPlatform = fun
     return true;
 };
 
-
 //------------------------------------------------------------------------------
 // PLATFORM COLLISION
 //------------------------------------------------------------------------------
 
 runmysteriet.handler.PlayerHandler.prototype.checkPlatform = function(player, platform) {
+
+    var playerBottom = 0;
+    var platformTop = 0;
+    var playerPreviousBottom = 0;
 
     if (!player || !platform) {
         return false;
@@ -282,34 +288,37 @@ runmysteriet.handler.PlayerHandler.prototype.checkPlatform = function(player, pl
         return false;
     }
 
-    if (player.velocityY >= 0) {
+    playerBottom = player.y + player.height / 2;
+    platformTop = platform.y;
+    playerPreviousBottom = player.previousY + player.height / 2;
+
+    /*
+     * Spelaren ska bara landa om den faller nedåt
+     * och kom ovanifrån plattformen.
+     */
+    if (player.velocityY >= 0 && playerPreviousBottom <= platformTop + 10) {
+
         player.y = this.getStandingY(player, platform);
-        player.velocityY = 0; //står still i y led
+        player.velocityY = 0;
         player.isOnGround = true;
         player.currentPlatform = platform;
 
-        if (platform.isRaft === true) {//om spelaren är på flotten ska den följa med
-                if (this.areAllActivePlayersOnPlatform(platform)) {
-                    if (typeof platform.start === "function") {
-                         platform.start();
+        if (platform.isRaft === true) {
+
+            if (this.areAllActivePlayersOnPlatform(platform)) {
+                if (typeof platform.start === "function") {
+                    platform.start();
+                }
+            }
+
+            player.x += platform.deltaX || 0;
         }
-    }
-        player.x += platform.deltaX || 0; //spelaren rör sig i x-led lika snabbt som flotte
-
-
-        }
-
-        player.currentPlatform = platform;
-//         if (platform.isRaft === true && typeof platform.start === "function") {
-//             platform.start();
-// }
 
         return true;
     }
 
     return false;
 };
-
 
 //------------------------------------------------------------------------------
 // PLAYER ON PLAYER
@@ -345,27 +354,6 @@ runmysteriet.handler.PlayerHandler.prototype.checkPlayerPlatform = function(play
 
     return false;
 };
-
-//------------------------------------------------------------------------------
-// GAMEPAD
-//------------------------------------------------------------------------------    
-runmysteriet.handler.PlayerHandler.prototype.getGamepad = function(gamepadID) {
-
-    if (!this.application) {
-        return null;
-    }
-
-    if (!this.application.inputs) {
-        return null;
-    }
-
-    if (!this.application.inputs.gamepads) {
-        return null;
-    }
-
-    return this.application.inputs.gamepads.get(gamepadID);
-};
-
 
 //------------------------------------------------------------------------------
 // INPUT HANDLER
@@ -441,7 +429,9 @@ runmysteriet.handler.PlayerHandler.prototype.createHpBar = function() {
 
 runmysteriet.handler.PlayerHandler.prototype.placePlayerOnPlatform = function(player, platform, offsetX) {
 
-    if (!player || !platform) return;
+    if (!player || !platform) {
+        return;
+    }
 
     player.x = platform.x + (offsetX || 0);
     player.y = this.getStandingY(player, platform);
@@ -480,18 +470,17 @@ runmysteriet.handler.PlayerHandler.prototype.getStandingY = function(player, pla
 runmysteriet.handler.PlayerHandler.prototype.checkWaterDeath = function(player, index) {
 
     var water = null;
-    
 
     if (!player || player.isDead === true) {
-         this.dedSound = this.application.sounds.sound.get("ded");
         return;
     }
+
     /*
      * Om spelaren är på flotten ska vatten inte kunna döda.
      */
     if (player.currentPlatform && player.currentPlatform.isRaft === true) {
         return;
-}
+    }
 
     if (!this.platformHandler || !this.platformHandler.waterAreas) {
         return;
@@ -567,11 +556,6 @@ runmysteriet.handler.PlayerHandler.prototype.createAttack = function(player) {
     var attack = new runmysteriet.attack.Attack(player);
 
     this.stage.addChild(attack);
-
-    if (!this.attacks) {
-        this.attacks = [];
-    }
-
     this.attacks.push(attack);
 };
 

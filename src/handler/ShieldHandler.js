@@ -32,60 +32,69 @@ runmysteriet.handler.ShieldHandler = function (stage, application, levelWidth, l
 
 runmysteriet.handler.ShieldHandler.prototype.init = function () {
 
-    var wordData = this.getRandomWordData();
+    var wordData = null;
     var word = "";
-    var startX = 150; // starta en bit in i banan, inte direkt vid början
-    var endX = this.m_levelWidth - 150; //
+    var startX = 150;
+    var endX = this.m_levelWidth - 150;
     var spacing = 0;
     var i = 0;
     var shield = null;
 
-    if (wordData) {
+    /*
+     * Hämtar ett slumpat ord från words5.json.
+     */
+    wordData = this.getRandomWordData();
+
+    if (wordData && wordData.word) {
+
         word = String(wordData.word || "").toLowerCase();
 
         this.m_wordData = wordData;
         this.m_word = word;
         this.m_hints = wordData.Subword || [];
+
     } else {
+
+        /*
+         * Fallback om JSON inte kan laddas.
+         */
         word = "button";
 
         this.m_wordData = {
             word: "Button",
             Subword: ["Start", "Needle"]
         };
-        var wordData = this.getRandomWordData();
+
         this.m_word = word;
         this.m_hints = this.m_wordData.Subword;
     }
+
+    /*
+     * En bokstav göms och ska gissas senare i GuessWord.
+     */
     this.m_hiddenIndex = Math.floor(Math.random() * word.length);
 
-this.m_collectedMap = [];
+    this.m_collectedMap = [];
 
-for (i = 0; i < word.length; i++) {
-    this.m_collectedMap.push(false);
-}
-
-console.log("HIDDEN INDEX:", this.m_hiddenIndex);
+    for (i = 0; i < word.length; i++) {
+        this.m_collectedMap.push(false);
+    }
 
     spacing = (word.length > 1)
         ? (endX - startX) / (word.length - 1)
         : 0;
 
-    console.log("WORD:", word);
-    console.log("WORD DATA:", this.m_wordData);
-    console.log("HINTS:", this.m_hints);
-
     for (i = 0; i < word.length; i++) {
 
-    /*
-     * En bokstav ska inte placeras ut.
-     * Den blir en tom box i GuessWord.
-     */
-    if (i === this.m_hiddenIndex) {
-        continue;
-    }
+        /*
+         * En bokstav ska inte placeras ut.
+         * Den blir en tom box i GuessWord.
+         */
+        if (i === this.m_hiddenIndex) {
+            continue;
+        }
 
-    shield = new runmysteriet.ui.Shield();
+        shield = new runmysteriet.ui.Shield();
         shield.x = startX + i * spacing;
         shield.y = 140;
 
@@ -94,6 +103,7 @@ console.log("HIDDEN INDEX:", this.m_hiddenIndex);
         shield.wordIndex = i;
 
         shield.setRune(word.charAt(i));
+
         this.m_shields.push(shield);
         this.m_stage.addChild(shield);
     }
@@ -252,26 +262,6 @@ runmysteriet.handler.ShieldHandler.prototype.allRunesColected = function () {
 // GETTERS
 //-------------------------
 
-runmysteriet.handler.ShieldHandler.prototype.getWord = function() {
-    return this.m_word;
-};
-
-runmysteriet.handler.ShieldHandler.prototype.getHints = function() {
-    return this.m_hints;
-};
-
-runmysteriet.handler.ShieldHandler.prototype.getCollected = function () {
-  return this.m_collected;
-};
-
-// runmysteriet.handler.ShieldHandler.prototype.allRunesColected = function () {
-//   return this.m_word.length > 0 &&
-//          this.m_collected.length >= this.m_word.length;
-// };
-
-runmysteriet.handler.ShieldHandler.prototype.getWordData = function() {
-    return this.m_wordData;
-};
 
 runmysteriet.handler.ShieldHandler.prototype.getGuessData = function() {
     return {
@@ -280,14 +270,4 @@ runmysteriet.handler.ShieldHandler.prototype.getGuessData = function() {
         collectedMap: this.m_collectedMap,
         hiddenIndex: this.m_hiddenIndex
     };
-};
-
-//-------------------------
-// DISPLAY
-//-------------------------
-
-runmysteriet.handler.ShieldHandler.prototype.display = function () {
-
-  this.box = new rune.display.Graphic(10, 10, 100, 100);
-  this.box.backgroundColor = "#ffffff";
 };
