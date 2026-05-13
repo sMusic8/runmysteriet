@@ -10,16 +10,9 @@
  */
 runmysteriet.segments.Segment_5 = function() {
 
-    /** @type {number} */
     this.tileSize = 268;
-
-    /** @type {number} */
     this.groundY = 200;
-
-    /** @type {number} */
     this.tileW = 32;
-
-    /** @type {number} */
     this.tileH = 20;
 
     console.log("Segment 5");
@@ -27,38 +20,15 @@ runmysteriet.segments.Segment_5 = function() {
 
 /**
  * Generates Segment 5 ground layout.
- *
- * @param {!rune.display.Stage} stage
- * @param {number=} startX
- * @return {{
- *   platforms: !Array<!rune.display.Graphic>,
- *   holes: !Array<!runmysteriet.ui.graphic.Hole>,
- *   enemySpawns: !Array<!Object>,
- *   endX: number
- * }}
  */
 runmysteriet.segments.Segment_5.prototype.ground = function(stage, startX) {
 
-    /** @type {number} */
     var x = startX || 0;
 
-    /** @type {!Array<!rune.display.Graphic>} */
     var platforms = [];
-
-    /** @type {!Array<!runmysteriet.ui.graphic.Hole>} */
     var holes = [];
-
-    /** @type {!Array<!Object>} */
     var enemySpawns = [];
 
-    /**
-     * Builds grass tiles.
-     *
-     * @param {number} px
-     * @param {number} py
-     * @param {number} tiles
-     * @param {!runmysteriet.segments.Segment_5} _this
-     */
     function buildGrass(px, py, tiles, _this) {
 
         for (var i = 0; i < tiles; i++) {
@@ -76,14 +46,6 @@ runmysteriet.segments.Segment_5.prototype.ground = function(stage, startX) {
         }
     }
 
-    /**
-     * Builds stone tiles.
-     *
-     * @param {number} px
-     * @param {number} py
-     * @param {number} tiles
-     * @param {!runmysteriet.segments.Segment_5} _this
-     */
     function buildStone(px, py, tiles, _this) {
 
         for (var i = 0; i < tiles; i++) {
@@ -103,37 +65,59 @@ runmysteriet.segments.Segment_5.prototype.ground = function(stage, startX) {
 
     //----------------------------------------------------------------------
 
-    // START PLATFORM
-    buildGrass(x, this.groundY, 4, this);
-    x += 4 * this.tileW;
+    // START PLATFORM (lite längre för säker start)
+    buildGrass(x, this.groundY, 5, this);
+    x += 5 * this.tileW;
 
     //----------------------------------------------------------------------
 
-    // HOLE + PLATFORM LOOP
-    for (var i = 0; i < 3; i++) {
+    // BALANSERAD HOLE LOOP
+    for (var i = 0; i < 2; i++) {
+
+        var holeWidth = 80; // ✔️ mindre hål
 
         var hole = new runmysteriet.ui.graphic.Hole(
             x,
             this.groundY,
-            180,
+            holeWidth,
             200
         );
 
         stage.addChild(hole);
         holes.push(hole);
 
-        x += 180;
+        // 🔥 LAVA (matchar exakt hålet nu)
+        var lavaCols = Math.ceil(holeWidth / this.tileW);
+        var lavaRows = 6;
 
-        var py = this.groundY - (i * 30);
+        for (var ly = 0; ly < lavaRows; ly++) {
+            for (var lx = 0; lx < lavaCols; lx++) {
 
-        buildStone(x, py, 3, this);
+                var lava = new rune.display.Graphic(
+                    x + lx * this.tileW,
+                    this.groundY + ly * this.tileH,
+                    this.tileW,
+                    this.tileH,
+                    "lava"
+                );
 
-        x += 3 * this.tileW;
+                stage.addChild(lava);
+            }
+        }
+
+        x += holeWidth;
+
+        // ✔️ större landningsyta
+        var py = this.groundY - (i * 20);
+
+        buildStone(x, py, 4, this);
+
+        x += 4 * this.tileW;
     }
 
     //----------------------------------------------------------------------
 
-    // END PLATFORM
+    // SAFE END PLATFORM
     buildGrass(x, this.groundY, 6, this);
     x += 6 * this.tileW;
 

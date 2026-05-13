@@ -37,26 +37,12 @@ runmysteriet.segments.Segment_1 = function() {
  */
 runmysteriet.segments.Segment_1.prototype.ground = function(stage, startX) {
 
-    /** @type {number} */
     var x = startX || 0;
 
-    /** @type {!Array<!rune.display.Graphic>} */
     var platforms = [];
-
-    /** @type {!Array<!runmysteriet.ui.graphic.Hole>} */
     var holes = [];
-
-    /** @type {!Array<!Object>} */
     var enemySpawns = [];
 
-    /**
-     * Builds grass tiles.
-     *
-     * @param {number} px
-     * @param {number} py
-     * @param {number} tiles
-     * @param {!runmysteriet.segments.Segment_1} _this
-     */
     function buildGrass(px, py, tiles, _this) {
 
         for (var i = 0; i < tiles; i++) {
@@ -74,14 +60,6 @@ runmysteriet.segments.Segment_1.prototype.ground = function(stage, startX) {
         }
     }
 
-    /**
-     * Builds stone tiles.
-     *
-     * @param {number} px
-     * @param {number} py
-     * @param {number} tiles
-     * @param {!runmysteriet.segments.Segment_1} _this
-     */
     function buildStone(px, py, tiles, _this) {
 
         for (var i = 0; i < tiles; i++) {
@@ -124,6 +102,29 @@ runmysteriet.segments.Segment_1.prototype.ground = function(stage, startX) {
 
     stage.addChild(hole);
     holes.push(hole);
+
+    // =========================
+    // 🔥 LAVA (ADDED HERE)
+    // =========================
+
+    var tileSize = 32;
+    var cols = Math.ceil(hole.width / tileSize);
+    var rows = Math.ceil(hole.height / tileSize);
+
+    for (var ly = 0; ly < rows; ly++) {
+        for (var lx = 0; lx < cols; lx++) {
+
+            var lava = new rune.display.Graphic(
+                hole.x + (lx * tileSize),
+                hole.y + (ly * tileSize),
+                tileSize,
+                tileSize,
+                "lava"
+            );
+
+            stage.addChild(lava);
+        }
+    }
 
     //----------------------------------------------------------------------
 

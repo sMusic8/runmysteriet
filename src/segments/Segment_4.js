@@ -52,12 +52,13 @@ runmysteriet.segments.Segment_4.prototype.ground = function(stage, startX) {
     var enemySpawns = [];
 
     /**
-     * Builds grass platform tiles.
+     * Builds grass tiles.
      *
      * @param {number} px
      * @param {number} py
      * @param {number} tiles
      * @param {!runmysteriet.segments.Segment_4} _this
+     * @return {void}
      */
     function buildGrass(px, py, tiles, _this) {
 
@@ -77,12 +78,13 @@ runmysteriet.segments.Segment_4.prototype.ground = function(stage, startX) {
     }
 
     /**
-     * Builds stone platform tiles.
+     * Builds stone tiles.
      *
      * @param {number} px
      * @param {number} py
      * @param {number} tiles
      * @param {!runmysteriet.segments.Segment_4} _this
+     * @return {void}
      */
     function buildStone(px, py, tiles, _this) {
 
@@ -101,15 +103,11 @@ runmysteriet.segments.Segment_4.prototype.ground = function(stage, startX) {
         }
     }
 
-    //----------------------------------------------------------------------
-
-    // START GROUND
+    // START
     buildGrass(x, this.groundY, 6, this);
     x += 6 * this.tileW;
 
-    //----------------------------------------------------------------------
-
-    // HOLE SECTION
+    // HOLE
     var holeWidth = 400;
 
     var hole = new runmysteriet.ui.graphic.Hole(
@@ -122,9 +120,28 @@ runmysteriet.segments.Segment_4.prototype.ground = function(stage, startX) {
     stage.addChild(hole);
     holes.push(hole);
 
-    //----------------------------------------------------------------------
+    // 🔥 LAVA
+    var lavaCols = Math.ceil(holeWidth / this.tileW);
+    var lavaRows = 6;
 
-    // ZIG ZAG PLATFORM SECTION
+    for (var ly = 0; ly < lavaRows; ly++) {
+
+        for (var lx = 0; lx < lavaCols; lx++) {
+
+            var lava = new rune.display.Graphic(
+                x + lx * this.tileW,
+                this.groundY + ly * this.tileH,
+                this.tileW,
+                this.tileH,
+                "lava"
+            );
+
+            stage.addChild(lava);
+        
+        }
+    }
+
+    // ZIG ZAG
     for (var i = 0; i < 6; i++) {
 
         var px = x + 40 + (i * 70);
@@ -133,9 +150,7 @@ runmysteriet.segments.Segment_4.prototype.ground = function(stage, startX) {
         buildStone(px, py, 2, this);
     }
 
-    //----------------------------------------------------------------------
-
-    // LANDING PLATFORM
+    // LANDING
     x += holeWidth;
 
     buildGrass(x, this.groundY, 8, this);
@@ -143,8 +158,6 @@ runmysteriet.segments.Segment_4.prototype.ground = function(stage, startX) {
 
     buildGrass(x, this.groundY, 6, this);
     x += 6 * this.tileW;
-
-    //----------------------------------------------------------------------
 
     return {
         platforms: platforms,

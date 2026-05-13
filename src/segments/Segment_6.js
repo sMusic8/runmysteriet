@@ -39,26 +39,12 @@ runmysteriet.segments.Segment_6 = function() {
  */
 runmysteriet.segments.Segment_6.prototype.ground = function(stage, startX) {
 
-    /** @type {number} */
     var x = startX || 0;
 
-    /** @type {!Array<!rune.display.Graphic>} */
     var platforms = [];
-
-    /** @type {!Array<!runmysteriet.ui.graphic.Hole>} */
     var holes = [];
-
-    /** @type {!Array<!Object>} */
     var enemySpawns = [];
 
-    /**
-     * Builds grass tiles.
-     *
-     * @param {number} px
-     * @param {number} py
-     * @param {number} tiles
-     * @param {!runmysteriet.segments.Segment_6} _this
-     */
     function buildGrass(px, py, tiles, _this) {
 
         for (var i = 0; i < tiles; i++) {
@@ -76,14 +62,6 @@ runmysteriet.segments.Segment_6.prototype.ground = function(stage, startX) {
         }
     }
 
-    /**
-     * Builds stone tiles.
-     *
-     * @param {number} px
-     * @param {number} py
-     * @param {number} tiles
-     * @param {!runmysteriet.segments.Segment_6} _this
-     */
     function buildStone(px, py, tiles, _this) {
 
         for (var i = 0; i < tiles; i++) {
@@ -103,16 +81,13 @@ runmysteriet.segments.Segment_6.prototype.ground = function(stage, startX) {
 
     //----------------------------------------------------------------------
 
-    // START PLATFORM
     buildGrass(x, this.groundY, 6, this);
     x += 6 * this.tileW;
 
     //----------------------------------------------------------------------
 
-    // HOLE + PLATFORM MIX SECTION
     for (var i = 0; i < 5; i++) {
 
-        // HOLE
         var hole = new runmysteriet.ui.graphic.Hole(
             x,
             this.groundY,
@@ -123,9 +98,27 @@ runmysteriet.segments.Segment_6.prototype.ground = function(stage, startX) {
         stage.addChild(hole);
         holes.push(hole);
 
+        // 🔥 LAVA (TILLAGD)
+        var lavaCols = Math.ceil(80 / this.tileW);
+        var lavaRows = 6;
+
+        for (var ly = 0; ly < lavaRows; ly++) {
+            for (var lx = 0; lx < lavaCols; lx++) {
+
+                var lava = new rune.display.Graphic(
+                    x + lx * this.tileW,
+                    this.groundY + ly * this.tileH,
+                    this.tileW,
+                    this.tileH,
+                    "lava"
+                );
+
+                stage.addChild(lava);
+            }
+        }
+
         x += 80;
 
-        // STONE PLATFORM AFTER HOLE (SLIGHTLY ASCENDING)
         var py = this.groundY - (i * 20);
 
         buildStone(x, py, 3, this);
@@ -135,7 +128,6 @@ runmysteriet.segments.Segment_6.prototype.ground = function(stage, startX) {
 
     //----------------------------------------------------------------------
 
-    // END PLATFORM
     buildGrass(x, this.groundY, 6, this);
     x += 6 * this.tileW;
 

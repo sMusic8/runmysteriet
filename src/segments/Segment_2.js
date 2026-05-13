@@ -42,37 +42,15 @@ runmysteriet.segments.Segment_2 = function() {
  */
 runmysteriet.segments.Segment_2.prototype.ground = function(stage, startX) {
 
-    /** @type {number} */
     var x = startX || 0;
-
-    /** @type {!Array<!rune.display.Graphic>} */
     var platforms = [];
-
-    /** @type {!Array<!runmysteriet.ui.graphic.Hole>} */
     var holes = [];
-
-    /** @type {!Array<!Object>} */
     var enemySpawns = [];
 
-    /**
-     * Builds a stone platform using tiles.
-     *
-     * @param {number} px
-     * @param {number} py
-     * @param {number} widthTiles
-     * @return {!Array<!rune.display.Graphic>}
-     */
     var buildStonePlatform = (function(_this) {
 
-        /**
-         * @param {number} px
-         * @param {number} py
-         * @param {number} widthTiles
-         * @return {!Array<!rune.display.Graphic>}
-         */
         return function(px, py, widthTiles) {
 
-            /** @type {!Array<!rune.display.Graphic>} */
             var group = [];
 
             for (var i = 0; i < widthTiles; i++) {
@@ -82,7 +60,7 @@ runmysteriet.segments.Segment_2.prototype.ground = function(stage, startX) {
                     py,
                     _this.tileW,
                     _this.tileH,
-                    "bana-gras1"
+                    "stone_block"
                 );
 
                 stage.addChild(tile);
@@ -95,8 +73,6 @@ runmysteriet.segments.Segment_2.prototype.ground = function(stage, startX) {
 
     })(this);
 
-    //----------------------------------------------------------------------
-
     // START PLATFORM
     buildStonePlatform(x, this.groundY, 8);
 
@@ -107,8 +83,6 @@ runmysteriet.segments.Segment_2.prototype.ground = function(stage, startX) {
     });
 
     x += 8 * this.tileW;
-
-    //----------------------------------------------------------------------
 
     // LARGE HOLE SECTION
     var holeWidth = 520;
@@ -123,7 +97,30 @@ runmysteriet.segments.Segment_2.prototype.ground = function(stage, startX) {
     stage.addChild(hole);
     holes.push(hole);
 
-    //----------------------------------------------------------------------
+    // -----------------------------
+    // 🔥 LAVA (NYTT TILLAGT)
+    // -----------------------------
+
+    var lavaTileW = this.tileW;
+    var lavaTileH = this.tileH;
+    var lavaRows = 6; // fyller ner i hålet
+    var lavaCols = Math.ceil(holeWidth / lavaTileW);
+
+    for (var ly = 0; ly < lavaRows; ly++) {
+
+        for (var lx = 0; lx < lavaCols; lx++) {
+
+            var lavaTile = new rune.display.Graphic(
+                x + (lx * lavaTileW),
+                this.groundY + (ly * lavaTileH),
+                lavaTileW,
+                lavaTileH,
+                "lava"
+            );
+
+            stage.addChild(lavaTile);
+        }
+    }
 
     // MID AIR PLATFORM SECTION
     var platformCount = 5;
@@ -146,9 +143,6 @@ runmysteriet.segments.Segment_2.prototype.ground = function(stage, startX) {
         }
     }
 
-    //----------------------------------------------------------------------
-
-    // LANDING PLATFORM
     x += holeWidth;
 
     buildStonePlatform(x, this.groundY, 8);
@@ -161,9 +155,6 @@ runmysteriet.segments.Segment_2.prototype.ground = function(stage, startX) {
 
     x += 8 * this.tileW;
 
-    //----------------------------------------------------------------------
-
-    // FINAL PLATFORM
     buildStonePlatform(x, this.groundY, 6);
 
     enemySpawns.push({
@@ -173,8 +164,6 @@ runmysteriet.segments.Segment_2.prototype.ground = function(stage, startX) {
     });
 
     x += 6 * this.tileW;
-
-    //----------------------------------------------------------------------
 
     return {
         platforms: platforms,

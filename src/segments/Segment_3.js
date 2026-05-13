@@ -10,16 +10,9 @@
  */
 runmysteriet.segments.Segment_3 = function() {
 
-    /** @type {number} */
     this.tileSize = 268;
-
-    /** @type {number} */
     this.groundY = 200;
-
-    /** @type {number} */
     this.tileW = 32;
-
-    /** @type {number} */
     this.tileH = 20;
 
     console.log("Segment 3");
@@ -27,38 +20,14 @@ runmysteriet.segments.Segment_3 = function() {
 
 /**
  * Generates the ground layout for Segment 3.
- *
- * @param {!rune.display.Stage} stage
- * @param {number=} startX
- * @return {{
- *   platforms: !Array<!rune.display.Graphic>,
- *   holes: !Array<!runmysteriet.ui.graphic.Hole>,
- *   enemySpawns: !Array<!Object>,
- *   endX: number
- * }}
  */
 runmysteriet.segments.Segment_3.prototype.ground = function(stage, startX) {
 
-    /** @type {number} */
     var x = startX || 0;
-
-    /** @type {!Array<!rune.display.Graphic>} */
     var platforms = [];
-
-    /** @type {!Array<!runmysteriet.ui.graphic.Hole>} */
     var holes = [];
-
-    /** @type {!Array<!Object>} */
     var enemySpawns = [];
 
-    /**
-     * Builds grass tiles.
-     *
-     * @param {number} px
-     * @param {number} py
-     * @param {number} tiles
-     * @param {!runmysteriet.segments.Segment_3} _this
-     */
     function buildGrass(px, py, tiles, _this) {
 
         for (var i = 0; i < tiles; i++) {
@@ -76,14 +45,6 @@ runmysteriet.segments.Segment_3.prototype.ground = function(stage, startX) {
         }
     }
 
-    /**
-     * Builds stone platform tiles.
-     *
-     * @param {number} px
-     * @param {number} py
-     * @param {number} tiles
-     * @param {!runmysteriet.segments.Segment_3} _this
-     */
     function buildStone(px, py, tiles, _this) {
 
         for (var i = 0; i < tiles; i++) {
@@ -101,9 +62,7 @@ runmysteriet.segments.Segment_3.prototype.ground = function(stage, startX) {
         }
     }
 
-    //----------------------------------------------------------------------
-
-    // START PLATFORM (GRASS)
+    // START
     buildGrass(x, this.groundY, 8, this);
 
     enemySpawns.push({
@@ -114,9 +73,7 @@ runmysteriet.segments.Segment_3.prototype.ground = function(stage, startX) {
 
     x += 8 * this.tileW;
 
-    //----------------------------------------------------------------------
-
-    // HOLE SECTION
+    // HOLE
     var holeWidth = 520;
 
     var hole = new runmysteriet.ui.graphic.Hole(
@@ -129,15 +86,35 @@ runmysteriet.segments.Segment_3.prototype.ground = function(stage, startX) {
     stage.addChild(hole);
     holes.push(hole);
 
-    //----------------------------------------------------------------------
+    // -----------------------------
+    // 🔥 LAVA (FIXAD VISUELL DEL)
+    // -----------------------------
 
-    // STAIR PLATFORM (STONE)
+    var lavaCols = Math.ceil(holeWidth / this.tileW);
+    var lavaRows = 6;
+
+    for (var ly = 0; ly < lavaRows; ly++) {
+
+        for (var lx = 0; lx < lavaCols; lx++) {
+
+            var lava = new rune.display.Graphic(
+                x + lx * this.tileW,
+                this.groundY + ly * this.tileH,
+                this.tileW,
+                this.tileH,
+                "lava"
+            );
+
+            stage.addChild(lava);
+        }
+    }
+
+    // STAIR
     var steps = 6;
 
     for (var i = 0; i < steps; i++) {
 
         var px = x + 40 + (i * 80);
-
         var py = this.groundY - (40 + i * 25);
 
         buildStone(px, py, 2, this);
@@ -152,9 +129,7 @@ runmysteriet.segments.Segment_3.prototype.ground = function(stage, startX) {
         }
     }
 
-    //----------------------------------------------------------------------
-
-    // LANDING PLATFORM
+    // LANDING
     x += holeWidth;
 
     buildGrass(x, this.groundY, 8, this);
@@ -167,9 +142,7 @@ runmysteriet.segments.Segment_3.prototype.ground = function(stage, startX) {
 
     x += 8 * this.tileW;
 
-    //----------------------------------------------------------------------
-
-    // EXTRA GROUND
+    // EXTRA
     buildGrass(x, this.groundY, 6, this);
 
     enemySpawns.push({
@@ -179,8 +152,6 @@ runmysteriet.segments.Segment_3.prototype.ground = function(stage, startX) {
     });
 
     x += 6 * this.tileW;
-
-    //----------------------------------------------------------------------
 
     return {
         platforms: platforms,
