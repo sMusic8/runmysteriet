@@ -37,7 +37,7 @@ runmysteriet.segments.Segment_2.prototype.ground = function(stage, startX) {
                     py,
                     _this.tileW,
                     _this.tileH,
-                    "stone_block"
+                    "bana-gras1"
                 );
 
                 stage.addChild(tile);
