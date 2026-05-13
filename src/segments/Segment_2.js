@@ -4,7 +4,7 @@
 
 runmysteriet.segments.Segment_2 = function() {
     this.tileSize = 268;
-    this.groundY = 220;
+    this.groundY = 200;
     this.holeHeight = 200;
 
     // 🔥 storlek på varje stone tile

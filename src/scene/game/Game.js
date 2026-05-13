@@ -20,6 +20,7 @@ runmysteriet.scene.Game = function(levelNumber, score, playerName) {
     this.m_isPaused = false;
     this.m_pauseTitle = null;
     this.m_pauseMenu = null;
+    this.m_pauseOverlay = null;
 
     this.m_timeLeft = 200;
     this.m_timerText = null;
@@ -175,15 +176,28 @@ this.m_playerHandler = new runmysteriet.handler.PlayerHandler(
 //------------------------------------------------------------------------------
 
 runmysteriet.scene.Game.prototype.update = function(step) {
-    rune.scene.Scene.prototype.update.call(this, step);
 
+    /*
+     * Game over-menyn ska kunna läsa input,
+     * men spelet bakom ska inte uppdateras.
+     */
     if (this.m_gameOverActive === true) {
         this.updateGameOverInput();
+        this.updateHUD();
         return;
     }
 
+    /*
+     * Pausinput måste kollas innan Rune uppdaterar stage/tweens.
+     */
     this.updatePauseInput();
 
+    /*
+     * Om spelet är pausat ska vi INTE köra:
+     * rune.scene.Scene.prototype.update.call(this, step);
+     *
+     * Annars fortsätter båtar, sköldar, flotte och tweens.
+     */
     if (this.m_isPaused === true) {
         this.updateHUD();
         return;
@@ -193,6 +207,12 @@ runmysteriet.scene.Game.prototype.update = function(step) {
         this.updateHUD();
         return;
     }
+
+    /*
+     * Rune uppdaterar stage, children, tweens och timers här.
+     * Den ska bara köras när spelet inte är pausat.
+     */
+    rune.scene.Scene.prototype.update.call(this, step);
 
     if (this.m_cloudHandler) {
         this.m_cloudHandler.update();
@@ -302,8 +322,13 @@ runmysteriet.scene.Game.prototype.updateHUD = function() {
         this.m_highscoreHud.x = camera.viewport.x + 15;
         this.m_highscoreHud.y = camera.viewport.y + 45;
 }
-};
 
+
+    if (this.m_runeText) {
+        this.m_runeText.x = camera.viewport.x + 15;
+        this.m_runeText.y = camera.viewport.y + 65;
+    }
+};
 //------------------------------------------------------------------------------
 // UPDATE HELPERS
 //------------------------------------------------------------------------------
@@ -396,6 +421,23 @@ runmysteriet.scene.Game.prototype.createPauseMenu = function() {
         return;
     }
 
+    /*
+     * Mörk overlay över spelet bakom pausmenyn.
+     * Alpha 0.5 = 50% opacity.
+     */
+    this.m_pauseOverlay = new rune.display.Graphic(
+        0,
+        0,
+        this.application.screen.width,
+        this.application.screen.height
+    );
+
+    this.m_pauseOverlay.backgroundColor = "#000000";
+    this.m_pauseOverlay.alpha = 0.7;
+    this.m_pauseOverlay.visible = false;
+
+    this.stage.addChild(this.m_pauseOverlay);
+
     this.m_pauseTitle = new rune.text.BitmapField("SPELET AR PAUSAT");
     this.m_pauseTitle.autoSize = true;
     this.m_pauseTitle.visible = false;
@@ -419,6 +461,10 @@ runmysteriet.scene.Game.prototype.openPauseMenu = function() {
     this.createPauseMenu();
     this.updatePauseMenuPosition();
 
+    if (this.m_pauseOverlay) {
+        this.m_pauseOverlay.visible = true;
+    }
+
     if (this.m_pauseTitle) {
         this.m_pauseTitle.visible = true;
     }
@@ -427,13 +473,20 @@ runmysteriet.scene.Game.prototype.openPauseMenu = function() {
         this.m_pauseMenu.setVisible(true);
     }
 
+    if (this.tweens) {
+        this.tweens.paused = true;
+    }
+
     if (this.backgroundMusic && typeof this.backgroundMusic.pause === "function") {
         this.backgroundMusic.pause();
     }
 };
-
 runmysteriet.scene.Game.prototype.closePauseMenu = function() {
     this.m_isPaused = false;
+
+    if (this.m_pauseOverlay) {
+        this.m_pauseOverlay.visible = false;
+    }
 
     if (this.m_pauseTitle) {
         this.m_pauseTitle.visible = false;
@@ -443,8 +496,12 @@ runmysteriet.scene.Game.prototype.closePauseMenu = function() {
         this.m_pauseMenu.setVisible(false);
     }
 
+    if (this.tweens) {
+        this.tweens.paused = false;
+    }
+
     if (this.backgroundMusic && typeof this.backgroundMusic.play === "function") {
-        this.backgroundMusic.play(true);
+        this.backgroundMusic.play();
     }
 };
 
@@ -454,6 +511,11 @@ runmysteriet.scene.Game.prototype.updatePauseMenuPosition = function() {
     if (!camera) {
         return;
     }
+
+    if (this.m_pauseOverlay) {
+    this.m_pauseOverlay.x = camera.viewport.x;
+    this.m_pauseOverlay.y = camera.viewport.y;
+}
 
     if (this.m_pauseTitle) {
         this.m_pauseTitle.x = camera.viewport.x + 80;

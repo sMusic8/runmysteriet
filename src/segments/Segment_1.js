@@ -4,7 +4,7 @@
 
 runmysteriet.segments.Segment_1 = function() {
     this.tileSize = 268;
-    this.groundY = 220;
+    this.groundY = 200;
 
     this.tileW = 32;
     this.tileH = 20;

@@ -16,7 +16,7 @@ runmysteriet.handler.PlatformHandler = function(stage, screenWidth) {
     this.levelWidth = 0;
 };
 
-//här initieras platformhandlern
+//här initieras platformhandlern och bygger upp leveln genom att loopa igenom segmenten och lägga till plattformar, hål, fiendespawns, vattenområden och båtar.
 runmysteriet.handler.PlatformHandler.prototype.init = function(levelNumber) {
     levelNumber = levelNumber || 1;
 
@@ -42,7 +42,7 @@ runmysteriet.handler.PlatformHandler.prototype.init = function(levelNumber) {
     }
 
     var x = 0;
-//här loopar vi igenom segmenten och bygger upp leveln
+//här loopas igenom segmenten och bygger upp leveln
     for (var i = 0; i < segmentCount; i++) {
         var segmentIndex = (levelNumber + i - 1) % segmentTypes.length;
         var SegmentClass = segmentTypes[segmentIndex];
@@ -147,6 +147,7 @@ runmysteriet.handler.PlatformHandler.prototype.addBoats = function(boats) {
         this.boats.push(boats[i]);
     }
 };
+
 
 runmysteriet.handler.PlatformHandler.prototype.startBoatTweens = function(tweens) {
     var boat = null;
