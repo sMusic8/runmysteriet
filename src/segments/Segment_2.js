@@ -2,32 +2,77 @@
 // SEGMENT 2
 //------------------------------------------------------------------------------
 
+/**
+ * Segment 2 constructor.
+ * Handles stone platforms and large hole traversal section.
+ *
+ * @constructor
+ */
 runmysteriet.segments.Segment_2 = function() {
+
+    /** @type {number} */
     this.tileSize = 268;
+
+    /** @type {number} */
     this.groundY = 200;
+
+    /** @type {number} */
     this.holeHeight = 200;
 
-    // 🔥 storlek på varje stone tile
+    /** @type {number} */
     this.tileW = 32;
+
+    /** @type {number} */
     this.tileH = 20;
+
+    console.log("Segment 2");
 };
 
+/**
+ * Generates Segment 2 ground layout.
+ *
+ * @param {!rune.display.Stage} stage
+ * @param {number=} startX
+ * @return {{
+ *   platforms: !Array<!rune.display.Graphic>,
+ *   holes: !Array<!runmysteriet.ui.graphic.Hole>,
+ *   enemySpawns: !Array<!Object>,
+ *   endX: number
+ * }}
+ */
 runmysteriet.segments.Segment_2.prototype.ground = function(stage, startX) {
 
+    /** @type {number} */
     var x = startX || 0;
 
+    /** @type {!Array<!rune.display.Graphic>} */
     var platforms = [];
+
+    /** @type {!Array<!runmysteriet.ui.graphic.Hole>} */
     var holes = [];
+
+    /** @type {!Array<!Object>} */
     var enemySpawns = [];
 
-    //----------------------------------------------------------------------
-    // HJÄLPFUNKTION: bygg stenplattform av tiles
-    //----------------------------------------------------------------------
-
+    /**
+     * Builds a stone platform using tiles.
+     *
+     * @param {number} px
+     * @param {number} py
+     * @param {number} widthTiles
+     * @return {!Array<!rune.display.Graphic>}
+     */
     var buildStonePlatform = (function(_this) {
 
+        /**
+         * @param {number} px
+         * @param {number} py
+         * @param {number} widthTiles
+         * @return {!Array<!rune.display.Graphic>}
+         */
         return function(px, py, widthTiles) {
 
+            /** @type {!Array<!rune.display.Graphic>} */
             var group = [];
 
             for (var i = 0; i < widthTiles; i++) {
@@ -51,9 +96,8 @@ runmysteriet.segments.Segment_2.prototype.ground = function(stage, startX) {
     })(this);
 
     //----------------------------------------------------------------------
-    // FÖRSTA MARK
-    //----------------------------------------------------------------------
 
+    // START PLATFORM
     buildStonePlatform(x, this.groundY, 8);
 
     enemySpawns.push({
@@ -65,9 +109,8 @@ runmysteriet.segments.Segment_2.prototype.ground = function(stage, startX) {
     x += 8 * this.tileW;
 
     //----------------------------------------------------------------------
-    // STORT HÅL
-    //----------------------------------------------------------------------
 
+    // LARGE HOLE SECTION
     var holeWidth = 520;
 
     var hole = new runmysteriet.ui.graphic.Hole(
@@ -81,9 +124,8 @@ runmysteriet.segments.Segment_2.prototype.ground = function(stage, startX) {
     holes.push(hole);
 
     //----------------------------------------------------------------------
-    // SMÅ PLATTFORMAR ÖVER HÅLET (STONE TILES)
-    //----------------------------------------------------------------------
 
+    // MID AIR PLATFORM SECTION
     var platformCount = 5;
     var spacing = 110;
 
@@ -92,10 +134,10 @@ runmysteriet.segments.Segment_2.prototype.ground = function(stage, startX) {
         var px = x + 30 + (i * spacing);
         var py = this.groundY - (60 + (i % 2) * 40);
 
-        // små 2-tile plattformar
         buildStonePlatform(px, py, 2);
 
         if (i % 2 === 0) {
+
             enemySpawns.push({
                 type: "kristen",
                 x: px + 20,
@@ -105,9 +147,8 @@ runmysteriet.segments.Segment_2.prototype.ground = function(stage, startX) {
     }
 
     //----------------------------------------------------------------------
-    // LANDNING EFTER HÅL
-    //----------------------------------------------------------------------
 
+    // LANDING PLATFORM
     x += holeWidth;
 
     buildStonePlatform(x, this.groundY, 8);
@@ -121,9 +162,8 @@ runmysteriet.segments.Segment_2.prototype.ground = function(stage, startX) {
     x += 8 * this.tileW;
 
     //----------------------------------------------------------------------
-    // EXTRA PLATTFORM
-    //----------------------------------------------------------------------
 
+    // FINAL PLATFORM
     buildStonePlatform(x, this.groundY, 6);
 
     enemySpawns.push({
@@ -134,8 +174,6 @@ runmysteriet.segments.Segment_2.prototype.ground = function(stage, startX) {
 
     x += 6 * this.tileW;
 
-    //----------------------------------------------------------------------
-    // RETURN
     //----------------------------------------------------------------------
 
     return {

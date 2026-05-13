@@ -34,7 +34,8 @@ runmysteriet.handler.PlatformHandler.prototype.init = function(levelNumber) {
         runmysteriet.segments.Segment_3,
         runmysteriet.segments.Segment_4,
         runmysteriet.segments.Segment_5,
-        runmysteriet.segments.Segment_6
+        runmysteriet.segments.Segment_6,
+        runmysteriet.segments.Segment_End
     ];
 
     //

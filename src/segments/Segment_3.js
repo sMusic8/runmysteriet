@@ -1,29 +1,68 @@
 //------------------------------------------------------------------------------
-// SEGMENT 1
+// SEGMENT 3
 //------------------------------------------------------------------------------
 
+/**
+ * Segment 3 constructor.
+ * Defines tile size and ground settings for this level segment.
+ *
+ * @constructor
+ */
 runmysteriet.segments.Segment_3 = function() {
+
+    /** @type {number} */
     this.tileSize = 268;
+
+    /** @type {number} */
     this.groundY = 200;
 
+    /** @type {number} */
     this.tileW = 32;
+
+    /** @type {number} */
     this.tileH = 20;
+
+    console.log("Segment 3");
 };
 
+/**
+ * Generates the ground layout for Segment 3.
+ *
+ * @param {!rune.display.Stage} stage
+ * @param {number=} startX
+ * @return {{
+ *   platforms: !Array<!rune.display.Graphic>,
+ *   holes: !Array<!runmysteriet.ui.graphic.Hole>,
+ *   enemySpawns: !Array<!Object>,
+ *   endX: number
+ * }}
+ */
 runmysteriet.segments.Segment_3.prototype.ground = function(stage, startX) {
 
+    /** @type {number} */
     var x = startX || 0;
 
+    /** @type {!Array<!rune.display.Graphic>} */
     var platforms = [];
+
+    /** @type {!Array<!runmysteriet.ui.graphic.Hole>} */
     var holes = [];
+
+    /** @type {!Array<!Object>} */
     var enemySpawns = [];
 
-    //----------------------------------------------------------------------
-    // GRÄS (MARK)
-    //----------------------------------------------------------------------
-
+    /**
+     * Builds grass tiles.
+     *
+     * @param {number} px
+     * @param {number} py
+     * @param {number} tiles
+     * @param {!runmysteriet.segments.Segment_3} _this
+     */
     function buildGrass(px, py, tiles, _this) {
+
         for (var i = 0; i < tiles; i++) {
+
             var tile = new rune.display.Graphic(
                 px + (i * _this.tileW),
                 py,
@@ -31,33 +70,40 @@ runmysteriet.segments.Segment_3.prototype.ground = function(stage, startX) {
                 _this.tileH,
                 "bana-gras1"
             );
+
             stage.addChild(tile);
             platforms.push(tile);
         }
     }
 
-    //----------------------------------------------------------------------
-    // STEN (SMÅ BLOCK)
-    //----------------------------------------------------------------------
-
+    /**
+     * Builds stone platform tiles.
+     *
+     * @param {number} px
+     * @param {number} py
+     * @param {number} tiles
+     * @param {!runmysteriet.segments.Segment_3} _this
+     */
     function buildStone(px, py, tiles, _this) {
+
         for (var i = 0; i < tiles; i++) {
+
             var tile = new rune.display.Graphic(
                 px + (i * _this.tileW),
                 py,
                 _this.tileW,
                 _this.tileH,
-                "tree_block" // 🔥 ändrad till stone
+                "tree_block"
             );
+
             stage.addChild(tile);
             platforms.push(tile);
         }
     }
 
     //----------------------------------------------------------------------
-    // MARK
-    //----------------------------------------------------------------------
 
+    // START PLATFORM (GRASS)
     buildGrass(x, this.groundY, 8, this);
 
     enemySpawns.push({
@@ -69,9 +115,8 @@ runmysteriet.segments.Segment_3.prototype.ground = function(stage, startX) {
     x += 8 * this.tileW;
 
     //----------------------------------------------------------------------
-    // HÅL
-    //----------------------------------------------------------------------
 
+    // HOLE SECTION
     var holeWidth = 520;
 
     var hole = new runmysteriet.ui.graphic.Hole(
@@ -85,23 +130,20 @@ runmysteriet.segments.Segment_3.prototype.ground = function(stage, startX) {
     holes.push(hole);
 
     //----------------------------------------------------------------------
-    // TRAPPA AV SMÅ BLOCK 🔥
-    //----------------------------------------------------------------------
 
+    // STAIR PLATFORM (STONE)
     var steps = 6;
 
     for (var i = 0; i < steps; i++) {
 
         var px = x + 40 + (i * 80);
 
-        // varje steg högre upp
         var py = this.groundY - (40 + i * 25);
 
-        // små block (1–2 tiles)
         buildStone(px, py, 2, this);
 
-        // fiender på vissa steg
         if (i === 2 || i === 4) {
+
             enemySpawns.push({
                 type: "kristen",
                 x: px + 10,
@@ -111,9 +153,8 @@ runmysteriet.segments.Segment_3.prototype.ground = function(stage, startX) {
     }
 
     //----------------------------------------------------------------------
-    // LANDNING
-    //----------------------------------------------------------------------
 
+    // LANDING PLATFORM
     x += holeWidth;
 
     buildGrass(x, this.groundY, 8, this);
@@ -127,9 +168,8 @@ runmysteriet.segments.Segment_3.prototype.ground = function(stage, startX) {
     x += 8 * this.tileW;
 
     //----------------------------------------------------------------------
-    // EXTRA MARK
-    //----------------------------------------------------------------------
 
+    // EXTRA GROUND
     buildGrass(x, this.groundY, 6, this);
 
     enemySpawns.push({
@@ -140,8 +180,6 @@ runmysteriet.segments.Segment_3.prototype.ground = function(stage, startX) {
 
     x += 6 * this.tileW;
 
-    //----------------------------------------------------------------------
-    // RETURN
     //----------------------------------------------------------------------
 
     return {

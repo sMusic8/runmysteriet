@@ -2,26 +2,61 @@
 // SEGMENT 1
 //------------------------------------------------------------------------------
 
+/**
+ * Segment_1 constructor.
+ * @constructor
+ */
 runmysteriet.segments.Segment_1 = function() {
+
+    /** @type {number} */
     this.tileSize = 268;
+
+    /** @type {number} */
     this.groundY = 200;
 
+    /** @type {number} */
     this.tileW = 32;
+
+    /** @type {number} */
     this.tileH = 20;
+
+    console.log("Segment 1");
 };
 
+/**
+ * Generates ground for Segment 1.
+ *
+ * @param {!rune.display.Stage} stage
+ * @param {number=} startX
+ * @return {{
+ *   platforms: !Array<!rune.display.Graphic>,
+ *   holes: !Array<!runmysteriet.ui.graphic.Hole>,
+ *   enemySpawns: !Array<!Object>,
+ *   endX: number
+ * }}
+ */
 runmysteriet.segments.Segment_1.prototype.ground = function(stage, startX) {
 
+    /** @type {number} */
     var x = startX || 0;
 
+    /** @type {!Array<!rune.display.Graphic>} */
     var platforms = [];
+
+    /** @type {!Array<!runmysteriet.ui.graphic.Hole>} */
     var holes = [];
+
+    /** @type {!Array<!Object>} */
     var enemySpawns = [];
 
-    //----------------------------------------------------------------------
-    // HJÄLPFUNKTION: GRÄS (MARK)
-    //----------------------------------------------------------------------
-
+    /**
+     * Builds grass tiles.
+     *
+     * @param {number} px
+     * @param {number} py
+     * @param {number} tiles
+     * @param {!runmysteriet.segments.Segment_1} _this
+     */
     function buildGrass(px, py, tiles, _this) {
 
         for (var i = 0; i < tiles; i++) {
@@ -39,10 +74,14 @@ runmysteriet.segments.Segment_1.prototype.ground = function(stage, startX) {
         }
     }
 
-    //----------------------------------------------------------------------
-    // HJÄLPFUNKTION: STEN (HOPPPLATTFORM)
-    //----------------------------------------------------------------------
-
+    /**
+     * Builds stone tiles.
+     *
+     * @param {number} px
+     * @param {number} py
+     * @param {number} tiles
+     * @param {!runmysteriet.segments.Segment_1} _this
+     */
     function buildStone(px, py, tiles, _this) {
 
         for (var i = 0; i < tiles; i++) {
@@ -61,8 +100,6 @@ runmysteriet.segments.Segment_1.prototype.ground = function(stage, startX) {
     }
 
     //----------------------------------------------------------------------
-    // MARK
-    //----------------------------------------------------------------------
 
     buildGrass(x, this.groundY, 8, this);
 
@@ -74,8 +111,6 @@ runmysteriet.segments.Segment_1.prototype.ground = function(stage, startX) {
 
     x += 8 * this.tileW;
 
-    //----------------------------------------------------------------------
-    // HÅL
     //----------------------------------------------------------------------
 
     var holeWidth = 520;
@@ -91,8 +126,6 @@ runmysteriet.segments.Segment_1.prototype.ground = function(stage, startX) {
     holes.push(hole);
 
     //----------------------------------------------------------------------
-    // HOPPPLATTFORMAR (STEN - ANNORLUNDA)
-    //----------------------------------------------------------------------
 
     var count = 6;
     var spacing = 95;
@@ -100,11 +133,8 @@ runmysteriet.segments.Segment_1.prototype.ground = function(stage, startX) {
     for (var i = 0; i < count; i++) {
 
         var px = x + 30 + (i * spacing);
-
-        // lite variation i höjd
         var py = this.groundY - (70 + (i % 3) * 30);
 
-        // sten istället för gräs
         buildStone(px, py, 2, this);
 
         if (i % 2 === 0) {
@@ -116,8 +146,6 @@ runmysteriet.segments.Segment_1.prototype.ground = function(stage, startX) {
         }
     }
 
-    //----------------------------------------------------------------------
-    // LANDNING
     //----------------------------------------------------------------------
 
     x += holeWidth;
@@ -133,8 +161,6 @@ runmysteriet.segments.Segment_1.prototype.ground = function(stage, startX) {
     x += 8 * this.tileW;
 
     //----------------------------------------------------------------------
-    // EXTRA MARK (lite variation)
-    //----------------------------------------------------------------------
 
     buildGrass(x, this.groundY, 6, this);
 
@@ -146,8 +172,6 @@ runmysteriet.segments.Segment_1.prototype.ground = function(stage, startX) {
 
     x += 6 * this.tileW;
 
-    //----------------------------------------------------------------------
-    // RETURN
     //----------------------------------------------------------------------
 
     return {

@@ -1,14 +1,14 @@
 //------------------------------------------------------------------------------
-// SEGMENT 5
+// SEGMENT END
 //------------------------------------------------------------------------------
 
 /**
- * Segment 5 constructor.
- * Contains alternating holes and stone platform sections.
+ * Segment_End constructor.
+ * Final level segment with ascending staircase structure.
  *
  * @constructor
  */
-runmysteriet.segments.Segment_5 = function() {
+runmysteriet.segments.Segment_End = function() {
 
     /** @type {number} */
     this.tileSize = 268;
@@ -22,22 +22,22 @@ runmysteriet.segments.Segment_5 = function() {
     /** @type {number} */
     this.tileH = 20;
 
-    console.log("Segment 5");
+    console.log("Segment end");
 };
 
 /**
- * Generates Segment 5 ground layout.
+ * Generates end segment terrain.
  *
  * @param {!rune.display.Stage} stage
  * @param {number=} startX
  * @return {{
  *   platforms: !Array<!rune.display.Graphic>,
- *   holes: !Array<!runmysteriet.ui.graphic.Hole>,
+ *   holes: !Array<!Object>,
  *   enemySpawns: !Array<!Object>,
  *   endX: number
  * }}
  */
-runmysteriet.segments.Segment_5.prototype.ground = function(stage, startX) {
+runmysteriet.segments.Segment_End.prototype.ground = function(stage, startX) {
 
     /** @type {number} */
     var x = startX || 0;
@@ -45,21 +45,22 @@ runmysteriet.segments.Segment_5.prototype.ground = function(stage, startX) {
     /** @type {!Array<!rune.display.Graphic>} */
     var platforms = [];
 
-    /** @type {!Array<!runmysteriet.ui.graphic.Hole>} */
+    /** @type {!Array<!Object>} */
     var holes = [];
 
     /** @type {!Array<!Object>} */
     var enemySpawns = [];
 
     /**
-     * Builds grass tiles.
+     * Builds a horizontal platform using tiles.
      *
      * @param {number} px
      * @param {number} py
      * @param {number} tiles
-     * @param {!runmysteriet.segments.Segment_5} _this
+     * @param {!runmysteriet.segments.Segment_End} _this
+     * @param {string} texture
      */
-    function buildGrass(px, py, tiles, _this) {
+    function build(px, py, tiles, _this, texture) {
 
         for (var i = 0; i < tiles; i++) {
 
@@ -68,7 +69,7 @@ runmysteriet.segments.Segment_5.prototype.ground = function(stage, startX) {
                 py,
                 _this.tileW,
                 _this.tileH,
-                "bana-gras1"
+                texture
             );
 
             stage.addChild(tile);
@@ -76,66 +77,46 @@ runmysteriet.segments.Segment_5.prototype.ground = function(stage, startX) {
         }
     }
 
-    /**
-     * Builds stone tiles.
-     *
-     * @param {number} px
-     * @param {number} py
-     * @param {number} tiles
-     * @param {!runmysteriet.segments.Segment_5} _this
-     */
-    function buildStone(px, py, tiles, _this) {
+    //----------------------------------------------------------------------
 
-        for (var i = 0; i < tiles; i++) {
-
-            var tile = new rune.display.Graphic(
-                px + (i * _this.tileW),
-                py,
-                _this.tileW,
-                _this.tileH,
-                "stone_block"
-            );
-
-            stage.addChild(tile);
-            platforms.push(tile);
-        }
-    }
+    /** @type {string} */
+    var texture = "wood_block";
 
     //----------------------------------------------------------------------
 
     // START PLATFORM
-    buildGrass(x, this.groundY, 4, this);
-    x += 4 * this.tileW;
+    build(x, this.groundY, 8, this, texture);
+    x += 8 * this.tileW;
 
     //----------------------------------------------------------------------
 
-    // HOLE + PLATFORM LOOP
-    for (var i = 0; i < 3; i++) {
+    // STAIR STEP 1 (LOW)
+    var stepSpacingX = 140;
+    var stepSpacingY = 55;
 
-        var hole = new runmysteriet.ui.graphic.Hole(
-            x,
-            this.groundY,
-            180,
-            200
-        );
+    /** @type {number} */
+    var startY = this.groundY;
 
-        stage.addChild(hole);
-        holes.push(hole);
-
-        x += 180;
-
-        var py = this.groundY - (i * 30);
-
-        buildStone(x, py, 3, this);
-
-        x += 3 * this.tileW;
-    }
+    build(x, startY, 6, this, texture);
+    x += stepSpacingX;
 
     //----------------------------------------------------------------------
 
-    // END PLATFORM
-    buildGrass(x, this.groundY, 6, this);
-    x += 6 * this.tileW;
+    // STAIR STEP 2 (MID)
+    build(x, startY - stepSpacingY, 6, this, texture);
+    x += stepSpacingX;
+
+    //----------------------------------------------------------------------
+
+    // STAIR STEP 3 (HIGH)
+    build(x, startY - (stepSpacingY * 2), 6, this, texture);
+    x += stepSpacingX;
+
+    //----------------------------------------------------------------------
+
+    // FINAL PLATFORM (TOP LANDING)
+    build(x, startY - (stepSpacingY * 2), 8, this, texture);
+    x += 8 * this.tileW;
 
     //----------------------------------------------------------------------
 
