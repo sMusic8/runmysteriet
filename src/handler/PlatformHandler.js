@@ -16,7 +16,10 @@ runmysteriet.handler.PlatformHandler = function(stage, screenWidth) {
     this.levelWidth = 0;
 };
 
-//här initieras platformhandlern och bygger upp leveln genom att loopa igenom segmenten och lägga till plattformar, hål, fiendespawns, vattenområden och båtar.
+//------------------------------------------------------------------------------
+// PLATFORM HANDLER INIT
+//------------------------------------------------------------------------------
+
 runmysteriet.handler.PlatformHandler.prototype.init = function(levelNumber) {
     levelNumber = levelNumber || 1;
 
@@ -27,29 +30,60 @@ runmysteriet.handler.PlatformHandler.prototype.init = function(levelNumber) {
     this.levelWidth = 0;
     this.boats = [];
 
-    var segmentTypes = [
-        runmysteriet.segments.Segment_Water,
+    var x = 0;
+
+    //--------------------------------------------------------------------------
+    // SEGMENTS
+    //--------------------------------------------------------------------------
+
+    var waterSegment = runmysteriet.segments.Segment_Water;
+
+    var segments = [
         runmysteriet.segments.Segment_1,
         runmysteriet.segments.Segment_2,
         runmysteriet.segments.Segment_3,
         runmysteriet.segments.Segment_4,
         runmysteriet.segments.Segment_5,
-        runmysteriet.segments.Segment_6,
-        runmysteriet.segments.Segment_End
+        runmysteriet.segments.Segment_6
     ];
 
-    //
-    var segmentCount = 4 + Math.floor((levelNumber - 1) / 5);
+    var endSegment = runmysteriet.segments.Segment_End;
 
-    if (segmentCount > 20) {
-        segmentCount = 20;
+    //--------------------------------------------------------------------------
+    // shuffle (alla segment används exakt en gång)
+    //--------------------------------------------------------------------------
+
+    for (var i = segments.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var temp = segments[i];
+        segments[i] = segments[j];
+        segments[j] = temp;
     }
 
-    var x = 0;
-//här loopas igenom segmenten och bygger upp leveln
-    for (var i = 0; i < segmentCount; i++) {
-        var segmentIndex = (levelNumber + i - 1) % segmentTypes.length;
-        var SegmentClass = segmentTypes[segmentIndex];
+    //--------------------------------------------------------------------------
+    // WATER FÖRST
+    //--------------------------------------------------------------------------
+
+    if (waterSegment) {
+        var water = new waterSegment();
+        var waterResult = water.ground(this.stage, x);
+
+        this.addPlatforms(waterResult.platforms);
+        this.addHoles(waterResult.holes);
+        this.addEnemySpawns(waterResult.enemySpawns);
+        this.addWaterAreas(waterResult.waterAreas || []);
+        this.addBoats(waterResult.boats || []);
+
+        x = waterResult.endX;
+    }
+
+    //--------------------------------------------------------------------------
+    // ALLA SEGMENT EXACT ONCE
+    //--------------------------------------------------------------------------
+
+    for (var k = 0; k < segments.length; k++) {
+
+        var SegmentClass = segments[k];
         var segment = new SegmentClass();
 
         var result = segment.ground(this.stage, x);
@@ -58,14 +92,33 @@ runmysteriet.handler.PlatformHandler.prototype.init = function(levelNumber) {
         this.addHoles(result.holes);
         this.addEnemySpawns(result.enemySpawns);
         this.addWaterAreas(result.waterAreas || []);
-        this.addBoats(result.boats || []);  
+        this.addBoats(result.boats || []);
+
         x = result.endX;
     }
-console.log("segmentCount:", segmentCount);
-console.log("segmentTypes:", segmentTypes);
-    this.levelWidth = x;
-};
 
+    //--------------------------------------------------------------------------
+    // END SIST
+    //--------------------------------------------------------------------------
+
+    if (endSegment) {
+
+        var end = new endSegment();
+        var endResult = end.ground(this.stage, x);
+
+        this.addPlatforms(endResult.platforms);
+        this.addHoles(endResult.holes);
+        this.addEnemySpawns(endResult.enemySpawns);
+        this.addWaterAreas(endResult.waterAreas || []);
+        this.addBoats(endResult.boats || []);
+
+        x = endResult.endX;
+    }
+
+    this.levelWidth = x;
+
+    console.log("levelWidth:", this.levelWidth);
+};
 
 runmysteriet.handler.PlatformHandler.prototype.addPlatforms = function(platforms) {
     if (!platforms) {

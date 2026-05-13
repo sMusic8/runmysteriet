@@ -80,7 +80,7 @@ runmysteriet.segments.Segment_End.prototype.ground = function(stage, startX) {
     //----------------------------------------------------------------------
 
     /** @type {string} */
-    var texture = "wood_block";
+    var texture = "tree_block";
 
     //----------------------------------------------------------------------
 
