@@ -1,87 +1,147 @@
-
-
+//------------------------------------------------------------------------------
+// SEGMENT 2
+//------------------------------------------------------------------------------
 
 runmysteriet.segments.Segment_2 = function() {
     this.tileSize = 268;
     this.groundY = 220;
     this.holeHeight = 200;
+
+    // 🔥 storlek på varje stone tile
+    this.tileW = 32;
+    this.tileH = 20;
 };
 
 runmysteriet.segments.Segment_2.prototype.ground = function(stage, startX) {
-    var x = startX;
+
+    var x = startX || 0;
+
     var platforms = [];
     var holes = [];
     var enemySpawns = [];
 
-    var platform1 = new runmysteriet.ui.Platform();
-    platform1.x = x;
-    platform1.y = this.groundY;
-    stage.addChild(platform1);
-    platforms.push(platform1);
+    //----------------------------------------------------------------------
+    // HJÄLPFUNKTION: bygg stenplattform av tiles
+    //----------------------------------------------------------------------
 
-    x += this.tileSize;
+    var buildStonePlatform = (function(_this) {
 
-    enemySpawns.push({
-    type: "kristen",
-    x: x + 90,
-    y: this.groundY - 35
-});
+        return function(px, py, widthTiles) {
 
+            var group = [];
+
+            for (var i = 0; i < widthTiles; i++) {
+
+                var tile = new rune.display.Graphic(
+                    px + (i * _this.tileW),
+                    py,
+                    _this.tileW,
+                    _this.tileH,
+                    "stone_block"
+                );
+
+                stage.addChild(tile);
+                platforms.push(tile);
+                group.push(tile);
+            }
+
+            return group;
+        };
+
+    })(this);
+
+    //----------------------------------------------------------------------
+    // FÖRSTA MARK
+    //----------------------------------------------------------------------
+
+    buildStonePlatform(x, this.groundY, 8);
 
     enemySpawns.push({
         type: "kristen",
-        x: x + 210,
+        x: x + 120,
         y: this.groundY - 40
     });
-    var hole1 = new runmysteriet.ui.graphic.Hole(
+
+    x += 8 * this.tileW;
+
+    //----------------------------------------------------------------------
+    // STORT HÅL
+    //----------------------------------------------------------------------
+
+    var holeWidth = 520;
+
+    var hole = new runmysteriet.ui.graphic.Hole(
         x,
         this.groundY,
-        60,
+        holeWidth,
         this.holeHeight
     );
 
-    stage.addChild(hole1);
-    holes.push(hole1);
+    stage.addChild(hole);
+    holes.push(hole);
 
-    x += hole1.width;
+    //----------------------------------------------------------------------
+    // SMÅ PLATTFORMAR ÖVER HÅLET (STONE TILES)
+    //----------------------------------------------------------------------
 
-    var platform2 = new runmysteriet.ui.Platform();
-    platform2.x = x;
-    platform2.y = this.groundY;
-    stage.addChild(platform2);
-    platforms.push(platform2);
+    var platformCount = 5;
+    var spacing = 110;
+
+    for (var i = 0; i < platformCount; i++) {
+
+        var px = x + 30 + (i * spacing);
+        var py = this.groundY - (60 + (i % 2) * 40);
+
+        // små 2-tile plattformar
+        buildStonePlatform(px, py, 2);
+
+        if (i % 2 === 0) {
+            enemySpawns.push({
+                type: "kristen",
+                x: px + 20,
+                y: py - 35
+            });
+        }
+    }
+
+    //----------------------------------------------------------------------
+    // LANDNING EFTER HÅL
+    //----------------------------------------------------------------------
+
+    x += holeWidth;
+
+    buildStonePlatform(x, this.groundY, 8);
 
     enemySpawns.push({
-    type: "kristen",
-    x: x + 100,
-    y: this.groundY - 40
-});
+        type: "kristen",
+        x: x + 120,
+        y: this.groundY - 40
+    });
+
+    x += 8 * this.tileW;
+
+    //----------------------------------------------------------------------
+    // EXTRA PLATTFORM
+    //----------------------------------------------------------------------
+
+    buildStonePlatform(x, this.groundY, 6);
 
     enemySpawns.push({
-    type: "kristen",
-    x: x + 190,
-    y: this.groundY - 40
-});
-    x += this.tileSize;
+        type: "kristen",
+        x: x + 80,
+        y: this.groundY - 40
+    });
 
-    var platform3 = new runmysteriet.ui.Platform();
-    platform3.x = x;
-    platform3.y = this.groundY;
-    stage.addChild(platform3);
-    platforms.push(platform3);
+    x += 6 * this.tileW;
 
-    enemySpawns.push({
-    type: "kristen",
-    x: x + 140,
-    y: this.groundY - 40
-});
+    //----------------------------------------------------------------------
+    // RETURN
+    //----------------------------------------------------------------------
 
-    x += this.tileSize;
-
-  return {
-    platforms: platforms,
-    holes: holes,
-    enemySpawns: enemySpawns,
-    endX: x
-};
+    return {
+        platforms: platforms,
+        holes: holes,
+        enemySpawns: enemySpawns,
+        endX: x
+    };
 };

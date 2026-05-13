@@ -1,37 +1,70 @@
-//segment 1 - första del av bana
-
 //------------------------------------------------------------------------------
 // SEGMENT 1
 //------------------------------------------------------------------------------
 
 runmysteriet.segments.Segment_1 = function() {
-    console.log("Bacon")
     this.tileSize = 268;
     this.groundY = 220;
-    this.holeHeight = 200;
+
+    this.tileW = 32;
+    this.tileH = 20;
 };
 
-//------------------------------------------------------------------------------
-// GROUND
-//------------------------------------------------------------------------------
-
 runmysteriet.segments.Segment_1.prototype.ground = function(stage, startX) {
-    
+
     var x = startX || 0;
 
     var platforms = [];
     var holes = [];
     var enemySpawns = [];
 
+    //----------------------------------------------------------------------
+    // HJÄLPFUNKTION: GRÄS (MARK)
+    //----------------------------------------------------------------------
 
-    //--------------------------------------------------------------------------
-    // FÖRSTA PLATTFORMEN
-    //--------------------------------------------------------------------------
+    function buildGrass(px, py, tiles, _this) {
 
-    var platform1 = new runmysteriet.ui.Platform(x, this.groundY);
+        for (var i = 0; i < tiles; i++) {
 
-    stage.addChild(platform1);
-    platforms.push(platform1);
+            var tile = new rune.display.Graphic(
+                px + (i * _this.tileW),
+                py,
+                _this.tileW,
+                _this.tileH,
+                "grass_block"
+            );
+
+            stage.addChild(tile);
+            platforms.push(tile);
+        }
+    }
+
+    //----------------------------------------------------------------------
+    // HJÄLPFUNKTION: STEN (HOPPPLATTFORM)
+    //----------------------------------------------------------------------
+
+    function buildStone(px, py, tiles, _this) {
+
+        for (var i = 0; i < tiles; i++) {
+
+            var tile = new rune.display.Graphic(
+                px + (i * _this.tileW),
+                py,
+                _this.tileW,
+                _this.tileH,
+                "grass_block"
+            );
+
+            stage.addChild(tile);
+            platforms.push(tile);
+        }
+    }
+
+    //----------------------------------------------------------------------
+    // MARK
+    //----------------------------------------------------------------------
+
+    buildGrass(x, this.groundY, 8, this);
 
     enemySpawns.push({
         type: "kristen",
@@ -39,82 +72,83 @@ runmysteriet.segments.Segment_1.prototype.ground = function(stage, startX) {
         y: this.groundY - 40
     });
 
-    enemySpawns.push({
-        type: "kristen",
-        x: x + 210,
-        y: this.groundY - 40
-    });
+    x += 8 * this.tileW;
 
-    x += this.tileSize;
-
-    //--------------------------------------------------------------------------
-    // ANDRA PLATTFORMEN
-    //--------------------------------------------------------------------------
-
-    var platform2 = new runmysteriet.ui.Platform(x, this.groundY);
-
-    stage.addChild(platform2);
-    platforms.push(platform2);
-
-    x += this.tileSize;
-
-    //--------------------------------------------------------------------------
+    //----------------------------------------------------------------------
     // HÅL
-    //--------------------------------------------------------------------------
+    //----------------------------------------------------------------------
 
-    var holeX = x;
+    var holeWidth = 520;
 
     var hole = new runmysteriet.ui.graphic.Hole(
-        holeX,
+        x,
         this.groundY,
-        40,
-        this.holeHeight
+        holeWidth,
+        200
     );
 
     stage.addChild(hole);
     holes.push(hole);
 
     //----------------------------------------------------------------------
-    // FLERA LUFTPLATTFORMAR (NU FUNGERAR)
+    // HOPPPLATTFORMAR (STEN - ANNORLUNDA)
     //----------------------------------------------------------------------
 
-    var airPlatform1 = new runmysteriet.ui.Platform(
-        holeX - 120,
-        this.groundY - 80
-    );
+    var count = 6;
+    var spacing = 95;
 
-    var airPlatform2 = new runmysteriet.ui.Platform(
-        holeX + 40,
-        this.groundY - 140
-    );
+    for (var i = 0; i < count; i++) {
 
-    var airPlatform3 = new runmysteriet.ui.Platform(
-        holeX + 200,
-        this.groundY - 100
-    );
+        var px = x + 30 + (i * spacing);
 
-    stage.addChild(airPlatform1);
-    stage.addChild(airPlatform2);
-    stage.addChild(airPlatform3);
+        // lite variation i höjd
+        var py = this.groundY - (70 + (i % 3) * 30);
 
-    platforms.push(airPlatform1, airPlatform2, airPlatform3);
+        // sten istället för gräs
+        buildStone(px, py, 2, this);
 
-    x += hole.width;
+        if (i % 2 === 0) {
+            enemySpawns.push({
+                type: "kristen",
+                x: px + 20,
+                y: py - 35
+            });
+        }
+    }
 
-    //--------------------------------------------------------------------------
-    // TREDJE PLATTFORMEN
-    //--------------------------------------------------------------------------
+    //----------------------------------------------------------------------
+    // LANDNING
+    //----------------------------------------------------------------------
 
-    var platform3 = new runmysteriet.ui.Platform(x, this.groundY);
+    x += holeWidth;
 
-    stage.addChild(platform3);
-    platforms.push(platform3);
+    buildGrass(x, this.groundY, 8, this);
 
-    x += this.tileSize;
-//console.log(platforms)
-    //--------------------------------------------------------------------------
-    // RETURNERA SEGMENTETS DATA
-    //--------------------------------------------------------------------------
+    enemySpawns.push({
+        type: "kristen",
+        x: x + 120,
+        y: this.groundY - 40
+    });
+
+    x += 8 * this.tileW;
+
+    //----------------------------------------------------------------------
+    // EXTRA MARK (lite variation)
+    //----------------------------------------------------------------------
+
+    buildGrass(x, this.groundY, 6, this);
+
+    enemySpawns.push({
+        type: "kristen",
+        x: x + 80,
+        y: this.groundY - 40
+    });
+
+    x += 6 * this.tileW;
+
+    //----------------------------------------------------------------------
+    // RETURN
+    //----------------------------------------------------------------------
 
     return {
         platforms: platforms,
