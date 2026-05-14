@@ -45,6 +45,10 @@ runmysteriet.handler.PlayerHandler = function(stage, platformHandler, applicatio
 
     /** @type {!Array<!Object>} */
     this.attacks = [];
+
+    /// Kameran behöver referens till spelare för att kunna följa dem.
+    /** @type {?rune.camera.Camera} */
+    this.camera = null;
 };
 
 //------------------------------------------------------------------------------
@@ -113,6 +117,7 @@ runmysteriet.handler.PlayerHandler.prototype.update = function() {
     this.updateInput();
     this.updateMovement();
     this.updateCollisions();
+    this.keepPlayersInsideLevel();
     this.updateAttacks();
 
 
@@ -191,6 +196,46 @@ runmysteriet.handler.PlayerHandler.prototype.updateMovement = function() {
         player.y += player.velocityY;
 
         player.isOnGround = false;
+    }
+};
+
+//------------------------------------------------------------------------------
+// LEVEL BOUNDS
+//------------------------------------------------------------------------------
+
+runmysteriet.handler.PlayerHandler.prototype.keepPlayersInsideLevel = function() {
+
+    var i = 0;
+    var player = null;
+    var maxX = 0;
+
+    if (!this.platformHandler || !this.platformHandler.levelWidth) {
+        return;
+    }
+
+    for (i = 0; i < this.players.length; i++) {
+
+        player = this.players[i];
+
+        if (!player || player.isDead === true) {
+            continue;
+        }
+
+        /*
+         * Stoppa spelaren från att gå utanför vänster sida.
+         */
+        if (player.x < 0) {
+            player.x = 0;
+        }
+
+        /*
+         * Stoppa spelaren från att gå utanför höger sida av leveln.
+         */
+        maxX = this.platformHandler.levelWidth - player.width;
+
+        if (player.x > maxX) {
+            player.x = maxX;
+        }
     }
 };
 
@@ -637,6 +682,66 @@ runmysteriet.handler.PlayerHandler.prototype.updateAttacks = function() {
 runmysteriet.handler.PlayerHandler.prototype.setEnemyHandler = function(enemyHandler) {
 
     this.enemyHandler = enemyHandler;
+};
+
+//------------------------------------------------------------------------------
+// CAMERA
+//------------------------------------------------------------------------------
+
+/**
+ * Kopplar kameran till PlayerHandler.
+ *
+ * @param {!rune.camera.Camera} camera
+ * @return {void}
+ */
+runmysteriet.handler.PlayerHandler.prototype.setCamera = function(camera) {
+
+    this.camera = camera;
+};
+
+/**
+ * Hindrar levande spelare från att lämna kamerans synliga område.
+ * Detta gör att spelarna inte kan gå ifrån varandra.
+ *
+ * @return {void}
+ */
+runmysteriet.handler.PlayerHandler.prototype.keepPlayersInsideCamera = function() {
+
+    var i = 0;
+    var player = null;
+    var leftLimit = 0;
+    var rightLimit = 0;
+    var margin = 8;
+
+    if (!this.camera || !this.camera.viewport) {
+        return;
+    }
+
+    leftLimit = this.camera.viewport.x + margin;
+    rightLimit = this.camera.viewport.x + this.camera.viewport.width - margin;
+
+    for (i = 0; i < this.players.length; i++) {
+
+        player = this.players[i];
+
+        if (!player || player.isDead === true) {
+            continue;
+        }
+
+        /*
+         * Stoppa spelaren från att lämna kamerans vänstra sida.
+         */
+        if (player.x < leftLimit) {
+            player.x = leftLimit;
+        }
+
+        /*
+         * Stoppa spelaren från att lämna kamerans högra sida.
+         */
+        if (player.x + player.width > rightLimit) {
+            player.x = rightLimit - player.width;
+        }
+    }
 };
 //------------------------------------------------------------------------------
 // ATTACK EMITTER

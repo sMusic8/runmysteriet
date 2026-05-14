@@ -147,6 +147,8 @@ this.m_playerHandler = new runmysteriet.handler.PlayerHandler(
         this.m_playerHandler,
         this.m_platformHandler.levelWidth
     );
+    // Ge playerHandler referens till kameran så att den kan hålla spelare inom leveln.
+    this.m_playerHandler.setCamera(this.camera);
 
     /*
      * Sköldar / runor
@@ -235,6 +237,11 @@ runmysteriet.scene.Game.prototype.update = function(step) {
     if (this.m_cameraHandler) {
         this.m_cameraHandler.update();
     }
+    
+    if (this.m_playerHandler) {
+    this.m_playerHandler.keepPlayersInsideCamera();
+}
+
 
     if (this.m_backgroundHandler) {
         this.m_backgroundHandler.update();
@@ -288,6 +295,7 @@ runmysteriet.scene.Game.prototype.createHUD = function() {
     this.m_shieldHandler.onCollectedChanged = function(text) {
         if (self.m_runeText) {
             self.m_runeText.text = "RUNOR: " + text;
+            
         }
     };
 }
@@ -646,7 +654,7 @@ runmysteriet.scene.Game.prototype.checkLevelCompletion = function() {
      * Om alla spelare är döda förlorar man.
      */
     if (this.areAllPlayersDead()) {
-        this.loseGame("ALLA SPELARE DOG");
+        this.loseGame("ALLA SPELARE DOG"); 
         return;
     }
 
