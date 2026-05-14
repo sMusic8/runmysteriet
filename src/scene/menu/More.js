@@ -34,6 +34,16 @@ runmysteriet.scene.More.prototype.init = function() {
 
     rune.scene.Scene.prototype.init.call(this);
 
+     this.backgroundMusic = this.application.sounds.sound.get("sound_musicMenu");
+  this.menuSound = this.application.sounds.sound.get("sound_menu");
+  if (this.backgroundMusic) {
+    this.backgroundMusic.loop = true;
+    this.backgroundMusic.volume = 0.5;
+    this.backgroundMusic.play();
+  }
+
+  //If gamepad eller kaybord justpresst ändra nummret på volume med ett steg i en loop
+
     // ✔ FIX: BACKGROUND ONLY
     this.m_background = new rune.display.Graphic(
         0,

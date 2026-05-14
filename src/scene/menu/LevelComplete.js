@@ -71,6 +71,14 @@ runmysteriet.scene.LevelComplete.prototype.init = function() {
     rune.scene.Scene.prototype.init.call(this);
 
     this.menuSound = this.application.sounds.sound.get("sound_menu");
+     this.backgroundMusic = this.application.sounds.sound.get("sound_musicMenu");
+  if (this.backgroundMusic) {
+    this.backgroundMusic.loop = true;
+    this.backgroundMusic.volume = 0.5;
+    this.backgroundMusic.play();
+  }
+
+  //If gamepad eller kaybord justpresst ändra nummret på volume med ett steg i en loop
 
     if (this.levelNumber >= this.maxLevel) {
         titleText = "DU VANN HELA SPELET";

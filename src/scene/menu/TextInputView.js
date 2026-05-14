@@ -70,6 +70,15 @@ runmysteriet.scene.TextInputView.prototype.constructor =
 runmysteriet.scene.TextInputView.prototype.init = function() {
 
     rune.scene.Scene.prototype.init.call(this);
+     this.backgroundMusic = this.application.sounds.sound.get("sound_musicMenu");
+  this.menuSound = this.application.sounds.sound.get("sound_menu");
+  if (this.backgroundMusic) {
+    this.backgroundMusic.loop = true;
+    this.backgroundMusic.volume = 0.5;
+    this.backgroundMusic.play();
+  }
+
+  //If gamepad eller kaybord justpresst ändra nummret på volume med ett steg i en loop
 
     this.m_gameInput = new runmysteriet.input.GameInput(this.application);
 
