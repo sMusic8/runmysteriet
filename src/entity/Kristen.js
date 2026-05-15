@@ -130,6 +130,13 @@ runmysteriet.entity.Kristen.prototype.takeDamage = function (damage) {
   console.log("Kristen tog skada:", damage, "HP kvar:", this.hp);
 
   if (this.hp <= 0) {
+    if (!this.deadSound) {
+        this.deadSound = this.application.sounds.sound.get("sound_enemydead");
+    }
+
+    if (this.deadSound) {
+        this.deadSound.play();
+    }
     this.die();
   }
 };
