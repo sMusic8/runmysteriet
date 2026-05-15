@@ -3,209 +3,171 @@
  *
  * @constructor
  * @extends {rune.display.Sprite}
- * @param {string} texture
- * @param {number=} x
- * @param {number=} y
  */
-runmysteriet.entity.Kristen = function(texture, x, y) {
+runmysteriet.entity.Kristen = function (texture, x, y) {
+  rune.display.Sprite.call(this, x || 0, y || 0, 32, 40, texture);
 
-    rune.display.Sprite.call(
-        this,
-        x || 0,
-        y || 0,
-        32,
-        40,
-        texture
-    );
+  this.hp = 100;
+  this.maxHp = 100;
+  this.hitCooldown = 0;
+  this.hpBar = null;
+  this.isDead = false;
 
-    /** @type {number} */
-    this.hp = 100;
+  /** @type {string} */
+  this.currentHpTexture = "hpbar1";
 
-    /** @type {number} */
-    this.maxHp = 100;
-
-    /** @type {number} */
-    this.hitCooldown = 0;
-
-    /** @type {?rune.display.Sprite} */
-    this.hpBar = null;
-
-    /** @type {boolean} */
-    this.isDead = false;
-
-    if (rune.physics && rune.physics.Space) {
+  if (rune.physics && rune.physics.Space) {
     this.allowCollisions = rune.physics.Space.ANY;
-}
+  }
 
-    // physics flags (engine-specific → behöver externs)
-   // this.allowCollisions = rune.physics.Space.ANY;
-    this.immovable = true;
+  this.immovable = true;
 };
 
-//------------------------------------------------------------------------------
-// INHERITANCE
-//------------------------------------------------------------------------------
-
-runmysteriet.entity.Kristen.prototype = Object.create(rune.display.Sprite.prototype);
-runmysteriet.entity.Kristen.prototype.constructor = runmysteriet.entity.Kristen;
+runmysteriet.entity.Kristen.prototype = Object.create(
+  rune.display.Sprite.prototype
+);
+runmysteriet.entity.Kristen.prototype.constructor =
+  runmysteriet.entity.Kristen;
 
 //------------------------------------------------------------------------------
 // INIT
 //------------------------------------------------------------------------------
 
-/**
- * @return {void}
- */
-runmysteriet.entity.Kristen.prototype.init = function() {
+runmysteriet.entity.Kristen.prototype.init = function () {
+  rune.display.Sprite.prototype.init.call(this);
 
-    rune.display.Sprite.prototype.init.call(this);
+  this.animation.create("start", [0, 1, 2], 3, true);
+  this.animation.gotoAndPlay("start");
 
-    this.animation.create("start", [0, 1, 2], 3, true);
-    this.animation.gotoAndPlay("start");
-
-    /** @type {!rune.display.Sprite} */
-    this.hpBar = new rune.display.Sprite(
-        0,
-        0,
-        32,
-        4,
-        "hpbar"
-    );
-
-    this.hpBar.anchorX = 0;
+  this.hpBar = new rune.display.Graphic(0, 0, 32, 4, "hpbar1");
+  this.hpBar.anchorX = 0;
 };
 
 //------------------------------------------------------------------------------
 // UPDATE
 //------------------------------------------------------------------------------
 
-/**
- * @param {number} step
- * @return {void}
- */
-runmysteriet.entity.Kristen.prototype.update = function(step) {
+runmysteriet.entity.Kristen.prototype.update = function (step) {
+  if (this.isDead) return;
 
-    if (this.isDead) return;
+  rune.display.Sprite.prototype.update.call(this, step);
 
-    rune.display.Sprite.prototype.update.call(this, step);
+  if (this.hitCooldown > 0) {
+    this.hitCooldown--;
+  }
 
-    if (this.hitCooldown > 0) {
-        this.hitCooldown--;
+  // Lägg till hpBar EN gång
+  if (this.hpBar && this.stage && !this.hpBar.stage) {
+    this.stage.addChild(this.hpBar);
+  }
+
+  if (this.hpBar) {
+    this.hpBar.x = this.x;
+    this.hpBar.y = this.y - 8;
+
+    // skala hp
+    var p = this.hp / this.maxHp;
+    if (p < 0) p = 0;
+    this.hpBar.scaleX = p;
+
+    // 🔥 BESTÄM RÄTT TEXTUR
+    var newTexture;
+
+    if (this.hp > 80) {
+      newTexture = "hpbar1";
+    } else if (this.hp > 50) {
+      newTexture = "hpbar2";
+    } else if (this.hp > 30) {
+      newTexture = "hpbar3";
+    } else {
+      newTexture = "hpbar4";
     }
 
-    if (this.hpBar && this.stage && !this.hpBar.stage) {
+    // 🔥 BYT ENDAST OM DEN ÄNDRAS
+    if (newTexture !== this.currentHpTexture) {
+      this.currentHpTexture = newTexture;
+
+      if (this.hpBar.stage) {
+        this.hpBar.stage.removeChild(this.hpBar);
+      }
+
+      this.hpBar = new rune.display.Graphic(0, 0, 32, 4, newTexture);
+      this.hpBar.anchorX = 0;
+
+      if (this.stage) {
         this.stage.addChild(this.hpBar);
+      }
     }
-
-    if (this.hpBar) {
-
-        this.hpBar.x = this.x;
-        this.hpBar.y = this.y - 8;
-
-        var p = this.hp / this.maxHp;
-        if (p < 0) p = 0;
-
-        this.hpBar.scaleX = p;
-    }
+  }
 };
 
 //------------------------------------------------------------------------------
 // COLLISION
 //------------------------------------------------------------------------------
 
-/**
- * @param {?Object} player
- * @return {void}
- */
-runmysteriet.entity.Kristen.prototype.handleCollision = function(player) {
+runmysteriet.entity.Kristen.prototype.handleCollision = function (player) {
+  if (!player || player.isDead === true) return;
 
-    if (!player || player.isDead === true) {
-        return;
-    }
+  if (typeof player.hitTestAndSeparate !== "function") return;
 
-    if (typeof player.hitTestAndSeparate !== "function") {
-        return;
-    }
+  var hit = player.hitTestAndSeparate(this);
+  if (!hit) return;
 
-    var hit = player.hitTestAndSeparate(this);
+  if (this.hitCooldown > 0) return;
 
-    if (!hit) {
-        return;
-    }
+  this.hitCooldown = 20;
 
-    /*
-     * När spelaren nuddar fienden ska SPELAREN ta skada.
-     * Fienden ska INTE ta skada här.
-     */
-    if (this.hitCooldown > 0) {
-        return;
-    }
-
-    this.hitCooldown = 20;
-
-    if (player.hp !== undefined) {
-        player.hp -= 10;
-    }
+  if (player.hp !== undefined) {
+    player.hp -= 10;
+  }
 };
 
-/**
- * Fienden tar skada från spelarens attack.
- *
- * @param {number} damage
- * @return {void}
- */
-runmysteriet.entity.Kristen.prototype.takeDamage = function(damage) {
+runmysteriet.entity.Kristen.prototype.takeDamage = function (damage) {
+  if (this.isDead) return;
 
-    if (this.isDead === true) {
-        return;
-    }
+  this.hp -= damage;
 
-    this.hp -= damage;
+  console.log("Kristen tog skada:", damage, "HP kvar:", this.hp);
 
-    console.log("Kristen tog skada:", damage, "HP kvar:", this.hp);
-
-    if (this.hp <= 0) {
-        this.die();
-    }
+  if (this.hp <= 0) {
+    this.die();
+  }
 };
 
 //------------------------------------------------------------------------------
 // DIE
 //------------------------------------------------------------------------------
 
-/**
- * @return {void}
- */
-runmysteriet.entity.Kristen.prototype.die = function() {
+runmysteriet.entity.Kristen.prototype.die = function () {
+  if (this.isDead) return;
 
-    if (this.isDead) return;
+  this.isDead = true;
 
-    this.isDead = true;
+  console.log("Kristen död");
 
-    console.log("Kristen död");
+  this.visible = false;
+  this.active = false;
 
-    this.visible = false;
-    this.active = false;
-
-    if (this.hpBar && this.hpBar.stage) {
-        this.hpBar.stage.removeChild(this.hpBar);
-        this.hpBar = null;
+  if (this.hpBar) {
+    if (this.hpBar.stage) {
+      this.hpBar.stage.removeChild(this.hpBar);
     }
+    this.hpBar = null;
+  }
+
+  if (this.stage) {
+    this.stage.removeChild(this);
+  }
 };
 
 //------------------------------------------------------------------------------
 // PLAYER COLLISION LOOP
 //------------------------------------------------------------------------------
 
-/**
- * @param {!Array<!Object>} players
- * @return {void}
- */
-runmysteriet.entity.Kristen.prototype.checkPlayerCollisions = function(players) {
+runmysteriet.entity.Kristen.prototype.checkPlayerCollisions = function (players) {
+  if (!players) return;
 
-    if (!players) return;
-
-    for (var i = 0; i < players.length; i++) {
-        this.handleCollision(players[i]);
-    }
+  for (var i = 0; i < players.length; i++) {
+    this.handleCollision(players[i]);
+  }
 };
