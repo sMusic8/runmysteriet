@@ -396,32 +396,136 @@ runmysteriet.handler.PlayerHandler.prototype.checkPlatform = function(player, pl
     return false;
 };
 
+
+//------------------------------------------------------------------------------
+// PLAYER HITBOX HELPERS
+//------------------------------------------------------------------------------
+
+runmysteriet.handler.PlayerHandler.prototype.getPlayerFootY = function(player) {
+
+    if (!player) {
+        return 0;
+    }
+
+    /*
+     * Samma fotpunktstänk som används i checkPlatform:
+     * player.y + player.height / 2
+     */
+    return player.y + player.height / 2;
+};
+
+runmysteriet.handler.PlayerHandler.prototype.getPlayerPreviousFootY = function(player) {
+
+    if (!player) {
+        return 0;
+    }
+
+    if (typeof player.previousY !== "number") {
+        return this.getPlayerFootY(player);
+    }
+
+    return player.previousY + player.height / 2;
+};
+
+runmysteriet.handler.PlayerHandler.prototype.getPlayerHeadY = function(player) {
+
+    if (!player) {
+        return 0;
+    }
+
+    /*
+     * Spelarens övre kollisionspunkt.
+     */
+    return player.y - player.height / 2;
+};
 //------------------------------------------------------------------------------
 // PLAYER ON PLAYER
 //------------------------------------------------------------------------------
 
 runmysteriet.handler.PlayerHandler.prototype.checkPlayerPlatform = function(player, other) {
 
-    var hitboxOffsetX = 10;
-    var hitboxWidth = other.width - 20;
+    var playerFootY = 0;
+    var playerPreviousFootY = 0;
+    var otherHeadY = 0;
 
-    var playerPreviousBottom = player.previousY + player.height;
-    var otherTop = other.y;
+    var playerLeft = 0;
+    var playerRight = 0;
+    var otherLeft = 0;
+    var otherRight = 0;
 
-    var otherLeft = other.x + hitboxOffsetX;
-    var otherRight = other.x + hitboxOffsetX + hitboxWidth;
+    var hitboxPaddingX = 8;
+    var toleranceY = 3;
 
-    var playerCenterX = player.x + player.width / 2;
+    var isFalling = false;
+    var wasAbove = false;
+    var hasReachedOther = false;
+    var isOverOther = false;
 
-    var isOverOther =
-        playerCenterX >= otherLeft &&
-        playerCenterX <= otherRight;
+    if (!player || !other) {
+        return false;
+    }
 
-    var wasAbove = playerPreviousBottom <= otherTop;
+    if (player === other) {
+        return false;
+    }
 
-    if (player.velocityY >= 0 && wasAbove && isOverOther) {
+    if (player.isDead === true || other.isDead === true) {
+        return false;
+    }
 
-        player.y = otherTop - player.height;
+    /*
+     * Spelaren måste falla nedåt.
+     */
+    isFalling = player.velocityY >= 0;
+
+    if (isFalling !== true) {
+        return false;
+    }
+
+    /*
+     * räknar spelarens fotpunkt på samma sätt som i checkPlatform
+     */
+    playerFootY = this.getPlayerFootY(player);
+    playerPreviousFootY = this.getPlayerPreviousFootY(player);
+
+    /*
+     * räkna den andra spelarens huvud/överkant
+     */
+    otherHeadY = this.getPlayerHeadY(other);
+
+    /*
+     * spelaren måste ha varit ovanför i förra framen
+     * detta hindrar också att spelaren snappas upp från sidan eller underifrån
+     */
+    wasAbove = playerPreviousFootY <= otherHeadY + toleranceY;
+
+    /*
+     * spelaren måste faktiskt ha nått ner till den andra spelaren
+     */
+    hasReachedOther = playerFootY >= otherHeadY - toleranceY;
+
+    /*
+     * Horisontell kollisionsyta
+     * och krymper hitboxen lite så spelaren inte fastnar på ytterkanterna
+     */
+    playerLeft = player.x + hitboxPaddingX;
+    playerRight = player.x + player.width - hitboxPaddingX;
+
+    otherLeft = other.x + hitboxPaddingX;
+    otherRight = other.x + other.width - hitboxPaddingX;
+
+    isOverOther =
+        playerRight >= otherLeft &&
+        playerLeft <= otherRight;
+
+    if (wasAbove && hasReachedOther && isOverOther) {
+
+        /*
+         * placerar spelarens fot exakt på den andra spelarens huvud
+         * placerar utifrån den andra spelarens huvud för att undvika att spelaren fastnar i huvudet
+         */
+        player.y = otherHeadY - player.height / 2;
+
         player.velocityY = 0;
         player.isOnGround = true;
 
@@ -444,8 +548,8 @@ runmysteriet.handler.PlayerHandler.prototype.handleInput = function(player, inde
         player.isMoving = true;
 
         /*
-         * direction används av attacken.
-         * flippedX vänder bilden.
+         * direction används av attacken
+         * flippedX vänder bilden
          */
         player.direction = -1;
         player.flippedX = true;

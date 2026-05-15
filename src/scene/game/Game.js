@@ -300,7 +300,7 @@ this.stage.addChild(this.m_runeTextBg);
 /*
  * Text som visar insamlade runor.
  */
-this.m_runeText = new rune.text.BitmapField("RUNOR: ");
+this.m_runeText = new rune.text.BitmapField("RUNES: ");
 this.m_runeText.autoSize = true;
 this.m_runeText.x = 15;
 this.m_runeText.y = 65;
@@ -314,7 +314,7 @@ if (this.m_shieldHandler) {
     this.m_shieldHandler.onCollectedChanged = function(text) {
 
         if (self.m_runeText) {
-            self.m_runeText.text = "RUNOR: " + text;
+            self.m_runeText.text = "RUNES: " + text;
         }
 
         
