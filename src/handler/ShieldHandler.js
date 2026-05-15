@@ -172,25 +172,72 @@ runmysteriet.handler.ShieldHandler.prototype.getRandomWordData = function() {
 
 runmysteriet.handler.ShieldHandler.prototype.update = function (players) {
 
-  for (var i = this.m_shields.length - 1; i >= 0; i--) {
+    var i = 0;
+    var j = 0;
+    var shield = null;
+    var player = null;
 
-    var shield = this.m_shields[i];
-
-    if (!shield.active) continue;
-
-    for (var j = 0; j < players.length; j++) {
-
-      var player = players[j];
-
-      if (shield.hitTestObject(player)) {
-        this.collectShield(shield);
-        break;
-      }
+    if (!players) {
+        return;
     }
 
-    shield.update();
-  }
+    for (i = 0; i < this.m_shields.length; i++) {
+
+        shield = this.m_shields[i];
+
+        if (!shield) {
+            continue;
+        }
+
+        /*
+         * Viktigt:
+         * vi kör INTE shield.update() här eftersom det sker i runmysteriet.scene.game.Game.prototype.update.call(this, step) i Game.js
+         *
+         * skölden ligger redan på stage, och Rune uppdaterar stage-children
+         * via rune.scene.Scene.prototype.update.call(this, step) i Game.js
+         *
+         * den här handlern ska bara kontrollera kollision/insamling
+         */
+
+        if (shield.isCollected === true) {
+            continue;
+        }
+
+        if (shield.visible === false) {
+            continue;
+        }
+
+        for (j = 0; j < players.length; j++) {
+
+            player = players[j];
+
+            /*
+             * Döda, saknade eller osynliga spelare ska inte kunna samla runor.
+             */
+            if (!player) {
+                continue;
+            }
+
+            if (player.isDead === true) {
+                continue;
+            }
+
+            if (player.visible === false) {
+                continue;
+            }
+
+            if (player.active === false) {
+                continue;
+            }
+
+            if (shield.hitTestObject(player)) {
+                this.collectShield(shield);
+                break;
+            }
+        }
+    }
 };
+
 
 //-------------------------
 // COLLECT
