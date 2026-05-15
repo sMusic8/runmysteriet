@@ -283,20 +283,41 @@ runmysteriet.scene.Game.prototype.createHUD = function() {
     this.stage.addChild(this.m_highscoreHud);
 
     /*
-     * När ShieldHandler säger att texten ändrats,
-     * uppdaterar vi texten i HUD.
-     */
-    this.m_runeText = new rune.text.BitmapField("RUNOR: ");
-    this.m_runeText.x = 15;
-    this.m_runeText.y = 65;
-    this.stage.addChild(this.m_runeText);
+ * Bakgrund bakom runtexten.
+ */
+this.m_runeTextBg = new rune.display.Graphic(
+    10,
+    61,
+    150,
+    18
+);
 
-    if (this.m_shieldHandler) {
+this.m_runeTextBg.backgroundColor = "#000000";
+this.m_runeTextBg.alpha = 0.6;
+
+this.stage.addChild(this.m_runeTextBg);
+
+/*
+ * Text som visar insamlade runor.
+ */
+this.m_runeText = new rune.text.BitmapField("RUNOR: ");
+this.m_runeText.autoSize = true;
+this.m_runeText.x = 15;
+this.m_runeText.y = 65;
+//så att texten hamnar ovanpå bakgrunden
+this.stage.addChild(this.m_runeText);
+
+
+
+// Kopplar shieldHandler till HUD så att den kan uppdatera runtexten när runor samlas in.
+if (this.m_shieldHandler) {
     this.m_shieldHandler.onCollectedChanged = function(text) {
+
         if (self.m_runeText) {
             self.m_runeText.text = "RUNOR: " + text;
-            
         }
+
+        
     };
 }
 
@@ -322,19 +343,25 @@ runmysteriet.scene.Game.prototype.updateHUD = function() {
         this.m_scoreText.x = camera.viewport.x + 15;
         this.m_scoreText.y = camera.viewport.y + 30;
     }
-    /**
-     * Highscore följer kameran så att den alltid är synlig högst upp på skärmen.
+
+    /*
+     * Highscore följer kameran så att den alltid är synlig.
      */
-
     if (this.m_highscoreHud) {
-        this.m_highscoreHud.x = camera.viewport.x + 15;
-        this.m_highscoreHud.y = camera.viewport.y + 45;
-}
+        this.m_highscoreHud.x = camera.viewport.x + 12;
+        this.m_highscoreHud.y = camera.viewport.y + 40;
+    }
 
+    /*
+     * Runtext + bakgrund placeras vid höger kant.
+     */
+    if (this.m_runeTextBg && this.m_runeText) {
 
-    if (this.m_runeText) {
-        this.m_runeText.x = camera.viewport.x + 15;
-        this.m_runeText.y = camera.viewport.y + 65;
+        this.m_runeTextBg.x = camera.viewport.x + 5;
+        this.m_runeTextBg.y = camera.viewport.y + 205;
+
+        this.m_runeText.x = this.m_runeTextBg.x + 6;
+        this.m_runeText.y = this.m_runeTextBg.y + 4;
     }
 };
 //------------------------------------------------------------------------------
