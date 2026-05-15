@@ -604,21 +604,53 @@ runmysteriet.handler.PlayerHandler.prototype.checkBoatDeath = function(player, i
 
 runmysteriet.handler.PlayerHandler.prototype.killPlayer = function(player, index) {
 
-    if (!player) {
+    if (!player || player.isDead === true) {
         return;
     }
 
+    // 🔥 markera död DIREKT
     player.isDead = true;
-    player.visible = false;
-    player.active = false;
-    player.velocityY = 0;
     player.hp = 0;
+    player.velocityY = 0;
+    player.active = false;
 
-    if (player.hpBar) {
-        player.hpBar.visible = false;
+    // 🔊 spela ljud DIREKT (innan remove/visible changes kan störa perceptionen)
+    if (!this.deadSound) {
+        this.deadSound = this.application.sounds.sound.get("sound_playerdead");
     }
 
+    if (this.deadSound) {
+        this.deadSound.play();
+    }
+
+    // 🧠 logik först – visuellt sen
     console.log("Spelaren " + index + " dog");
+
+    // 🔥 HP bar bort direkt (men utan att påverka spelaren först)
+    if (player.hpBar) {
+        if (player.hpBar.stage) {
+            player.hpBar.stage.removeChild(player.hpBar);
+        }
+        player.hpBar.visible = false;
+        player.hpBar = null;
+    }
+
+    // 👻 dölj spelaren (inte remove direkt om Rune kan få update-fel)
+    player.visible = false;
+
+    // 🔥 viktigt: stoppa physics-känsla direkt
+    player.x = player.x;
+    player.y = player.y;
+
+    // (valfritt men stabilt i Rune)
+    if (typeof player.remove === "function") {
+        // låt bli att alltid ta bort direkt – kan skapa “för sent ljud”-känsla i vissa engines
+        setTimeout(function() {
+            if (player.stage) {
+                player.stage.removeChild(player);
+            }
+        }, 0);
+    }
 };
 
 /**
