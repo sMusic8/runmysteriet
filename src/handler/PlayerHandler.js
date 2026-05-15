@@ -120,33 +120,64 @@ runmysteriet.handler.PlayerHandler.prototype.update = function() {
     this.keepPlayersInsideLevel();
     this.updateAttacks();
 
-
     for (var i = 0; i < this.players.length; i++) {
 
         var p = this.players[i];
 
-        if (!p) {
-            continue;
-        }
-       
+        if (!p) continue;
+
         if (typeof p.updateAttackCooldown === "function") {
             p.updateAttackCooldown();
         }
 
+        // ---------------------------
+        // HP BAR POSITION + SCALE
+        // ---------------------------
         if (p.hpBar) {
 
             p.hpBar.x = p.x;
             p.hpBar.y = p.y - 12;
 
             var hpPercent = p.hp / p.maxHp;
-
-            if (hpPercent < 0) {
-                hpPercent = 0;
-            }
+            if (hpPercent < 0) hpPercent = 0;
 
             p.hpBar.scaleX = hpPercent;
         }
 
+        // ---------------------------
+        // 🔥 HP BAR TEXTURE SYSTEM (FIX)
+        // ---------------------------
+        var newTexture;
+
+        if (p.hp > 80) {
+            newTexture = "hpbar1";
+        } else if (p.hp > 50) {
+            newTexture = "hpbar2";
+        } else if (p.hp > 30) {
+            newTexture = "hpbar3";
+        } else {
+            newTexture = "hpbar4";
+        }
+
+        if (p.hpBar && newTexture !== p.hpBar.currentHpTexture) {
+
+            p.hpBar.currentHpTexture = newTexture;
+
+            if (p.hpBar.stage) {
+                p.hpBar.stage.removeChild(p.hpBar);
+            }
+
+            p.hpBar = new rune.display.Graphic(0, 0, 32, 4, newTexture);
+            p.hpBar.anchorX = 0;
+            p.hpBar.anchorY = 0;
+            p.hpBar.currentHpTexture = newTexture;
+
+            this.stage.addChild(p.hpBar);
+        }
+
+        // ---------------------------
+        // DEATH
+        // ---------------------------
         if (p.hp <= 0 && p.isDead !== true) {
             this.killPlayer(p, i);
             continue;
@@ -452,18 +483,20 @@ runmysteriet.handler.PlayerHandler.prototype.handleInput = function(player, inde
 
 runmysteriet.handler.PlayerHandler.prototype.createHpBar = function() {
 
-    var bar = new rune.display.Sprite(0, 0, 32, 4, "spritesheet_hpbar");
+    var bar = new rune.display.Graphic(0, 0, 32, 4, "hpbar1");
 
+    // Förankring
     bar.anchorX = 0;
+    bar.anchorY = 0;
 
-    bar.animation.create("full", [0], 0, false);
-    bar.animation.create("high", [1], 0, false);
-    bar.animation.create("medium", [2], 0, false);
-    bar.animation.create("low", [3], 0, false);
+    // 🔥 Spara nuvarande texture (viktigt för att undvika konstant recreation)
+    bar.currentHpTexture = "hpbar1";
 
-    bar.animation.gotoAndStop("full");
-
+    // Default scale
     bar.scaleX = 1;
+    bar.scaleY = 1;
+
+    bar.visible = true;
 
     return bar;
 };
