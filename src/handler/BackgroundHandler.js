@@ -30,10 +30,9 @@ runmysteriet.handler.BackgroundHandler = function(stage, camera, screenWidth, sc
 
     /** @type {!Array<string>} */
     this.backgroundTextures = [
-        "background",
         "background1",
         "background2",
-        "background3"
+        "background4"
     ];
 
     /** @type {number} */
