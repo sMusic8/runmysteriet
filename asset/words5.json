@@ -1,82 +1,82 @@
 [
     {
-        "word": "table",
-        "Subword": ["saw", "spoon"]
+        "word": "raven",
+        "Subword": ["black bird", "viking sign"]
     },
     {
-        "word": "chair",
-        "Subword": ["arm", "wheel"]
-    },
-    {
-        "word": "paper",
-        "Subword": ["work", "clip"]
-    },
-    {
-        "word": "school",
-        "Subword": ["high", "primary"]
-    },
-    {
-        "word": "mat",
-        "Subword": ["door", "yoga"]
+        "word": "sword",
+        "Subword": ["sharp blade", "battle weapon"]
     },
     {
         "word": "stone",
-        "Subword": ["wall", "work"]
+        "Subword": ["hard rock", "rune carving"]
     },
     {
-        "word": "light",
-        "Subword": ["house", "bulb"]
+        "word": "frost",
+        "Subword": ["cold ice", "winter air"]
     },
     {
-        "word": "pressure",
-        "Subword": ["blood", "air"]
+        "word": "blood",
+        "Subword": ["red liquid", "battle wound"]
+    },
+    {
+        "word": "horse",
+        "Subword": ["riding animal", "travel"]
+    },
+    {
+        "word": "north",
+        "Subword": ["map direction", "viking lands"]
+    },
+    {
+        "word": "storm",
+        "Subword": ["strong wind", "bad weather"]
     },
     {
         "word": "water",
-        "Subword": ["line", "proof"]
+        "Subword": ["river sea", "boat travel"]
     },
     {
-        "word": "list",
-        "Subword": ["shopping", "guest"]
+        "word": "light",
+        "Subword": ["sun glow", "see in dark"]
     },
     {
-        "word": "heart",
-        "Subword": ["beat", "less"]
+        "word": "flame",
+        "Subword": ["fire heat", "burning"]
     },
     {
-        "word": "sound",
-        "Subword": ["wave", "track"]
+        "word": "spear",
+        "Subword": ["long weapon", "sharp point"]
     },
     {
-        "word": "apple",
-        "Subword": ["pie", "tree"]
+        "word": "river",
+        "Subword": ["flowing water", "boat path"]
     },
     {
-        "word": "bread",
-        "Subword": ["box", "fruit"]
+        "word": "crown",
+        "Subword": ["king symbol", "royal power"]
     },
     {
-        "word": "candy",
-        "Subword": ["shop", "bar"]
+        "word": "night",
+        "Subword": ["dark time", "stars"]
     },
     {
-        "word": "house",
-        "Subword": ["plant", "boat"]
+        "word": "earth",
+        "Subword": ["ground", "soil"]
     },
     {
-        "word": "money",
-        "Subword": ["bag", "tree"]
+        "word": "giant",
+        "Subword": ["huge creature", "old myth"]
     },
     {
-        "word": "town",
-        "Subword": ["home", "down"]
+        "word": "trees",
+        "Subword": ["forest", "wood"]
     },
     {
-        "word": "protection",
-        "Subword": ["sun", "hearing"]
+        "word": "shore",
+        "Subword": ["land edge", "near water"]
     },
     {
-        "word": "side",
-        "Subword": ["front", "web"]
+        "word": "honey",
+        "Subword": ["sweet food", "bees"]
     }
 ]

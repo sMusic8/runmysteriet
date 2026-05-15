@@ -78,17 +78,17 @@ runmysteriet.ui.graphic.HighscoreHud.prototype.createBestText = function() {
     item = this.application.highscores.get(0, 0);
 
     if (!item) {
-        return "HIGHSCORE: -";
+        return "HIGHSCORE: \n-";
     }
 
     name = item.name || item.username || "PLAYER";
     score = parseInt(item.score, 10) || 0;
 
     if (score <= 0) {
-        return "HIGHSCORE: -";
+        return "HIGHSCORE: \n-";
     }
 
-    return "HIGHSCORE: " + name + " " + score;
+    return "HIGHSCORE: \n" + name + " " + score;
 };
 
 /**

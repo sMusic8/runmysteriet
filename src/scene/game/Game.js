@@ -23,8 +23,6 @@ runmysteriet.scene.Game = function(levelNumber, score, playerName) {
     this.m_pauseOverlay = null;
 
     this.m_timeLeft = 200;
-    this.m_timerText = null;
-    this.m_scoreText = null;
 
     this.m_gameEnd = false;
     this.m_finishX = 0;
@@ -39,7 +37,7 @@ runmysteriet.scene.Game = function(levelNumber, score, playerName) {
     this.m_gameInput = null;
 
     this.camera = null;
-    this.m_highscoreHud = null;
+    this.m_hudHandler = null;
     this.m_highscoreSaved = false;
 };
     
@@ -250,121 +248,32 @@ runmysteriet.scene.Game.prototype.update = function(step) {
     this.updateTimer();
     this.updateHUD();
 };
+
 //------------------------------------------------------------------------------
 // HUD
 //------------------------------------------------------------------------------
 
 runmysteriet.scene.Game.prototype.createHUD = function() {
-    var self = this;
 
-    /*
-     * Timer
-     */
-    this.m_timerText = new rune.text.BitmapField("TIME LEFT: 200");
-    this.m_timerText.x = 15;
-    this.m_timerText.y = 15;
-    this.stage.addChild(this.m_timerText);
+    this.m_hudHandler = new runmysteriet.handler.HudHandler(
+        this.stage,
+        this.application,
+        this.cameras
+    );
 
-    /*
-     * Score / level
-     */
-    this.m_scoreText = new rune.text.BitmapField(" ");
-    this.m_scoreText.x = 15;
-    this.m_scoreText.y = 30;
-    this.stage.addChild(this.m_scoreText);
+    this.m_hudHandler.init();
 
-
-    /**
-    * Highscore högst upp på scenen.
-    */
-    this.m_highscoreHud = new runmysteriet.ui.graphic.HighscoreHud(this.application);
-    this.m_highscoreHud.x = 15;
-    this.m_highscoreHud.y = 45;
-    this.stage.addChild(this.m_highscoreHud);
-
-    /*
- * Bakgrund bakom runtexten.
- */
-this.m_runeTextBg = new rune.display.Graphic(
-    10,
-    61,
-    150,
-    18
-);
-
-this.m_runeTextBg.backgroundColor = "#000000";
-this.m_runeTextBg.alpha = 0.6;
-
-this.stage.addChild(this.m_runeTextBg);
-
-/*
- * Text som visar insamlade runor.
- */
-this.m_runeText = new rune.text.BitmapField("RUNES: ");
-this.m_runeText.autoSize = true;
-this.m_runeText.x = 15;
-this.m_runeText.y = 65;
-//så att texten hamnar ovanpå bakgrunden
-this.stage.addChild(this.m_runeText);
-
-
-
-// Kopplar shieldHandler till HUD så att den kan uppdatera runtexten när runor samlas in.
-if (this.m_shieldHandler) {
-    this.m_shieldHandler.onCollectedChanged = function(text) {
-
-        if (self.m_runeText) {
-            self.m_runeText.text = "RUNES: " + text;
-        }
-
-        
-    };
-}
+    if (this.m_shieldHandler) {
+        this.m_hudHandler.connectShieldHandler(this.m_shieldHandler);
+    }
 
     this.updateHUD();
 };
 
 runmysteriet.scene.Game.prototype.updateHUD = function() {
-    var camera = this.cameras.getCameraAt(0);
 
-    if (!camera || !camera.viewport) {
-        return;
-    }
-
-    /*
-     * Timer och score sitter fast på skärmen.
-     */
-    if (this.m_timerText) {
-        this.m_timerText.x = camera.viewport.x + 15;
-        this.m_timerText.y = camera.viewport.y + 15;
-    }
-
-    if (this.m_scoreText) {
-        this.m_scoreText.x = camera.viewport.x + 15;
-        this.m_scoreText.y = camera.viewport.y + 30;
-    }
-
-    /*
-     * Highscore följer kameran så att den alltid är synlig.
-     */
-    if (this.m_highscoreHud) {
-    this.m_highscoreHud.x =
-        camera.viewport.x +
-        camera.viewport.width / 2 -
-        this.m_highscoreHud.width / 2;
-
-    this.m_highscoreHud.y = camera.viewport.y + 15;
-}
-    /*
-     * Runtext + bakgrund placeras vid höger kant.
-     */
-    if (this.m_runeTextBg && this.m_runeText) {
-
-        this.m_runeTextBg.x = camera.viewport.x + 5;
-        this.m_runeTextBg.y = camera.viewport.y + 205;
-
-        this.m_runeText.x = this.m_runeTextBg.x + 6;
-        this.m_runeText.y = this.m_runeTextBg.y + 4;
+    if (this.m_hudHandler) {
+        this.m_hudHandler.update();
     }
 };
 //------------------------------------------------------------------------------
@@ -556,12 +465,12 @@ runmysteriet.scene.Game.prototype.updatePauseMenuPosition = function() {
 }
 
     if (this.m_pauseTitle) {
-        this.m_pauseTitle.x = camera.viewport.x + 80;
+        this.m_pauseTitle.x = camera.viewport.x + 170;
         this.m_pauseTitle.y = camera.viewport.y + 85;
     }
 
     if (this.m_pauseMenu) {
-        this.m_pauseMenu.setCameraPosition(camera, 80, 115);
+        this.m_pauseMenu.setCameraPosition(camera, 170, 115);
     }
 };
 
@@ -616,14 +525,18 @@ runmysteriet.scene.Game.prototype.handleMenuListInput = function(menuList, onCho
 // TIMER
 //------------------------------------------------------------------------------
 
-runmysteriet.scene.Game.prototype.updateTimer = function() {
-    if (this.allRunesColected()) {
-        if (this.m_timerText) {
-        this.m_timerText.text = "LEVEL IS COMPLETED GO GUESS THE WORD!";
-        }
+runmysteriet.scene.Game.prototype.updateTimer = function () {
 
-        if (this.m_scoreText) {
-            this.m_scoreText.text = "LEVEL " + this.m_levelNumber + "  POANG " + this.m_score;
+    if (this.allRunesColected()) {
+
+        if (this.m_hudHandler) {
+            this.m_hudHandler.setTimerText(
+                "LEVEL IS COMPLETED GUESS THE WORD!"
+            );
+
+            this.m_hudHandler.setScoreText(
+                "LEVEL " + this.m_levelNumber + "  SCORE " + this.m_score
+            );
         }
 
         return;
@@ -635,12 +548,14 @@ runmysteriet.scene.Game.prototype.updateTimer = function() {
         this.m_timeLeft = 0;
     }
 
-    if (this.m_timerText) {
-        this.m_timerText.text = "TID KVAR " + Math.ceil(this.m_timeLeft);
-    }
+    if (this.m_hudHandler) {
+        this.m_hudHandler.setTimerText(
+            "TIME LEFT: " + Math.ceil(this.m_timeLeft)
+        );
 
-    if (this.m_scoreText) {
-        this.m_scoreText.text = "LEVEL " + this.m_levelNumber + "  POANG " + this.m_score;
+        this.m_hudHandler.setScoreText(
+        "LEVEL " + this.m_levelNumber + "  SCORE " + this.m_score
+        );
     }
 };
 
@@ -684,7 +599,7 @@ runmysteriet.scene.Game.prototype.checkLevelCompletion = function() {
      * Om alla spelare är döda förlorar man.
      */
     if (this.areAllPlayersDead()) {
-        this.loseGame("ALLA SPELARE DOG"); 
+        this.loseGame("ALL PLAYERS ARE DEAD"); 
         return;
     }
 
@@ -692,7 +607,7 @@ runmysteriet.scene.Game.prototype.checkLevelCompletion = function() {
      * Om tiden tar slut förlorar man.
      */
     if (this.m_timeLeft <= 0) {
-        this.loseGame("TIDEN TOG SLUT");
+        this.loseGame("TIME IS UP");
     }
 };
 //------------------------------------------------------------------------------
@@ -819,11 +734,11 @@ runmysteriet.scene.Game.prototype.loseGame = function(reason) {
 
     this.saveHighscore();
 
-    if (this.m_highscoreHud && typeof this.m_highscoreHud.reload === "function") {
-        this.m_highscoreHud.reload();
-    }
+    if (this.m_hudHandler) {
+    this.m_hudHandler.reloadHighscore();
+}
 
-    this.createGameOverMenu(reason || "DU FORLORADE");
+    this.createGameOverMenu(reason || "YOU LOST");
     this.updateGameOverMenuPosition();
 
     if (this.m_gameOverTitle) {
@@ -844,7 +759,7 @@ runmysteriet.scene.Game.prototype.createGameOverMenu = function(reason) {
         return;
     }
 
-    this.m_gameOverTitle = new rune.text.BitmapField(reason || "DU FORLORADE");
+    this.m_gameOverTitle = new rune.text.BitmapField(reason || "YOU LOST");
     this.m_gameOverTitle.autoSize = true;
     this.m_gameOverTitle.visible = false;
     this.stage.addChild(this.m_gameOverTitle);

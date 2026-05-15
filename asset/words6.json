@@ -1,0 +1,102 @@
+[
+    {
+        "word": "shield",
+        "Subword": ["protection", "battle"]
+    },
+    {
+        "word": "viking",
+        "Subword": ["norse", "warrior"]
+    },
+    {
+        "word": "forest",
+        "Subword": ["trees", "wild"]
+    },
+    {
+        "word": "battle",
+        "Subword": ["fight", "enemy"]
+    },
+    {
+        "word": "castle",
+        "Subword": ["king", "stone"]
+    },
+    {
+        "word": "hammer",
+        "Subword": ["thor", "tool"]
+    },
+    {
+        "word": "winter",
+        "Subword": ["snow", "cold"]
+    },
+    {
+        "word": "dragon",
+        "Subword": ["fire", "monster"]
+    },
+    {
+        "word": "frozen",
+        "Subword": ["ice", "cold"]
+    },
+    {
+        "word": "animal",
+        "Subword": ["living", "creature"]
+    },
+    {
+        "word": "island",
+        "Subword": ["water", "land"]
+    },
+    {
+        "word": "bridge",
+        "Subword": ["cross", "river"]
+    },
+    {
+        "word": "father",
+        "Subword": ["parent", "family"]
+    },
+    {
+        "word": "mother",
+        "Subword": ["parent", "family"]
+    },
+    {
+        "word": "golden",
+        "Subword": ["treasure", "yellow"]
+    },
+    {
+        "word": "hunter",
+        "Subword": ["track", "animals"]
+    },
+    {
+        "word": "danger",
+        "Subword": ["risk", "harm"]
+    },
+    {
+        "word": "arrows",
+        "Subword": ["bow", "sharp"]
+    },
+    {
+        "word": "helmet",
+        "Subword": ["head", "armor"]
+    },
+    {
+        "word": "throne",
+        "Subword": ["king", "chair"]
+    },
+    {
+        "word": "school",
+        "Subword": ["learn", "class"]
+    },
+    {
+        "word": "church",
+        "Subword": ["faith", "prayer"]
+    },
+    {
+        "word": "silver",
+        "Subword": ["metal", "treasure"]
+    },
+    {
+        "word": "pirate",
+        "Subword": ["ship", "robber"]
+    },
+    {
+        "word": "tunnel",
+        "Subword": ["underground", "path"]
+    }
+]

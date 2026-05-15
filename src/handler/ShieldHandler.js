@@ -26,6 +26,32 @@ runmysteriet.handler.ShieldHandler = function (stage, application, levelWidth, l
   this.onCollectedChanged = null;
 
 };
+
+//------------------------------------------------------------------------------
+// WORD RESOURCE
+//------------------------------------------------------------------------------
+
+/**
+ * Returnerar vilken ordlista som ska användas beroende på level.
+ *
+ * Level 1-5 använder 5-bokstavsord
+ * Level 6-10 använder 6-bokstavsord
+ * Level 11-och vidare använder 7-bokstavsord
+ *
+ * @return {string}
+ */
+runmysteriet.handler.ShieldHandler.prototype.getWordResourceName = function() {
+
+    if (this.m_levelNumber >= 11) {
+        return "words7";
+    }
+
+    if (this.m_levelNumber >= 6) {
+        return "words6";
+    }
+
+    return "words5";
+};
 //-------------------------
 // INIT
 //-------------------------
@@ -117,6 +143,7 @@ runmysteriet.handler.ShieldHandler.prototype.init = function () {
 
 runmysteriet.handler.ShieldHandler.prototype.getRandomWordData = function() {
 
+    var resourceName = "";
     var resource = null;
     var data = null;
     var index = 0;
@@ -127,13 +154,25 @@ runmysteriet.handler.ShieldHandler.prototype.getRandomWordData = function() {
     }
 
     /*
-     * Namnet måste matcha Requests.js:
-     * this.add("words5", "...")
+     * Välj ordlista beroende på level.
      */
-    resource = this.application.resources.get("words5");
+    resourceName = this.getWordResourceName();
+
+    resource = this.application.resources.get(resourceName);
+
+    /*
+     * Fallback till words5 om words6 eller words7 saknas.
+     */
+    if (!resource) {
+        console.log("Could not find resource:", resourceName);
+        console.log("Falling back to words5.");
+
+        resourceName = "words5";
+        resource = this.application.resources.get(resourceName);
+    }
 
     if (!resource) {
-        console.log("Could not find resource: words5");
+        console.log("Could not find fallback resource: words5");
         return null;
     }
 
@@ -146,13 +185,13 @@ runmysteriet.handler.ShieldHandler.prototype.getRandomWordData = function() {
         try {
             data = JSON.parse(data);
         } catch (error) {
-            console.log("Could not parse words5 JSON:", error);
+            console.log("Could not parse " + resourceName + " JSON:", error);
             return null;
         }
     }
 
     if (!data || !data.length) {
-        console.log("words5 JSON is empty or wrong format.");
+        console.log(resourceName + " JSON is empty or wrong format.");
         return null;
     }
 
@@ -161,11 +200,14 @@ runmysteriet.handler.ShieldHandler.prototype.getRandomWordData = function() {
      */
     index = Math.floor(Math.random() * data.length);
 
+    console.log("WORD RESOURCE:", resourceName);
     console.log("RANDOM WORD INDEX:", index);
     console.log("RANDOM WORD DATA:", data[index]);
 
     return data[index];
 };
+
+
 //-------------------------
 // UPDATE
 //-------------------------
