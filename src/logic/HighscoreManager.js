@@ -66,7 +66,7 @@ runmysteriet.logic.HighscoreManager.prototype.hasSameEntry = function(name, scor
         return false;
     }
 
-    for (i = 0; i < 10; i++) {
+    for (i = 0; i < 5; i++) {
         item = this.application.highscores.get(i, 0);
 
         if (!item) {

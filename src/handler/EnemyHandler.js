@@ -111,11 +111,30 @@ runmysteriet.handler.EnemyHandler.prototype.update = function(players) {
  */
 runmysteriet.handler.EnemyHandler.prototype.clear = function() {
 
-    for (var i = 0; i < this.enemies.length; i++) {
+    var i = 0;
+    var enemy = null;
 
-        var enemy = this.enemies[i];
+    for (i = 0; i < this.enemies.length; i++) {
 
-        if (enemy && enemy.stage) {
+        enemy = this.enemies[i];
+
+        if (!enemy) {
+            continue;
+        }
+
+        /*
+         * Kristen skapar hpBar separat och lägger den direkt på stage.
+         * Därför måste hpBar tas bort separat innan fienden tas bort.
+         */
+        if (enemy.hpBar && enemy.hpBar.stage) {
+            enemy.hpBar.stage.removeChild(enemy.hpBar);
+            enemy.hpBar = null;
+        }
+
+        /*
+         * Ta bort själva fienden från stage.
+         */
+        if (enemy.stage) {
             enemy.stage.removeChild(enemy);
         }
     }

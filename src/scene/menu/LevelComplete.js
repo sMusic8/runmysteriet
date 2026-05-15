@@ -41,6 +41,9 @@ runmysteriet.scene.LevelComplete = function(levelNumber, totalScore, earnedScore
 
     /** @type {boolean} */
     this.m_hasSavedHighscore = false;
+
+    /** @type {?runmysteriet.ui.graphic.HighscoreHud} */
+    this.m_highscoreHud = null;
 };
 
 //------------------------------------------------------------------------------
@@ -71,11 +74,11 @@ runmysteriet.scene.LevelComplete.prototype.init = function() {
     rune.scene.Scene.prototype.init.call(this);
 
     this.menuSound = this.application.sounds.sound.get("sound_menu");
-     this.backgroundMusic = this.application.sounds.sound.get("sound_musicMenu");
-  if (this.backgroundMusic) {
-    this.backgroundMusic.loop = true;
-    this.backgroundMusic.volume = 0.5;
-    this.backgroundMusic.play();
+    this.backgroundMusic = this.application.sounds.sound.get("sound_musicMenu");
+    if (this.backgroundMusic) {
+        this.backgroundMusic.loop = true;
+        this.backgroundMusic.volume = 0.5;
+        this.backgroundMusic.play();
   }
 
   //If gamepad eller kaybord justpresst ändra nummret på volume med ett steg i en loop
@@ -126,6 +129,18 @@ runmysteriet.scene.LevelComplete.prototype.init = function() {
     savedText.y += 18;
     savedText.scale = 0.7;
     this.stage.addChild(savedText);
+        /*
+    * Visa top 5 highscores när leveln är klar.
+    */
+    this.m_highscoreHud = new runmysteriet.ui.graphic.HighscoreHud(
+        this.application,
+        5
+    );
+
+    this.m_highscoreHud.x = this.application.screen.width - this.m_highscoreHud.width - 15;
+    this.m_highscoreHud.y = 15;
+
+    this.stage.addChild(this.m_highscoreHud);
 
     this.createMenu();
     this.updateMenu();

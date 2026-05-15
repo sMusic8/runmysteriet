@@ -78,23 +78,26 @@ this.m_controller.rotation = 0;
     text2.flicker.start(750, 0.5);
     this.stage.addChild(text2);
 
-    this.m_highscoreHud = new runmysteriet.ui.graphic.HighscoreHud(this.application);
-    this.m_highscoreHud.center = this.application.screen.center;
-    this.m_highscoreHud.y -= 18;
-    this.m_highscoreHud.scale = 0.8;
+    this.m_highscoreHud = new runmysteriet.ui.graphic.HighscoreHud(
+    this.application,
+    5
+    );
+
+    this.m_highscoreHud.x = 15;
+    this.m_highscoreHud.y =150;
+
     this.stage.addChild(this.m_highscoreHud);
 
     this.menuList = new runmysteriet.ui.graphic.MenuList(
         this.stage,
         this.application,
         ["Play game", "Read more", "Credits"],
-        40,
-        15,
+        45,
+        25,
         1
     );
 
-    this.menuList.scaleX = 2.5;
-    this.menuList.scaleY = 2.5;
+
 };
 
 //------------------------------------------------------------------------------

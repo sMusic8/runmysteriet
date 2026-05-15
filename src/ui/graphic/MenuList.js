@@ -61,11 +61,21 @@ runmysteriet.ui.graphic.MenuList.prototype.create = function() {
     this.clear();
 
     for (i = 0; i < this.labels.length; i++) {
+
         item = new rune.text.BitmapField(this.labels[i]);
         item.autoSize = true;
+/*
+         * Rune använder scaleX och scaleY.
+         * item.scale fungerar inte som riktig Rune-skalning.
+         */
+        item.scaleX = this.scale;
+        item.scaleY = this.scale;
+
+        /*
+         * Centrera efter skalning, annars kan placeringen bli fel.
+         */
         item.center = this.application.screen.center;
         item.y += this.yOffset + i * this.spacing;
-        item.scale = this.scale;
 
         this.stage.addChild(item);
         this.items.push(item);
@@ -157,6 +167,34 @@ runmysteriet.ui.graphic.MenuList.prototype.setVisible = function(value) {
 
     for (i = 0; i < this.items.length; i++) {
         this.items[i].visible = value;
+    }
+};
+
+
+
+/**
+ * Skalar alla menyval.
+ *
+ * @param {number} value
+ * @return {void}
+ */
+runmysteriet.ui.graphic.MenuList.prototype.setScale = function(value) {
+
+    var i = 0;
+    var item = null;
+
+    this.scale = value || 1;
+
+    for (i = 0; i < this.items.length; i++) {
+
+        item = this.items[i];
+
+        if (!item) {
+            continue;
+        }
+
+        item.scaleX = this.scale;
+        item.scaleY = this.scale;
     }
 };
 

@@ -197,16 +197,36 @@ runmysteriet.handler.PlatformHandler.prototype.addBoats = function(boats) {
 };
 
 runmysteriet.handler.PlatformHandler.prototype.startBoatTweens = function(tweens) {
-    if (!this.boats) return;
 
-    console.log("boat count", this.boats.length);
+    var i = 0;
+    var boat = null;
 
-    for (var i = 0; i < this.boats.length; i++) {
-        var boat = this.boats[i];
+    if (!tweens) {
+        console.log("PlatformHandler.startBoatTweens: tweens saknas");
+        return;
+    }
 
-        if (boat && typeof boat.startTween === "function") {
-            boat.startTween(tweens, boat.minX, boat.maxX);
-            console.log("startTween:", boat);
+    if (!this.boats) {
+        console.log("PlatformHandler.startBoatTweens: boats-array saknas");
+        return;
+    }
+
+    for (i = 0; i < this.boats.length; i++) {
+
+        boat = this.boats[i];
+
+        if (!boat) {
+            continue;
+        }
+
+        if (typeof boat.startTween === "function") {
+            boat.startTween(
+                tweens,
+                boat.minX,
+                boat.maxX
+            );
+        } else {
+            console.log("PlatformHandler.startBoatTweens: båten saknar startTween", boat);
         }
     }
 };

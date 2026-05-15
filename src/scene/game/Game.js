@@ -260,7 +260,7 @@ runmysteriet.scene.Game.prototype.createHUD = function() {
     /*
      * Timer
      */
-    this.m_timerText = new rune.text.BitmapField("TID KVAR 200");
+    this.m_timerText = new rune.text.BitmapField("TIME LEFT: 200");
     this.m_timerText.x = 15;
     this.m_timerText.y = 15;
     this.stage.addChild(this.m_timerText);
@@ -348,10 +348,13 @@ runmysteriet.scene.Game.prototype.updateHUD = function() {
      * Highscore följer kameran så att den alltid är synlig.
      */
     if (this.m_highscoreHud) {
-        this.m_highscoreHud.x = camera.viewport.x + 12;
-        this.m_highscoreHud.y = camera.viewport.y + 40;
-    }
+    this.m_highscoreHud.x =
+        camera.viewport.x +
+        camera.viewport.width / 2 -
+        this.m_highscoreHud.width / 2;
 
+    this.m_highscoreHud.y = camera.viewport.y + 15;
+}
     /*
      * Runtext + bakgrund placeras vid höger kant.
      */
@@ -473,7 +476,7 @@ runmysteriet.scene.Game.prototype.createPauseMenu = function() {
 
     this.stage.addChild(this.m_pauseOverlay);
 
-    this.m_pauseTitle = new rune.text.BitmapField("SPELET AR PAUSAT");
+    this.m_pauseTitle = new rune.text.BitmapField("GAME PAUSED");
     this.m_pauseTitle.autoSize = true;
     this.m_pauseTitle.visible = false;
     this.stage.addChild(this.m_pauseTitle);
@@ -481,10 +484,10 @@ runmysteriet.scene.Game.prototype.createPauseMenu = function() {
     this.m_pauseMenu = new runmysteriet.ui.graphic.MenuList(
         this.stage,
         this.application,
-        ["FORTSATT SPELET", "AVSLUTA SPELET"],
+        ["CONTINUE", "QUIT GAME"],
         0,
-        20,
-        0.8
+        22,
+        1
     );
 
     this.m_pauseMenu.setVisible(false);
@@ -849,10 +852,10 @@ runmysteriet.scene.Game.prototype.createGameOverMenu = function(reason) {
     this.m_gameOverMenu = new runmysteriet.ui.graphic.MenuList(
         this.stage,
         this.application,
-        ["STARTA NYTT SPEL", "TILL HUVUDMENY"],
+        [ "RESTART LEVEL", "QUIT TO MENU"],
         0,
-        20,
-        0.8
+        22,
+        1
     );
 
     this.m_gameOverMenu.setVisible(false);
