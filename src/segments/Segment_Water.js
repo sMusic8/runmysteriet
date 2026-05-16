@@ -68,7 +68,7 @@ runmysteriet.segments.Segment_Water.prototype.ground = function(stage, startX) {
      */
     var boat = new runmysteriet.entity.EnglishBoat(
         water.x + 60, /// 20 är avståndet mellan båten och flotten, kan justeras
-        water.y - 120// 150 är avståndet mellan båten och vattnet, kan justeras
+        water.y - 75//  är avståndet mellan båten och vattnet, kan justeras
     );
 
     /*

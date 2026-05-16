@@ -32,6 +32,9 @@ runmysteriet.handler.PlayerHandler = function(stage, platformHandler, applicatio
     /** @type {number} */
     this.m_avatarPlatformOffsetY = 14;
 
+    ///** @type {number} */
+    this.m_raftPlatformOffsetY = 0;
+
     /** @type {!runmysteriet.input.GameInput} */
     this.input = input;
 
@@ -641,9 +644,27 @@ runmysteriet.handler.PlayerHandler.prototype.placePlayerOnStartPlatform = functi
 
 runmysteriet.handler.PlayerHandler.prototype.getStandingY = function(player, platform) {
 
-    if (!player || !platform) return 0;
+    var offsetY = 0;
 
-    return platform.y - player.height / 2 - this.m_avatarPlatformOffsetY;
+    if (!player || !platform) {
+        return 0;
+    }
+
+    /*
+     * Vanliga plattformar behöver större offset eftersom avatarens sprite/hitbox
+     * annars kan se ut att sjunka ner i marken.
+     */
+    offsetY = this.m_avatarPlatformOffsetY;
+
+    /*
+     * Flotten är tunnare och ska ha egen offset.
+     * Lägre offset gör att avataren hamnar längre ner och ser ut att stå på flotten.
+     */
+    if (platform.isRaft === true) {
+        offsetY = this.m_raftPlatformOffsetY;
+    }
+
+    return platform.y - player.height / 2 - offsetY;
 };
 
 //------------------------------------------------------------------------------
@@ -680,23 +701,100 @@ runmysteriet.handler.PlayerHandler.prototype.checkWaterDeath = function(player, 
     }
 };
 
+//------------------------------------------------------------------------------
+// BOAT DEATH
+//------------------------------------------------------------------------------
+
 runmysteriet.handler.PlayerHandler.prototype.checkBoatDeath = function(player, index) {
 
     var boat = null;
+    var raft = null;
+    var i = 0;
+
+    var playerLeft = 0;
+    var playerRight = 0;
+    var playerTop = 0;
+    var playerFoot = 0;
+
+    var boatLeft = 0;
+    var boatRight = 0;
+    var boatTop = 0;
+    var boatBottom = 0;
+
+    var overlapsX = false;
+    var boatIsAbovePlayer = false;
+    var boatTouchesPlayerY = false;
+
+    var paddingX = 6;
 
     if (!player || player.isDead === true) {
         return;
     }
 
+    /*
+     * Viktigt:
+     * Båten ska bara kunna döda om spelaren står på flotten.
+     */
+    if (!player.currentPlatform || player.currentPlatform.isRaft !== true) {
+        return;
+    }
+
+    raft = player.currentPlatform;
+
     if (!this.platformHandler || !this.platformHandler.boats) {
         return;
     }
 
-    for (var i = 0; i < this.platformHandler.boats.length; i++) {
+    playerLeft = player.x + paddingX;
+    playerRight = player.x + player.width - paddingX;
+
+    playerTop = this.getPlayerHeadY(player);
+    playerFoot = this.getPlayerFootY(player);
+
+    for (i = 0; i < this.platformHandler.boats.length; i++) {
 
         boat = this.platformHandler.boats[i];
 
-        if (boat && boat.isTouchingPlayer(player)) {
+        if (!boat) {
+            continue;
+        }
+
+        boatLeft = boat.x + paddingX;
+        boatRight = boat.x + boat.width - paddingX;
+
+        boatTop = boat.y;
+        boatBottom = boat.y + boat.height;
+
+        /*
+         * Båten måste vara över spelaren i X-led.
+         */
+        overlapsX =
+            playerRight > boatLeft &&
+            playerLeft < boatRight;
+
+        /*
+         * Eftersom Y ökar nedåt:
+         * boatTop < playerFoot betyder att båten ligger ovanför/nära spelarens kropp.
+         */
+        boatIsAbovePlayer = boatTop < playerFoot;
+
+        /*
+         * Båten måste också nå spelarens kropp i Y-led.
+         * Annars skulle spelaren dö bara för att båten är högt ovanför.
+         */
+        boatTouchesPlayerY =
+            boatBottom > playerTop &&
+            boatTop < playerFoot;
+
+        /*
+         * Extra säkerhet:
+         * Båten ska vara ovanför flotten, inte under den.
+         */
+        if (boat.y > raft.y) {
+            continue;
+        }
+
+        if (overlapsX && boatIsAbovePlayer && boatTouchesPlayerY) {
             this.killPlayer(player, index);
             return;
         }
