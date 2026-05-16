@@ -73,9 +73,12 @@ runmysteriet.logic.HighscoreManager.prototype.hasSameEntry = function(name, scor
             continue;
         }
 
-        if (String(item.name || "").toUpperCase() === name && item.score === score) {
-            return true;
-        }
+       if (
+            String(item.name || "").toUpperCase() === name &&
+            parseInt(item.score, 10) === score
+) {
+    return true;
+}
     }
 
     return false;

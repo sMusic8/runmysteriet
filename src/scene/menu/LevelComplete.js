@@ -64,7 +64,7 @@ runmysteriet.scene.LevelComplete.prototype.constructor = runmysteriet.scene.Leve
  */
 runmysteriet.scene.LevelComplete.prototype.init = function() {
 
-    var titleText = "LEVEL " + this.levelNumber + " KLAR";
+    var titleText = "LEVEL " + this.levelNumber + " COMPLETE";
     var title = null;
     var earned = null;
     var total = null;
@@ -84,7 +84,7 @@ runmysteriet.scene.LevelComplete.prototype.init = function() {
   //If gamepad eller kaybord justpresst ändra nummret på volume med ett steg i en loop
 
     if (this.levelNumber >= this.maxLevel) {
-        titleText = "DU VANN HELA SPELET";
+        titleText = "YOU WON THE WHOLE GAME";
     }
 
     title = new rune.text.BitmapField(titleText);
@@ -93,7 +93,7 @@ runmysteriet.scene.LevelComplete.prototype.init = function() {
     title.y -= 75;
     this.stage.addChild(title);
 
-    nameText = new rune.text.BitmapField("NAMN " + this.playerName);
+    nameText = new rune.text.BitmapField("NAME " + this.playerName);
     nameText.autoSize = true;
     nameText.center = this.application.screen.center;
     nameText.y -= 50;
@@ -101,7 +101,7 @@ runmysteriet.scene.LevelComplete.prototype.init = function() {
     this.stage.addChild(nameText);
 
     earned = new rune.text.BitmapField(
-        "TIDSPOANG +" + this.earnedScore
+        "EARNED SCORE +" + this.earnedScore
     );
     earned.autoSize = true;
     earned.center = this.application.screen.center;
@@ -110,7 +110,7 @@ runmysteriet.scene.LevelComplete.prototype.init = function() {
     this.stage.addChild(earned);
 
     total = new rune.text.BitmapField(
-        "TOTAL POANG " + this.totalScore
+        "TOTAL SCORE " + this.totalScore
     );
     total.autoSize = true;
     total.center = this.application.screen.center;
@@ -119,9 +119,9 @@ runmysteriet.scene.LevelComplete.prototype.init = function() {
     this.stage.addChild(total);
 
     if (this.saveHighscore() >= 0) {
-        savedText = new rune.text.BitmapField("HIGHSCORE SPARAD");
+        savedText = new rune.text.BitmapField("HIGHSCORE SAVED");
     } else {
-        savedText = new rune.text.BitmapField("HIGHSCORE OFORANDRAD");
+        savedText = new rune.text.BitmapField("HIGHSCORE NOT SAVED");
     }
 
     savedText.autoSize = true;
@@ -192,9 +192,9 @@ runmysteriet.scene.LevelComplete.prototype.createMenu = function() {
     var i = 0;
 
     if (this.levelNumber < this.maxLevel) {
-        labels = ["NASTA LEVEL", "TILLBAKA TILL STARTMENY"];
+        labels = ["NEXT LEVEL", "BACK TO MAIN MENU"];
     } else {
-        labels = ["TILLBAKA TILL STARTMENY"];
+        labels = ["BACK TO MAIN MENU"];
     }
 
     for (i = 0; i < labels.length; i++) {

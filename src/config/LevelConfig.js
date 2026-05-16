@@ -20,7 +20,7 @@ runmysteriet.config.LevelConfig = function(levelNumber) {
  * @return {number}
  */
 runmysteriet.config.LevelConfig.prototype.getMaxLevel = function() {
-    return 100;
+    return 20;
 };
 
 //------------------------------------------------------------------------------

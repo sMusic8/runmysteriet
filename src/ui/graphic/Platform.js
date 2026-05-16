@@ -11,12 +11,20 @@ runmysteriet.ui.Platform = function(x, y, width, height, texture) {
 
      rune.display.Graphic.call(
         this,
-        (x !== undefined ? x : 200),
+        (x !== undefined ? x : 200), 
         (y !== undefined ? y : 200),
         width || 268,
         height || 32,
         texture || "bana-gras1"
     );
+
+            /*
+        * Kollisionsyta.
+        * Gör hitboxen lite smalare än grafiken så spelaren inte fastnar i kanter.
+        */
+        this.collisionPaddingLeft = 0;
+        this.collisionPaddingRight = 0;
+        this.collisionPaddingTop = 0;
 };
 
 // Inheritance
@@ -33,4 +41,16 @@ runmysteriet.ui.Platform.prototype.constructor = runmysteriet.ui.Platform;
  */
 runmysteriet.ui.Platform.prototype.init = function() {
     rune.display.Graphic.prototype.init.call(this);
+};
+
+runmysteriet.ui.Platform.prototype.getCollisionLeft = function() {
+    return this.x + this.collisionPaddingLeft;
+};
+
+runmysteriet.ui.Platform.prototype.getCollisionRight = function() {
+    return this.x + this.width - this.collisionPaddingRight;
+};
+
+runmysteriet.ui.Platform.prototype.getCollisionTop = function() {
+    return this.y + this.collisionPaddingTop;
 };

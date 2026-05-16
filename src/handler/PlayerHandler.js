@@ -505,8 +505,8 @@ runmysteriet.handler.PlayerHandler.prototype.checkPlayerPlatform = function(play
     hasReachedOther = playerFootY >= otherHeadY - toleranceY;
 
     /*
-     * Horisontell kollisionsyta
-     * och krymper hitboxen lite så spelaren inte fastnar på ytterkanterna
+     * Horisontell kollisionsyta.
+     * och krymper hitboxen lite så spelaren inte fastnar på ytterkanter
      */
     playerLeft = player.x + hitboxPaddingX;
     playerRight = player.x + player.width - hitboxPaddingX;
@@ -548,8 +548,8 @@ runmysteriet.handler.PlayerHandler.prototype.handleInput = function(player, inde
         player.isMoving = true;
 
         /*
-         * direction används av attacken
-         * flippedX vänder bilden
+         * direction används av attacken.
+         * flippedX vänder bilden.
          */
         player.direction = -1;
         player.flippedX = true;
@@ -708,53 +708,21 @@ runmysteriet.handler.PlayerHandler.prototype.checkBoatDeath = function(player, i
 
 runmysteriet.handler.PlayerHandler.prototype.killPlayer = function(player, index) {
 
-    if (!player || player.isDead === true) {
+    if (!player) {
         return;
     }
 
-    // 🔥 markera död DIREKT
     player.isDead = true;
-    player.hp = 0;
-    player.velocityY = 0;
-    player.active = false;
-
-    // 🔊 spela ljud DIREKT (innan remove/visible changes kan störa perceptionen)
-    if (!this.deadSound) {
-        this.deadSound = this.application.sounds.sound.get("sound_playerdead");
-    }
-
-    if (this.deadSound) {
-        this.deadSound.play();
-    }
-
-    // 🧠 logik först – visuellt sen
-    console.log("Spelaren " + index + " dog");
-
-    // 🔥 HP bar bort direkt (men utan att påverka spelaren först)
-    if (player.hpBar) {
-        if (player.hpBar.stage) {
-            player.hpBar.stage.removeChild(player.hpBar);
-        }
-        player.hpBar.visible = false;
-        player.hpBar = null;
-    }
-
-    // 👻 dölj spelaren (inte remove direkt om Rune kan få update-fel)
     player.visible = false;
+    player.active = false;
+    player.velocityY = 0;
+    player.hp = 0;
 
-    // 🔥 viktigt: stoppa physics-känsla direkt
-    player.x = player.x;
-    player.y = player.y;
-
-    // (valfritt men stabilt i Rune)
-    if (typeof player.remove === "function") {
-        // låt bli att alltid ta bort direkt – kan skapa “för sent ljud”-känsla i vissa engines
-        setTimeout(function() {
-            if (player.stage) {
-                player.stage.removeChild(player);
-            }
-        }, 0);
+    if (player.hpBar) {
+        player.hpBar.visible = false;
     }
+
+    console.log("Spelaren " + index + " dog");
 };
 
 /**
@@ -880,14 +848,14 @@ runmysteriet.handler.PlayerHandler.prototype.keepPlayersInsideCamera = function(
     var player = null;
     var leftLimit = 0;
     var rightLimit = 0;
+    var playerWidth = 32;
     var margin = 8;
 
     if (!this.camera || !this.camera.viewport) {
         return;
     }
 
-    leftLimit = this.camera.viewport.x + margin;
-    rightLimit = this.camera.viewport.x + this.camera.viewport.width - margin;
+    leftLimit = Math.round(this.camera.viewport.x) + margin;
 
     for (i = 0; i < this.players.length; i++) {
 
@@ -895,6 +863,18 @@ runmysteriet.handler.PlayerHandler.prototype.keepPlayersInsideCamera = function(
 
         if (!player || player.isDead === true) {
             continue;
+        }
+
+        playerWidth = player.width || 32;
+
+        rightLimit =
+            Math.round(this.camera.viewport.x) +
+            this.camera.viewport.width -
+            margin -
+            playerWidth;
+
+        if (rightLimit < leftLimit) {
+            rightLimit = leftLimit;
         }
 
         /*
@@ -907,12 +887,12 @@ runmysteriet.handler.PlayerHandler.prototype.keepPlayersInsideCamera = function(
         /*
          * Stoppa spelaren från att lämna kamerans högra sida.
          */
-        if (player.x + player.width > rightLimit) {
-            player.x = rightLimit - player.width;
+        if (player.x > rightLimit) {
+            player.x = rightLimit;
         }
     }
 };
-//------------------------------------------------------------------------------
+
 // ATTACK EMITTER
 //------------------------------------------------------------------------------    
 runmysteriet.handler.PlayerHandler.prototype.createAttackEmitter = function(x, y) {

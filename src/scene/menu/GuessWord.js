@@ -392,30 +392,6 @@ runmysteriet.scene.GuessWord.prototype.buyHint = function() {
 
 
 //------------------------------------------------------------------------------
-// WRONG GUESS PENALTY
-//------------------------------------------------------------------------------
-
-/**
- * Drar poäng när spelaren gissar fel bokstav.
- *
- * @return {void}
- */
-runmysteriet.scene.GuessWord.prototype.applyWrongGuessPenalty = function() {
-
-    this.m_earnedScore -= this.m_wrongGuessPenalty;
-
-    if (this.m_earnedScore < 0) {
-        this.m_earnedScore = 0;
-    }
-
-    this.m_totalScore = this.m_scoreBeforeLevel + this.m_earnedScore;
-
-    if (this.m_scoreText) {
-        this.m_scoreText.text = "SCORE: " + this.m_totalScore;
-    }
-};
-
-//------------------------------------------------------------------------------
 // CHECK ANSWER
 //------------------------------------------------------------------------------
 

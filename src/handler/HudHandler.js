@@ -73,7 +73,7 @@ runmysteriet.handler.HudHandler.prototype.init = function() {
     /*
      * Runtext.
      */
-    this.m_runeText = new rune.text.BitmapField("RUNOR: ");
+    this.m_runeText = new rune.text.BitmapField("RUNES: ");
     this.m_runeText.autoSize = true;
 
     this.stage.addChild(this.m_runeText);
@@ -112,6 +112,10 @@ runmysteriet.handler.HudHandler.prototype.connectShieldHandler = function(shield
 runmysteriet.handler.HudHandler.prototype.update = function() {
 
     var camera = null;
+    var cameraX = 0;
+    var cameraY = 0;
+    var screenWidth = 0;
+    var screenHeight = 0;
     var runeBoxWidth = 0;
 
     if (!this.cameras) {
@@ -125,60 +129,68 @@ runmysteriet.handler.HudHandler.prototype.update = function() {
     }
 
     /*
-     * Timer vänster.
+     * HUD ska vara fast på skärmen.
+     * Eftersom objekt i stage renderas relativt kameran,
+     * måste deras world-position vara camera position + fast screen offset.
+     */
+    cameraX = Math.round(camera.viewport.x);
+    cameraY = Math.round(camera.viewport.y);
+
+    screenWidth = camera.viewport.width;
+    screenHeight = camera.viewport.height;
+
+    /*
+     * Timer fast uppe till vänster.
      */
     if (this.m_timerText) {
-        this.m_timerText.x = camera.viewport.x + 15;
-        this.m_timerText.y = camera.viewport.y + 15;
+        this.m_timerText.x = cameraX + 15;
+        this.m_timerText.y = cameraY + 15;
     }
 
     /*
-     * Score vänster.
+     * Level / score fast under timer.
      */
     if (this.m_scoreText) {
-        this.m_scoreText.x = camera.viewport.x + 15;
-        this.m_scoreText.y = camera.viewport.y + 30;
+        this.m_scoreText.x = cameraX + 15;
+        this.m_scoreText.y = cameraY + 30;
     }
 
     /*
-    * Bästa highscore i höger kant.
-    */
+     * Highscore fast uppe till höger.
+     */
     if (this.m_highscoreHud) {
         this.m_highscoreHud.x =
-            camera.viewport.x +
-            camera.viewport.width -
+            cameraX +
+            screenWidth -
             this.m_highscoreHud.width -
             15;
 
-        this.m_highscoreHud.y = camera.viewport.y + 15;
+        this.m_highscoreHud.y = cameraY + 15;
     }
 
     /*
- * Runtext längst ner till vänster.
- */
+     * Samlade runor fast nere till vänster.
+     */
     if (this.m_runeText && this.m_runeTextBg) {
 
-        runeBoxWidth = this.m_runeText.width + 10; //
+        runeBoxWidth = this.m_runeText.width + 10;
 
-        if (runeBoxWidth < 150) {
+        if (runeBoxWidth < 120) {
             runeBoxWidth = 120;
         }
 
         this.m_runeTextBg.width = runeBoxWidth;
-        this.m_runeTextBg.height = 15; // Höjden är konstant
+        this.m_runeTextBg.height = 15;
 
-        /*
-        * Vänster längst ner i kamerans synliga fönster.
-        */
-        this.m_runeTextBg.x = camera.viewport.x + 5; // 5px padding från vänster
+        this.m_runeTextBg.x = cameraX + 5;
         this.m_runeTextBg.y =
-            camera.viewport.y +
-            camera.viewport.height -
+            cameraY +
+            screenHeight -
             this.m_runeTextBg.height -
-            2;// 15px padding från botten
+            2;
 
-        this.m_runeText.x = this.m_runeTextBg.x + 5; // 5px padding från vänster
-        this.m_runeText.y = this.m_runeTextBg.y + 3;// 3px padding uppifrån
+        this.m_runeText.x = this.m_runeTextBg.x + 5;
+        this.m_runeText.y = this.m_runeTextBg.y + 3;
     }
 };
 

@@ -84,12 +84,25 @@ runmysteriet.handler.ShieldHandler.prototype.init = function () {
         /*
          * Fallback om JSON inte kan laddas.
          */
-        word = "button";
-
-        this.m_wordData = {
-            word: "Button",
-            Subword: ["Start", "Needle"]
-        };
+      if (this.m_levelNumber >= 11) {
+            word = "warrior";
+            this.m_wordData = {
+                word: "warrior",
+                Subword: ["fighter", "battle"]
+            };
+        } else if (this.m_levelNumber >= 6) {
+            word = "shield";
+            this.m_wordData = {
+                word: "shield",
+                Subword: ["protection", "battle"]
+            };
+        } else {
+            word = "raven";
+            this.m_wordData = {
+                word: "raven",
+                Subword: ["black bird", "viking sign"]
+            };
+        }
 
         this.m_word = word;
         this.m_hints = this.m_wordData.Subword;

@@ -1,153 +1,154 @@
 //------------------------------------------------------------------------------
-// GAME OVER
+// GAME OVER SCENE
 //------------------------------------------------------------------------------
 
-/**
- * Game over scene.
- *
- * @constructor
- * @extends rune.scene.Scene
- * @param {string=} playerName
- * @param {number=} score
- */
-runmysteriet.scene.GameOver = function(playerName, score) {
+runmysteriet.scene.GameOver = function(playerName, score, reason) {
 
     rune.scene.Scene.call(this);
 
     this.m_playerName = playerName || "PLAYER";
     this.m_score = score || 0;
+    this.m_reason = reason || "GAME OVER";
 
-    this.m_gameInput = null;
-    this.m_menuItems = [];
-    this.m_selectedIndex = 0;
+    this.m_title = null;
+    this.m_scoreText = null;
+    this.m_highscoreHud = null;
+    this.m_menu = null;
+
+    this.m_menuSound = null;
 };
 
-runmysteriet.scene.GameOver.prototype = Object.create(rune.scene.Scene.prototype);
-runmysteriet.scene.GameOver.prototype.constructor = runmysteriet.scene.GameOver;
+//------------------------------------------------------------------------------
+// INHERITANCE
+//------------------------------------------------------------------------------
+
+runmysteriet.scene.GameOver.prototype =
+    Object.create(rune.scene.Scene.prototype);
+
+runmysteriet.scene.GameOver.prototype.constructor =
+    runmysteriet.scene.GameOver;
+
+//------------------------------------------------------------------------------
+// INIT
+//------------------------------------------------------------------------------
 
 runmysteriet.scene.GameOver.prototype.init = function() {
 
     rune.scene.Scene.prototype.init.call(this);
-    console.log("Bacon");
- this.backgroundMusic = this.application.sounds.sound.get("sound_musicMenu");
-  this.menuSound = this.application.sounds.sound.get("sound_menu");
-  if (this.backgroundMusic) {
-    this.backgroundMusic.loop = true;
-    this.backgroundMusic.volume = 0.5;
-    this.backgroundMusic.play();
-  }
 
-  //If gamepad eller kaybord justpresst ändra nummret på volume med ett steg i en loop
+    this.m_menuSound = this.application.sounds.sound.get("sound_menu");
 
+    /*
+     * Titel.
+     */
+    this.m_title = new rune.text.BitmapField(this.m_reason);
+    this.m_title.autoSize = true;
+    this.m_title.center = this.application.screen.center;
+    this.m_title.y = 45;
 
-    this.m_gameInput = new runmysteriet.input.GameInput(this.application);
+    this.stage.addChild(this.m_title);
 
-    this.createText();
-    this.createMenu();
-    this.updateMenu();
-};
-
-runmysteriet.scene.GameOver.prototype.createText = function() {
-
-    var title = new rune.text.BitmapField("GAME OVER");
-    title.autoSize = true;
-    title.center = this.application.screen.center;
-    title.y -= 70;
-    this.stage.addChild(title);
-
-    var scoreText = new rune.text.BitmapField(
-        this.m_playerName + " SCORE " + this.m_score
+    /*
+     * Spelarens score.
+     */
+    this.m_scoreText = new rune.text.BitmapField(
+        "SCORE: " + this.m_score
     );
-    scoreText.autoSize = true;
-    scoreText.center = this.application.screen.center;
-    scoreText.y -= 35;
-    scoreText.scale = 0.8;
-    this.stage.addChild(scoreText);
+
+    this.m_scoreText.autoSize = true;
+    this.m_scoreText.center = this.application.screen.center;
+    this.m_scoreText.y = 75;
+
+    this.stage.addChild(this.m_scoreText);
+
+    /*
+     * Top 5 highscore.
+     */
+    this.m_highscoreHud = new runmysteriet.ui.graphic.HighscoreHud(
+        this.application,
+        5
+    );
+
+    this.m_highscoreHud.x = 15;
+    this.m_highscoreHud.y = 105;
+
+    this.stage.addChild(this.m_highscoreHud);
+
+    /*
+     * Meny.
+     */
+    this.m_menu = new runmysteriet.ui.graphic.MenuList(
+        this.stage,
+        this.application,
+        ["START NEW GAME", "MAIN MENU"],
+        135,
+        22,
+        1
+    );
 };
 
-runmysteriet.scene.GameOver.prototype.createMenu = function() {
-
-    var labels = ["STARTA OM", "TILL STARTMENY"];
-    var item = null;
-    var i = 0;
-
-    for (i = 0; i < labels.length; i++) {
-        item = new rune.text.BitmapField(labels[i]);
-        item.autoSize = true;
-        item.center = this.application.screen.center;
-        item.y += 25 + i * 25;
-        item.scale = 0.8;
-
-        this.stage.addChild(item);
-        this.m_menuItems.push(item);
-    }
-};
+//------------------------------------------------------------------------------
+// UPDATE
+//------------------------------------------------------------------------------
 
 runmysteriet.scene.GameOver.prototype.update = function(step) {
 
-    var input = null;
-
     rune.scene.Scene.prototype.update.call(this, step);
 
-    input = this.m_gameInput.read(this.keyboard);
-
-    if (input.down) {
-        this.m_selectedIndex++;
-
-        if (this.m_selectedIndex >= this.m_menuItems.length) {
-            this.m_selectedIndex = 0;
-        }
-
-        this.updateMenu();
-    }
-
-    if (input.up) {
-        this.m_selectedIndex--;
-
-        if (this.m_selectedIndex < 0) {
-            this.m_selectedIndex = this.m_menuItems.length - 1;
-        }
-
-        this.updateMenu();
-    }
-
-    if (input.choose) {
-        this.chooseSelected();
-    }
+    this.handleInput();
 };
 
-runmysteriet.scene.GameOver.prototype.updateMenu = function() {
+//------------------------------------------------------------------------------
+// INPUT
+//------------------------------------------------------------------------------
 
-    var item = null;
-    var text = "";
-    var i = 0;
+runmysteriet.scene.GameOver.prototype.handleInput = function() {
 
-    for (i = 0; i < this.m_menuItems.length; i++) {
-        item = this.m_menuItems[i];
-        text = item.text.replace("> ", "");
-
-        if (i === this.m_selectedIndex) {
-            item.text = "> " + text;
-        } else {
-            item.text = text;
-        }
-    }
-};
-
-runmysteriet.scene.GameOver.prototype.chooseSelected = function() {
-
-    if (this.m_selectedIndex === 0) {
-        this.application.scenes.load([
-            new runmysteriet.scene.Game(
-                1,
-                0,
-                this.m_playerName
-            )
-        ]);
+    if (!this.m_menu) {
         return;
     }
 
-    this.application.scenes.load([
-        new runmysteriet.scene.Menu()
-    ]);
+    if (this.keyboard.justPressed("DOWN")) {
+        this.playMenuSound();
+        this.m_menu.moveNext();
+    }
+
+    if (this.keyboard.justPressed("UP")) {
+        this.playMenuSound();
+        this.m_menu.movePrevious();
+    }
+
+    if (this.keyboard.justPressed("ENTER") ||
+        this.keyboard.justPressed("SPACE")) {
+
+        this.chooseMenuItem();
+    }
+};
+
+runmysteriet.scene.GameOver.prototype.chooseMenuItem = function() {
+
+    var selectedIndex = 0;
+
+    if (!this.m_menu) {
+        return;
+    }
+
+    selectedIndex = this.m_menu.getSelectedIndex();
+
+    if (selectedIndex === 0) {
+        this.application.scenes.load([
+            new runmysteriet.scene.Game(1, 0, this.m_playerName)
+        ]);
+    } else if (selectedIndex === 1) {
+        this.application.scenes.load([
+            new runmysteriet.scene.Menu()
+        ]);
+    }
+};
+
+runmysteriet.scene.GameOver.prototype.playMenuSound = function() {
+
+    if (this.m_menuSound) {
+        this.m_menuSound.play();
+    }
 };

@@ -22,7 +22,7 @@ runmysteriet.scene.TextInputView = function(getHelpText) {
 
     /** @type {Function} */
     this.getHelpText = getHelpText || function() {
-        return "UP/DOWN = BOKSTAV  ENTER/X = VALJ  BACK/ESC = TA BORT";
+        return "UP/DOWN = CHOOSE LETTER     ENTER/X = VALIDATE     BACK/ESC = DELETE";
     };
 
     /** @type {?runmysteriet.input.GameInput} */
@@ -99,7 +99,7 @@ runmysteriet.scene.TextInputView.prototype.init = function() {
 
 runmysteriet.scene.TextInputView.prototype.createText = function() {
 
-    this.m_titleText = new rune.text.BitmapField("SKRIV NAMN");
+    this.m_titleText = new rune.text.BitmapField("WRITE YOUR NAMES");
     this.m_titleText.autoSize = true;
     this.m_titleText.center = this.application.screen.center;
     this.m_titleText.y -= 80;
@@ -238,7 +238,7 @@ runmysteriet.scene.TextInputView.prototype.updateText = function() {
     }
 
     if (this.m_letterText) {
-        this.m_letterText.text = "VALD BOKSTAV: " +
+        this.m_letterText.text = "SELECTED LETTER: " +
             this.m_nameInputs[this.m_currentPlayer].getSelectedLetter().toUpperCase();
         this.m_letterText.center = this.application.screen.center;
         this.m_letterText.y += 60;
@@ -246,11 +246,11 @@ runmysteriet.scene.TextInputView.prototype.updateText = function() {
 
     if (this.m_startText) {
         if (this.areBothNamesComplete()) {
-            this.m_startText.text = "TRYCK ENTER/X FOR ATT STARTA";
+            this.m_startText.text = "PRESS ENTER/X TO START";
         } else if (this.m_currentPlayer === 0) {
-            this.m_startText.text = "FYLL I SPELARE 1";
+            this.m_startText.text = "FILL IN PLAYER 1";
         } else {
-            this.m_startText.text = "FYLL I SPELARE 2";
+            this.m_startText.text = "FILL IN PLAYER 2";
         }
 
         this.m_startText.center = this.application.screen.center;
@@ -274,7 +274,7 @@ runmysteriet.scene.TextInputView.prototype.formatPlayerRow = function(index) {
     var i = 0;
     var letter = " ";
 
-    text += "SPELARE " + (index + 1) + ": ";
+    text += "PLAYER " + (index + 1) + ": ";
 
     for (i = 0; i < 4; i++) {
         letter = rawName.charAt(i);

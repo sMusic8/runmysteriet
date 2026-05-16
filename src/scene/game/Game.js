@@ -30,10 +30,6 @@ runmysteriet.scene.Game = function(levelNumber, score, playerName) {
     this.backgroundMusic = null;
     this.menuSound = null;
 
-    this.m_gameOverActive = false;
-    this.m_gameOverTitle = null;
-    this.m_gameOverMenu = null;
-
     this.m_gameInput = null;
 
     this.camera = null;
@@ -177,15 +173,6 @@ this.m_playerHandler = new runmysteriet.handler.PlayerHandler(
 
 runmysteriet.scene.Game.prototype.update = function(step) {
 
-    /*
-     * Game over-menyn ska kunna läsa input,
-     * men spelet bakom ska inte uppdateras.
-     */
-    if (this.m_gameOverActive === true) {
-        this.updateGameOverInput();
-        this.updateHUD();
-        return;
-    }
 
     /*
      * Pausinput måste kollas innan Rune uppdaterar stage/tweens.
@@ -232,12 +219,26 @@ runmysteriet.scene.Game.prototype.update = function(step) {
 
     this.checkLevelCompletion();
 
-    if (this.m_cameraHandler) {
-        this.m_cameraHandler.update();
-    }
-    
-    if (this.m_playerHandler) {
+ /*
+ * Begränsa spelarna mot nuvarande kamera innan kameran räknar ut sitt nya mål.
+ * Annars kan kamera och spelare påverka varandra i fel ordning och skapa skakning.
+ */
+if (this.m_playerHandler) {
     this.m_playerHandler.keepPlayersInsideCamera();
+}
+
+if (this.m_cameraHandler) {
+    this.m_cameraHandler.update();
+}
+
+/*
+ * Viktigt:
+ * Rune använder ett internt camera-offset vid render.
+ * Eftersom vi ändrar camera.viewport.x själva efter Rune update,
+ * behöver kameran synkas innan HUD:en placeras.
+ */
+if (this.camera && typeof this.camera.update === "function") {
+    this.camera.update(0);
 }
 
 
@@ -525,23 +526,13 @@ runmysteriet.scene.Game.prototype.handleMenuListInput = function(menuList, onCho
 // TIMER
 //------------------------------------------------------------------------------
 
-runmysteriet.scene.Game.prototype.updateTimer = function () {
+runmysteriet.scene.Game.prototype.updateTimer = function() {
 
-    if (this.allRunesColected()) {
-
-        if (this.m_hudHandler) {
-            this.m_hudHandler.setTimerText(
-                "LEVEL IS COMPLETED GUESS THE WORD!"
-            );
-
-            this.m_hudHandler.setScoreText(
-                "LEVEL " + this.m_levelNumber + "  SCORE " + this.m_score
-            );
-        }
-
-        return;
-    }
-
+    /*
+     * Timern ska fortsätta även om alla runor är samlade.
+     * Annars kan spelaren samla runorna och sedan ta hur lång tid som helst
+     * utan att förlora score.
+     */
     this.m_timeLeft -= 1 / 30;
 
     if (this.m_timeLeft < 0) {
@@ -549,16 +540,21 @@ runmysteriet.scene.Game.prototype.updateTimer = function () {
     }
 
     if (this.m_hudHandler) {
-        this.m_hudHandler.setTimerText(
-            "TIME LEFT: " + Math.ceil(this.m_timeLeft)
-        );
+
+        if (this.allRunesColected()) {
+            this.m_hudHandler.setTimerText(
+        "ALL RUNES FOUND - REACH THE END" );
+        } else {
+            this.m_hudHandler.setTimerText(
+                "TIME LEFT" + Math.ceil(this.m_timeLeft)
+            );
+        }
 
         this.m_hudHandler.setScoreText(
-        "LEVEL " + this.m_levelNumber + "  SCORE " + this.m_score
+            "LEVEL" + this.m_levelNumber + "SCORE " + this.m_score
         );
     }
 };
-
 //------------------------------------------------------------------------------
 // LEVEL COMPLETION
 //------------------------------------------------------------------------------
@@ -717,12 +713,12 @@ runmysteriet.scene.Game.prototype.winGame = function(winningPlayer) {
 };
 
 runmysteriet.scene.Game.prototype.loseGame = function(reason) {
-    if (this.m_gameOverActive === true) {
+
+    if (this.m_gameEnd === true) {
         return;
     }
 
     this.m_gameEnd = true;
-    this.m_gameOverActive = true;
 
     if (this.backgroundMusic) {
         if (typeof this.backgroundMusic.stop === "function") {
@@ -732,86 +728,24 @@ runmysteriet.scene.Game.prototype.loseGame = function(reason) {
         }
     }
 
+    /*
+     * Spara score innan GameOver-scenen öppnas.
+     */
     this.saveHighscore();
 
-    if (this.m_hudHandler) {
-    this.m_hudHandler.reloadHighscore();
-}
-
-    this.createGameOverMenu(reason || "YOU LOST");
-    this.updateGameOverMenuPosition();
-
-    if (this.m_gameOverTitle) {
-        this.m_gameOverTitle.visible = true;
-    }
-
-    if (this.m_gameOverMenu) {
-        this.m_gameOverMenu.setVisible(true);
-    }
+    /*
+     * Gå till separat GameOver-scen.
+     * Game.js ska inte längre skapa egen Game Over-meny.
+     */
+    this.application.scenes.load([
+        new runmysteriet.scene.GameOver(
+            this.m_playerName,
+            this.m_score,
+            reason || "GAME OVER"
+        )
+    ]);
 };
 
-//------------------------------------------------------------------------------
-// GAME OVER
-//------------------------------------------------------------------------------
-
-runmysteriet.scene.Game.prototype.createGameOverMenu = function(reason) {
-    if (this.m_gameOverMenu) {
-        return;
-    }
-
-    this.m_gameOverTitle = new rune.text.BitmapField(reason || "YOU LOST");
-    this.m_gameOverTitle.autoSize = true;
-    this.m_gameOverTitle.visible = false;
-    this.stage.addChild(this.m_gameOverTitle);
-
-    this.m_gameOverMenu = new runmysteriet.ui.graphic.MenuList(
-        this.stage,
-        this.application,
-        [ "RESTART LEVEL", "QUIT TO MENU"],
-        0,
-        22,
-        1
-    );
-
-    this.m_gameOverMenu.setVisible(false);
-};
-
-runmysteriet.scene.Game.prototype.updateGameOverInput = function() {
-    if (this.m_gameOverActive !== true) {
-        return;
-    }
-
-    this.updateGameOverMenuPosition();
-
-    this.handleMenuListInput(this.m_gameOverMenu, function(selectedIndex) {
-        if (selectedIndex === 0) {
-            this.application.scenes.load([
-                new runmysteriet.scene.Game(1, 0, this.m_playerName)
-            ]);
-        } else if (selectedIndex === 1) {
-            this.application.scenes.load([
-                new runmysteriet.scene.Menu()
-            ]);
-        }
-    });
-};
-
-runmysteriet.scene.Game.prototype.updateGameOverMenuPosition = function() {
-    var camera = this.cameras.getCameraAt(0);
-
-    if (!camera) {
-        return;
-    }
-
-    if (this.m_gameOverTitle) {
-        this.m_gameOverTitle.x = camera.viewport.x + 70;
-        this.m_gameOverTitle.y = camera.viewport.y + 80;
-    }
-
-    if (this.m_gameOverMenu) {
-        this.m_gameOverMenu.setCameraPosition(camera, 75, 120);
-    }
-};
 
 //------------------------------------------------------------------------------
 // RUNES
