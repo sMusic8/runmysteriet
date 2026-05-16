@@ -15,6 +15,16 @@ runmysteriet.handler.EnemyHandler = function(stage) {
 
     /** @type {!Array<!runmysteriet.entity.Kristen>} */
     this.enemies = [];
+
+    /*
+     * Grottbilder som skapas vid varje Kristen.
+     */
+    this.caves = [];
+
+    /*
+     * Osynliga blockeringar som hindrar spelaren från att hoppa över.
+     */
+    this.caveBlockers = [];
 };
 
 //------------------------------------------------------------------------------
@@ -64,18 +74,33 @@ runmysteriet.handler.EnemyHandler.prototype.init = function(levelConfig, enemySp
  */
 runmysteriet.handler.EnemyHandler.prototype.createKristen = function(spawn) {
 
+    var caveData = null;
+
+    /*
+     * Skapa grottan först så den hamnar bakom Kristen.
+     */
+    caveData = this.createKristenCave(spawn);
+
     var kristen = new runmysteriet.entity.Kristen(
         "spritesheet_kristen",
         spawn.x,
         spawn.y
     );
 
+    /*
+     * Koppla grotta och blocker till just denna Kristen.
+     */
+    kristen.cave = caveData.cave;
+    kristen.caveBlocker = caveData.blocker;
+
+    caveData.cave.enemy = kristen;
+    caveData.blocker.enemy = kristen;
+
     this.enemies.push(kristen);
     this.stage.addChild(kristen);
 
     return kristen;
 };
-
 //------------------------------------------------------------------------------
 // UPDATE
 //------------------------------------------------------------------------------
@@ -92,11 +117,17 @@ runmysteriet.handler.EnemyHandler.prototype.update = function(players) {
 
         var enemy = this.enemies[i];
 
-        if (!enemy || enemy.isDead === true) continue;
+        if (!enemy || enemy.isDead === true) {
+            continue;
+        }
+
+      if (typeof enemy.faceNearestPlayer === "function") {
+         enemy.faceNearestPlayer(players);
+}
 
         if (typeof enemy.checkPlayerCollisions === "function") {
             enemy.checkPlayerCollisions(players);
-        }
+}
     }
 };
 
@@ -140,4 +171,56 @@ runmysteriet.handler.EnemyHandler.prototype.clear = function() {
     }
 
     this.enemies = [];
+};
+
+runmysteriet.handler.EnemyHandler.prototype.createKristenCave = function(spawn) {
+
+    var cave = null;
+    var blocker = null;
+
+    var caveWidth = 200;
+    var caveHeight = 150;
+
+    var caveX = spawn.x + 32;//// Justera så Kristen hamnar i mitten av grottan.
+    var caveY = spawn.y - 68;// Justera så Kristen hamnar i mitten av grottan.
+
+    cave = new rune.display.Graphic(
+        caveX,
+        caveY,
+        caveWidth,
+        caveHeight,
+        "big_stone"
+    );
+
+    /*
+     * Osynlig blocker-zon.
+     * Den används inte som vanlig plattform, utan som logisk spärr.
+     */
+    blocker = new rune.display.Graphic(
+        caveX,
+        caveY,
+        caveWidth,
+        caveHeight
+    );
+
+    blocker.alpha = 0;
+
+    /*
+     * Spelaren får bara passera om fötterna är under denna gräns.
+     * Är spelaren högre upp än detta, räknas det som att spelaren försöker hoppa över.
+     *
+     * Justera detta värde om öppningen känns för låg/hög.
+     */
+    blocker.openingY = spawn.y + 55;
+
+    this.caves.push(cave);
+    this.caveBlockers.push(blocker);
+
+    this.stage.addChild(cave);
+    this.stage.addChild(blocker);
+
+    return {
+        cave: cave,
+        blocker: blocker
+    };
 };

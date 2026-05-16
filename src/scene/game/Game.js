@@ -78,16 +78,7 @@ runmysteriet.scene.Game.prototype.init = function() {
 
     this.m_backgroundHandler.init();
 
-    /*
-     * Moln
-     */
-    this.m_cloudHandler = new runmysteriet.handler.CloudHandler(
-        this.stage,
-        this.application.screen.width
-    );
-
-    this.m_cloudHandler.init();
-
+   
     /*
      * Plattformar / segment / holes / enemy spawnpoints
      */
@@ -100,6 +91,18 @@ runmysteriet.scene.Game.prototype.init = function() {
     this.m_platformHandler.startBoatTweens(this.tweens);
 
     this.m_finishX = this.m_platformHandler.levelWidth - 50;
+   
+    /*
+     * Moln
+     */
+    this.m_cloudHandler = new runmysteriet.handler.CloudHandler(
+        this.stage,
+        this.application.screen.width,
+        this.m_platformHandler.levelWidth
+    );
+
+    this.m_cloudHandler.init();
+
 
     /*
      * Spelare

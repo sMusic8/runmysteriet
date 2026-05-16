@@ -312,6 +312,7 @@ runmysteriet.handler.PlayerHandler.prototype.updateCollisions = function() {
             this.checkPlayerPlatform(player, other);
         }
 
+        this.checkCaveBlockers(player);
         this.checkWaterDeath(player, i);
         this.checkBoatDeath(player, i);
     }
@@ -928,4 +929,94 @@ runmysteriet.handler.PlayerHandler.prototype.createAttackEmitter = function(x, y
     this.stage.addChild(emitter);
 
     emitter.emit(10);
+};
+
+//------------------------------------------------------------------------------
+// CAVE BLOCKERS
+//------------------------------------------------------------------------------
+
+/**
+ * Hindrar spelaren från att hoppa över grottan.
+ * Spelaren får bara passera genom den lägre öppningen där Kristen står.
+ *
+ * @param {!runmysteriet.entity.Player} player
+ * @return {void}
+ */
+runmysteriet.handler.PlayerHandler.prototype.checkCaveBlockers = function(player) {
+
+    var blockers = null;
+    var blocker = null;
+    var i = 0;
+
+    var playerLeft = 0;
+    var playerRight = 0;
+    var playerFootY = 0;
+
+    var blockerLeft = 0;
+    var blockerRight = 0;
+
+    var overlapsX = false;
+    var isTooHigh = false;
+
+    if (!player || player.isDead === true) {
+        return;
+    }
+
+    if (!this.enemyHandler || !this.enemyHandler.caveBlockers) {
+        return;
+    }
+
+    blockers = this.enemyHandler.caveBlockers;
+
+    playerLeft = player.x;
+    playerRight = player.x + player.width;
+    playerFootY = this.getPlayerFootY(player);
+
+    for (i = 0; i < blockers.length; i++) {
+
+        blocker = blockers[i];
+        
+
+        if (!blocker) {
+            continue;
+        }
+        if (blocker.enemy && blocker.enemy.isDead === true) {
+            continue;
+        }
+
+        blockerLeft = blocker.x;
+        blockerRight = blocker.x + blocker.width;
+
+        overlapsX =
+            playerRight > blockerLeft &&
+            playerLeft < blockerRight;
+
+        /*
+         * Om spelarens fötter är ovanför öppningen,
+         * försöker spelaren passera för högt.
+         */
+        isTooHigh = playerFootY < blocker.openingY;
+
+        if (overlapsX && isTooHigh) {
+
+            /*
+             * Flytta tillbaka spelaren till positionen innan sidledsrörelsen.
+             * Detta stoppar hopp över grottan men tillåter gång genom öppningen.
+             */
+            if (typeof player.previousX === "number") {
+                player.x = player.previousX;
+            } else {
+                player.x = blockerLeft - player.width;
+            }
+
+            /*
+             * Om spelaren är på väg uppåt, stoppa upphoppet lite.
+             */
+            if (player.velocityY < 0) {
+                player.velocityY = 0;
+            }
+
+            return;
+        }
+    }
 };

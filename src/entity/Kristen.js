@@ -168,6 +168,65 @@ runmysteriet.entity.Kristen.prototype.die = function () {
 };
 
 //------------------------------------------------------------------------------
+// FACE PLAYER
+//------------------------------------------------------------------------------
+
+/**
+ * Vänder Kristen mot närmaste levande spelare.
+ *
+ * @param {!Array<!runmysteriet.entity.Player>} players
+ * @return {void}
+ */
+runmysteriet.entity.Kristen.prototype.faceNearestPlayer = function(players) {
+
+    var nearestPlayer = null;
+    var nearestDistance = Number.MAX_VALUE;
+    var player = null;
+    var distance = 0;
+    var i = 0;
+
+    var kristenCenterX = this.x + this.width / 2;
+    var playerCenterX = 0;
+
+    if (!players || this.isDead === true) {
+        return;
+    }
+
+    for (i = 0; i < players.length; i++) {
+
+        player = players[i];
+
+        if (!player || player.isDead === true) {
+            continue;
+        }
+
+        playerCenterX = player.x + player.width / 2;
+        distance = Math.abs(playerCenterX - kristenCenterX);
+
+        if (distance < nearestDistance) {
+            nearestDistance = distance;
+            nearestPlayer = player;
+        }
+    }
+
+    if (!nearestPlayer) {
+        return;
+    }
+
+    playerCenterX = nearestPlayer.x + nearestPlayer.width / 2;
+
+    /*
+     * Om spelaren är till vänster om Kristen ska Kristen titta vänster.
+     * Om din sprite blir felvänd, byt true/false här.
+     */
+    if (playerCenterX < kristenCenterX) {
+        this.flippedX = true;
+    } else {
+        this.flippedX = false;
+    }
+};
+
+//------------------------------------------------------------------------------
 // PLAYER COLLISION LOOP
 //------------------------------------------------------------------------------
 

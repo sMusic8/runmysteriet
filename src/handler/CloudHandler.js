@@ -9,11 +9,11 @@
  * @param {!rune.display.Stage} stage
  * @param {number} screenWidth
  */
-runmysteriet.handler.CloudHandler = function(stage, screenWidth) {
+runmysteriet.handler.CloudHandler = function(stage, screenWidth, levelWidth) {
 
     this.stage = stage;
     this.screenWidth = screenWidth;
-    this.levelWidth = screenWidth * 4;
+    this.levelWidth = levelWidth || screenWidth * 4;
 
     this.clouds = [];
 
@@ -36,25 +36,27 @@ runmysteriet.handler.CloudHandler = function(stage, screenWidth) {
 
 runmysteriet.handler.CloudHandler.prototype.init = function() {
 
-    var cloudCount = 20;     // 🔥 fler moln
-    var spacing = 80;        // 🔥 tätare mellanrum
+    var cloudCount = 30;
+    var spacing = this.levelWidth / cloudCount;
 
     for (var i = 0; i < cloudCount; i++) {
 
         var randomIndex = Math.floor(Math.random() * this.cloudResources.length);
 
-        // 🔥 slumpa storlek för variation
-        var scale = 0.7 + Math.random() * 0.8;
+        var scale = 0.8 + Math.random() * 0.4;
+
+        var cloudWidth = 160 * scale;
+        var cloudHeight = 90 * scale;
 
         var cloud = new rune.display.Graphic(
-            Math.random() * this.levelWidth,          // 🔥 sprid över hela banan
-            20 + Math.random() * 100,
-            100 * scale,
-            60 * scale,
+            i * spacing + Math.random() * spacing,
+            0 + Math.random() * 45,
+            cloudWidth,
+            cloudHeight,
             this.cloudResources[randomIndex]
         );
 
-        cloud.speed = 0.3 + Math.random() * 0.5;
+        cloud.speed = 0.15 + Math.random() * 0.25;
 
         this.clouds.push(cloud);
         this.stage.addChild(cloud);
@@ -71,12 +73,20 @@ runmysteriet.handler.CloudHandler.prototype.update = function() {
 
         var cloud = this.clouds[i];
 
+        if (!cloud) {
+            continue;
+        }
+
         cloud.x += cloud.speed;
 
-        if (cloud.x > this.levelWidth + 200) {
+        /*
+         * Molnet ska röra sig under hela leveln.
+         * När det lämnar levelns högerkant börjar det om från vänster.
+         */
+        if (cloud.x > this.levelWidth + cloud.width) {
 
-            cloud.x = -200;
-            cloud.y = 20 + Math.random() * 100;
+            cloud.x = -cloud.width;
+            cloud.y = 0 + Math.random() * 45;
         }
     }
 };
