@@ -17,6 +17,7 @@ npx google-closure-compiler \
 --js "./../../src/entity/Kristen.js" \
 --js "./../../src/entity/EnglishBoat.js" \
 --js "./../../src/entity/Player.js" \
+--js "./../../src/entity/Disease.js" \
 --js "./../../src/ui/graphic/Platform.js" \
 --js "./../../src/ui/graphic/MenuList.js" \
 --js "./../../src/ui/graphic/Hole.js" \
@@ -33,6 +34,7 @@ npx google-closure-compiler \
 --js "./../../src/handler/EnemyHandler.js" \
 --js "./../../src/handler/PlayerHandler.js" \
 --js "./../../src/handler/HudHandler.js" \
+--js "./../../src/handler/DiseaseHandler.js" \
 --js "./../../src/scene/menu/More.js" \
 --js "./../../src/scene/menu/Credits.js" \
 --js "./../../src/scene/menu/LevelComplete.js" \

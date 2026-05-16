@@ -35,6 +35,7 @@ runmysteriet.scene.Game = function(levelNumber, score, playerName) {
     this.camera = null;
     this.m_hudHandler = null;
     this.m_highscoreSaved = false;
+    this.m_diseaseHandler = null;
 };
     
 //------------------------------------------------------------------------------
@@ -144,8 +145,17 @@ this.m_playerHandler = new runmysteriet.handler.PlayerHandler(
         this.m_playerHandler,
         this.m_platformHandler.levelWidth
     );
-    // Ge playerHandler referens till kameran så att den kan hålla spelare inom leveln.
+    // Ger playerHandler referens till kameran så att den kan hålla spelare inom leveln.
     this.m_playerHandler.setCamera(this.camera);
+
+            /*
+        * Sjukdomar / hazards
+        */
+        this.m_diseaseHandler = new runmysteriet.handler.DiseaseHandler(
+            this.stage
+        );
+
+        this.m_diseaseHandler.init(this.m_levelNumber);
 
     /*
      * Sköldar / runor
@@ -218,8 +228,8 @@ runmysteriet.scene.Game.prototype.update = function(step) {
 
     this.updateHoles();
     this.updateEnemies();
+    this.updateDiseases();
     this.updateShields();
-
     this.checkLevelCompletion();
 
  /*
@@ -843,4 +853,15 @@ runmysteriet.scene.Game.prototype.dispose = function() {
     }
 
     rune.scene.Scene.prototype.dispose.call(this);
+};
+
+//------------------------------------------------------------------------------
+// DISEASES
+//------------------------------------------------------------------------------
+
+runmysteriet.scene.Game.prototype.updateDiseases = function() {
+
+    if (this.m_diseaseHandler && this.m_playerHandler) {
+        this.m_diseaseHandler.update(this.m_playerHandler.players);
+    }
 };
