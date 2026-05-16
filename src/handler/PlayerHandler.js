@@ -32,6 +32,9 @@ runmysteriet.handler.PlayerHandler = function(stage, platformHandler, applicatio
     /** @type {number} */
     this.m_avatarPlatformOffsetY = 14;
 
+    ///** @type {number} */
+    this.m_raftPlatformOffsetY = 0;
+
     /** @type {!runmysteriet.input.GameInput} */
     this.input = input;
 
@@ -641,9 +644,27 @@ runmysteriet.handler.PlayerHandler.prototype.placePlayerOnStartPlatform = functi
 
 runmysteriet.handler.PlayerHandler.prototype.getStandingY = function(player, platform) {
 
-    if (!player || !platform) return 0;
+    var offsetY = 0;
 
-    return platform.y - player.height / 2 - this.m_avatarPlatformOffsetY;
+    if (!player || !platform) {
+        return 0;
+    }
+
+    /*
+     * Vanliga plattformar behöver större offset eftersom avatarens sprite/hitbox
+     * annars kan se ut att sjunka ner i marken.
+     */
+    offsetY = this.m_avatarPlatformOffsetY;
+
+    /*
+     * Flotten är tunnare och ska ha egen offset.
+     * Lägre offset gör att avataren hamnar längre ner och ser ut att stå på flotten.
+     */
+    if (platform.isRaft === true) {
+        offsetY = this.m_raftPlatformOffsetY;
+    }
+
+    return platform.y - player.height / 2 - offsetY;
 };
 
 //------------------------------------------------------------------------------

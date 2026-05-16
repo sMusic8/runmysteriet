@@ -21,7 +21,7 @@ runmysteriet.ui.graphic.Raft = function(x, y) {
     this.minX = this.startX;
     this.maxX = this.startX + 100;
 
-    this.speed = 0.7;
+    this.speed = 1.4;
     this.direction = 1;
 
     this.previousX = this.x;
@@ -34,6 +34,19 @@ runmysteriet.ui.graphic.Raft = function(x, y) {
     this.hasArrived = false;    
 };
 
+runmysteriet.ui.graphic.Raft.prototype.start = function() {
+
+    /*
+     * VIKTIGT - ta inte bortdenna checken
+     * så startar inte flotten flera gånger
+     * annars kan tween/rörelse startas om varje frame och då hackar flotten 
+     */
+    if (this.hasStarted === true || this.hasArrived === true) {
+        return;
+    }
+
+    this.hasStarted = true;
+};
 
 runmysteriet.ui.graphic.Raft.prototype = Object.create(rune.display.Graphic.prototype);
 runmysteriet.ui.graphic.Raft.prototype.constructor = runmysteriet.ui.graphic.Raft;
@@ -47,28 +60,36 @@ runmysteriet.ui.graphic.Raft.prototype.start = function() {
 };
 
 runmysteriet.ui.graphic.Raft.prototype.update = function(step) {
-    rune.display.Graphic.prototype.update.call(this, step);
-    
-    
-    this.previousX = this.x;
-    this.deltaX = 0;
 
-    if (this.hasStarted !== true) {
+    /*
+     * Spara position före rörelse.
+     */
+    this.previousX = this.x;
+
+    /*
+     * Om flotten inte har startat ska den stå still.
+     */
+    if (this.hasStarted !== true || this.hasArrived === true) {
+        this.deltaX = 0;
         return;
     }
 
-    this.x += this.speed * this.direction;
+    /*
+     * Flytta flotten mjukt åt höger.
+     */
+    this.x += this.speed;
 
-    if (this.x <= this.minX) {
-        this.x = this.minX;
-        this.direction = -1;
+    /*
+     * Stoppa vid maxX.
+     */
+    if (this.x >= this.maxX) {
+        this.x = this.maxX;
+        this.hasArrived = true;
     }
 
-  if (this.x >= this.maxX) {
-    this.x = this.maxX;
-    this.hasStarted = false;
-    this.hasArrived = true;
-}
-
+    /*
+     * Hur mycket flotten flyttade denna frame.
+     * Spelaren använder detta för att följa med.
+     */
     this.deltaX = this.x - this.previousX;
 };
