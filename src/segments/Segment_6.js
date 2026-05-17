@@ -49,6 +49,7 @@ runmysteriet.segments.Segment_6.prototype.ground = function(stage, startX) {
     var enemySpawns = [];
     var waterAreas = [];
     var boats = [];
+    var diseaseSpawns = [];
 
     function buildGrass(px, py, tiles, _this) {
 
@@ -160,6 +161,7 @@ runmysteriet.segments.Segment_6.prototype.ground = function(stage, startX) {
         platforms: platforms,
         holes: holes,
         enemySpawns: enemySpawns,
+        diseaseSpawns: diseaseSpawns,
         waterAreas: waterAreas,
         boats: boats,
         endX: segmentEnd

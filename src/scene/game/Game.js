@@ -56,6 +56,7 @@ runmysteriet.scene.Game.prototype.init = function() {
 
     this.camera = this.cameras.getCameraAt(0);
 
+    this.m_levelCompleted = false;
 
     /*
      * Musik
@@ -155,8 +156,10 @@ this.m_playerHandler = new runmysteriet.handler.PlayerHandler(
             this.stage
         );
 
-        this.m_diseaseHandler.init(this.m_levelNumber);
-
+        this.m_diseaseHandler.init(
+            this.m_levelNumber,
+            this.m_platformHandler.getDiseaseSpawns()
+        );
     /*
      * Sköldar / runor
      */
@@ -598,10 +601,10 @@ runmysteriet.scene.Game.prototype.checkLevelCompletion = function() {
             continue;
         }
 
-        if (player.x >= this.m_finishX) {
+        if (this.hasPlayerReachedEndZone(player)) {
             this.winGame(player);
             return;
-        }
+}
     }
 
     /*
@@ -864,4 +867,34 @@ runmysteriet.scene.Game.prototype.updateDiseases = function(step) {
     if (this.m_diseaseHandler && this.m_playerHandler) {
         this.m_diseaseHandler.update(this.m_playerHandler.players, step);
     }
+};
+
+runmysteriet.scene.Game.prototype.hasPlayerReachedEndZone = function(player) {
+    var endZones = null;
+    var endZone = null;
+    var i = 0;
+
+    if (!player || !this.m_platformHandler) {
+        return false;
+    }
+
+    if (typeof this.m_platformHandler.getEndZones !== "function") {
+        return false;
+    }
+
+    endZones = this.m_platformHandler.getEndZones();
+
+    if (!endZones) {
+        return false;
+    }
+
+    for (i = 0; i < endZones.length; i++) {
+        endZone = endZones[i];
+
+        if (endZone && player.hitTestObject(endZone)) {
+            return true;
+        }
+    }
+
+    return false;
 };

@@ -11,6 +11,8 @@ runmysteriet.handler.PlatformHandler = function(stage, screenWidth) {
     this.enemySpawns = [];
     this.waterAreas = [];
     this.boats = [];
+    this.endZones = [];
+    this.diseaseSpawns = [];
 
     this.levelWidth = 0;
 };
@@ -27,6 +29,8 @@ runmysteriet.handler.PlatformHandler.prototype.init = function(levelNumber) {
     this.enemySpawns = [];
     this.waterAreas = [];
     this.boats = [];
+    this.endZones = [];
+    this.diseaseSpawns = [];
 
     var x = 0;
     var i = 0;
@@ -47,7 +51,7 @@ runmysteriet.handler.PlatformHandler.prototype.init = function(levelNumber) {
     //----------------------------------------------------------------------
 
     segment = new runmysteriet.segments.Segment_Start();
-    result = segment.ground(this.stage, x);
+    result = segment.ground(this.stage, x, this.levelNumber);
     this.addSegmentResult(result);
     x = result.endX;
 
@@ -59,7 +63,7 @@ runmysteriet.handler.PlatformHandler.prototype.init = function(levelNumber) {
         SegmentClass = chosenSegments[i];
         segment = new SegmentClass();
 
-        result = segment.ground(this.stage, x);
+        result = segment.ground(this.stage, x, this.levelNumber);
         this.addSegmentResult(result);
 
         x = result.endX;
@@ -70,7 +74,7 @@ runmysteriet.handler.PlatformHandler.prototype.init = function(levelNumber) {
     //----------------------------------------------------------------------
 
     segment = new runmysteriet.segments.Segment_Water();
-    result = segment.ground(this.stage, x);
+    result = segment.ground(this.stage, x, this.levelNumber);
     this.addSegmentResult(result);
     x = result.endX;
 
@@ -82,7 +86,7 @@ runmysteriet.handler.PlatformHandler.prototype.init = function(levelNumber) {
         SegmentClass = chosenSegments[beforeWaterCount + i];
         segment = new SegmentClass();
 
-        result = segment.ground(this.stage, x);
+        result = segment.ground(this.stage, x, this.levelNumber);
         this.addSegmentResult(result);
 
         x = result.endX;
@@ -93,7 +97,7 @@ runmysteriet.handler.PlatformHandler.prototype.init = function(levelNumber) {
     //----------------------------------------------------------------------
 
     segment = new runmysteriet.segments.Segment_End();
-    result = segment.ground(this.stage, x);
+    result = segment.ground(this.stage, x, this.levelNumber);
     this.addSegmentResult(result);
     x = result.endX;
 
@@ -252,6 +256,7 @@ runmysteriet.handler.PlatformHandler.prototype.getSegmentPool = function() {
         runmysteriet.segments.Segment_6
     ];
 };
+
 runmysteriet.handler.PlatformHandler.prototype.addSegmentResult = function(result) {
     if (!result) {
         return;
@@ -262,6 +267,8 @@ runmysteriet.handler.PlatformHandler.prototype.addSegmentResult = function(resul
     this.addEnemySpawns(result.enemySpawns || []);
     this.addWaterAreas(result.waterAreas || []);
     this.addBoats(result.boats || []);
+    this.addEndZones(result.endZones || []);
+    this.addDiseaseSpawns(result.diseaseSpawns || []);
 };
 
 runmysteriet.handler.PlatformHandler.prototype.getRandomSegment = function(pool) {
@@ -281,4 +288,45 @@ runmysteriet.handler.PlatformHandler.prototype.getRandomSegments = function(pool
     }
 
     return result;
+};
+
+runmysteriet.handler.PlatformHandler.prototype.addEndZones = function(endZones) {
+    if (!endZones) {
+        return;
+    }
+
+    for (var i = 0; i < endZones.length; i++) {
+        this.endZones.push(endZones[i]);
+    }
+};
+runmysteriet.handler.PlatformHandler.prototype.getEndZones = function() {
+    return this.endZones;
+};
+
+runmysteriet.handler.PlatformHandler.prototype.addDiseaseSpawns = function(diseaseSpawns) {
+    if (!diseaseSpawns) {
+        return;
+    }
+
+    for (var i = 0; i < diseaseSpawns.length; i++) {
+        this.diseaseSpawns.push(diseaseSpawns[i]);
+    }
+};
+
+runmysteriet.handler.PlatformHandler.prototype.getDiseaseSpawns = function() {
+    return this.diseaseSpawns;
+};
+
+runmysteriet.handler.PlatformHandler.prototype.addDiseaseSpawns = function(diseaseSpawns) {
+    if (!diseaseSpawns) {
+        return;
+    }
+
+    for (var i = 0; i < diseaseSpawns.length; i++) {
+        this.diseaseSpawns.push(diseaseSpawns[i]);
+    }
+};
+
+runmysteriet.handler.PlatformHandler.prototype.getDiseaseSpawns = function() {
+    return this.diseaseSpawns;
 };

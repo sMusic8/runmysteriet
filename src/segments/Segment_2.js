@@ -53,6 +53,7 @@ runmysteriet.segments.Segment_2.prototype.ground = function(stage, startX) {
     var enemySpawns = [];
     var waterAreas = [];
     var boats = [];
+    var diseaseSpawns = [];
 
     var buildStonePlatform = (function(_this) {
         return function(px, py, widthTiles) {
@@ -171,6 +172,7 @@ runmysteriet.segments.Segment_2.prototype.ground = function(stage, startX) {
         platforms: platforms,
         holes: holes,
         enemySpawns: enemySpawns,
+        diseaseSpawns: diseaseSpawns,
         waterAreas: waterAreas,
         boats: boats,
         endX: segmentEnd

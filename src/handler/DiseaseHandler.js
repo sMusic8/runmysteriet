@@ -17,19 +17,31 @@ runmysteriet.handler.DiseaseHandler = function(stage) {
 // INIT
 //------------------------------------------------------------------------------
 
-runmysteriet.handler.DiseaseHandler.prototype.init = function(levelNumber) {
-
+runmysteriet.handler.DiseaseHandler.prototype.init = function(levelNumber, diseaseSpawns) {
     this.clear();
 
-    /*
-     * Testplaceringar.
-     * Justera x och y efter din bana.
-     */
-    this.addDisease("gray", 190, 155);
-    this.addDisease("brown", 130, 155);
-    this.addDisease("red", 160, 160);
+    if (!diseaseSpawns || diseaseSpawns.length === 0) {
+        return;
+    }
+
+    for (var i = 0; i < diseaseSpawns.length; i++) {
+        this.addDisease(
+            diseaseSpawns[i].type,
+            diseaseSpawns[i].x,
+            diseaseSpawns[i].y
+        );
+    }
 };
 
+runmysteriet.handler.DiseaseHandler.prototype.clear = function() {
+    for (var i = 0; i < this.m_diseases.length; i++) {
+        if (this.m_diseases[i] && this.m_diseases[i].parent) {
+            this.m_diseases[i].parent.removeChild(this.m_diseases[i]);
+        }
+    }
+
+    this.m_diseases = [];
+};
 //------------------------------------------------------------------------------
 // ADD DISEASE
 //------------------------------------------------------------------------------
