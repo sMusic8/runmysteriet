@@ -178,8 +178,8 @@ runmysteriet.handler.EnemyHandler.prototype.createKristenCave = function(spawn) 
     var cave = null;
     var blocker = null;
 
-    var caveWidth = 200;
-    var caveHeight = 150;
+    var caveWidth = 100;
+    var caveHeight = 100;
 
     var caveX = spawn.x + 32;//// Justera så Kristen hamnar i mitten av grottan.
     var caveY = spawn.y - 68;// Justera så Kristen hamnar i mitten av grottan.
@@ -189,7 +189,7 @@ runmysteriet.handler.EnemyHandler.prototype.createKristenCave = function(spawn) 
         caveY,
         caveWidth,
         caveHeight,
-        "big_stone"
+        "grottan"
     );
 
     /*
