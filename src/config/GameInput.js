@@ -245,6 +245,8 @@ runmysteriet.input.GameInput.prototype.readPlayer = function(keyboard, playerInd
     var input = {
         left: false,
         right: false,
+        up: false,
+        down: false,
         jump: false,
         attack: false
     };
@@ -259,6 +261,7 @@ runmysteriet.input.GameInput.prototype.readPlayer = function(keyboard, playerInd
             if (typeof keyboard.pressed === "function") {
                 input.left = input.left || keyboard.pressed("LEFT");
                 input.right = input.right || keyboard.pressed("RIGHT");
+                input.down = input.down || keyboard.pressed("DOWN");
             }
 
             if (typeof keyboard.justPressed === "function") {
@@ -275,6 +278,7 @@ runmysteriet.input.GameInput.prototype.readPlayer = function(keyboard, playerInd
             if (typeof keyboard.pressed === "function") {
                 input.left = input.left || keyboard.pressed("A");
                 input.right = input.right || keyboard.pressed("D");
+                input.down = input.down || keyboard.pressed("S");
             }
 
             if (typeof keyboard.justPressed === "function") {

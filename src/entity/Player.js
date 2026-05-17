@@ -31,6 +31,18 @@ runmysteriet.entity.Player = function(controls, spriteConfig) {
     /** @type {!Object} */
     this.spriteConfig = spriteConfig;
 
+    /** @type {string} */
+    this.normalTexture = spriteConfig.texture;
+
+    /** @type {string} */
+    this.crouchTexture = spriteConfig.crouchTexture || spriteConfig.texture;
+    
+    /** @type {boolean} */
+    this.isCrouching = false;
+   
+    /** @type {string} */
+    this.m_currentTexture = this.normalTexture;
+
     /** @type {number} */
     this.speed = 2;
 
@@ -93,8 +105,10 @@ runmysteriet.entity.Player.prototype.init = function() {
     */
 
     this.animation.create("idle", [0], 1, true);
-    this.animation.create("run", [0, 1], 4, true);
+    this.animation.create("run", [0, 1], 6, true);
     this.animation.create("jump", [1], 1, false);
+    this.animation.create("attack", [2, 3, 4], 8, false);
+    this.animation.create("crouch", [5, 6], 6, true);
 
     this.playAnimation("idle");
 };
@@ -135,17 +149,43 @@ runmysteriet.entity.Player.prototype.update = function(step) {
  */
 runmysteriet.entity.Player.prototype.updateAnimation = function() {
 
-    if (this.isOnGround === false) {
-        this.playAnimation("jump");
-    }
-    else if (this.isMoving === true) {
-        this.playAnimation("run");
-    }
-    else {
-        this.playAnimation("idle");
-    }
-};
+    /*
+     * Attack ska gå före allt annat.
+     */
+    if (this.isAttacking === true) {
+        this.playAnimation("attack");
 
+        this.attackAnimationTimer--;
+
+        if (this.attackAnimationTimer <= 0) {
+            this.attackAnimationTimer = 0;
+            this.isAttacking = false;
+            this.currentAnimation = "";
+        }
+
+        return;
+    }
+
+    /*
+     * Krypning kommer före jump/run/idle.
+     */
+    if (this.isCrouching === true) {
+        this.playAnimation("crouch");
+        return;
+    }
+
+    if (this.isOnGround !== true) {
+        this.playAnimation("jump");
+        return;
+    }
+
+    if (this.isMoving === true) {
+        this.playAnimation("run");
+        return;
+    }
+
+    this.playAnimation("idle");
+};
 //------------------------------------------------------------------------------
 // ANIMATION HELPER
 //------------------------------------------------------------------------------
@@ -194,4 +234,26 @@ runmysteriet.entity.Player.prototype.updateAttackCooldown = function() {
     if (this.attackCooldown > 0) {
         this.attackCooldown--;
     }
+};
+
+//------------------------------------------------------------------------------
+// TEXTURE
+//------------------------------------------------------------------------------
+
+runmysteriet.entity.Player.prototype.setPlayerTexture = function(texture) {
+
+    if (!texture) {
+        return;
+    }
+
+    if (this.m_currentTexture === texture) {
+        return;
+    }
+
+    this.m_currentTexture = texture;
+
+    /*
+     * texture-byte via texture-egenskapen
+     */
+    this.texture = texture;
 };

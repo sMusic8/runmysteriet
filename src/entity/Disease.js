@@ -2,13 +2,11 @@
 // DISEASE
 //------------------------------------------------------------------------------
 
-runmysteriet.entity = runmysteriet.entity || {};
-
 /**
  * En sjukdom som kan skada spelaren.
  *
  * @constructor
- * @extends rune.display.Graphic
+ * @extends rune.display.Sprite
  * @param {number} x
  * @param {number} y
  * @param {string} type
@@ -17,12 +15,12 @@ runmysteriet.entity.Disease = function(x, y, type) {
 
     var data = runmysteriet.entity.Disease.getData(type);
 
-    rune.display.Graphic.call(
+    rune.display.Sprite.call(
         this,
-        x || 0,
+        x || 0, 
         y || 0,
-        32,
-        32,
+        15,
+        15,
         data.texture
     );
 
@@ -33,10 +31,19 @@ runmysteriet.entity.Disease = function(x, y, type) {
 
     this.baseY = this.y;
     this.m_floatTime = Math.random() * 100;
+
+
+    /*
+     * Varje sjukdoms-spritesheet har 4 frames:
+     * frame 0, 1, 2, 3.
+     */
+    this.animation.create("idle", [0, 1, 2, 3], 10, true);
+    this.animation.gotoAndPlay("idle");
+
 };
 
 runmysteriet.entity.Disease.prototype =
-    Object.create(rune.display.Graphic.prototype);
+    Object.create(rune.display.Sprite.prototype);
 
 runmysteriet.entity.Disease.prototype.constructor =
     runmysteriet.entity.Disease;
@@ -73,6 +80,10 @@ runmysteriet.entity.Disease.getData = function(type) {
 
 runmysteriet.entity.Disease.prototype.update = function(step) {
 
+    rune.display.Sprite.prototype.update.call(this, step);
+    /*
+     * liten svävande efect
+     */
     this.m_floatTime += 0.08;
     this.y = this.baseY + Math.sin(this.m_floatTime) * 2;
 };

@@ -25,9 +25,9 @@ runmysteriet.handler.DiseaseHandler.prototype.init = function(levelNumber) {
      * Testplaceringar.
      * Justera x och y efter din bana.
      */
-    this.addDisease("gray", 450, 170);
-    this.addDisease("brown", 750, 170);
-    this.addDisease("red", 1050, 170);
+    this.addDisease("gray", 190, 155);
+    this.addDisease("brown", 130, 155);
+    this.addDisease("red", 160, 160);
 };
 
 //------------------------------------------------------------------------------
@@ -48,7 +48,7 @@ runmysteriet.handler.DiseaseHandler.prototype.addDisease = function(type, x, y) 
 // UPDATE
 //------------------------------------------------------------------------------
 
-runmysteriet.handler.DiseaseHandler.prototype.update = function(players) {
+runmysteriet.handler.DiseaseHandler.prototype.update = function(players, step) {
 
     var i = 0;
     var j = 0;
@@ -69,7 +69,7 @@ runmysteriet.handler.DiseaseHandler.prototype.update = function(players) {
         }
 
         if (typeof disease.update === "function") {
-            disease.update();
+            disease.update(step);
         }
 
         for (j = 0; j < players.length; j++) {
@@ -80,8 +80,7 @@ runmysteriet.handler.DiseaseHandler.prototype.update = function(players) {
                 continue;
             }
 
-            if (player.hitTestObject(disease)) {
-
+            if (this.hitTestPlayerDisease(player, disease)) {
                 /*
                  * Dra av HP.
                  */
@@ -123,4 +122,79 @@ runmysteriet.handler.DiseaseHandler.prototype.clear = function() {
     }
 
     this.diseases = [];
+};
+
+//------------------------------------------------------------------------------
+// COLLISION
+//------------------------------------------------------------------------------
+
+runmysteriet.handler.DiseaseHandler.prototype.hitTestPlayerDisease = function(player, disease) {
+
+    var playerLeft = 0;
+    var playerRight = 0;
+    var playerTop = 0;
+    var playerBottom = 0;
+
+    var diseaseLeft = 0;
+    var diseaseRight = 0;
+    var diseaseTop = 0;
+    var diseaseBottom = 0;
+
+    var playerHitboxHeight = 0;
+
+    /*
+     * Spelarens hitbox görs lite smalare.
+     */
+    var playerPaddingX = 8;
+
+    /*
+     * Sjukdomen är bara 15x15.
+     * Därför ska padding vara små värden.
+     */
+    var diseasePaddingX = 2;
+    var diseasePaddingTop = 2;
+    var diseasePaddingBottom = 4;
+
+    if (!player || !disease) {
+        return false;
+    }
+
+    /*
+     * Spelarens hitbox.
+     */
+    playerLeft = player.x + playerPaddingX;
+    playerRight = player.x + player.width - playerPaddingX;
+
+    playerBottom = player.y + player.height / 2;
+
+    if (player.isCrouching === true) {
+        /*
+         * Lägre hitbox när spelaren kryper.
+         */
+        playerHitboxHeight = 10;
+    } else {
+        /*
+         * Gör normal hitbox lite lägre än hela spriten.
+         * Annars träffar osynliga pixlar för lätt.
+         */
+        playerHitboxHeight = player.height - 6;
+    }
+
+    playerTop = playerBottom - playerHitboxHeight;
+
+    /*
+     * Sjukdomens mindre hitbox.
+     */
+    diseaseLeft = disease.x + diseasePaddingX;
+    diseaseRight = disease.x + disease.width - diseasePaddingX;
+
+    diseaseTop = disease.y + diseasePaddingTop;
+    diseaseBottom = disease.y + disease.height - diseasePaddingBottom;
+
+    return (
+        playerRight > diseaseLeft &&
+        playerLeft < diseaseRight &&
+        playerBottom > diseaseTop &&
+        playerTop < diseaseBottom
+    );
 };

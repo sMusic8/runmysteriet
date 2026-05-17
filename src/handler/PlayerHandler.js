@@ -61,14 +61,20 @@ runmysteriet.handler.PlayerHandler = function(stage, platformHandler, applicatio
 runmysteriet.handler.PlayerHandler.prototype.init = function() {
 
     var player1 = new runmysteriet.entity.Player(
-        { left: "LEFT", right: "RIGHT", jump: "UP" },
-        { texture: "spritesheet_freya_move", start: "idle" }
-    );
+        { left: "LEFT", right: "RIGHT", jump: "UP", down: "DOWN" },
+        {
+            texture: "spritesheet_freya_all",
+            start: "idle"
+        }
+);
 
     var player2 = new runmysteriet.entity.Player(
-        { left: "A", right: "D", jump: "W" },
-        { texture: "spritesheet_thor_move", start: "idle" }
-    );
+        { left: "A", right: "D", jump: "W", down: "S" },
+        {
+            texture: "spritesheet_thor_all",
+            start: "idle"
+        }
+);
 
     player1.direction = 1;
     player1.flippedX = false;
@@ -546,32 +552,30 @@ runmysteriet.handler.PlayerHandler.prototype.checkPlayerPlatform = function(play
 runmysteriet.handler.PlayerHandler.prototype.handleInput = function(player, index) {
 
     var input = this.input.readPlayer(this.keyboard, index);
+    var moveSpeed = player.speed;
+
+    player.wantsToCrouch = input.down === true;
+    player.isCrouching = input.down === true;
+
+    if (player.isCrouching === true) {
+        moveSpeed = player.speed * 0.4;
+    }
 
     if (input.left) {
-        player.x -= player.speed;
+        player.x -= moveSpeed;
         player.isMoving = true;
-
-        /*
-         * direction används av attacken.
-         * flippedX vänder bilden.
-         */
         player.direction = -1;
         player.flippedX = true;
     }
 
     if (input.right) {
-        player.x += player.speed;
+        player.x += moveSpeed;
         player.isMoving = true;
-
-        /*
-         * direction används av attacken.
-         * flippedX vänder bilden.
-         */
         player.direction = 1;
         player.flippedX = false;
     }
 
-    if (input.jump && player.isOnGround === true) {
+    if (input.jump && player.isOnGround === true && player.isCrouching !== true) {
         player.velocityY = player.jumpPower;
         player.isOnGround = false;
 
@@ -581,9 +585,13 @@ runmysteriet.handler.PlayerHandler.prototype.handleInput = function(player, inde
     }
 
     if (input.attack && player.canAttack()) {
-        this.createAttack(player);
-        player.resetAttackCooldown();
-    }
+    player.isAttacking = true;
+    player.attackAnimationTimer = 12;
+    player.currentAnimation = "";
+
+    this.createAttack(player);
+    player.resetAttackCooldown();
+}
 };
 //------------------------------------------------------------------------------
 // HP BAR

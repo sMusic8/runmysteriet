@@ -228,7 +228,7 @@ runmysteriet.scene.Game.prototype.update = function(step) {
 
     this.updateHoles();
     this.updateEnemies();
-    this.updateDiseases();
+    this.updateDiseases(step);
     this.updateShields();
     this.checkLevelCompletion();
 
@@ -308,7 +308,7 @@ runmysteriet.scene.Game.prototype.updateHoles = function() {
 };
 
 
-runmysteriet.scene.Game.prototype.updateEnemies = function() {
+runmysteriet.scene.Game.prototype.updateEnemies = function(step) {
     if (this.m_enemyHandler && this.m_playerHandler) {
         this.m_enemyHandler.update(this.m_playerHandler.players);
     }
@@ -859,9 +859,9 @@ runmysteriet.scene.Game.prototype.dispose = function() {
 // DISEASES
 //------------------------------------------------------------------------------
 
-runmysteriet.scene.Game.prototype.updateDiseases = function() {
+runmysteriet.scene.Game.prototype.updateDiseases = function(step) {
 
     if (this.m_diseaseHandler && this.m_playerHandler) {
-        this.m_diseaseHandler.update(this.m_playerHandler.players);
+        this.m_diseaseHandler.update(this.m_playerHandler.players, step);
     }
 };
