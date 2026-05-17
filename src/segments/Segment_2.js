@@ -4,14 +4,14 @@
 
 /**
  * Segment 2 constructor.
- * Handles stone platforms and large hole traversal section.
+ * Handles stone platforms and a lava traversal section.
  *
  * @constructor
  */
 runmysteriet.segments.Segment_2 = function() {
 
     /** @type {number} */
-    this.tileSize = 268;
+    this.length = 1000;
 
     /** @type {number} */
     this.groundY = 200;
@@ -24,7 +24,6 @@ runmysteriet.segments.Segment_2 = function() {
 
     /** @type {number} */
     this.tileH = 20;
-
     console.log("Segment 2");
 };
 
@@ -37,24 +36,27 @@ runmysteriet.segments.Segment_2 = function() {
  *   platforms: !Array<!rune.display.Graphic>,
  *   holes: !Array<!runmysteriet.ui.graphic.Hole>,
  *   enemySpawns: !Array<!Object>,
+ *   waterAreas: !Array<!Object>,
+ *   boats: !Array<!Object>,
  *   endX: number
  * }}
  */
 runmysteriet.segments.Segment_2.prototype.ground = function(stage, startX) {
 
-    var x = startX || 0;
+    var segmentStart = startX || 0;
+    var segmentEnd = segmentStart + this.length;
+
+    var x = segmentStart;
+
     var platforms = [];
     var holes = [];
     var enemySpawns = [];
+    var waterAreas = [];
+    var boats = [];
 
     var buildStonePlatform = (function(_this) {
-
         return function(px, py, widthTiles) {
-
-            var group = [];
-
             for (var i = 0; i < widthTiles; i++) {
-
                 var tile = new rune.display.Graphic(
                     px + (i * _this.tileW),
                     py,
@@ -65,27 +67,29 @@ runmysteriet.segments.Segment_2.prototype.ground = function(stage, startX) {
 
                 stage.addChild(tile);
                 platforms.push(tile);
-                group.push(tile);
             }
-
-            return group;
         };
-
     })(this);
 
-    // START PLATFORM
-    buildStonePlatform(x, this.groundY, 8);
+    //----------------------------------------------------------------------
+    // STARTPLATTFORM
+    //----------------------------------------------------------------------
+
+    buildStonePlatform(x, this.groundY, 6);
 
     enemySpawns.push({
         type: "kristen",
-        x: x + 120,
+        x: x + 100,
         y: this.groundY - 40
     });
 
-    x += 8 * this.tileW;
+    x += 6 * this.tileW;
 
-    // LARGE HOLE SECTION
-    var holeWidth = 520;
+    //----------------------------------------------------------------------
+    // LAVAHÅL
+    //----------------------------------------------------------------------
+
+    var holeWidth = 430;
 
     var hole = new runmysteriet.ui.graphic.Hole(
         x,
@@ -97,24 +101,16 @@ runmysteriet.segments.Segment_2.prototype.ground = function(stage, startX) {
     stage.addChild(hole);
     holes.push(hole);
 
-    // -----------------------------
-    // 🔥 LAVA (NYTT TILLAGT)
-    // -----------------------------
-
-    var lavaTileW = this.tileW;
-    var lavaTileH = this.tileH;
-    var lavaRows = 6; // fyller ner i hålet
-    var lavaCols = Math.ceil(holeWidth / lavaTileW);
+    var lavaCols = Math.ceil(holeWidth / this.tileW);
+    var lavaRows = 6;
 
     for (var ly = 0; ly < lavaRows; ly++) {
-
         for (var lx = 0; lx < lavaCols; lx++) {
-
             var lavaTile = new rune.display.Graphic(
-                x + (lx * lavaTileW),
-                this.groundY + (ly * lavaTileH),
-                lavaTileW,
-                lavaTileH,
+                x + (lx * this.tileW),
+                this.groundY + (ly * this.tileH),
+                this.tileW,
+                this.tileH,
                 "lava"
             );
 
@@ -122,19 +118,20 @@ runmysteriet.segments.Segment_2.prototype.ground = function(stage, startX) {
         }
     }
 
-    // MID AIR PLATFORM SECTION
-    var platformCount = 5;
-    var spacing = 110;
+    //----------------------------------------------------------------------
+    // PLATTFORMAR ÖVER LAVAN
+    //----------------------------------------------------------------------
+
+    var platformCount = 4;
+    var spacing = 95;
 
     for (var i = 0; i < platformCount; i++) {
-
-        var px = x + 30 + (i * spacing);
+        var px = x + 35 + (i * spacing);
         var py = this.groundY - (60 + (i % 2) * 40);
 
         buildStonePlatform(px, py, 2);
 
-        if (i % 2 === 0) {
-
+        if (i === 1 || i === 3) {
             enemySpawns.push({
                 type: "kristen",
                 x: px + 20,
@@ -145,30 +142,37 @@ runmysteriet.segments.Segment_2.prototype.ground = function(stage, startX) {
 
     x += holeWidth;
 
-    buildStonePlatform(x, this.groundY, 8);
-
-    enemySpawns.push({
-        type: "kristen",
-        x: x + 120,
-        y: this.groundY - 40
-    });
-
-    x += 8 * this.tileW;
+    //----------------------------------------------------------------------
+    // LANDNINGSMARK
+    //----------------------------------------------------------------------
 
     buildStonePlatform(x, this.groundY, 6);
 
     enemySpawns.push({
         type: "kristen",
-        x: x + 80,
+        x: x + 90,
         y: this.groundY - 40
     });
 
     x += 6 * this.tileW;
 
+    //----------------------------------------------------------------------
+    // FYLL UT RESTEN TILL 1000 PX
+    //----------------------------------------------------------------------
+
+    if (x < segmentEnd) {
+        var remainingWidth = segmentEnd - x;
+        var remainingTiles = Math.ceil(remainingWidth / this.tileW);
+
+        buildStonePlatform(x, this.groundY, remainingTiles);
+    }
+
     return {
         platforms: platforms,
         holes: holes,
         enemySpawns: enemySpawns,
-        endX: x
+        waterAreas: waterAreas,
+        boats: boats,
+        endX: segmentEnd
     };
 };

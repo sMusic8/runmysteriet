@@ -20,7 +20,7 @@ runmysteriet.handler.PlatformHandler = function(stage, screenWidth) {
 //------------------------------------------------------------------------------
 
 runmysteriet.handler.PlatformHandler.prototype.init = function(levelNumber) {
-    levelNumber = levelNumber || 1;
+    this.levelNumber = levelNumber || 1;
 
     this.platforms = [];
     this.holes = [];
@@ -29,98 +29,73 @@ runmysteriet.handler.PlatformHandler.prototype.init = function(levelNumber) {
     this.boats = [];
 
     var x = 0;
+    var i = 0;
+    var segment = null;
+    var result = null;
+    var SegmentClass = null;
+
+    var pool = this.getSegmentPool();
+
+    var beforeWaterCount = this.getSegmentsBeforeWaterCount();
+    var afterWaterCount = this.getSegmentsAfterWaterCount();
+    var totalRandomCount = beforeWaterCount + afterWaterCount;
+
+    var chosenSegments = this.getRandomSegments(pool, totalRandomCount);
 
     //----------------------------------------------------------------------
-    // WATER + END SEGMENT
+    // START
     //----------------------------------------------------------------------
 
-    var waterSegment = runmysteriet.segments.Segment_Water;
-    var endSegment = runmysteriet.segments.Segment_End;
+    segment = new runmysteriet.segments.Segment_Start();
+    result = segment.ground(this.stage, x);
+    this.addSegmentResult(result);
+    x = result.endX;
 
     //----------------------------------------------------------------------
-    // VANLIGA SEGMENT (VI TAR BARA 3 ST)
+    // RANDOM SEGMENT FÖRE VATTEN
     //----------------------------------------------------------------------
 
-    var segments = [
-        runmysteriet.segments.Segment_1,
-        runmysteriet.segments.Segment_2,
-        runmysteriet.segments.Segment_3,
-        runmysteriet.segments.Segment_4,
-        runmysteriet.segments.Segment_5,
-        runmysteriet.segments.Segment_6
-    ];
+    for (i = 0; i < beforeWaterCount; i++) {
+        SegmentClass = chosenSegments[i];
+        segment = new SegmentClass();
 
-    //----------------------------------------------------------------------
-    // SHUFFLE
-    //----------------------------------------------------------------------
-
-    for (var i = segments.length - 1; i > 0; i--) {
-        var j = Math.floor(Math.random() * (i + 1));
-        var temp = segments[i];
-        segments[i] = segments[j];
-        segments[j] = temp;
-    }
-
-    //----------------------------------------------------------------------
-    // TA ENDAST 3 UNIKA SEGMENT
-    //----------------------------------------------------------------------
-
-    var chosenSegments = segments.slice(0, 3);
-
-    //----------------------------------------------------------------------
-    // WATER FÖRST
-    //----------------------------------------------------------------------
-
-    if (waterSegment) {
-        var water = new waterSegment();
-        var waterResult = water.ground(this.stage, x);
-
-        this.addPlatforms(waterResult.platforms);
-        this.addHoles(waterResult.holes);
-        this.addEnemySpawns(waterResult.enemySpawns);
-        this.addWaterAreas(waterResult.waterAreas || []);
-        this.addBoats(waterResult.boats || []);
-
-        x = waterResult.endX;
-    }
-
-    //----------------------------------------------------------------------
-    // 3 RANDOM SEGMENT (UNIKA)
-    //----------------------------------------------------------------------
-
-    for (var k = 0; k < chosenSegments.length; k++) {
-
-        var SegmentClass = chosenSegments[k];
-        var segment = new SegmentClass();
-
-        var result = segment.ground(this.stage, x);
-
-        this.addPlatforms(result.platforms);
-        this.addHoles(result.holes);
-        this.addEnemySpawns(result.enemySpawns);
-        this.addWaterAreas(result.waterAreas || []);
-        this.addBoats(result.boats || []);
+        result = segment.ground(this.stage, x);
+        this.addSegmentResult(result);
 
         x = result.endX;
     }
 
     //----------------------------------------------------------------------
-    // END SIST
+    // VATTEN I MITTEN
     //----------------------------------------------------------------------
 
-    if (endSegment) {
+    segment = new runmysteriet.segments.Segment_Water();
+    result = segment.ground(this.stage, x);
+    this.addSegmentResult(result);
+    x = result.endX;
 
-        var end = new endSegment();
-        var endResult = end.ground(this.stage, x);
+    //----------------------------------------------------------------------
+    // RANDOM SEGMENT EFTER VATTEN
+    //----------------------------------------------------------------------
 
-        this.addPlatforms(endResult.platforms);
-        this.addHoles(endResult.holes);
-        this.addEnemySpawns(endResult.enemySpawns);
-        this.addWaterAreas(endResult.waterAreas || []);
-        this.addBoats(endResult.boats || []);
+    for (i = 0; i < afterWaterCount; i++) {
+        SegmentClass = chosenSegments[beforeWaterCount + i];
+        segment = new SegmentClass();
 
-        x = endResult.endX;
+        result = segment.ground(this.stage, x);
+        this.addSegmentResult(result);
+
+        x = result.endX;
     }
+
+    //----------------------------------------------------------------------
+    // END
+    //----------------------------------------------------------------------
+
+    segment = new runmysteriet.segments.Segment_End();
+    result = segment.ground(this.stage, x);
+    this.addSegmentResult(result);
+    x = result.endX;
 
     this.levelWidth = x;
 
@@ -229,4 +204,81 @@ runmysteriet.handler.PlatformHandler.prototype.startBoatTweens = function(tweens
             console.log("PlatformHandler.startBoatTweens: båten saknar startTween", boat);
         }
     }
+};
+
+
+runmysteriet.handler.PlatformHandler.prototype.getSegmentsBeforeWaterCount = function() {
+    if (this.levelNumber >= 11) {
+        return 3;
+    }
+
+    return 2;
+};
+
+runmysteriet.handler.PlatformHandler.prototype.getSegmentsAfterWaterCount = function() {
+    if (this.levelNumber >= 6) {
+        return 2;
+    }
+
+    return 1;
+};
+
+
+runmysteriet.handler.PlatformHandler.prototype.getSegmentPool = function() {
+    if (this.levelNumber >= 11) {
+        return [
+            runmysteriet.segments.Segment_1,
+            runmysteriet.segments.Segment_2,
+            runmysteriet.segments.Segment_3,
+            runmysteriet.segments.Segment_4,
+            runmysteriet.segments.Segment_5,
+            runmysteriet.segments.Segment_6
+        ];
+    }
+
+    if (this.levelNumber >= 6) {
+        return [
+            runmysteriet.segments.Segment_2,
+            runmysteriet.segments.Segment_3,
+            runmysteriet.segments.Segment_4,
+            runmysteriet.segments.Segment_5,
+            runmysteriet.segments.Segment_6
+        ];
+    }
+
+    return [
+        runmysteriet.segments.Segment_4,
+        runmysteriet.segments.Segment_5,
+        runmysteriet.segments.Segment_6
+    ];
+};
+runmysteriet.handler.PlatformHandler.prototype.addSegmentResult = function(result) {
+    if (!result) {
+        return;
+    }
+
+    this.addPlatforms(result.platforms || []);
+    this.addHoles(result.holes || []);
+    this.addEnemySpawns(result.enemySpawns || []);
+    this.addWaterAreas(result.waterAreas || []);
+    this.addBoats(result.boats || []);
+};
+
+runmysteriet.handler.PlatformHandler.prototype.getRandomSegment = function(pool) {
+    var index = Math.floor(Math.random() * pool.length);
+    return pool[index];
+};
+
+runmysteriet.handler.PlatformHandler.prototype.getRandomSegments = function(pool, count) {
+    var copy = pool.slice();
+    var result = [];
+    var index = 0;
+
+    while (result.length < count && copy.length > 0) {
+        index = Math.floor(Math.random() * copy.length);
+        result.push(copy[index]);
+        copy.splice(index, 1);
+    }
+
+    return result;
 };

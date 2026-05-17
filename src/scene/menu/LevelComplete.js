@@ -118,10 +118,10 @@ runmysteriet.scene.LevelComplete.prototype.init = function() {
     total.scale = 0.8;
     this.stage.addChild(total);
 
-    if (this.saveHighscore() >= 0) {
+    if (this.saveHighscore() >= 4) {
         savedText = new rune.text.BitmapField("HIGHSCORE SAVED");
     } else {
-        savedText = new rune.text.BitmapField("HIGHSCORE NOT SAVED");
+        savedText = new rune.text.BitmapField("TOP 5 HIGHSCORE NOT REACHED");
     }
 
     savedText.autoSize = true;
@@ -224,10 +224,10 @@ runmysteriet.scene.LevelComplete.prototype.updateMenu = function() {
     for (i = 0; i < this.menuItems.length; i++) {
 
         item = this.menuItems[i];
-        text = item.text.replace("> ", "");
+        text = item.text.replace(" > ", "");
 
         if (i === this.selectedIndex) {
-            item.text = "> " + text;
+            item.text = " > " + text;
         } else {
             item.text = text;
         }

@@ -3,15 +3,15 @@
 //------------------------------------------------------------------------------
 
 /**
- * Segment_End constructor.
- * Final level segment with ascending staircase structure.
+ * Slutsegment för en nivå.
+ * Segmentet visar målområdet och ger spelaren en tydlig känsla av att nivån är klar.
  *
  * @constructor
  */
 runmysteriet.segments.Segment_End = function() {
 
     /** @type {number} */
-    this.tileSize = 268;
+    this.length = 900;
 
     /** @type {number} */
     this.groundY = 200;
@@ -22,11 +22,12 @@ runmysteriet.segments.Segment_End = function() {
     /** @type {number} */
     this.tileH = 20;
 
-    console.log("Segment end");
+    /** @type {string} */
+    this.backgroundTexture = "end";
 };
 
 /**
- * Generates end segment terrain.
+ * Skapar slutsegmentets bana.
  *
  * @param {!rune.display.Stage} stage
  * @param {number=} startX
@@ -34,96 +35,141 @@ runmysteriet.segments.Segment_End = function() {
  *   platforms: !Array<!rune.display.Graphic>,
  *   holes: !Array<!Object>,
  *   enemySpawns: !Array<!Object>,
+ *   waterAreas: !Array<!Object>,
+ *   boats: !Array<!Object>,
  *   endX: number
  * }}
  */
 runmysteriet.segments.Segment_End.prototype.ground = function(stage, startX) {
 
-    /** @type {number} */
-    var x = startX || 0;
+    var segmentStart = startX || 0;
+    var segmentEnd = segmentStart + this.length;
 
-    /** @type {!Array<!rune.display.Graphic>} */
+    var x = segmentStart;
+
     var platforms = [];
-
-    /** @type {!Array<!Object>} */
     var holes = [];
-
-    /** @type {!Array<!Object>} */
     var enemySpawns = [];
+    var waterAreas = [];
+    var boats = [];
 
-    /**
-     * Builds a horizontal platform using tiles.
-     *
-     * @param {number} px
-     * @param {number} py
-     * @param {number} tiles
-     * @param {!runmysteriet.segments.Segment_End} _this
-     * @param {string} texture
+    //--------------------------------------------------------------------------
+    // BAKGRUND
+    //--------------------------------------------------------------------------
+
+    /*
+     * Byt "end_background" till namnet på din faktiska bakgrundsbild
+     * i Requests.js om den heter något annat.
      */
-    function build(px, py, tiles, _this, texture) {
+    var background = new rune.display.Graphic(
+        segmentStart,
+        0,
+        this.length,
+        240,
+        this.backgroundTexture
+    );
 
-        for (var i = 0; i < tiles; i++) {
+    stage.addChild(background);
 
-            var tile = new rune.display.Graphic(
-                px + (i * _this.tileW),
-                py,
-                _this.tileW,
-                _this.tileH,
-                texture
-            );
+    //--------------------------------------------------------------------------
+    // MARK
+    //--------------------------------------------------------------------------
 
-            stage.addChild(tile);
-            platforms.push(tile);
-        }
+    var tiles = Math.ceil(this.length / this.tileW);
+
+    for (var i = 0; i < tiles; i++) {
+
+        var tile = new rune.display.Graphic(
+            x + (i * this.tileW),
+            this.groundY,
+            this.tileW,
+            this.tileH,
+            "bana-gras1"
+        );
+
+        stage.addChild(tile);
+        platforms.push(tile);
     }
 
-    //----------------------------------------------------------------------
+    //--------------------------------------------------------------------------
+    // MÅLPORT / LEVEL CLEAR-OMRÅDE
+    //--------------------------------------------------------------------------
 
-    /** @type {string} */
-    var texture = "tree_block";
+    /*
+     * Detta är den visuella målporten.
+     */
+    var goal = new rune.display.Graphic(
+        segmentStart + this.length - 180,
+        this.groundY - 96,
+        96,
+        96,
+        "b2"
+    );
 
-    //----------------------------------------------------------------------
+    stage.addChild(goal);
 
-    // START PLATFORM
-    build(x, this.groundY, 8, this, texture);
-    x += 8 * this.tileW;
+    /*
+     * Markerar målet så Game/LevelComplete-logik kan hitta det om du vill.
+     */
+    goal.isLevelEnd = true;
 
-    //----------------------------------------------------------------------
+    //--------------------------------------------------------------------------
+    // VISUELLA EFFEKTER
+    //--------------------------------------------------------------------------
 
-    // STAIR STEP 1 (LOW)
-    var stepSpacingX = 140;
-    var stepSpacingY = 55;
+    /*
+     * Små dekorativa ljuspunkter runt målet.
+     * Dessa är bara visuella och påverkar inte collision.
+     */
+    for (var j = 0; j < 6; j++) {
 
-    /** @type {number} */
-    var startY = this.groundY;
+        var sparkle = new rune.display.Graphic(
+            goal.x + 10 + (j * 14),
+            goal.y - 20 - ((j % 2) * 12),
+            8,
+            8,
+            "sparkle"
+        );
 
-    build(x, startY, 6, this, texture);
-    x += stepSpacingX;
+        stage.addChild(sparkle);
 
-    //----------------------------------------------------------------------
+        /*
+         * Om tween-systemet används senare kan dessa animeras.
+         * Just nu är de säkra statiska effekter.
+         */
+        sparkle.isDecoration = true;
+    }
 
-    // STAIR STEP 2 (MID)
-    build(x, startY - stepSpacingY, 6, this, texture);
-    x += stepSpacingX;
+    //--------------------------------------------------------------------------
+    // SÄKER LANDNINGSYTA EFTER MÅLET
+    //--------------------------------------------------------------------------
 
-    //----------------------------------------------------------------------
+    /*
+     * Extra mark efter målbilden gör att spelaren inte faller direkt
+     * när level clear triggas.
+     */
+    var safeTiles = 4;
 
-    // STAIR STEP 3 (HIGH)
-    build(x, startY - (stepSpacingY * 2), 6, this, texture);
-    x += stepSpacingX;
+    for (var k = 0; k < safeTiles; k++) {
 
-    //----------------------------------------------------------------------
+        var safeTile = new rune.display.Graphic(
+            segmentEnd - ((safeTiles - k) * this.tileW),
+            this.groundY,
+            this.tileW,
+            this.tileH,
+            "bana-gras1"
+        );
 
-    // FINAL PLATFORM (TOP LANDING)
-    build(x, startY - (stepSpacingY * 2), 8, this, texture);
-    x += 8 * this.tileW;
-
-    //----------------------------------------------------------------------
+        stage.addChild(safeTile);
+        platforms.push(safeTile);
+    }
 
     return {
         platforms: platforms,
         holes: holes,
         enemySpawns: enemySpawns,
-        endX: x
+        waterAreas: waterAreas,
+        boats: boats,
+        endX: segmentEnd
     };
 };

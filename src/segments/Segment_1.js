@@ -4,12 +4,13 @@
 
 /**
  * Segment_1 constructor.
+ *
  * @constructor
  */
 runmysteriet.segments.Segment_1 = function() {
 
     /** @type {number} */
-    this.tileSize = 268;
+    this.length = 1000;
 
     /** @type {number} */
     this.groundY = 200;
@@ -19,7 +20,7 @@ runmysteriet.segments.Segment_1 = function() {
 
     /** @type {number} */
     this.tileH = 20;
-
+    
     console.log("Segment 1");
 };
 
@@ -32,16 +33,23 @@ runmysteriet.segments.Segment_1 = function() {
  *   platforms: !Array<!rune.display.Graphic>,
  *   holes: !Array<!runmysteriet.ui.graphic.Hole>,
  *   enemySpawns: !Array<!Object>,
+ *   waterAreas: !Array<!Object>,
+ *   boats: !Array<!Object>,
  *   endX: number
  * }}
  */
 runmysteriet.segments.Segment_1.prototype.ground = function(stage, startX) {
 
-    var x = startX || 0;
+    var segmentStart = startX || 0;
+    var segmentEnd = segmentStart + this.length;
+
+    var x = segmentStart;
 
     var platforms = [];
     var holes = [];
     var enemySpawns = [];
+    var waterAreas = [];
+    var boats = [];
 
     function buildGrass(px, py, tiles, _this) {
 
@@ -78,20 +86,24 @@ runmysteriet.segments.Segment_1.prototype.ground = function(stage, startX) {
     }
 
     //----------------------------------------------------------------------
+    // STARTMARK
+    //----------------------------------------------------------------------
 
-    buildGrass(x, this.groundY, 8, this);
+    buildGrass(x, this.groundY, 6, this);
 
     enemySpawns.push({
         type: "kristen",
-        x: x + 120,
+        x: x + 100,
         y: this.groundY - 40
     });
 
-    x += 8 * this.tileW;
+    x += 6 * this.tileW;
 
     //----------------------------------------------------------------------
+    // LAVAHÅL
+    //----------------------------------------------------------------------
 
-    var holeWidth = 520;
+    var holeWidth = 430;
 
     var hole = new runmysteriet.ui.graphic.Hole(
         x,
@@ -103,22 +115,17 @@ runmysteriet.segments.Segment_1.prototype.ground = function(stage, startX) {
     stage.addChild(hole);
     holes.push(hole);
 
-    // =========================
-    // 🔥 LAVA (ADDED HERE)
-    // =========================
-
-    var tileSize = 32;
-    var cols = Math.ceil(hole.width / tileSize);
-    var rows = Math.ceil(hole.height / tileSize);
+    var cols = Math.ceil(hole.width / this.tileW);
+    var rows = Math.ceil(hole.height / this.tileH);
 
     for (var ly = 0; ly < rows; ly++) {
         for (var lx = 0; lx < cols; lx++) {
 
             var lava = new rune.display.Graphic(
-                hole.x + (lx * tileSize),
-                hole.y + (ly * tileSize),
-                tileSize,
-                tileSize,
+                hole.x + (lx * this.tileW),
+                hole.y + (ly * this.tileH),
+                this.tileW,
+                this.tileH,
                 "lava"
             );
 
@@ -127,18 +134,20 @@ runmysteriet.segments.Segment_1.prototype.ground = function(stage, startX) {
     }
 
     //----------------------------------------------------------------------
+    // PLATTFORMAR ÖVER LAVAN
+    //----------------------------------------------------------------------
 
-    var count = 6;
-    var spacing = 95;
+    var count = 5;
+    var spacing = 78;
 
-    for (var i = 0; i < count; i++) {
+    for (var j = 0; j < count; j++) {
 
-        var px = x + 30 + (i * spacing);
-        var py = this.groundY - (70 + (i % 3) * 30);
+        var px = x + 30 + (j * spacing);
+        var py = this.groundY - (70 + (j % 3) * 30);
 
         buildStone(px, py, 2, this);
 
-        if (i % 2 === 0) {
+        if (j % 2 === 0) {
             enemySpawns.push({
                 type: "kristen",
                 x: px + 20,
@@ -147,38 +156,45 @@ runmysteriet.segments.Segment_1.prototype.ground = function(stage, startX) {
         }
     }
 
-    //----------------------------------------------------------------------
-
     x += holeWidth;
 
-    buildGrass(x, this.groundY, 8, this);
-
-    enemySpawns.push({
-        type: "kristen",
-        x: x + 120,
-        y: this.groundY - 40
-    });
-
-    x += 8 * this.tileW;
-
+    //----------------------------------------------------------------------
+    // LANDNINGSMARK
     //----------------------------------------------------------------------
 
     buildGrass(x, this.groundY, 6, this);
 
     enemySpawns.push({
         type: "kristen",
-        x: x + 80,
+        x: x + 100,
         y: this.groundY - 40
     });
 
     x += 6 * this.tileW;
 
     //----------------------------------------------------------------------
+    // FYLL UT RESTEN TILL 1000 PX
+    //----------------------------------------------------------------------
+
+    if (x < segmentEnd) {
+        var remainingWidth = segmentEnd - x;
+        var remainingTiles = Math.ceil(remainingWidth / this.tileW);
+
+        buildGrass(x, this.groundY, remainingTiles, this);
+
+        enemySpawns.push({
+            type: "kristen",
+            x: x + 80,
+            y: this.groundY - 40
+        });
+    }
 
     return {
         platforms: platforms,
         holes: holes,
         enemySpawns: enemySpawns,
-        endX: x
+        waterAreas: waterAreas,
+        boats: boats,
+        endX: segmentEnd
     };
 };

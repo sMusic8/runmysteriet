@@ -51,6 +51,7 @@ npx google-closure-compiler \
 --js "./../../src/segments/Segment_4.js" \
 --js "./../../src/segments/Segment_5.js" \
 --js "./../../src/segments/Segment_6.js" \
+--js"./../../src/segments/Segment_Start.js" \
 --js "./../../src/segments/Segment_end.js" \
 --js "./../../src/segments/Segment_Water.js" \
 --js "./../../src/scene/menu/TextInputView.js" \

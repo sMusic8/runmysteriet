@@ -6,7 +6,11 @@ runmysteriet.segments.Segment_Water = function() {
     this.groundY = 200; 
 
     this.waterWidth = 402;
-    this.waterHeight = 32; //
+    this.waterHeight = 32; 
+
+
+        console.log("Segment Water");
+
 };
 
 runmysteriet.segments.Segment_Water.prototype.ground = function(stage, startX) {

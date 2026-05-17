@@ -91,7 +91,7 @@ runmysteriet.scene.GuessWord = function(levelNumber, earnedScore, totalScore, wo
     this.m_wrongGuessPenalty = 10; 
 
     /*
-     * Blir true när spelaren har gissat rätt.
+     * blir true när spelaren har gissat rätt
      */
     this.m_answeredCorrect = false;
 };
@@ -108,7 +108,7 @@ runmysteriet.scene.GuessWord.prototype.constructor = runmysteriet.scene.GuessWor
 //------------------------------------------------------------------------------
 
 /**
- * Startar GuessWord-scenen.
+ * startas GuessWord-scenen
  *
  * @return {void}
  */
@@ -120,11 +120,11 @@ runmysteriet.scene.GuessWord.prototype.init = function() {
   this.menuSound = this.application.sounds.sound.get("sound_menu");
   if (this.backgroundMusic) {
     this.backgroundMusic.loop = true;
-    this.backgroundMusic.volume = 0.5;
+    this.backgroundMusic.volume = 0.3;
     this.backgroundMusic.play();
   }
 
-  //If gamepad eller kaybord justpresst ändra nummret på volume med ett steg i en loop
+  //om gamepad eller keybord justpressas ändras nummret på volume med ett steg i en loop
 
     console.log("GuessWord startad");
     console.log("WORD DATA:", this.m_wordData);
@@ -147,7 +147,7 @@ runmysteriet.scene.GuessWord.prototype.init = function() {
 //------------------------------------------------------------------------------
 
 /**
- * Skapar texten som visas på skärmen.
+ * Skapar texten som visas på skärmen
  *
  * @return {void}
  */
@@ -165,11 +165,14 @@ runmysteriet.scene.GuessWord.prototype.createText = function() {
     this.m_letterText.y += 10;
     this.stage.addChild(this.m_letterText);
 
-    this.m_hintText = new rune.text.BitmapField("HINT: PRESS T / TRIANGLE, COSTS 20 POINTS");    this.m_hintText.autoSize = true;
+
+    this.m_hintText = new rune.text.BitmapField("HINT: PRESS T / TRIANGLE, COSTS 20 POINTS");    
+    this.m_hintText.autoSize = true;
     this.m_hintText.center = this.application.screen.center;
     this.m_hintText.y += 40;
     this.m_hintText.scale = 0.8;
     this.stage.addChild(this.m_hintText);
+
 
     this.m_scoreText = new rune.text.BitmapField("SCORE: " + this.m_totalScore);
     this.m_scoreText.autoSize = true;
@@ -179,8 +182,9 @@ runmysteriet.scene.GuessWord.prototype.createText = function() {
     this.stage.addChild(this.m_scoreText);
 
 
-    //
-    this.m_messageText = new rune.text.BitmapField("UP/DOWN = LETTER, ENTER/CROSS = GUESS, T/TRIANGLE = HINT");    this.m_messageText.autoSize = true;
+    
+    this.m_messageText = new rune.text.BitmapField("UP/DOWN = LETTER, ENTER/CROSS = GUESS, T/TRIANGLE = HINT");    
+    this.m_messageText.autoSize = true;
     this.m_messageText.center = this.application.screen.center;
     this.m_messageText.y += 90;
     this.m_messageText.scale = 0.7;
@@ -328,7 +332,7 @@ runmysteriet.scene.GuessWord.prototype.buyHint = function() {
     var hint = "";
 
     /*
-     * Finns det fler ledtrådar?
+     * Finns det fler ledtrådar
      */
     if (this.m_currentHintIndex >= this.m_hints.length) {
 

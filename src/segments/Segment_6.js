@@ -11,7 +11,7 @@
 runmysteriet.segments.Segment_6 = function() {
 
     /** @type {number} */
-    this.tileSize = 268;
+    this.length = 1000;
 
     /** @type {number} */
     this.groundY = 200;
@@ -21,8 +21,6 @@ runmysteriet.segments.Segment_6 = function() {
 
     /** @type {number} */
     this.tileH = 20;
-
-    console.log("Segment 6");
 };
 
 /**
@@ -34,16 +32,23 @@ runmysteriet.segments.Segment_6 = function() {
  *   platforms: !Array<!rune.display.Graphic>,
  *   holes: !Array<!runmysteriet.ui.graphic.Hole>,
  *   enemySpawns: !Array<!Object>,
+ *   waterAreas: !Array<!Object>,
+ *   boats: !Array<!Object>,
  *   endX: number
  * }}
  */
 runmysteriet.segments.Segment_6.prototype.ground = function(stage, startX) {
 
-    var x = startX || 0;
+    var segmentStart = startX || 0;
+    var segmentEnd = segmentStart + this.length;
+
+    var x = segmentStart;
 
     var platforms = [];
     var holes = [];
     var enemySpawns = [];
+    var waterAreas = [];
+    var boats = [];
 
     function buildGrass(px, py, tiles, _this) {
 
@@ -80,26 +85,34 @@ runmysteriet.segments.Segment_6.prototype.ground = function(stage, startX) {
     }
 
     //----------------------------------------------------------------------
-
-    buildGrass(x, this.groundY, 6, this);
-    x += 6 * this.tileW;
-
+    // STARTMARK
     //----------------------------------------------------------------------
 
-    for (var i = 0; i < 5; i++) {
+    buildGrass(x, this.groundY, 5, this);
+    x += 5 * this.tileW;
+
+    //----------------------------------------------------------------------
+    // VÄXLANDE HÅL OCH STENPLATTFORMAR
+    //----------------------------------------------------------------------
+
+    for (var j = 0; j < 4; j++) {
+
+        var holeWidth = 80;
 
         var hole = new runmysteriet.ui.graphic.Hole(
             x,
             this.groundY,
-            80,
+            holeWidth,
             200
         );
 
         stage.addChild(hole);
         holes.push(hole);
 
-        // 🔥 LAVA (TILLAGD)
-        var lavaCols = Math.ceil(80 / this.tileW);
+        /*
+         * Lava placeras i hålet.
+         */
+        var lavaCols = Math.ceil(holeWidth / this.tileW);
         var lavaRows = 6;
 
         for (var ly = 0; ly < lavaRows; ly++) {
@@ -117,26 +130,38 @@ runmysteriet.segments.Segment_6.prototype.ground = function(stage, startX) {
             }
         }
 
-        x += 80;
+        x += holeWidth;
 
-        var py = this.groundY - (i * 20);
+        var py = this.groundY - (j * 18);
 
         buildStone(x, py, 3, this);
-
         x += 3 * this.tileW;
     }
 
     //----------------------------------------------------------------------
+    // LANDNINGSMARK
+    //----------------------------------------------------------------------
 
-    buildGrass(x, this.groundY, 6, this);
-    x += 6 * this.tileW;
+    buildGrass(x, this.groundY, 4, this);
+    x += 4 * this.tileW;
 
     //----------------------------------------------------------------------
+    // FYLL UT RESTEN TILL 1000 PX
+    //----------------------------------------------------------------------
+
+    if (x < segmentEnd) {
+        var remainingWidth = segmentEnd - x;
+        var remainingTiles = Math.ceil(remainingWidth / this.tileW);
+
+        buildGrass(x, this.groundY, remainingTiles, this);
+    }
 
     return {
         platforms: platforms,
         holes: holes,
         enemySpawns: enemySpawns,
-        endX: x
+        waterAreas: waterAreas,
+        boats: boats,
+        endX: segmentEnd
     };
 };

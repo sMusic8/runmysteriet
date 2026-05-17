@@ -3,31 +3,55 @@
 //------------------------------------------------------------------------------
 
 /**
- * Segment 5 constructor.
- * Contains alternating holes and stone platform sections.
+ * Segment 5.
+ * Innehåller mindre lavahål och stenplattformar.
  *
  * @constructor
  */
 runmysteriet.segments.Segment_5 = function() {
 
-    this.tileSize = 268;
+    /** @type {number} */
+    this.length = 1000;
+
+    /** @type {number} */
     this.groundY = 200;
+
+    /** @type {number} */
     this.tileW = 32;
+
+    /** @type {number} */
     this.tileH = 20;
 
-    console.log("Segment 5");
+        console.log("Segment 5");
+
 };
 
 /**
- * Generates Segment 5 ground layout.
+ * Skapar segmentets bana.
+ *
+ * @param {!rune.display.Stage} stage
+ * @param {number=} startX
+ * @return {{
+ *   platforms: !Array<!rune.display.Graphic>,
+ *   holes: !Array<!Object>,
+ *   enemySpawns: !Array<!Object>,
+ *   waterAreas: !Array<!Object>,
+ *   boats: !Array<!Object>,
+ *   endX: number
+ * }}
  */
 runmysteriet.segments.Segment_5.prototype.ground = function(stage, startX) {
 
-    var x = startX || 0;
+    var segmentStart = startX || 0;
+    var segmentEnd = segmentStart + this.length;
+
+    var x = segmentStart;
 
     var platforms = [];
     var holes = [];
     var enemySpawns = [];
+    var waterAreas = [];
+    var boats = [];
 
     function buildGrass(px, py, tiles, _this) {
 
@@ -64,17 +88,19 @@ runmysteriet.segments.Segment_5.prototype.ground = function(stage, startX) {
     }
 
     //----------------------------------------------------------------------
+    // STARTMARK
+    //----------------------------------------------------------------------
 
-    // START PLATFORM (lite längre för säker start)
     buildGrass(x, this.groundY, 5, this);
     x += 5 * this.tileW;
 
     //----------------------------------------------------------------------
+    // TVÅ MINDRE LAVAHÅL
+    //----------------------------------------------------------------------
 
-    // BALANSERAD HOLE LOOP
     for (var i = 0; i < 2; i++) {
 
-        var holeWidth = 80; // ✔️ mindre hål
+        var holeWidth = 80;
 
         var hole = new runmysteriet.ui.graphic.Hole(
             x,
@@ -86,7 +112,9 @@ runmysteriet.segments.Segment_5.prototype.ground = function(stage, startX) {
         stage.addChild(hole);
         holes.push(hole);
 
-        // 🔥 LAVA (matchar exakt hålet nu)
+        /*
+         * Lava placeras i hålet.
+         */
         var lavaCols = Math.ceil(holeWidth / this.tileW);
         var lavaRows = 6;
 
@@ -107,26 +135,39 @@ runmysteriet.segments.Segment_5.prototype.ground = function(stage, startX) {
 
         x += holeWidth;
 
-        // ✔️ större landningsyta
+        /*
+         * Stenplattform efter hålet.
+         */
         var py = this.groundY - (i * 20);
 
         buildStone(x, py, 4, this);
-
         x += 4 * this.tileW;
     }
 
     //----------------------------------------------------------------------
+    // SÄKER MARK EFTER HINDER
+    //----------------------------------------------------------------------
 
-    // SAFE END PLATFORM
     buildGrass(x, this.groundY, 6, this);
     x += 6 * this.tileW;
 
     //----------------------------------------------------------------------
+    // FYLLER UT RESTEN AV SEGMENTET TILL SÅ VI HAR 1000 PX
+    //----------------------------------------------------------------------
+
+    if (x < segmentEnd) {
+        var remainingWidth = segmentEnd - x;
+        var remainingTiles = Math.ceil(remainingWidth / this.tileW);
+
+        buildGrass(x, this.groundY, remainingTiles, this);
+    }
 
     return {
         platforms: platforms,
         holes: holes,
         enemySpawns: enemySpawns,
-        endX: x
+        waterAreas: waterAreas,
+        boats: boats,
+        endX: segmentEnd
     };
 };
