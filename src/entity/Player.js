@@ -44,7 +44,7 @@ runmysteriet.entity.Player = function(controls, spriteConfig) {
     this.m_currentTexture = this.normalTexture;
 
     /** @type {number} */
-    this.speed = 2;
+    this.speed = 2.7;
 
     /** @type {number} */
     this.velocityY = 0;
@@ -53,7 +53,7 @@ runmysteriet.entity.Player = function(controls, spriteConfig) {
     this.gravity = 0.5;
 
     /** @type {number} */
-    this.jumpPower = -9;
+    this.jumpPower = - 10;
 
     /** @type {boolean} */
     this.isOnGround = false;

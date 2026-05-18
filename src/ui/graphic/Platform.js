@@ -19,11 +19,11 @@ runmysteriet.ui.Platform = function(x, y, width, height, texture) {
     );
 
             /*
-        * Kollisionsyta.
-        * Gör hitboxen lite smalare än grafiken så spelaren inte fastnar i kanter.
+        * Kollisionsyta
+        * Gör hitboxen lite smalare än grafiken så spelaren inte fastnar i kanter
         */
-        this.collisionPaddingLeft = 0;
-        this.collisionPaddingRight = 0;
+        this.collisionPaddingLeft = 4;
+        this.collisionPaddingRight = 4;
         this.collisionPaddingTop = 0;
 };
 
