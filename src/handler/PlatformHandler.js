@@ -13,6 +13,8 @@ runmysteriet.handler.PlatformHandler = function(stage, screenWidth) {
     this.boats = [];
     this.endZones = [];
     this.diseaseSpawns = [];
+    this.runeSpawns = [];
+    this.armorSpawns = [];
 
     this.levelWidth = 0;
 };
@@ -31,6 +33,8 @@ runmysteriet.handler.PlatformHandler.prototype.init = function(levelNumber) {
     this.boats = [];
     this.endZones = [];
     this.diseaseSpawns = [];
+    this.runeSpawns = [];
+    this.armorSpawns = [];
 
     var x = 0;
     var i = 0;
@@ -104,6 +108,8 @@ runmysteriet.handler.PlatformHandler.prototype.init = function(levelNumber) {
     this.levelWidth = x;
 
     console.log("levelWidth:", this.levelWidth);
+
+    console.log("runeSpawns:", this.runeSpawns.length);
 };
 
 //------------------------------------------------------------------------------
@@ -269,6 +275,8 @@ runmysteriet.handler.PlatformHandler.prototype.addSegmentResult = function(resul
     this.addBoats(result.boats || []);
     this.addEndZones(result.endZones || []);
     this.addDiseaseSpawns(result.diseaseSpawns || []);
+    this.addRuneSpawns(result.runeSpawns || []);
+    this.addArmorSpawns(result.armorSpawns || []);
 };
 
 
@@ -313,3 +321,43 @@ runmysteriet.handler.PlatformHandler.prototype.getDiseaseSpawns = function() {
     return this.diseaseSpawns;
 };
 
+runmysteriet.handler.PlatformHandler.prototype.addRuneSpawns = function(runeSpawns) {
+    if (!runeSpawns) {
+        return;
+    }
+
+    for (var i = 0; i < runeSpawns.length; i++) {
+        this.runeSpawns.push(runeSpawns[i]);
+    }
+};
+
+runmysteriet.handler.PlatformHandler.prototype.getRuneSpawns = function() {
+    return this.runeSpawns;
+};
+
+runmysteriet.handler.PlatformHandler.prototype.addArmorSpawns = function(armorSpawns) {
+    if (!armorSpawns) {
+        return;
+    }
+
+    for (var i = 0; i < armorSpawns.length; i++) {
+        this.armorSpawns.push(armorSpawns[i]);
+    }
+};
+
+runmysteriet.handler.PlatformHandler.prototype.getArmorSpawns = function() {
+    return this.armorSpawns;
+};
+
+
+runmysteriet.handler.PlatformHandler.prototype.getArmorCount = function() {
+    if (this.levelNumber >= 11) {
+        return 4;
+    }
+
+    if (this.levelNumber >= 6) {
+        return 3;
+    }
+
+    return 2;
+};

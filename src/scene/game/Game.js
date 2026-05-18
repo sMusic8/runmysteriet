@@ -13,6 +13,7 @@ runmysteriet.scene.Game = function(levelNumber, score, playerName) {
     this.m_backgroundHandler = null;
     this.m_enemyHandler = null;
     this.m_diseaseHandler = null;
+    this.m_armorHandler = null;
 
     this.m_levelConfig = null;
     this.m_levelNumber = levelNumber || 1;
@@ -158,6 +159,28 @@ runmysteriet.scene.Game.prototype.init = function() {
         this.m_platformHandler.getDiseaseSpawns()
     );
 
+
+
+
+
+        /** 
+    * Rustning
+    */
+    this.m_armorHandler = new runmysteriet.handler.ArmorHandler(
+        this.stage,
+        this.application,
+        this.m_levelNumber,
+        this.m_platformHandler.getArmorSpawns()
+    );
+
+    this.m_armorHandler.init();
+
+    this.m_armorHandler.onArmorCollected = function(player, armor) {
+        if (player) {
+            player.hasArmor = true;
+        }
+    };
+
     /*
      * Sköldar / runor
      */
@@ -165,10 +188,14 @@ runmysteriet.scene.Game.prototype.init = function() {
         this.stage,
         this.application,
         this.m_platformHandler.levelWidth,
-        this.m_levelNumber
-    );
+        this.m_levelNumber,
+        this.m_platformHandler.getRuneSpawns()
+);
 
     this.m_shieldHandler.init();
+
+
+    
 
     /*
      * HUD
@@ -211,6 +238,7 @@ runmysteriet.scene.Game.prototype.update = function(step) {
     this.updateHoles();
     this.updateEnemies();
     this.updateDiseases(step);
+    this.updateArmor();
     this.updateShields();
     this.checkLevelCompletion();
 
@@ -295,6 +323,12 @@ runmysteriet.scene.Game.prototype.updateDiseases = function(step) {
     }
 };
 
+
+runmysteriet.scene.Game.prototype.updateArmor = function() {
+    if (this.m_armorHandler && this.m_playerHandler) {
+        this.m_armorHandler.update(this.m_playerHandler.players);
+    }
+};
 //------------------------------------------------------------------------------
 // PAUSE
 //------------------------------------------------------------------------------
@@ -835,6 +869,10 @@ runmysteriet.scene.Game.prototype.dispose = function() {
     if (this.m_enemyHandler) {
         this.m_enemyHandler.clear();
     }
+
+    if (this.m_armorHandler) {
+    this.m_armorHandler.clear();
+    }    
 
     rune.scene.Scene.prototype.dispose.call(this);
 };

@@ -38,53 +38,81 @@ runmysteriet.scene.GameOver.prototype.init = function() {
 
     this.m_menuSound = this.application.sounds.sound.get("sound_menu");
 
-    /*
-     * Titel.
-     */
-    this.m_title = new rune.text.BitmapField(this.m_reason);
+    this.createTitle();
+    this.createScoreText();
+    this.createMenu();
+    this.createHighscoreHud();
+    this.positionMenu();
+};
+
+//------------------------------------------------------------------------------
+// CREATE
+//------------------------------------------------------------------------------
+
+runmysteriet.scene.GameOver.prototype.createTitle = function() {
+
+    this.m_title = new rune.text.BitmapField("GAME OVER");
     this.m_title.autoSize = true;
+    this.m_title.scaleX = 1.5;
+    this.m_title.scaleY = 1.5;
     this.m_title.center = this.application.screen.center;
-    this.m_title.y = 45;
+    this.m_title.y = 35;
 
     this.stage.addChild(this.m_title);
+};
+runmysteriet.scene.GameOver.prototype.createScoreText = function() {
 
-    /*
-     * Spelarens score.
-     */
     this.m_scoreText = new rune.text.BitmapField(
         "SCORE: " + this.m_score
     );
 
     this.m_scoreText.autoSize = true;
     this.m_scoreText.center = this.application.screen.center;
-    this.m_scoreText.y = 75;
+    this.m_scoreText.y = 55; 
 
     this.stage.addChild(this.m_scoreText);
+};
 
-    /*
-     * Top 5 highscore.
-     */
+runmysteriet.scene.GameOver.prototype.createMenu = function() {
+
+    this.m_menu = new runmysteriet.ui.graphic.MenuList(
+        this.stage,
+        this.application,
+        ["START NEW GAME", "BACK TO MENU"],
+        155,
+        22,
+        1
+    );
+};
+
+runmysteriet.scene.GameOver.prototype.createHighscoreHud = function() {
+
     this.m_highscoreHud = new runmysteriet.ui.graphic.HighscoreHud(
         this.application,
         5
     );
 
     this.m_highscoreHud.x = 15;
-    this.m_highscoreHud.y = 105;
+    this.m_highscoreHud.y = 140;
 
     this.stage.addChild(this.m_highscoreHud);
+};
 
-    /*
-     * Meny.
-     */
-    this.m_menu = new runmysteriet.ui.graphic.MenuList(
-        this.stage,
-        this.application,
-        ["START NEW GAME", "MAIN MENU"],
-        135,
-        22,
-        1
-    );
+runmysteriet.scene.GameOver.prototype.positionMenu = function() {
+
+    var camera = this.cameras.getCameraAt(0);
+
+    if (!this.m_menu) {
+        return;
+    }
+
+    if (this.m_menu.setCameraPosition && camera) {
+        this.m_menu.setCameraPosition(camera, 155, 95);
+        return;
+    }
+
+    this.m_menu.x = 155;
+    this.m_menu.y = 95;
 };
 
 //------------------------------------------------------------------------------

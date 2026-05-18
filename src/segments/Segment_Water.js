@@ -52,6 +52,8 @@ runmysteriet.segments.Segment_Water.prototype.ground = function(stage, startX, l
     var diseaseSpawns = [];
     var waterAreas = [];
     var boats = [];
+    var runeSpawns = [];
+    var armorSpawns = [];
 
     var leftLandX = x;
     var water = null;
@@ -65,6 +67,7 @@ runmysteriet.segments.Segment_Water.prototype.ground = function(stage, startX, l
     this.addRaft(stage, platforms, water);
     this.addBoat(stage, boats, water);
 
+
     x += this.waterWidth;
 
     rightLandX = x;
@@ -72,21 +75,23 @@ runmysteriet.segments.Segment_Water.prototype.ground = function(stage, startX, l
 
     x += this.tileSize;
 
-    this.addDiseases(
-        diseaseSpawns,
-        leftLandX,
-        rightLandX,
-        levelNumber
-    );
+    this.addDiseases(diseaseSpawns, leftLandX, rightLandX, levelNumber);
+    this.addRuneSpawns(runeSpawns, leftLandX, rightLandX);
+    this.addArmorSpawns(armorSpawns, leftLandX, rightLandX);
+
+
 
     return {
         platforms: platforms,
         holes: holes,
         enemySpawns: enemySpawns,
         diseaseSpawns: diseaseSpawns,
+        runeSpawns: runeSpawns,
+        armorSpawns: armorSpawns,
         waterAreas: waterAreas,
         boats: boats,
         endX: x
+        
     };
 };
 
@@ -280,6 +285,32 @@ runmysteriet.segments.Segment_Water.prototype.getDiseasePositions = function(lef
             type: "gray",
             x: leftLandX + 190,
             y: this.groundY - 40
+        }
+    ];
+};
+
+//------------------------------------------------------------------------------
+// RUNES
+//------------------------------------------------------------------------------
+
+runmysteriet.segments.Segment_Water.prototype.addRuneSpawns = function(runeSpawns, leftLandX, rightLandX) {
+    var positions = this.getRunePositions(leftLandX, rightLandX);
+    var i = 0;
+
+    for (i = 0; i < positions.length; i++) {
+        runeSpawns.push(positions[i]);
+    }
+};
+
+runmysteriet.segments.Segment_Water.prototype.getRunePositions = function(leftLandX, rightLandX) {
+    return [
+        {
+            x: leftLandX + 150,
+            y: this.groundY - 70
+        },
+        {
+            x: rightLandX + 150,
+            y: this.groundY - 70
         }
     ];
 };

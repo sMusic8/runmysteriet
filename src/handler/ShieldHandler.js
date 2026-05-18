@@ -2,46 +2,34 @@
 // SHIELD HANDLER
 //------------------------------------------------------------------------------
 
-runmysteriet.handler.ShieldHandler = function (stage, application, levelWidth, levelNumber) {
+runmysteriet.handler.ShieldHandler = function(stage, application, levelWidth, levelNumber, runeSpawns) {
 
-  this.m_stage = stage;
-  this.application = application;
-  this.m_levelWidth = levelWidth;
-  this.m_levelNumber = levelNumber || 1;
+    this.m_stage = stage;
+    this.application = application;
+    this.m_levelWidth = levelWidth;
+    this.m_levelNumber = levelNumber || 1;
+    this.m_runeSpawns = runeSpawns || [];
 
-  this.m_shields = [];
-  this.m_collected = [];
-  this.m_word = "";
+    this.m_shields = [];
+    this.m_collected = [];
+    this.m_word = "";
 
-  this.m_wordData = null;
-  this.m_hints = [];
-  this.m_collectedMap = [];
-  this.m_hiddenIndex = -1;
+    this.m_wordData = null;
+    this.m_hints = [];
+    this.m_collectedMap = [];
+    this.m_hiddenIndex = -1;
 
-  this.catchSound = this.application.sounds.sound.get("sound_catch");
+    this.catchSound = this.application.sounds.sound.get("sound_catch");
 
-  this.box = null;
-
-  // callback till UI
-  this.onCollectedChanged = null;
-
+    this.box = null;
+    this.onCollectedChanged = null;
 };
 
 //------------------------------------------------------------------------------
 // WORD RESOURCE
 //------------------------------------------------------------------------------
 
-/**
- * Returnerar vilken ordlista som ska användas beroende på level.
- *
- * Level 1-5 använder 5-bokstavsord
- * Level 6-10 använder 6-bokstavsord
- * Level 11-och vidare använder 7-bokstavsord
- *
- * @return {string}
- */
 runmysteriet.handler.ShieldHandler.prototype.getWordResourceName = function() {
-
     if (this.m_levelNumber >= 11) {
         return "words7";
     }
@@ -52,90 +40,49 @@ runmysteriet.handler.ShieldHandler.prototype.getWordResourceName = function() {
 
     return "words5";
 };
-//-------------------------
+
+//------------------------------------------------------------------------------
 // INIT
-//-------------------------
+//------------------------------------------------------------------------------
 
-runmysteriet.handler.ShieldHandler.prototype.init = function () {
-
+runmysteriet.handler.ShieldHandler.prototype.init = function() {
     var wordData = null;
     var word = "";
-    var startX = 150; 
-    var endX = this.m_levelWidth - 150;
-    var spacing = 0;
     var i = 0;
     var shield = null;
+    var spawn = null;
 
-    /*
-     * Hämtar ett slumpat ord från words5.json.
-     */
     wordData = this.getRandomWordData();
 
     if (wordData && wordData.word) {
-
         word = String(wordData.word || "").toUpperCase();
 
         this.m_wordData = wordData;
         this.m_word = word;
         this.m_hints = wordData.Subword || [];
-
     } else {
+        this.setFallbackWord();
 
-        /*
-         * Fallback om JSON inte kan laddas.
-         */
-      if (this.m_levelNumber >= 11) {
-            word = "warrior";
-            this.m_wordData = {
-                word: "warrior",
-                Subword: ["fighter", "battle"]
-            };
-        } else if (this.m_levelNumber >= 6) {
-            word = "shield";
-            this.m_wordData = {
-                word: "shield",
-                Subword: ["protection", "battle"]
-            };
-        } else {
-            word = "raven";
-            this.m_wordData = {
-                word: "raven",
-                Subword: ["black bird", "viking sign"]
-            };
-        }
-
-        this.m_word = word;
-        this.m_hints = this.m_wordData.Subword;
+        word = this.m_word;
     }
 
-    /*
-     * En bokstav göms och ska gissas senare i GuessWord.
-     */
     this.m_hiddenIndex = Math.floor(Math.random() * word.length);
-
     this.m_collectedMap = [];
 
     for (i = 0; i < word.length; i++) {
         this.m_collectedMap.push(false);
     }
 
-    spacing = (word.length > 1)
-        ? (endX - startX) / (word.length - 1)
-        : 0;
-
     for (i = 0; i < word.length; i++) {
-
-        /*
-         * En bokstav ska inte placeras ut.
-         * Den blir en tom box i GuessWord.
-         */
         if (i === this.m_hiddenIndex) {
             continue;
         }
 
+        spawn = this.getRuneSpawn(i);
+
         shield = new runmysteriet.ui.Shield();
-        shield.x = startX + i * spacing;
-        shield.y = 150; //
+        shield.x = spawn.x;
+        shield.y = spawn.y;
 
         shield.__collected = false;
         shield.active = true;
@@ -148,14 +95,78 @@ runmysteriet.handler.ShieldHandler.prototype.init = function () {
     }
 };
 
+//------------------------------------------------------------------------------
+// FALLBACK WORD
+//------------------------------------------------------------------------------
 
+runmysteriet.handler.ShieldHandler.prototype.setFallbackWord = function() {
+    if (this.m_levelNumber >= 11) {
+        this.m_wordData = {
+            word: "warrior",
+            Subword: ["fighter", "battle"]
+        };
+    } else if (this.m_levelNumber >= 6) {
+        this.m_wordData = {
+            word: "shield",
+            Subword: ["protection", "battle"]
+        };
+    } else {
+        this.m_wordData = {
+            word: "raven",
+            Subword: ["black bird", "viking sign"]
+        };
+    }
+
+    this.m_word = String(this.m_wordData.word || "").toUpperCase();
+    this.m_hints = this.m_wordData.Subword || [];
+};
+
+//------------------------------------------------------------------------------
+// RUNE SPAWNS
+//------------------------------------------------------------------------------
+
+runmysteriet.handler.ShieldHandler.prototype.getRuneSpawn = function(index) {
+    var spawn = null;
+
+    if (this.m_runeSpawns && this.m_runeSpawns.length > 0) {
+        spawn = this.m_runeSpawns[index % this.m_runeSpawns.length];
+
+        if (spawn) {
+            return {
+                x: spawn.x,
+                y: spawn.y
+            };
+        }
+    }
+
+    return this.getFallbackRuneSpawn(index);
+};
+
+runmysteriet.handler.ShieldHandler.prototype.getFallbackRuneSpawn = function(index) {
+    var startX = 150;
+    var endX = this.m_levelWidth - 150;
+    var count = 5;
+    var spacing = 0;
+
+    if (this.m_word && this.m_word.length > 1) {
+        count = this.m_word.length;
+    }
+
+    spacing = (count > 1)
+        ? (endX - startX) / (count - 1)
+        : 0;
+
+    return {
+        x: startX + index * spacing,
+        y: 150
+    };
+};
 
 //------------------------------------------------------------------------------
 // GET RANDOM WORD DATA
 //------------------------------------------------------------------------------
 
 runmysteriet.handler.ShieldHandler.prototype.getRandomWordData = function() {
-
     var resourceName = "";
     var resource = null;
     var data = null;
@@ -166,16 +177,9 @@ runmysteriet.handler.ShieldHandler.prototype.getRandomWordData = function() {
         return null;
     }
 
-    /*
-     * Välj ordlista beroende på level.
-     */
     resourceName = this.getWordResourceName();
-
     resource = this.application.resources.get(resourceName);
 
-    /*
-     * Fallback till words5 om words6 eller words7 saknas.
-     */
     if (!resource) {
         console.log("Could not find resource:", resourceName);
         console.log("Falling back to words5.");
@@ -191,9 +195,6 @@ runmysteriet.handler.ShieldHandler.prototype.getRandomWordData = function() {
 
     data = resource.data;
 
-    /*
-     * Om JSON kommer som text gör vi om den till array.
-     */
     if (typeof data === "string") {
         try {
             data = JSON.parse(data);
@@ -208,9 +209,6 @@ runmysteriet.handler.ShieldHandler.prototype.getRandomWordData = function() {
         return null;
     }
 
-    /*
-     * Här sker slumpen.
-     */
     index = Math.floor(Math.random() * data.length);
 
     console.log("WORD RESOURCE:", resourceName);
@@ -220,13 +218,11 @@ runmysteriet.handler.ShieldHandler.prototype.getRandomWordData = function() {
     return data[index];
 };
 
-
-//-------------------------
+//------------------------------------------------------------------------------
 // UPDATE
-//-------------------------
+//------------------------------------------------------------------------------
 
-runmysteriet.handler.ShieldHandler.prototype.update = function (players) {
-
+runmysteriet.handler.ShieldHandler.prototype.update = function(players) {
     var i = 0;
     var j = 0;
     var shield = null;
@@ -237,22 +233,11 @@ runmysteriet.handler.ShieldHandler.prototype.update = function (players) {
     }
 
     for (i = 0; i < this.m_shields.length; i++) {
-
         shield = this.m_shields[i];
 
         if (!shield) {
             continue;
         }
-
-        /*
-         * Viktigt:
-         * vi kör INTE shield.update() här eftersom det sker i runmysteriet.scene.game.Game.prototype.update.call(this, step) i Game.js
-         *
-         * skölden ligger redan på stage, och Rune uppdaterar stage-children
-         * via rune.scene.Scene.prototype.update.call(this, step) i Game.js
-         *
-         * den här handlern ska bara kontrollera kollision/insamling
-         */
 
         if (shield.isCollected === true) {
             continue;
@@ -263,12 +248,8 @@ runmysteriet.handler.ShieldHandler.prototype.update = function (players) {
         }
 
         for (j = 0; j < players.length; j++) {
-
             player = players[j];
 
-            /*
-             * Döda, saknade eller osynliga spelare ska inte kunna samla runor.
-             */
             if (!player) {
                 continue;
             }
@@ -293,55 +274,61 @@ runmysteriet.handler.ShieldHandler.prototype.update = function (players) {
     }
 };
 
-
-//-------------------------
+//------------------------------------------------------------------------------
 // COLLECT
-//-------------------------
+//------------------------------------------------------------------------------
 
-runmysteriet.handler.ShieldHandler.prototype.collectShield = function (shield) {
+runmysteriet.handler.ShieldHandler.prototype.collectShield = function(shield) {
+    var index = 0;
 
-  if (!shield || shield.__collected) return;
+    if (!shield || shield.__collected) {
+        return;
+    }
 
-  shield.__collected = true;
-  shield.active = false;
+    shield.__collected = true;
+    shield.active = false;
 
-if (this.catchSound) {
-    this.catchSound.play(true);
-}
-  this.m_stage.removeChild(shield);
+    if (this.catchSound) {
+        this.catchSound.play(true);
+    }
 
-  var index = this.m_shields.indexOf(shield);
-  if (index !== -1) this.m_shields.splice(index, 1);
+    this.m_stage.removeChild(shield);
 
-  this.m_collected.push(shield);
-  if (shield.wordIndex !== undefined && shield.wordIndex !== null) {
-    this.m_collectedMap[shield.wordIndex] = true;
-}
+    index = this.m_shields.indexOf(shield);
 
-  console.log("Collected:", shield.rune);
+    if (index !== -1) {
+        this.m_shields.splice(index, 1);
+    }
 
-  //  UPDATE UI
-  if (this.onCollectedChanged) {
-    this.onCollectedChanged(this.getRuneString());
-  }
+    this.m_collected.push(shield);
+
+    if (shield.wordIndex !== undefined && shield.wordIndex !== null) {
+        this.m_collectedMap[shield.wordIndex] = true;
+    }
+
+    console.log("Collected:", shield.rune);
+
+    if (this.onCollectedChanged) {
+        this.onCollectedChanged(this.getRuneString());
+    }
 };
 
-//-------------------------
-// STRING BUILDER (för UI)
-//-------------------------
+//------------------------------------------------------------------------------
+// STRING BUILDER
+//------------------------------------------------------------------------------
 
-runmysteriet.handler.ShieldHandler.prototype.getRuneString = function () {
+runmysteriet.handler.ShieldHandler.prototype.getRuneString = function() {
+    var result = "";
+    var i = 0;
 
-  var result = "";
+    for (i = 0; i < this.m_collected.length; i++) {
+        result += this.m_collected[i].rune;
+    }
 
-  for (var i = 0; i < this.m_collected.length; i++) {
-    result += this.m_collected[i].rune;
-  }
-
-  return result;
+    return result;
 };
 
-runmysteriet.handler.ShieldHandler.prototype.allRunesColected = function () {
+runmysteriet.handler.ShieldHandler.prototype.allRunesColected = function() {
     var placedRuneCount = 0;
 
     if (!this.m_word || this.m_word.length <= 0) {
@@ -350,20 +337,16 @@ runmysteriet.handler.ShieldHandler.prototype.allRunesColected = function () {
 
     placedRuneCount = this.m_word.length;
 
-    /*
-     * En bokstav placeras inte ut.
-     * Därför kan spelaren bara samla word.length - 1 runor.
-     */
     if (this.m_hiddenIndex >= 0) {
         placedRuneCount--;
     }
 
     return this.m_collected.length >= placedRuneCount;
 };
-//-------------------------
-// GETTERS
-//-------------------------
 
+//------------------------------------------------------------------------------
+// GETTERS
+//------------------------------------------------------------------------------
 
 runmysteriet.handler.ShieldHandler.prototype.getGuessData = function() {
     return {

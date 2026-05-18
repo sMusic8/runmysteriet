@@ -72,6 +72,7 @@ runmysteriet.segments.Segment_End.prototype.ground = function(stage, startX, lev
     var waterAreas = [];
     var boats = [];
     var endZones = [];
+    var runeSpawns = [];
 
     var gateX = segmentStart + this.length - 240;
     var gateY = this.groundY - 100;
@@ -80,13 +81,17 @@ runmysteriet.segments.Segment_End.prototype.ground = function(stage, startX, lev
     this.addGround(stage, platforms, x);
     this.addGoalMarkers(stage, gateX, gateY);
     this.addDiseases(diseaseSpawns, segmentStart, levelNumber);
+    this.addRuneSpawns(runeSpawns, segmentStart);
     this.addEndZone(stage, endZones, segmentEnd);
+    this.addArmorSpawns(armorSpawns, segmentStart);
 
     return {
         platforms: platforms,
         holes: holes,
         enemySpawns: enemySpawns,
         diseaseSpawns: diseaseSpawns,
+        runeSpawns: runeSpawns,
+        armorSpawns: armorSpawns,
         waterAreas: waterAreas,
         boats: boats,
         endZones: endZones,
@@ -302,4 +307,30 @@ runmysteriet.segments.Segment_End.prototype.addEndZone = function(stage, endZone
 
     stage.addChild(endZone);
     endZones.push(endZone);
+};
+
+//------------------------------------------------------------------------------
+// RUNES
+//------------------------------------------------------------------------------
+
+runmysteriet.segments.Segment_End.prototype.addRuneSpawns = function(runeSpawns, segmentStart) {
+    var positions = this.getRunePositions(segmentStart);
+    var i = 0;
+
+    for (i = 0; i < positions.length; i++) {
+        runeSpawns.push(positions[i]);
+    }
+};
+
+runmysteriet.segments.Segment_End.prototype.getRunePositions = function(segmentStart) {
+    return [
+        {
+            x: segmentStart + 250,
+            y: this.groundY - 70
+        },
+        {
+            x: segmentStart + 520,
+            y: this.groundY - 70
+        }
+    ];
 };

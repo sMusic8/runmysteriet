@@ -62,8 +62,10 @@ runmysteriet.segments.Segment_4.prototype.ground = function(stage, startX, level
     var holes = [];
     var enemySpawns = [];
     var diseaseSpawns = [];
+    var armorSpawns = [];
     var waterAreas = [];
     var boats = [];
+    var runeSpawns = [];
 
     var holeWidth = 360;
 
@@ -80,12 +82,16 @@ runmysteriet.segments.Segment_4.prototype.ground = function(stage, startX, level
 
     this.addRemainingGround(stage, platforms, x, segmentEnd);
     this.addDiseases(diseaseSpawns, segmentStart, levelNumber);
+    this.addRuneSpawns(runeSpawns, segmentStart);
+    this.addArmorSpawns(armorSpawns, segmentStart);
 
     return {
         platforms: platforms,
         holes: holes,
         enemySpawns: enemySpawns,
         diseaseSpawns: diseaseSpawns,
+        runeSpawns: runeSpawns,
+        armorSpawns: armorSpawns,
         waterAreas: waterAreas,
         boats: boats,
         endX: segmentEnd
@@ -315,6 +321,60 @@ runmysteriet.segments.Segment_4.prototype.getDiseasePositions = function(segment
             type: "gray",
             x: segmentStart + 900,
             y: this.groundY - 40
+        }
+    ];
+};
+
+//------------------------------------------------------------------------------
+// RUNES
+//------------------------------------------------------------------------------
+
+runmysteriet.segments.Segment_4.prototype.addRuneSpawns = function(runeSpawns, segmentStart) {
+    var positions = this.getRunePositions(segmentStart);
+    var i = 0;
+
+    for (i = 0; i < positions.length; i++) {
+        runeSpawns.push(positions[i]);
+    }
+};
+
+runmysteriet.segments.Segment_4.prototype.getRunePositions = function(segmentStart) {
+    return [
+        {
+            x: segmentStart + 90,
+            y: this.groundY - 70
+        },
+        {
+            x: segmentStart + 690,
+            y: this.groundY - 70
+        },
+        {
+            x: segmentStart + 880,
+            y: this.groundY - 70
+        }
+    ];
+};
+
+
+//------------------------------------------------------------------------------
+// ARMOR
+//------------------------------------------------------------------------------
+
+runmysteriet.segments.Segment_3.prototype.addArmorSpawns = function(armorSpawns, segmentStart) {
+    var positions = this.getArmorPositions(segmentStart);
+    var i = 0;
+
+    for (i = 0; i < positions.length; i++) {
+        armorSpawns.push(positions[i]);
+    }
+};
+
+
+runmysteriet.segments.Segment_3.prototype.getArmorPositions = function(segmentStart) {
+    return [
+        {
+            x: segmentStart + 850,
+            y: this.groundY - 45
         }
     ];
 };

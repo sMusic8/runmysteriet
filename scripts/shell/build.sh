@@ -35,6 +35,7 @@ npx google-closure-compiler \
 --js "./../../src/handler/PlayerHandler.js" \
 --js "./../../src/handler/HudHandler.js" \
 --js "./../../src/handler/DiseaseHandler.js" \
+--js "./../../src/handler/ArmorHandler.js" \
 --js "./../../src/scene/menu/More.js" \
 --js "./../../src/scene/menu/Credits.js" \
 --js "./../../src/scene/menu/LevelComplete.js" \
