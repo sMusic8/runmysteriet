@@ -3,8 +3,8 @@
 //------------------------------------------------------------------------------
 
 /**
- * Segment 3 constructor.
- * Creates a lava hole with rising stone platforms.
+ * Segment 3.
+ * Skapar ett lavasegment med stigande plattformar, fiender och sjukdomar.
  *
  * @constructor
  */
@@ -21,92 +21,180 @@ runmysteriet.segments.Segment_3 = function() {
 
     /** @type {number} */
     this.tileH = 20;
-    console.log("Segment 3");
 
+    /** @type {string} */
+    this.groundTexture = "bana-gras1";
+
+    /** @type {string} */
+    this.platformTexture = "tree_block";
+
+    /** @type {string} */
+    this.lavaTexture = "lava";
 };
 
+//------------------------------------------------------------------------------
+// PUBLIC METHODS
+//------------------------------------------------------------------------------
+
 /**
- * Generates the ground layout for Segment 3.
+ * Skapar Segment 3.
  *
  * @param {!rune.display.Stage} stage
  * @param {number=} startX
+ * @param {number=} levelNumber
  * @return {{
- *   platforms: !Array<!rune.display.Graphic>,
- *   holes: !Array<!runmysteriet.ui.graphic.Hole>,
+ *   platforms: !Array<!Object>,
+ *   holes: !Array<!Object>,
  *   enemySpawns: !Array<!Object>,
+ *   diseaseSpawns: !Array<!Object>,
  *   waterAreas: !Array<!Object>,
  *   boats: !Array<!Object>,
  *   endX: number
  * }}
  */
-runmysteriet.segments.Segment_3.prototype.ground = function(stage, startX) {
+runmysteriet.segments.Segment_3.prototype.ground = function(stage, startX, levelNumber) {
 
     var segmentStart = startX || 0;
     var segmentEnd = segmentStart + this.length;
-
     var x = segmentStart;
 
     var platforms = [];
     var holes = [];
     var enemySpawns = [];
+    var diseaseSpawns = [];
     var waterAreas = [];
     var boats = [];
-    var diseaseSpawns = [];
 
-    function buildGrass(px, py, tiles, _this) {
+    var holeWidth = 430;
 
-        for (var i = 0; i < tiles; i++) {
+    this.addStartGround(stage, platforms, enemySpawns, x);
+    x += 6 * this.tileW;
 
-            var tile = new rune.display.Graphic(
-                px + (i * _this.tileW),
-                py,
-                _this.tileW,
-                _this.tileH,
-                "bana-gras1"
-            );
+    this.addLavaHole(stage, holes, x, holeWidth);
+    this.addStairPlatforms(stage, platforms, enemySpawns, x);
 
-            stage.addChild(tile);
-            platforms.push(tile);
-        }
-    }
+    x += holeWidth;
 
-    function buildStone(px, py, tiles, _this) {
+    this.addLandingGround(stage, platforms, enemySpawns, x);
+    x += 6 * this.tileW;
 
-        for (var i = 0; i < tiles; i++) {
+    this.addRemainingGround(stage, platforms, x, segmentEnd);
+    this.addDiseases(diseaseSpawns, segmentStart, levelNumber);
 
-            var tile = new rune.display.Graphic(
-                px + (i * _this.tileW),
-                py,
-                _this.tileW,
-                _this.tileH,
-                "tree_block"
-            );
+    return {
+        platforms: platforms,
+        holes: holes,
+        enemySpawns: enemySpawns,
+        diseaseSpawns: diseaseSpawns,
+        waterAreas: waterAreas,
+        boats: boats,
+        endX: segmentEnd
+    };
+};
 
-            stage.addChild(tile);
-            platforms.push(tile);
-        }
-    }
+//------------------------------------------------------------------------------
+// GROUND
+//------------------------------------------------------------------------------
 
-    //----------------------------------------------------------------------
-    // STARTMARK
-    //----------------------------------------------------------------------
-
-    buildGrass(x, this.groundY, 6, this);
+/**
+ * Lägger till startmark.
+ *
+ * @param {!rune.display.Stage} stage
+ * @param {!Array<!Object>} platforms
+ * @param {!Array<!Object>} enemySpawns
+ * @param {number} x
+ */
+runmysteriet.segments.Segment_3.prototype.addStartGround = function(stage, platforms, enemySpawns, x) {
+    this.addTiles(stage, platforms, x, this.groundY, 6, this.groundTexture);
 
     enemySpawns.push({
         type: "kristen",
         x: x + 100,
         y: this.groundY - 40
     });
+};
 
-    x += 6 * this.tileW;
+/**
+ * Lägger till landningsmark.
+ *
+ * @param {!rune.display.Stage} stage
+ * @param {!Array<!Object>} platforms
+ * @param {!Array<!Object>} enemySpawns
+ * @param {number} x
+ */
+runmysteriet.segments.Segment_3.prototype.addLandingGround = function(stage, platforms, enemySpawns, x) {
+    this.addTiles(stage, platforms, x, this.groundY, 6, this.groundTexture);
 
-    //----------------------------------------------------------------------
-    // LAVAHÅL
-    //----------------------------------------------------------------------
+    enemySpawns.push({
+        type: "kristen",
+        x: x + 100,
+        y: this.groundY - 40
+    });
+};
 
-    var holeWidth = 430;
+/**
+ * Fyller ut resten av segmentet med mark.
+ *
+ * @param {!rune.display.Stage} stage
+ * @param {!Array<!Object>} platforms
+ * @param {number} x
+ * @param {number} segmentEnd
+ */
+runmysteriet.segments.Segment_3.prototype.addRemainingGround = function(stage, platforms, x, segmentEnd) {
+    var remainingWidth = 0;
+    var remainingTiles = 0;
 
+    if (x >= segmentEnd) {
+        return;
+    }
+
+    remainingWidth = segmentEnd - x;
+    remainingTiles = Math.ceil(remainingWidth / this.tileW);
+
+    this.addTiles(stage, platforms, x, this.groundY, remainingTiles, this.groundTexture);
+};
+
+/**
+ * Skapar flera tiles.
+ *
+ * @param {!rune.display.Stage} stage
+ * @param {!Array<!Object>} platforms
+ * @param {number} x
+ * @param {number} y
+ * @param {number} amount
+ * @param {string} texture
+ */
+runmysteriet.segments.Segment_3.prototype.addTiles = function(stage, platforms, x, y, amount, texture) {
+    var i = 0;
+    var tile = null;
+
+    for (i = 0; i < amount; i++) {
+        tile = new rune.display.Graphic(
+            x + (i * this.tileW),
+            y,
+            this.tileW,
+            this.tileH,
+            texture
+        );
+
+        stage.addChild(tile);
+        platforms.push(tile);
+    }
+};
+
+//------------------------------------------------------------------------------
+// LAVA
+//------------------------------------------------------------------------------
+
+/**
+ * Lägger till lavahålet.
+ *
+ * @param {!rune.display.Stage} stage
+ * @param {!Array<!Object>} holes
+ * @param {number} x
+ * @param {number} holeWidth
+ */
+runmysteriet.segments.Segment_3.prototype.addLavaHole = function(stage, holes, x, holeWidth) {
     var hole = new runmysteriet.ui.graphic.Hole(
         x,
         this.groundY,
@@ -117,36 +205,56 @@ runmysteriet.segments.Segment_3.prototype.ground = function(stage, startX) {
     stage.addChild(hole);
     holes.push(hole);
 
-    var lavaCols = Math.ceil(holeWidth / this.tileW);
-    var lavaRows = 6;
+    this.addLavaTiles(stage, hole);
+};
 
-    for (var ly = 0; ly < lavaRows; ly++) {
-        for (var lx = 0; lx < lavaCols; lx++) {
+/**
+ * Fyller lavahålet med lavagrafik.
+ *
+ * @param {!rune.display.Stage} stage
+ * @param {!runmysteriet.ui.graphic.Hole} hole
+ */
+runmysteriet.segments.Segment_3.prototype.addLavaTiles = function(stage, hole) {
+    var lavaCols = Math.ceil(hole.width / this.tileW);
+    var lavaRows = Math.ceil(hole.height / this.tileH);
+    var lx = 0;
+    var ly = 0;
+    var lava = null;
 
-            var lava = new rune.display.Graphic(
-                x + (lx * this.tileW),
-                this.groundY + (ly * this.tileH),
+    for (ly = 0; ly < lavaRows; ly++) {
+        for (lx = 0; lx < lavaCols; lx++) {
+            lava = new rune.display.Graphic(
+                hole.x + (lx * this.tileW),
+                hole.y + (ly * this.tileH),
                 this.tileW,
                 this.tileH,
-                "lava"
+                this.lavaTexture
             );
 
             stage.addChild(lava);
         }
     }
+};
 
-    //----------------------------------------------------------------------
-    // TRAPPPLATTFORMAR ÖVER LAVAN
-    //----------------------------------------------------------------------
-
+/**
+ * Lägger till trappplattformar över lavan.
+ *
+ * @param {!rune.display.Stage} stage
+ * @param {!Array<!Object>} platforms
+ * @param {!Array<!Object>} enemySpawns
+ * @param {number} x
+ */
+runmysteriet.segments.Segment_3.prototype.addStairPlatforms = function(stage, platforms, enemySpawns, x) {
     var steps = 5;
+    var j = 0;
+    var px = 0;
+    var py = 0;
 
-    for (var j = 0; j < steps; j++) {
+    for (j = 0; j < steps; j++) {
+        px = x + 35 + (j * 78);
+        py = this.groundY - (40 + j * 22);
 
-        var px = x + 35 + (j * 78);
-        var py = this.groundY - (40 + j * 22);
-
-        buildStone(px, py, 2, this);
+        this.addTiles(stage, platforms, px, py, 2, this.platformTexture);
 
         if (j === 2 || j === 4) {
             enemySpawns.push({
@@ -156,41 +264,81 @@ runmysteriet.segments.Segment_3.prototype.ground = function(stage, startX) {
             });
         }
     }
+};
 
-    x += holeWidth;
+//------------------------------------------------------------------------------
+// DISEASES
+//------------------------------------------------------------------------------
 
-    //----------------------------------------------------------------------
-    // LANDNINGSMARK
-    //----------------------------------------------------------------------
+/**
+ * Returnerar antal sjukdomar baserat på level.
+ *
+ * Level 1-5: 2 sjukdomar
+ * Level 6-10: 3 sjukdomar
+ * Level 11+: 4 sjukdomar
+ *
+ * @param {number=} levelNumber
+ * @return {number}
+ */
+runmysteriet.segments.Segment_3.prototype.getDiseaseCount = function(levelNumber) {
+    levelNumber = levelNumber || 1;
 
-    buildGrass(x, this.groundY, 6, this);
-
-    enemySpawns.push({
-        type: "kristen",
-        x: x + 100,
-        y: this.groundY - 40
-    });
-
-    x += 6 * this.tileW;
-
-    //----------------------------------------------------------------------
-    // FYLL UT RESTEN TILL 1000 PX
-    //----------------------------------------------------------------------
-
-    if (x < segmentEnd) {
-        var remainingWidth = segmentEnd - x;
-        var remainingTiles = Math.ceil(remainingWidth / this.tileW);
-
-        buildGrass(x, this.groundY, remainingTiles, this);
+    if (levelNumber >= 11) {
+        return 4;
     }
 
-    return {
-        platforms: platforms,
-        holes: holes,
-        enemySpawns: enemySpawns,
-        waterAreas: waterAreas,
-        diseaseSpawns: diseaseSpawns,
-        boats: boats,
-        endX: segmentEnd
-    };
+    if (levelNumber >= 6) {
+        return 3;
+    }
+
+    return 2;
+};
+
+/**
+ * Lägger till sjukdomar på säkra markytor.
+ *
+ * @param {!Array<!Object>} diseaseSpawns
+ * @param {number} segmentStart
+ * @param {number=} levelNumber
+ */
+runmysteriet.segments.Segment_3.prototype.addDiseases = function(diseaseSpawns, segmentStart, levelNumber) {
+    var diseaseCount = this.getDiseaseCount(levelNumber);
+    var diseasePositions = this.getDiseasePositions(segmentStart);
+    var i = 0;
+
+    for (i = 0; i < diseaseCount && i < diseasePositions.length; i++) {
+        diseaseSpawns.push(diseasePositions[i]);
+    }
+};
+
+/**
+ * Returnerar sjukdomspositioner för Segment 3.
+ * Positionerna ligger på startmark och slutmark, inte över lavahålet.
+ *
+ * @param {number} segmentStart
+ * @return {!Array<!Object>}
+ */
+runmysteriet.segments.Segment_3.prototype.getDiseasePositions = function(segmentStart) {
+    return [
+        {
+            type: "gray",
+            x: segmentStart + 80,
+            y: this.groundY - 40
+        },
+        {
+            type: "brown",
+            x: segmentStart + 760,
+            y: this.groundY - 40
+        },
+        {
+            type: "red",
+            x: segmentStart + 850,
+            y: this.groundY - 40
+        },
+        {
+            type: "gray",
+            x: segmentStart + 930,
+            y: this.groundY - 40
+        }
+    ];
 };

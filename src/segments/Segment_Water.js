@@ -2,55 +2,145 @@
 // SEGMENT WATER
 //------------------------------------------------------------------------------
 
+/**
+ * Vattensegment.
+ * Innehåller mark, vatten, flotte, båt och sjukdomar.
+ *
+ * @constructor
+ */
 runmysteriet.segments.Segment_Water = function() {
+
+    /** @type {number} */
     this.tileSize = 280;
+
+    /** @type {number} */
     this.groundY = 200;
 
+    /** @type {number} */
     this.waterWidth = 402;
-    this.waterHeight = 32;
 
-    console.log("Segment Water");
+    /** @type {number} */
+    this.waterHeight = 32;
 };
 
+//------------------------------------------------------------------------------
+// PUBLIC METHODS
+//------------------------------------------------------------------------------
+
+/**
+ * Skapar vattensegmentet.
+ *
+ * @param {!rune.display.Stage} stage
+ * @param {number=} startX
+ * @param {number=} levelNumber
+ * @return {{
+ *   platforms: !Array<!Object>,
+ *   holes: !Array<!Object>,
+ *   enemySpawns: !Array<!Object>,
+ *   diseaseSpawns: !Array<!Object>,
+ *   waterAreas: !Array<!Object>,
+ *   boats: !Array<!Object>,
+ *   endX: number
+ * }}
+ */
 runmysteriet.segments.Segment_Water.prototype.ground = function(stage, startX, levelNumber) {
     var x = startX || 0;
 
     var platforms = [];
     var holes = [];
     var enemySpawns = [];
+    var diseaseSpawns = [];
     var waterAreas = [];
     var boats = [];
-    var diseaseSpawns = [];
 
-    function getDiseaseCount(levelNumber) {
-        if (levelNumber >= 11) {
-            return 4;
-        }
-
-        if (levelNumber >= 6) {
-            return 3;
-        }
-
-        return 2;
-    }
-
-    /*
-     * Vänster mark.
-     */
     var leftLandX = x;
+    var water = null;
+    var rightLandX = 0;
 
-    var platform1 = new runmysteriet.ui.Platform();
-    platform1.x = x;
-    platform1.y = this.groundY;
+    this.addLeftLand(stage, platforms, x);
+    x += this.tileSize;
 
-    stage.addChild(platform1);
-    platforms.push(platform1);
+    water = this.addWater(stage, waterAreas, x);
+
+    this.addRaft(stage, platforms, water);
+    this.addBoat(stage, boats, water);
+
+    x += this.waterWidth;
+
+    rightLandX = x;
+    this.addRightLand(stage, platforms, x);
 
     x += this.tileSize;
 
-    /*
-     * Vatten.
-     */
+    this.addDiseases(
+        diseaseSpawns,
+        leftLandX,
+        rightLandX,
+        levelNumber
+    );
+
+    return {
+        platforms: platforms,
+        holes: holes,
+        enemySpawns: enemySpawns,
+        diseaseSpawns: diseaseSpawns,
+        waterAreas: waterAreas,
+        boats: boats,
+        endX: x
+    };
+};
+
+//------------------------------------------------------------------------------
+// LAND
+//------------------------------------------------------------------------------
+
+/**
+ * Lägger till vänster mark.
+ *
+ * @param {!rune.display.Stage} stage
+ * @param {!Array<!Object>} platforms
+ * @param {number} x
+ */
+runmysteriet.segments.Segment_Water.prototype.addLeftLand = function(stage, platforms, x) {
+    var platform = new runmysteriet.ui.Platform();
+
+    platform.x = x;
+    platform.y = this.groundY;
+
+    stage.addChild(platform);
+    platforms.push(platform);
+};
+
+/**
+ * Lägger till höger mark.
+ *
+ * @param {!rune.display.Stage} stage
+ * @param {!Array<!Object>} platforms
+ * @param {number} x
+ */
+runmysteriet.segments.Segment_Water.prototype.addRightLand = function(stage, platforms, x) {
+    var platform = new runmysteriet.ui.Platform();
+
+    platform.x = x;
+    platform.y = this.groundY;
+
+    stage.addChild(platform);
+    platforms.push(platform);
+};
+
+//------------------------------------------------------------------------------
+// WATER
+//------------------------------------------------------------------------------
+
+/**
+ * Lägger till vattenområdet.
+ *
+ * @param {!rune.display.Stage} stage
+ * @param {!Array<!Object>} waterAreas
+ * @param {number} x
+ * @return {!runmysteriet.ui.graphic.Water}
+ */
+runmysteriet.segments.Segment_Water.prototype.addWater = function(stage, waterAreas, x) {
     var water = new runmysteriet.ui.graphic.Water(
         x,
         this.groundY - 8
@@ -59,10 +149,21 @@ runmysteriet.segments.Segment_Water.prototype.ground = function(stage, startX, l
     stage.addChild(water);
     waterAreas.push(water);
 
-    /*
-     * Flotte.
-     * Denna ska spelaren kunna stå på.
-     */
+    return water;
+};
+
+//------------------------------------------------------------------------------
+// RAFT
+//------------------------------------------------------------------------------
+
+/**
+ * Lägger till flotten.
+ *
+ * @param {!rune.display.Stage} stage
+ * @param {!Array<!Object>} platforms
+ * @param {!runmysteriet.ui.graphic.Water} water
+ */
+runmysteriet.segments.Segment_Water.prototype.addRaft = function(stage, platforms, water) {
     var raft = new runmysteriet.ui.graphic.Raft(
         water.x + 5,
         water.y - 8
@@ -74,51 +175,92 @@ runmysteriet.segments.Segment_Water.prototype.ground = function(stage, startX, l
     stage.addChild(raft);
 
     /*
-     * Flotten läggs i platforms så spelaren kan stå på den.
+     * Flotten räknas som plattform så spelaren kan stå på den.
      */
     platforms.push(raft);
+};
 
-    /*
-     * Engelsk båt.
-     * Denna är farlig. Vid collision ska spelaren dö.
-     */
+//------------------------------------------------------------------------------
+// BOAT
+//------------------------------------------------------------------------------
+
+/**
+ * Lägger till den engelska båten.
+ *
+ * @param {!rune.display.Stage} stage
+ * @param {!Array<!Object>} boats
+ * @param {!runmysteriet.ui.graphic.Water} water
+ */
+runmysteriet.segments.Segment_Water.prototype.addBoat = function(stage, boats, water) {
     var boat = new runmysteriet.entity.EnglishBoat(
         water.x + 60,
         water.y - 75
     );
 
-    /*
-     * Rörelseområde för tween.
-     */
     boat.minX = water.x - 160;
     boat.maxX = water.x + this.waterWidth - boat.width - 120;
 
     stage.addChild(boat);
     boats.push(boat);
+};
 
-    x += this.waterWidth;
+//------------------------------------------------------------------------------
+// DISEASES
+//------------------------------------------------------------------------------
 
-    /*
-     * Höger mark.
-     */
-    var rightLandX = x;
+/**
+ * Returnerar antal sjukdomar baserat på level.
+ *
+ * Level 1-5: 2 sjukdomar
+ * Level 6-10: 3 sjukdomar
+ * Level 11+: 4 sjukdomar
+ *
+ * @param {number=} levelNumber
+ * @return {number}
+ */
+runmysteriet.segments.Segment_Water.prototype.getDiseaseCount = function(levelNumber) {
+    levelNumber = levelNumber || 1;
 
-    var platform2 = new runmysteriet.ui.Platform();
-    platform2.x = x;
-    platform2.y = this.groundY;
+    if (levelNumber >= 11) {
+        return 4;
+    }
 
-    stage.addChild(platform2);
-    platforms.push(platform2);
+    if (levelNumber >= 6) {
+        return 3;
+    }
 
-    x += this.tileSize;
+    return 2;
+};
 
-    /*
-     * Sjukdomar.
-     * De placeras på landytorna, inte i vattenområdet.
-     */
-    var diseaseCount = getDiseaseCount(levelNumber);
+/**
+ * Lägger till sjukdomar på landytorna.
+ * Sjukdomar placeras inte i vattenområdet.
+ *
+ * @param {!Array<!Object>} diseaseSpawns
+ * @param {number} leftLandX
+ * @param {number} rightLandX
+ * @param {number=} levelNumber
+ */
+runmysteriet.segments.Segment_Water.prototype.addDiseases = function(diseaseSpawns, leftLandX, rightLandX, levelNumber) {
+    var diseaseCount = this.getDiseaseCount(levelNumber);
+    var diseasePositions = this.getDiseasePositions(leftLandX, rightLandX);
+    var i = 0;
 
-    var diseasePositions = [
+    for (i = 0; i < diseaseCount && i < diseasePositions.length; i++) {
+        diseaseSpawns.push(diseasePositions[i]);
+    }
+};
+
+/**
+ * Returnerar sjukdomspositioner för vattensegmentet.
+ * Positionerna ligger på vänster och höger mark.
+ *
+ * @param {number} leftLandX
+ * @param {number} rightLandX
+ * @return {!Array<!Object>}
+ */
+runmysteriet.segments.Segment_Water.prototype.getDiseasePositions = function(leftLandX, rightLandX) {
+    return [
         {
             type: "gray",
             x: leftLandX + 90,
@@ -140,18 +282,4 @@ runmysteriet.segments.Segment_Water.prototype.ground = function(stage, startX, l
             y: this.groundY - 40
         }
     ];
-
-    for (var i = 0; i < diseaseCount && i < diseasePositions.length; i++) {
-        diseaseSpawns.push(diseasePositions[i]);
-    }
-
-    return {
-        platforms: platforms,
-        holes: holes,
-        enemySpawns: enemySpawns,
-        diseaseSpawns: diseaseSpawns,
-        waterAreas: waterAreas,
-        boats: boats,
-        endX: x
-    };
 };

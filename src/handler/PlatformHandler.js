@@ -271,10 +271,6 @@ runmysteriet.handler.PlatformHandler.prototype.addSegmentResult = function(resul
     this.addDiseaseSpawns(result.diseaseSpawns || []);
 };
 
-runmysteriet.handler.PlatformHandler.prototype.getRandomSegment = function(pool) {
-    var index = Math.floor(Math.random() * pool.length);
-    return pool[index];
-};
 
 runmysteriet.handler.PlatformHandler.prototype.getRandomSegments = function(pool, count) {
     var copy = pool.slice();
@@ -317,16 +313,3 @@ runmysteriet.handler.PlatformHandler.prototype.getDiseaseSpawns = function() {
     return this.diseaseSpawns;
 };
 
-runmysteriet.handler.PlatformHandler.prototype.addDiseaseSpawns = function(diseaseSpawns) {
-    if (!diseaseSpawns) {
-        return;
-    }
-
-    for (var i = 0; i < diseaseSpawns.length; i++) {
-        this.diseaseSpawns.push(diseaseSpawns[i]);
-    }
-};
-
-runmysteriet.handler.PlatformHandler.prototype.getDiseaseSpawns = function() {
-    return this.diseaseSpawns;
-};

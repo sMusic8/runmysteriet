@@ -12,11 +12,13 @@ runmysteriet.scene.Game = function(levelNumber, score, playerName) {
     this.m_cameraHandler = null;
     this.m_backgroundHandler = null;
     this.m_enemyHandler = null;
+    this.m_diseaseHandler = null;
 
     this.m_levelConfig = null;
     this.m_levelNumber = levelNumber || 1;
     this.m_score = score || 0;
     this.m_playerName = playerName || "PLAYER";
+
     this.m_isPaused = false;
     this.m_pauseTitle = null;
     this.m_pauseMenu = null;
@@ -31,13 +33,12 @@ runmysteriet.scene.Game = function(levelNumber, score, playerName) {
     this.menuSound = null;
 
     this.m_gameInput = null;
-
     this.camera = null;
+
     this.m_hudHandler = null;
     this.m_highscoreSaved = false;
-    this.m_diseaseHandler = null;
 };
-    
+
 //------------------------------------------------------------------------------
 // INHERITANCE
 //------------------------------------------------------------------------------
@@ -53,20 +54,18 @@ runmysteriet.scene.Game.prototype.init = function() {
     rune.scene.Scene.prototype.init.call(this);
 
     this.m_gameInput = new runmysteriet.input.GameInput(this.application);
-
     this.camera = this.cameras.getCameraAt(0);
-
-    this.m_levelCompleted = false;
 
     /*
      * Musik
      */
     this.backgroundMusic = this.application.sounds.sound.get("sound_music");
     this.menuSound = this.application.sounds.sound.get("sound_menu");
+
     if (this.backgroundMusic) {
-    this.backgroundMusic.loop = true;
-    this.backgroundMusic.play();
-}
+        this.backgroundMusic.loop = true;
+        this.backgroundMusic.play();
+    }
 
     /*
      * Bakgrund
@@ -80,9 +79,8 @@ runmysteriet.scene.Game.prototype.init = function() {
 
     this.m_backgroundHandler.init();
 
-   
     /*
-     * Plattformar / segment / holes / enemy spawnpoints
+     * Plattformar
      */
     this.m_platformHandler = new runmysteriet.handler.PlatformHandler(
         this.stage,
@@ -93,7 +91,7 @@ runmysteriet.scene.Game.prototype.init = function() {
     this.m_platformHandler.startBoatTweens(this.tweens);
 
     this.m_finishX = this.m_platformHandler.levelWidth - 50;
-   
+
     /*
      * Moln
      */
@@ -105,25 +103,25 @@ runmysteriet.scene.Game.prototype.init = function() {
 
     this.m_cloudHandler.init();
 
-
     /*
      * Spelare
      */
-    // PlayerHandler initieras efter PlatformHandler så att den kan få referenser till plattformar, hål och fiendespawns.
-this.m_playerHandler = new runmysteriet.handler.PlayerHandler(
-    this.stage,
-    this.m_platformHandler,
-    this.application,
-    this.m_gameInput,
-    this.keyboard
-);
+    this.m_playerHandler = new runmysteriet.handler.PlayerHandler(
+        this.stage,
+        this.m_platformHandler,
+        this.application,
+        this.m_gameInput,
+        this.keyboard
+    );
 
     this.m_playerHandler.init();
 
     /*
      * Level config
      */
-    this.m_levelConfig = new runmysteriet.config.LevelConfig(this.m_levelNumber);
+    this.m_levelConfig = new runmysteriet.config.LevelConfig(
+        this.m_levelNumber
+    );
 
     /*
      * Fiender
@@ -134,8 +132,7 @@ this.m_playerHandler = new runmysteriet.handler.PlayerHandler(
         this.m_levelConfig,
         this.m_platformHandler.getEnemySpawns()
     );
-    
-    //kopplas ihop enemy-handlern med playerhandlern så att fienderna kan skada spelaren och spelaren kan attackera fienderna.
+
     this.m_playerHandler.setEnemyHandler(this.m_enemyHandler);
 
     /*
@@ -146,24 +143,25 @@ this.m_playerHandler = new runmysteriet.handler.PlayerHandler(
         this.m_playerHandler,
         this.m_platformHandler.levelWidth
     );
-    // Ger playerHandler referens till kameran så att den kan hålla spelare inom leveln.
+
     this.m_playerHandler.setCamera(this.camera);
 
-            /*
-        * Sjukdomar / hazards
-        */
-        this.m_diseaseHandler = new runmysteriet.handler.DiseaseHandler(
-            this.stage
-        );
+    /*
+     * Sjukdomar / hazards
+     */
+    this.m_diseaseHandler = new runmysteriet.handler.DiseaseHandler(
+        this.stage
+    );
 
-        this.m_diseaseHandler.init(
-            this.m_levelNumber,
-            this.m_platformHandler.getDiseaseSpawns()
-        );
+    this.m_diseaseHandler.init(
+        this.m_levelNumber,
+        this.m_platformHandler.getDiseaseSpawns()
+    );
+
     /*
      * Sköldar / runor
      */
-    this.m_shieldHandler = new runmysteriet.handler.ShieldHandler( //
+    this.m_shieldHandler = new runmysteriet.handler.ShieldHandler(
         this.stage,
         this.application,
         this.m_platformHandler.levelWidth,
@@ -171,16 +169,11 @@ this.m_playerHandler = new runmysteriet.handler.PlayerHandler(
     );
 
     this.m_shieldHandler.init();
-   // this.m_shieldHandler.display();
 
     /*
      * HUD
      */
     this.createHUD();
-
-    /*
-     * Paus-text/pausmeny skapas först när paus öppnas.
-     */
 };
 
 //------------------------------------------------------------------------------
@@ -188,19 +181,8 @@ this.m_playerHandler = new runmysteriet.handler.PlayerHandler(
 //------------------------------------------------------------------------------
 
 runmysteriet.scene.Game.prototype.update = function(step) {
-
-
-    /*
-     * Pausinput måste kollas innan Rune uppdaterar stage/tweens.
-     */
     this.updatePauseInput();
 
-    /*
-     * Om spelet är pausat ska vi INTE köra:
-     * rune.scene.Scene.prototype.update.call(this, step);
-     *
-     * Annars fortsätter båtar, sköldar, flotte och tweens.
-     */
     if (this.m_isPaused === true) {
         this.updateHUD();
         return;
@@ -211,17 +193,14 @@ runmysteriet.scene.Game.prototype.update = function(step) {
         return;
     }
 
-    /*
-     * Rune uppdaterar stage, children, tweens och timers här.
-     * Den ska bara köras när spelet inte är pausat.
-     */
     rune.scene.Scene.prototype.update.call(this, step);
 
     if (this.m_cloudHandler) {
         this.m_cloudHandler.update();
     }
 
-    if (this.m_platformHandler && typeof this.m_platformHandler.update === "function") {
+    if (this.m_platformHandler &&
+        typeof this.m_platformHandler.update === "function") {
         this.m_platformHandler.update(step);
     }
 
@@ -235,28 +214,17 @@ runmysteriet.scene.Game.prototype.update = function(step) {
     this.updateShields();
     this.checkLevelCompletion();
 
- /*
- * Begränsa spelarna mot nuvarande kamera innan kameran räknar ut sitt nya mål.
- * Annars kan kamera och spelare påverka varandra i fel ordning och skapa skakning.
- */
-if (this.m_playerHandler) {
-    this.m_playerHandler.keepPlayersInsideCamera();
-}
+    if (this.m_playerHandler) {
+        this.m_playerHandler.keepPlayersInsideCamera();
+    }
 
-if (this.m_cameraHandler) {
-    this.m_cameraHandler.update();
-}
+    if (this.m_cameraHandler) {
+        this.m_cameraHandler.update();
+    }
 
-/*
- * Viktigt:
- * Rune använder ett internt camera-offset vid render.
- * Eftersom vi ändrar camera.viewport.x själva efter Rune update,
- * behöver kameran synkas innan HUD:en placeras.
- */
-if (this.camera && typeof this.camera.update === "function") {
-    this.camera.update(0);
-}
-
+    if (this.camera && typeof this.camera.update === "function") {
+        this.camera.update(0);
+    }
 
     if (this.m_backgroundHandler) {
         this.m_backgroundHandler.update();
@@ -271,7 +239,6 @@ if (this.camera && typeof this.camera.update === "function") {
 //------------------------------------------------------------------------------
 
 runmysteriet.scene.Game.prototype.createHUD = function() {
-
     this.m_hudHandler = new runmysteriet.handler.HudHandler(
         this.stage,
         this.application,
@@ -288,11 +255,11 @@ runmysteriet.scene.Game.prototype.createHUD = function() {
 };
 
 runmysteriet.scene.Game.prototype.updateHUD = function() {
-
     if (this.m_hudHandler) {
         this.m_hudHandler.update();
     }
 };
+
 //------------------------------------------------------------------------------
 // UPDATE HELPERS
 //------------------------------------------------------------------------------
@@ -310,8 +277,7 @@ runmysteriet.scene.Game.prototype.updateHoles = function() {
     }
 };
 
-
-runmysteriet.scene.Game.prototype.updateEnemies = function(step) {
+runmysteriet.scene.Game.prototype.updateEnemies = function() {
     if (this.m_enemyHandler && this.m_playerHandler) {
         this.m_enemyHandler.update(this.m_playerHandler.players);
     }
@@ -320,6 +286,12 @@ runmysteriet.scene.Game.prototype.updateEnemies = function(step) {
 runmysteriet.scene.Game.prototype.updateShields = function() {
     if (this.m_shieldHandler && this.m_playerHandler) {
         this.m_shieldHandler.update(this.m_playerHandler.players);
+    }
+};
+
+runmysteriet.scene.Game.prototype.updateDiseases = function(step) {
+    if (this.m_diseaseHandler && this.m_playerHandler) {
+        this.m_diseaseHandler.update(this.m_playerHandler.players, step);
     }
 };
 
@@ -361,7 +333,9 @@ runmysteriet.scene.Game.prototype.isPauseButtonPressed = function() {
     var gamepad = null;
     var startIsPressed = false;
 
-    if (this.application && this.application.inputs && this.application.inputs.gamepads) {
+    if (this.application &&
+        this.application.inputs &&
+        this.application.inputs.gamepads) {
         gamepad = this.application.inputs.gamepads.get(0);
     }
 
@@ -385,10 +359,6 @@ runmysteriet.scene.Game.prototype.createPauseMenu = function() {
         return;
     }
 
-    /*
-     * Mörk overlay över spelet bakom pausmenyn.
-     * Alpha 0.5 = 50% opacity.
-     */
     this.m_pauseOverlay = new rune.display.Graphic(
         0,
         0,
@@ -405,6 +375,7 @@ runmysteriet.scene.Game.prototype.createPauseMenu = function() {
     this.m_pauseTitle = new rune.text.BitmapField("GAME PAUSED");
     this.m_pauseTitle.autoSize = true;
     this.m_pauseTitle.visible = false;
+
     this.stage.addChild(this.m_pauseTitle);
 
     this.m_pauseMenu = new runmysteriet.ui.graphic.MenuList(
@@ -441,10 +412,12 @@ runmysteriet.scene.Game.prototype.openPauseMenu = function() {
         this.tweens.paused = true;
     }
 
-    if (this.backgroundMusic && typeof this.backgroundMusic.pause === "function") {
+    if (this.backgroundMusic &&
+        typeof this.backgroundMusic.pause === "function") {
         this.backgroundMusic.pause();
     }
 };
+
 runmysteriet.scene.Game.prototype.closePauseMenu = function() {
     this.m_isPaused = false;
 
@@ -464,7 +437,8 @@ runmysteriet.scene.Game.prototype.closePauseMenu = function() {
         this.tweens.paused = false;
     }
 
-    if (this.backgroundMusic && typeof this.backgroundMusic.play === "function") {
+    if (this.backgroundMusic &&
+        typeof this.backgroundMusic.play === "function") {
         this.backgroundMusic.play();
     }
 };
@@ -477,9 +451,9 @@ runmysteriet.scene.Game.prototype.updatePauseMenuPosition = function() {
     }
 
     if (this.m_pauseOverlay) {
-    this.m_pauseOverlay.x = camera.viewport.x;
-    this.m_pauseOverlay.y = camera.viewport.y;
-}
+        this.m_pauseOverlay.x = camera.viewport.x;
+        this.m_pauseOverlay.y = camera.viewport.y;
+    }
 
     if (this.m_pauseTitle) {
         this.m_pauseTitle.x = camera.viewport.x + 170;
@@ -538,17 +512,12 @@ runmysteriet.scene.Game.prototype.handleMenuListInput = function(menuList, onCho
         onChoose.call(this, menuList.getSelectedIndex());
     }
 };
+
 //------------------------------------------------------------------------------
 // TIMER
 //------------------------------------------------------------------------------
 
 runmysteriet.scene.Game.prototype.updateTimer = function() {
-
-    /*
-     * Timern ska fortsätta även om alla runor är samlade.
-     * Annars kan spelaren samla runorna och sedan ta hur lång tid som helst
-     * utan att förlora score.
-     */
     this.m_timeLeft -= 1 / 30;
 
     if (this.m_timeLeft < 0) {
@@ -556,24 +525,26 @@ runmysteriet.scene.Game.prototype.updateTimer = function() {
     }
 
     if (this.m_hudHandler) {
-
         if (this.allRunesColected()) {
             this.m_hudHandler.setTimerText(
-        "ALL RUNES FOUND - REACH THE END" );
+                "ALL RUNES FOUND - REACH THE END"
+            );
         } else {
             this.m_hudHandler.setTimerText(
-                "TIME LEFT" + Math.ceil(this.m_timeLeft)
+                "TIME LEFT " + Math.ceil(this.m_timeLeft)
             );
         }
 
         this.m_hudHandler.setScoreText(
-            "LEVEL" + this.m_levelNumber + "SCORE " + this.m_score
+            "LEVEL " + this.m_levelNumber + " SCORE " + this.m_score
         );
     }
 };
+
 //------------------------------------------------------------------------------
 // LEVEL COMPLETION
 //------------------------------------------------------------------------------
+
 runmysteriet.scene.Game.prototype.checkLevelCompletion = function() {
     var players = null;
     var player = null;
@@ -589,11 +560,6 @@ runmysteriet.scene.Game.prototype.checkLevelCompletion = function() {
         return;
     }
 
-    /*
-     * om någon levande spelare når slutet av leveln
-     * ska spelet gå vidare till GuessWord.
-     *  det spelar ingen roll om alla runor är insamlade man ska försöka gissa ordet
-     */
     for (i = 0; i < players.length; i++) {
         player = players[i];
 
@@ -604,24 +570,49 @@ runmysteriet.scene.Game.prototype.checkLevelCompletion = function() {
         if (this.hasPlayerReachedEndZone(player)) {
             this.winGame(player);
             return;
-}
+        }
     }
 
-    /*
-     * Om alla spelare är döda förlorar man.
-     */
     if (this.areAllPlayersDead()) {
-        this.loseGame("ALL PLAYERS ARE DEAD"); 
+        this.loseGame("ALL PLAYERS ARE DEAD");
         return;
     }
 
-    /*
-     * Om tiden tar slut förlorar man.
-     */
     if (this.m_timeLeft <= 0) {
         this.loseGame("TIME IS UP");
     }
 };
+
+runmysteriet.scene.Game.prototype.hasPlayerReachedEndZone = function(player) {
+    var endZones = null;
+    var endZone = null;
+    var i = 0;
+
+    if (!player || !this.m_platformHandler) {
+        return false;
+    }
+
+    if (typeof this.m_platformHandler.getEndZones !== "function") {
+        return false;
+    }
+
+    endZones = this.m_platformHandler.getEndZones();
+
+    if (!endZones) {
+        return false;
+    }
+
+    for (i = 0; i < endZones.length; i++) {
+        endZone = endZones[i];
+
+        if (endZone && player.hitTestObject(endZone)) {
+            return true;
+        }
+    }
+
+    return false;
+};
+
 //------------------------------------------------------------------------------
 // PLAYER DEATH
 //------------------------------------------------------------------------------
@@ -659,7 +650,6 @@ runmysteriet.scene.Game.prototype.areAllPlayersDead = function() {
  * @return {number}
  */
 runmysteriet.scene.Game.prototype.saveHighscore = function() {
-
     var entry = null;
     var manager = null;
 
@@ -684,7 +674,6 @@ runmysteriet.scene.Game.prototype.saveHighscore = function() {
 //------------------------------------------------------------------------------
 
 runmysteriet.scene.Game.prototype.winGame = function(winningPlayer) {
-    
     var earnedScore = 0;
     var totalScore = 0;
     var guessData = null;
@@ -713,7 +702,6 @@ runmysteriet.scene.Game.prototype.winGame = function(winningPlayer) {
 
     if (this.m_shieldHandler &&
         typeof this.m_shieldHandler.getGuessData === "function") {
-
         guessData = this.m_shieldHandler.getGuessData();
     }
 
@@ -729,7 +717,6 @@ runmysteriet.scene.Game.prototype.winGame = function(winningPlayer) {
 };
 
 runmysteriet.scene.Game.prototype.loseGame = function(reason) {
-
     if (this.m_gameEnd === true) {
         return;
     }
@@ -744,15 +731,8 @@ runmysteriet.scene.Game.prototype.loseGame = function(reason) {
         }
     }
 
-    /*
-     * Spara score innan GameOver-scenen öppnas.
-     */
     this.saveHighscore();
 
-    /*
-     * Gå till separat GameOver-scen.
-     * Game.js ska inte längre skapa egen Game Over-meny.
-     */
     this.application.scenes.load([
         new runmysteriet.scene.GameOver(
             this.m_playerName,
@@ -761,7 +741,6 @@ runmysteriet.scene.Game.prototype.loseGame = function(reason) {
         )
     ]);
 };
-
 
 //------------------------------------------------------------------------------
 // RUNES
@@ -832,7 +811,9 @@ runmysteriet.scene.Game.prototype.restartLevel = function() {
         this.m_enemyHandler.clear();
     }
 
-    this.m_levelConfig = new runmysteriet.config.LevelConfig(this.m_levelNumber);
+    this.m_levelConfig = new runmysteriet.config.LevelConfig(
+        this.m_levelNumber
+    );
 
     this.m_enemyHandler = new runmysteriet.handler.EnemyHandler(this.stage);
 
@@ -856,45 +837,4 @@ runmysteriet.scene.Game.prototype.dispose = function() {
     }
 
     rune.scene.Scene.prototype.dispose.call(this);
-};
-
-//------------------------------------------------------------------------------
-// DISEASES
-//------------------------------------------------------------------------------
-
-runmysteriet.scene.Game.prototype.updateDiseases = function(step) {
-
-    if (this.m_diseaseHandler && this.m_playerHandler) {
-        this.m_diseaseHandler.update(this.m_playerHandler.players, step);
-    }
-};
-
-runmysteriet.scene.Game.prototype.hasPlayerReachedEndZone = function(player) {
-    var endZones = null;
-    var endZone = null;
-    var i = 0;
-
-    if (!player || !this.m_platformHandler) {
-        return false;
-    }
-
-    if (typeof this.m_platformHandler.getEndZones !== "function") {
-        return false;
-    }
-
-    endZones = this.m_platformHandler.getEndZones();
-
-    if (!endZones) {
-        return false;
-    }
-
-    for (i = 0; i < endZones.length; i++) {
-        endZone = endZones[i];
-
-        if (endZone && player.hitTestObject(endZone)) {
-            return true;
-        }
-    }
-
-    return false;
 };
