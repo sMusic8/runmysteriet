@@ -149,7 +149,7 @@ runmysteriet.scene.Game.prototype.init = function () {
   /*
    * Sjukdomar / hazards
    */
-  this.m_diseaseHandler = new runmysteriet.handler.DiseaseHandler(this.stage);
+  this.m_diseaseHandler = new runmysteriet.handler.DiseaseHandler(this.stage, this.application);
 
   this.m_diseaseHandler.init(
     this.m_levelNumber,
