@@ -314,3 +314,30 @@ runmysteriet.segments.Segment_Water.prototype.getRunePositions = function(leftLa
         }
     ];
 };
+
+//------------------------------------------------------------------------------
+// ARMOR
+//------------------------------------------------------------------------------
+
+runmysteriet.segments.Segment_Water.prototype.addArmorSpawns = function(armorSpawns, leftLandX, rightLandX) {
+    var positions = this.getArmorPositions(leftLandX, rightLandX);
+    var i = 0;
+
+    for (i = 0; i < positions.length; i++) {
+        armorSpawns.push(positions[i]);
+    }
+};
+
+runmysteriet.segments.Segment_Water.prototype.getArmorPositions = function(leftLandX, rightLandX) {
+    return [
+        {
+            x: leftLandX + 210,
+            y: this.groundY - 45
+        },
+        {
+            x: rightLandX + 220,
+            y: this.groundY - 45
+        }
+    ];
+};
+

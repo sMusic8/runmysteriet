@@ -10,6 +10,7 @@ runmysteriet.handler.ArmorHandler = function(stage, application, levelNumber, ar
     this.m_armorSpawns = armorSpawns || [];
 
     this.m_armors = [];
+
     this.onArmorCollected = null;
 };
 
@@ -57,6 +58,7 @@ runmysteriet.handler.ArmorHandler.prototype.getSelectedArmorSpawns = function() 
 
     while (result.length < maxCount && copy.length > 0) {
         index = Math.floor(Math.random() * copy.length);
+
         result.push(copy[index]);
         copy.splice(index, 1);
     }
@@ -69,7 +71,21 @@ runmysteriet.handler.ArmorHandler.prototype.getSelectedArmorSpawns = function() 
 //------------------------------------------------------------------------------
 
 runmysteriet.handler.ArmorHandler.prototype.addArmor = function(x, y) {
-    var armor = new rune.display.Graphic(
+    var box = null;
+    var armor = null;
+
+    box = new rune.display.Graphic(
+        x - 2,
+        y - 2,
+        21,
+        36
+    );
+
+    box.backgroundColor = "#1d37ad";
+    box.alpha = 0.45;
+    box.active = false;
+
+    armor = new rune.display.Graphic(
         x,
         y,
         17,
@@ -79,9 +95,15 @@ runmysteriet.handler.ArmorHandler.prototype.addArmor = function(x, y) {
 
     armor.active = true;
     armor.__collected = false;
+    armor.__box = box;
+    armor.__blinkTimer = 0;
+    armor.__blinkDirection = -1;
+    armor.alpha = 1;
+
+    this.m_stage.addChild(box);
+    this.m_stage.addChild(armor);
 
     this.m_armors.push(armor);
-    this.m_stage.addChild(armor);
 };
 
 //------------------------------------------------------------------------------
@@ -108,6 +130,8 @@ runmysteriet.handler.ArmorHandler.prototype.update = function(players) {
         if (armor.visible === false) {
             continue;
         }
+
+        this.updateBlink(armor);
 
         for (j = 0; j < players.length; j++) {
             player = players[j];
@@ -136,6 +160,29 @@ runmysteriet.handler.ArmorHandler.prototype.update = function(players) {
     }
 };
 
+runmysteriet.handler.ArmorHandler.prototype.updateBlink = function(armor) {
+    if (!armor) {
+        return;
+    }
+
+    armor.__blinkTimer += 1;
+
+    if (armor.__blinkTimer < 3) {
+        return;
+    }
+
+    armor.__blinkTimer = 0;
+    armor.alpha += 0.12 * armor.__blinkDirection;
+
+    if (armor.alpha <= 0.35) {
+        armor.alpha = 0.35;
+        armor.__blinkDirection = 1;
+    } else if (armor.alpha >= 1) {
+        armor.alpha = 1;
+        armor.__blinkDirection = -1;
+    }
+};
+
 //------------------------------------------------------------------------------
 // COLLECT
 //------------------------------------------------------------------------------
@@ -150,6 +197,10 @@ runmysteriet.handler.ArmorHandler.prototype.collectArmor = function(armor, playe
     armor.__collected = true;
     armor.active = false;
     armor.visible = false;
+
+    if (armor.__box && armor.__box.parent) {
+        armor.__box.parent.removeChild(armor.__box);
+    }
 
     if (armor.parent) {
         armor.parent.removeChild(armor);
@@ -176,6 +227,10 @@ runmysteriet.handler.ArmorHandler.prototype.clear = function() {
 
     for (i = 0; i < this.m_armors.length; i++) {
         armor = this.m_armors[i];
+
+        if (armor && armor.__box && armor.__box.parent) {
+            armor.__box.parent.removeChild(armor.__box);
+        }
 
         if (armor && armor.parent) {
             armor.parent.removeChild(armor);

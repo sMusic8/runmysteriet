@@ -69,6 +69,7 @@ runmysteriet.segments.Segment_End.prototype.ground = function(stage, startX, lev
     var holes = [];
     var enemySpawns = [];
     var diseaseSpawns = [];
+    var armorSpawns = [];
     var waterAreas = [];
     var boats = [];
     var endZones = [];
@@ -331,6 +332,29 @@ runmysteriet.segments.Segment_End.prototype.getRunePositions = function(segmentS
         {
             x: segmentStart + 520,
             y: this.groundY - 70
+        }
+    ];
+};
+
+
+//------------------------------------------------------------------------------
+// ARMOR
+//------------------------------------------------------------------------------
+
+runmysteriet.segments.Segment_End.prototype.addArmorSpawns = function(armorSpawns, segmentStart) {
+    var positions = this.getArmorPositions(segmentStart);
+    var i = 0;
+
+    for (i = 0; i < positions.length; i++) {
+        armorSpawns.push(positions[i]);
+    }
+};
+
+runmysteriet.segments.Segment_End.prototype.getArmorPositions = function(segmentStart) {
+    return [
+        {
+            x: segmentStart + 700,
+            y: this.groundY - 45
         }
     ];
 };

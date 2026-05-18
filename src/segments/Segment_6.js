@@ -62,6 +62,7 @@ runmysteriet.segments.Segment_6.prototype.ground = function(stage, startX, level
     var holes = [];
     var enemySpawns = [];
     var diseaseSpawns = [];
+    var armorSpawns = [];
     var waterAreas = [];
     var boats = [];
     var runeSpawns = [];

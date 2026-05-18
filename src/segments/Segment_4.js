@@ -360,7 +360,7 @@ runmysteriet.segments.Segment_4.prototype.getRunePositions = function(segmentSta
 // ARMOR
 //------------------------------------------------------------------------------
 
-runmysteriet.segments.Segment_3.prototype.addArmorSpawns = function(armorSpawns, segmentStart) {
+runmysteriet.segments.Segment_4.prototype.addArmorSpawns = function(armorSpawns, segmentStart) {
     var positions = this.getArmorPositions(segmentStart);
     var i = 0;
 
@@ -370,10 +370,10 @@ runmysteriet.segments.Segment_3.prototype.addArmorSpawns = function(armorSpawns,
 };
 
 
-runmysteriet.segments.Segment_3.prototype.getArmorPositions = function(segmentStart) {
+runmysteriet.segments.Segment_4.prototype.getArmorPositions = function(segmentStart) {
     return [
         {
-            x: segmentStart + 850,
+            x: segmentStart + 780,
             y: this.groundY - 45
         }
     ];
