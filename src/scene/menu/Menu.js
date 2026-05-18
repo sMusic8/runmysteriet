@@ -1,7 +1,3 @@
-//------------------------------------------------------------------------------
-// MENU SCENE
-//------------------------------------------------------------------------------
-
 runmysteriet.scene.Menu = function() {
     rune.scene.Scene.call(this);
 
@@ -9,6 +5,8 @@ runmysteriet.scene.Menu = function() {
     this.menuSound = null;
     this.m_background = null;
     this.m_highscoreHud = null;
+
+    this.backgroundMusic = null;
 };
 
 //------------------------------------------------------------------------------
@@ -23,19 +21,19 @@ runmysteriet.scene.Menu.prototype.constructor = runmysteriet.scene.Menu;
 //------------------------------------------------------------------------------
 
 runmysteriet.scene.Menu.prototype.init = function() {
+
     rune.scene.Scene.prototype.init.call(this);
 
     this.menuSound = this.application.sounds.sound.get("sound_menu");
- this.backgroundMusic = this.application.sounds.sound.get("sound_musicMenu");
-  if (this.backgroundMusic) {
-    this.backgroundMusic.loop = true;
-    this.backgroundMusic.volume = 0.5;
-    this.backgroundMusic.play();
-  }
+    this.backgroundMusic = this.application.sounds.sound.get("sound_musicMenu");
 
-  //If gamepad eller kaybord justpresst ändra nummret på volume med ett steg i en loop
+    if (this.backgroundMusic) {
+        this.backgroundMusic.loop = true;
+        this.backgroundMusic.volume = 0.5;
+        this.backgroundMusic.play();
+    }
 
-
+    // BACKGROUND
     this.m_background = new rune.display.Graphic(
         0,
         0,
@@ -46,17 +44,18 @@ runmysteriet.scene.Menu.prototype.init = function() {
 
     this.stage.addChild(this.m_background);
 
- this.m_controller = new rune.display.Graphic(
+    // CONTROLLER IMAGE
+    this.m_controller = new rune.display.Graphic(
         250,
         110,
         128,
         100,
         "testing"
     );
-this.m_controller.rotation = 0;
 
     this.stage.addChild(this.m_controller);
-   
+
+    // TITLE TEXT
     var text = new rune.text.BitmapField("Welcome to the Rune Mystery");
     text.autoSize = true;
     text.center = this.application.screen.center;
@@ -78,16 +77,18 @@ this.m_controller.rotation = 0;
     text2.flicker.start(750, 0.5);
     this.stage.addChild(text2);
 
+    // HIGHSCORE HUD
     this.m_highscoreHud = new runmysteriet.ui.graphic.HighscoreHud(
-    this.application,
-    5
+        this.application,
+        5
     );
 
     this.m_highscoreHud.x = 15;
-    this.m_highscoreHud.y =150;
+    this.m_highscoreHud.y = 150;
 
     this.stage.addChild(this.m_highscoreHud);
 
+    // MENU LIST
     this.menuList = new runmysteriet.ui.graphic.MenuList(
         this.stage,
         this.application,
@@ -96,8 +97,6 @@ this.m_controller.rotation = 0;
         25,
         1
     );
-
-
 };
 
 //------------------------------------------------------------------------------
@@ -105,7 +104,56 @@ this.m_controller.rotation = 0;
 //------------------------------------------------------------------------------
 
 runmysteriet.scene.Menu.prototype.update = function(step) {
+
     rune.scene.Scene.prototype.update.call(this, step);
+
+    var keyboard = this.keyboard;
+    var gamepad = this.gamepads.get(0);
+
+    // ----------------------------
+    // 🔊 VOLUME CONTROL (FIXED)
+    // ----------------------------
+
+    if (this.backgroundMusic) {
+
+        var stepVol = 0.1;
+
+        var increasePressed =
+            keyboard.justPressed("E") ||
+            keyboard.justPressed("e") ||
+            (gamepad && (gamepad.justPressed("RB") || gamepad.justPressed(5)));
+
+        var decreasePressed =
+            keyboard.justPressed("Q") ||
+            keyboard.justPressed("q") ||
+            (gamepad && (gamepad.justPressed("LB") || gamepad.justPressed(4)));
+
+        if (increasePressed) {
+
+            this.backgroundMusic.volume += stepVol;
+
+            if (this.backgroundMusic.volume > 1) {
+                this.backgroundMusic.volume = 0;
+            }
+
+            console.log("Volym:", this.backgroundMusic.volume.toFixed(2));
+        }
+
+        if (decreasePressed) {
+
+            this.backgroundMusic.volume -= stepVol;
+
+            if (this.backgroundMusic.volume < 0) {
+                this.backgroundMusic.volume = 1;
+            }
+
+            console.log("Volym:", this.backgroundMusic.volume.toFixed(2));
+        }
+    }
+
+    // ----------------------------
+    // MENU INPUT
+    // ----------------------------
 
     if (!this.menuList || typeof this.menuList.readInput !== "function") {
         return;
@@ -133,6 +181,7 @@ runmysteriet.scene.Menu.prototype.update = function(step) {
 //------------------------------------------------------------------------------
 
 runmysteriet.scene.Menu.prototype.chooseSelected = function() {
+
     var selectedIndex = this.menuList.getSelectedIndex();
 
     if (selectedIndex === 0) {
@@ -161,6 +210,7 @@ runmysteriet.scene.Menu.prototype.playMenuSound = function() {
 //------------------------------------------------------------------------------
 
 runmysteriet.scene.Menu.prototype.dispose = function() {
+
     if (this.menuList) {
         this.menuList.clear();
         this.menuList = null;

@@ -2,55 +2,28 @@
 // TEXT INPUT VIEW
 //------------------------------------------------------------------------------
 
-/**
- * Scene där två spelare skriver varsitt namn.
- *
- * Spelare 1: 4 bokstäver
- * Spelare 2: 4 bokstäver
- *
- * UP/DOWN = byt bokstav
- * ENTER/SPACE/X = lägg till bokstav / starta när båda är klara
- * BACK/ESC = ta bort bokstav
- *
- * @constructor
- * @extends rune.scene.Scene
- * @param {Function=} getHelpText
- */
 runmysteriet.scene.TextInputView = function(getHelpText) {
 
     rune.scene.Scene.call(this);
 
-    /** @type {Function} */
     this.getHelpText = getHelpText || function() {
         return "UP/DOWN = CHOOSE LETTER     ENTER/X = VALIDATE     BACK/ESC = DELETE";
     };
 
-    /** @type {?runmysteriet.input.GameInput} */
     this.m_gameInput = null;
-
-    /** @type {!Array<!runmysteriet.logic.NameInput>} */
     this.m_nameInputs = [];
-
-    /** @type {number} */
     this.m_currentPlayer = 0;
 
-    /** @type {?rune.text.BitmapField} */
     this.m_helpText = null;
-
-    /** @type {?rune.text.BitmapField} */
     this.m_titleText = null;
-
-    /** @type {?rune.text.BitmapField} */
     this.m_player1Text = null;
-
-    /** @type {?rune.text.BitmapField} */
     this.m_player2Text = null;
-
-    /** @type {?rune.text.BitmapField} */
     this.m_letterText = null;
-
-    /** @type {?rune.text.BitmapField} */
     this.m_startText = null;
+
+    // MUSIC (added)
+    this.backgroundMusic = null;
+    this.menuSound = null;
 };
 
 //------------------------------------------------------------------------------
@@ -70,15 +43,15 @@ runmysteriet.scene.TextInputView.prototype.constructor =
 runmysteriet.scene.TextInputView.prototype.init = function() {
 
     rune.scene.Scene.prototype.init.call(this);
-     this.backgroundMusic = this.application.sounds.sound.get("sound_musicMenu");
-  this.menuSound = this.application.sounds.sound.get("sound_menu");
-  if (this.backgroundMusic) {
-    this.backgroundMusic.loop = true;
-    this.backgroundMusic.volume = 0.5;
-    this.backgroundMusic.play();
-  }
 
-  //If gamepad eller kaybord justpresst ändra nummret på volume med ett steg i en loop
+    this.backgroundMusic = this.application.sounds.sound.get("sound_musicMenu");
+    this.menuSound = this.application.sounds.sound.get("sound_menu");
+
+    if (this.backgroundMusic) {
+        this.backgroundMusic.loop = true;
+        this.backgroundMusic.volume = 0.5;
+        this.backgroundMusic.play();
+    }
 
     this.m_gameInput = new runmysteriet.input.GameInput(this.application);
 
@@ -116,14 +89,12 @@ runmysteriet.scene.TextInputView.prototype.createText = function() {
     this.m_player1Text.autoSize = true;
     this.m_player1Text.center = this.application.screen.center;
     this.m_player1Text.y -= 15;
-    this.m_player1Text.scale = 0.9;
     this.stage.addChild(this.m_player1Text);
 
     this.m_player2Text = new rune.text.BitmapField(" ");
     this.m_player2Text.autoSize = true;
     this.m_player2Text.center = this.application.screen.center;
     this.m_player2Text.y += 20;
-    this.m_player2Text.scale = 0.9;
     this.stage.addChild(this.m_player2Text);
 
     this.m_letterText = new rune.text.BitmapField(" ");
@@ -151,6 +122,39 @@ runmysteriet.scene.TextInputView.prototype.update = function(step) {
     var currentInput = null;
 
     rune.scene.Scene.prototype.update.call(this, step);
+
+    // -------------------------------------------------
+    // VOLUME CONTROL (added like other scenes)
+    // -------------------------------------------------
+    if (this.backgroundMusic) {
+
+        var keyboard = this.keyboard;
+        var gamepad = this.application.inputs.gamepads.get(0);
+
+        var stepVol = 0.1;
+
+        if (keyboard.justPressed("E") || (gamepad && gamepad.justPressed(5))) {
+
+            this.backgroundMusic.volume += stepVol;
+
+            if (this.backgroundMusic.volume > 1) {
+                this.backgroundMusic.volume = 0;
+            }
+
+            console.log("Volym:", this.backgroundMusic.volume.toFixed(2));
+        }
+
+        if (keyboard.justPressed("Q") || (gamepad && gamepad.justPressed(4))) {
+
+            this.backgroundMusic.volume -= stepVol;
+
+            if (this.backgroundMusic.volume < 0) {
+                this.backgroundMusic.volume = 1;
+            }
+
+            console.log("Volym:", this.backgroundMusic.volume.toFixed(2));
+        }
+    }
 
     if (!this.m_gameInput || !this.m_nameInputs || this.m_nameInputs.length < 2) {
         return;
@@ -216,7 +220,7 @@ runmysteriet.scene.TextInputView.prototype.update = function(step) {
 };
 
 //------------------------------------------------------------------------------
-// UPDATE TEXT
+// REST OF FILE (UNCHANGED)
 //------------------------------------------------------------------------------
 
 runmysteriet.scene.TextInputView.prototype.updateText = function() {
@@ -258,12 +262,6 @@ runmysteriet.scene.TextInputView.prototype.updateText = function() {
     }
 };
 
-/**
- * Skapar text med fyra rutor för en spelare.
- *
- * @param {number} index
- * @return {string}
- */
 runmysteriet.scene.TextInputView.prototype.formatPlayerRow = function(index) {
 
     var nameInput = this.m_nameInputs[index];
@@ -293,16 +291,9 @@ runmysteriet.scene.TextInputView.prototype.formatPlayerRow = function(index) {
     return text;
 };
 
-/**
- * @return {boolean}
- */
 runmysteriet.scene.TextInputView.prototype.areBothNamesComplete = function() {
     return this.m_nameInputs[0].isComplete() && this.m_nameInputs[1].isComplete();
 };
-
-//------------------------------------------------------------------------------
-// START GAME
-//------------------------------------------------------------------------------
 
 runmysteriet.scene.TextInputView.prototype.startGame = function() {
 
@@ -318,10 +309,6 @@ runmysteriet.scene.TextInputView.prototype.startGame = function() {
         )
     ]);
 };
-
-//------------------------------------------------------------------------------
-// DISPOSE
-//------------------------------------------------------------------------------
 
 runmysteriet.scene.TextInputView.prototype.dispose = function() {
 

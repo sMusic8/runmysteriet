@@ -16,6 +16,9 @@ runmysteriet.scene.GameOver = function(playerName, score, reason) {
     this.m_menu = null;
 
     this.m_menuSound = null;
+
+    // MUSIC (added for volume control)
+    this.backgroundMusic = null;
 };
 
 //------------------------------------------------------------------------------
@@ -37,6 +40,15 @@ runmysteriet.scene.GameOver.prototype.init = function() {
     rune.scene.Scene.prototype.init.call(this);
 
     this.m_menuSound = this.application.sounds.sound.get("sound_menu");
+
+    // MUSIC (same pattern as other scenes)
+    this.backgroundMusic = this.application.sounds.sound.get("sound_musicMenu");
+
+    if (this.backgroundMusic) {
+        this.backgroundMusic.loop = true;
+        this.backgroundMusic.volume = 0.3;
+        this.backgroundMusic.play();
+    }
 
     this.createTitle();
     this.createScoreText();
@@ -60,6 +72,7 @@ runmysteriet.scene.GameOver.prototype.createTitle = function() {
 
     this.stage.addChild(this.m_title);
 };
+
 runmysteriet.scene.GameOver.prototype.createScoreText = function() {
 
     this.m_scoreText = new rune.text.BitmapField(
@@ -124,6 +137,39 @@ runmysteriet.scene.GameOver.prototype.update = function(step) {
     rune.scene.Scene.prototype.update.call(this, step);
 
     this.handleInput();
+
+    // -------------------------------------------------
+    // VOLUME CONTROL (same as other scenes)
+    // -------------------------------------------------
+    if (this.backgroundMusic) {
+
+        var keyboard = this.keyboard;
+        var gamepad = this.application.inputs.gamepads.get(0);
+
+        var stepVol = 0.1;
+
+        if (keyboard.justPressed("E") || (gamepad && gamepad.justPressed(5))) {
+
+            this.backgroundMusic.volume += stepVol;
+
+            if (this.backgroundMusic.volume > 1) {
+                this.backgroundMusic.volume = 0;
+            }
+
+            console.log("Volym:", this.backgroundMusic.volume.toFixed(2));
+        }
+
+        if (keyboard.justPressed("Q") || (gamepad && gamepad.justPressed(4))) {
+
+            this.backgroundMusic.volume -= stepVol;
+
+            if (this.backgroundMusic.volume < 0) {
+                this.backgroundMusic.volume = 1;
+            }
+
+            console.log("Volym:", this.backgroundMusic.volume.toFixed(2));
+        }
+    }
 };
 
 //------------------------------------------------------------------------------
