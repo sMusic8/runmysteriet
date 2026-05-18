@@ -156,23 +156,28 @@ runmysteriet.scene.Game.prototype.init = function () {
     this.m_platformHandler.getDiseaseSpawns(),
   );
 
-  /**
-   * Rustning
-   */
-  this.m_armorHandler = new runmysteriet.handler.ArmorHandler(
+/*
+ * Rustning
+ */
+
+this.m_armorHandler = new runmysteriet.handler.ArmorHandler(
     this.stage,
     this.application,
     this.m_levelNumber,
-    this.m_platformHandler.getArmorSpawns(),
-  );
+    this.m_platformHandler.getArmorSpawns()
+);
 
-  this.m_armorHandler.init();
+this.m_armorHandler.init();
 
-  this.m_armorHandler.onArmorCollected = function (player, armor) {
-    if (player) {
-      player.hasArmor = true;
+this.m_armorHandler.onArmorCollected = function(player, armor) {
+    if (!player) {
+        return;
     }
-  };
+
+    if (player.maxHp !== undefined) {
+        player.hp = player.maxHp;
+    }
+};
 
   /*
    * Sköldar / runor
