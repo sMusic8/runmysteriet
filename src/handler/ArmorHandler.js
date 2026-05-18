@@ -81,7 +81,7 @@ runmysteriet.handler.ArmorHandler.prototype.addArmor = function(x, y) {
         36
     );
 
-    box.backgroundColor = "#1d37ad";
+    //box.backgroundColor = "#1d37ad";
     box.alpha = 0.45;
     box.active = false;
 
@@ -193,7 +193,17 @@ runmysteriet.handler.ArmorHandler.prototype.collectArmor = function(armor, playe
     if (!armor || armor.__collected === true) {
         return;
     }
+if (this.application &&
+            this.application.sounds &&
+            this.application.sounds.sound) {
 
+          this.catchsound =
+            this.application.sounds.sound.get("sound_catch");
+
+          if (this.catchsound) {
+            this.catchsound.play();
+          }
+        }
     armor.__collected = true;
     armor.active = false;
     armor.visible = false;
