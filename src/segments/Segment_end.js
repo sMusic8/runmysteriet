@@ -53,6 +53,8 @@ runmysteriet.segments.Segment_End = function() {
  *   holes: !Array<!Object>,
  *   enemySpawns: !Array<!Object>,
  *   diseaseSpawns: !Array<!Object>,
+ *   runeSpawns: !Array<!Object>,
+ *   armorSpawns: !Array<!Object>,
  *   waterAreas: !Array<!Object>,
  *   boats: !Array<!Object>,
  *   endZones: !Array<!Object>,
@@ -63,7 +65,6 @@ runmysteriet.segments.Segment_End.prototype.ground = function(stage, startX, lev
 
     var segmentStart = startX || 0;
     var segmentEnd = segmentStart + this.length;
-    var x = segmentStart;
 
     var platforms = [];
     var holes = [];
@@ -79,7 +80,12 @@ runmysteriet.segments.Segment_End.prototype.ground = function(stage, startX, lev
     var gateY = this.groundY - 100;
 
     this.addBackground(stage, segmentStart);
-    this.addGround(stage, platforms, x);
+
+    /*
+     * Marken byggs i delar så små lavahål kan finnas mellan markbitarna.
+     */
+    this.addGroundWithSmallLavaHoles(stage, platforms, holes, segmentStart);
+
     this.addGoalMarkers(stage, gateX, gateY);
     this.addDiseases(diseaseSpawns, segmentStart, levelNumber);
     this.addRuneSpawns(runeSpawns, segmentStart);
@@ -128,7 +134,104 @@ runmysteriet.segments.Segment_End.prototype.addBackground = function(stage, segm
 //------------------------------------------------------------------------------
 
 /**
- * Lägger till marken i slutsegmentet.
+ * Lägger mark med små lavahål i slutsegmentet.
+ *
+ * @param {!rune.display.Stage} stage
+ * @param {!Array<!Object>} platforms
+ * @param {!Array<!Object>} holes
+ * @param {number} segmentStart
+ */
+runmysteriet.segments.Segment_End.prototype.addGroundWithSmallLavaHoles = function(stage, platforms, holes, segmentStart) {
+
+    var x = segmentStart;
+    var holeWidth = 64;
+
+    /*
+     * Mark före första hålet.
+     */
+    this.addTiles(
+        stage,
+        platforms,
+        x,
+        this.groundY,
+        8,
+        this.groundTexture
+    );
+
+    x += 8 * this.tileW;
+
+    /*
+     * Första lilla lavahålet.
+     */
+    this.addLavaHole(stage, holes, x, holeWidth);
+
+    x += holeWidth;
+
+    /*
+     * Mark mellan hålen.
+     */
+    this.addTiles(
+        stage,
+        platforms,
+        x,
+        this.groundY,
+        7,
+        this.groundTexture
+    );
+
+    x += 7 * this.tileW;
+
+    /*
+     * Andra lilla lavahålet.
+     */
+    this.addLavaHole(stage, holes, x, holeWidth);
+
+    x += holeWidth;
+
+    /*
+     * Resten av marken fram till slutet.
+     */
+    this.addTiles(
+        stage,
+        platforms,
+        x,
+        this.groundY,
+        Math.ceil((this.length - (x - segmentStart)) / this.tileW),
+        this.groundTexture
+    );
+};
+
+/**
+ * Lägger till ett litet lavahål.
+ *
+ * @param {!rune.display.Stage} stage
+ * @param {!Array<!Object>} holes
+ * @param {number} x
+ * @param {number} holeWidth
+ */
+runmysteriet.segments.Segment_End.prototype.addLavaHole = function(stage, holes, x, holeWidth) {
+
+    var hole = new runmysteriet.ui.graphic.Hole(
+        x,
+        this.groundY,
+        holeWidth,
+        200
+    );
+
+    /*
+     * Hole lägger själv ut sin lava.
+     */
+    hole.addToStage(stage);
+
+    /*
+     * Hole sparas för dödslogik.
+     */
+    holes.push(hole);
+};
+
+/**
+ * Lägger till vanlig mark över hela segmentet.
+ * Används inte just nu eftersom addGroundWithSmallLavaHoles används.
  *
  * @param {!rune.display.Stage} stage
  * @param {!Array<!Object>} platforms
@@ -335,7 +438,6 @@ runmysteriet.segments.Segment_End.prototype.getRunePositions = function(segmentS
         }
     ];
 };
-
 
 //------------------------------------------------------------------------------
 // ARMOR

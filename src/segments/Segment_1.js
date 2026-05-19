@@ -208,6 +208,7 @@ runmysteriet.segments.Segment_1.prototype.addTiles = function(stage, platforms, 
  * @param {number} holeWidth
  */
 runmysteriet.segments.Segment_1.prototype.addLavaHole = function(stage, holes, x, holeWidth) {
+
     var hole = new runmysteriet.ui.graphic.Hole(
         x,
         this.groundY,
@@ -215,38 +216,15 @@ runmysteriet.segments.Segment_1.prototype.addLavaHole = function(stage, holes, x
         200
     );
 
-    stage.addChild(hole);
+    /*
+     * Hole lägger själv ut lava
+     */
+    hole.addToStage(stage);
+
+    /*
+     * Hole sparas för dödslogik
+     */
     holes.push(hole);
-
-    this.addLavaTiles(stage, hole);
-};
-
-/**
- * Fyller hålet med lavagrafik.
- *
- * @param {!rune.display.Stage} stage
- * @param {!runmysteriet.ui.graphic.Hole} hole
- */
-runmysteriet.segments.Segment_1.prototype.addLavaTiles = function(stage, hole) {
-    var cols = Math.ceil(hole.width / this.tileW);
-    var rows = Math.ceil(hole.height / this.tileH);
-    var lx = 0;
-    var ly = 0;
-    var lava = null;
-
-    for (ly = 0; ly < rows; ly++) {
-        for (lx = 0; lx < cols; lx++) {
-            lava = new rune.display.Graphic(
-                hole.x + (lx * this.tileW),
-                hole.y + (ly * this.tileH),
-                this.tileW,
-                this.tileH,
-                this.lavaTexture
-            );
-
-            stage.addChild(lava);
-        }
-    }
 };
 
 /**
