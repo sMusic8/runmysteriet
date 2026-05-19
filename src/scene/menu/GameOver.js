@@ -16,8 +16,7 @@ runmysteriet.scene.GameOver = function(playerName, score, reason) {
     this.m_menu = null;
 
     this.m_menuSound = null;
-
-    // MUSIC (added for volume control)
+    this.m_gameInput = null;
     this.backgroundMusic = null;
 };
 
@@ -39,9 +38,9 @@ runmysteriet.scene.GameOver.prototype.init = function() {
 
     rune.scene.Scene.prototype.init.call(this);
 
-    this.m_menuSound = this.application.sounds.sound.get("sound_menu");
+    this.m_gameInput = new runmysteriet.input.GameInput(this.application);
 
-    // MUSIC (same pattern as other scenes)
+    this.m_menuSound = this.application.sounds.sound.get("sound_menu");
     this.backgroundMusic = this.application.sounds.sound.get("sound_musicMenu");
 
     if (this.backgroundMusic) {
@@ -81,7 +80,7 @@ runmysteriet.scene.GameOver.prototype.createScoreText = function() {
 
     this.m_scoreText.autoSize = true;
     this.m_scoreText.center = this.application.screen.center;
-    this.m_scoreText.y = 55; 
+    this.m_scoreText.y = 55;
 
     this.stage.addChild(this.m_scoreText);
 };
@@ -137,39 +136,6 @@ runmysteriet.scene.GameOver.prototype.update = function(step) {
     rune.scene.Scene.prototype.update.call(this, step);
 
     this.handleInput();
-
-    // -------------------------------------------------
-    // VOLUME CONTROL (same as other scenes)
-    // -------------------------------------------------
-    if (this.backgroundMusic) {
-
-        var keyboard = this.keyboard;
-        var gamepad = this.application.inputs.gamepads.get(0);
-
-        var stepVol = 0.1;
-
-        if (keyboard.justPressed("E") || (gamepad && gamepad.justPressed(5))) {
-
-            this.backgroundMusic.volume += stepVol;
-
-            if (this.backgroundMusic.volume > 1) {
-                this.backgroundMusic.volume = 0;
-            }
-
-            console.log("Volym:", this.backgroundMusic.volume.toFixed(2));
-        }
-
-        if (keyboard.justPressed("Q") || (gamepad && gamepad.justPressed(4))) {
-
-            this.backgroundMusic.volume -= stepVol;
-
-            if (this.backgroundMusic.volume < 0) {
-                this.backgroundMusic.volume = 1;
-            }
-
-            console.log("Volym:", this.backgroundMusic.volume.toFixed(2));
-        }
-    }
 };
 
 //------------------------------------------------------------------------------
@@ -178,26 +144,67 @@ runmysteriet.scene.GameOver.prototype.update = function(step) {
 
 runmysteriet.scene.GameOver.prototype.handleInput = function() {
 
-    if (!this.m_menu) {
+    var input = null;
+
+    if (!this.m_gameInput) {
         return;
     }
 
-    if (this.keyboard.justPressed("DOWN")) {
+    input = this.m_gameInput.read(this.keyboard);
+
+    this.handleMenuInput(input);
+    this.handleVolumeInput(input);
+};
+
+runmysteriet.scene.GameOver.prototype.handleMenuInput = function(input) {
+
+    if (!this.m_menu || !input) {
+        return;
+    }
+
+    if (input.down) {
         this.playMenuSound();
         this.m_menu.moveNext();
     }
 
-    if (this.keyboard.justPressed("UP")) {
+    if (input.up) {
         this.playMenuSound();
         this.m_menu.movePrevious();
     }
 
-    if (this.keyboard.justPressed("ENTER") ||
-        this.keyboard.justPressed("SPACE")) {
-
+    if (input.choose) {
         this.chooseMenuItem();
     }
 };
+
+runmysteriet.scene.GameOver.prototype.handleVolumeInput = function(input) {
+
+    var stepVol = 0.1;
+
+    if (!this.backgroundMusic || !input) {
+        return;
+    }
+
+    if (input.volumeUp) {
+        this.backgroundMusic.volume += stepVol;
+
+        if (this.backgroundMusic.volume > 1) {
+            this.backgroundMusic.volume = 0;
+        }
+    }
+
+    if (input.volumeDown) {
+        this.backgroundMusic.volume -= stepVol;
+
+        if (this.backgroundMusic.volume < 0) {
+            this.backgroundMusic.volume = 1;
+        }
+    }
+};
+
+//------------------------------------------------------------------------------
+// CHOOSE
+//------------------------------------------------------------------------------
 
 runmysteriet.scene.GameOver.prototype.chooseMenuItem = function() {
 
@@ -220,9 +227,58 @@ runmysteriet.scene.GameOver.prototype.chooseMenuItem = function() {
     }
 };
 
+//------------------------------------------------------------------------------
+// SOUND
+//------------------------------------------------------------------------------
+
 runmysteriet.scene.GameOver.prototype.playMenuSound = function() {
 
     if (this.m_menuSound) {
         this.m_menuSound.play();
+    }
+};
+
+//------------------------------------------------------------------------------
+// DISPOSE
+//------------------------------------------------------------------------------
+
+runmysteriet.scene.GameOver.prototype.dispose = function() {
+
+    if (this.m_menu) {
+        this.m_menu.clear();
+        this.m_menu = null;
+    }
+
+    this.stopBackgroundMusic();
+
+    this.m_title = null;
+    this.m_scoreText = null;
+    this.m_highscoreHud = null;
+    this.m_menuSound = null;
+    this.m_gameInput = null;
+    this.backgroundMusic = null;
+
+    rune.scene.Scene.prototype.dispose.call(this);
+};
+
+runmysteriet.scene.GameOver.prototype.stopBackgroundMusic = function() {
+
+    if (!this.backgroundMusic) {
+        return;
+    }
+
+    try {
+        if (typeof this.backgroundMusic.stop === "function") {
+            this.backgroundMusic.stop();
+        } else if (typeof this.backgroundMusic.pause === "function") {
+            this.backgroundMusic.pause();
+        }
+    } catch (error) {
+        if (typeof this.backgroundMusic.pause === "function") {
+            try {
+                this.backgroundMusic.pause();
+            } catch (ignore) {
+            }
+        }
     }
 };

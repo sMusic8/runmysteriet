@@ -3,29 +3,7 @@
 //------------------------------------------------------------------------------
 
 /**
- * Gemensam input-klass för keyboard och gamepad.
- *
- * @constructor
- * @param {!Object} application
- */
-runmysteriet.input.GameInput = function(application) {
-
-    this.application = application;
-
-    /*
-     * Cooldown gör att joystick/D-pad inte scrollar för snabbt.
-     */
-    this.m_scrollCooldown = 0;
-    this.m_scrollDelay = 8;
-};
-
-//------------------------------------------------------------------------------
-// GAME INPUT
-//------------------------------------------------------------------------------
-
-
-/**
- * Gemensam input-klass för keyboard och gamepad.
+ * Gemensam input-klass för keyboard och gamepad
  *
  * @constructor
  * @param {!Object} application
@@ -63,86 +41,130 @@ runmysteriet.input.GameInput.prototype.read = function(keyboard) {
         choose: false,
         back: false,
         hint: false,
-        pause: false
+        pause: false,
+        volumeUp: false,
+        volumeDown: false
     };
 
     if (this.m_scrollCooldown > 0) {
         this.m_scrollCooldown--;
     }
 
-    /*
-     * Tangentbord.
-     */
-    if (keyboard && typeof keyboard.justPressed === "function") {
-
-        input.up = keyboard.justPressed("UP");
-        input.down = keyboard.justPressed("DOWN");
-        input.left = keyboard.justPressed("LEFT");
-        input.right = keyboard.justPressed("RIGHT");
-
-        input.choose =
-            keyboard.justPressed("ENTER") ||
-            keyboard.justPressed("SPACE");
-
-        input.back =
-            keyboard.justPressed("ESCAPE");
-
-        input.hint =
-            keyboard.justPressed("T");
-
-        input.pause =
-            keyboard.justPressed("P") ||
-            keyboard.justPressed("ESCAPE");
-    }
-
-    /*
-     * Gamepad-knappar.
-     */
-    if (gamepad && typeof gamepad.justPressed === "function") {
-
-        input.choose = input.choose ||
-            gamepad.justPressed("A") ||
-            gamepad.justPressed("CROSS") ||
-            gamepad.justPressed(0);
-
-        input.back = input.back ||
-            gamepad.justPressed("B") ||
-            gamepad.justPressed("CIRCLE") ||
-            gamepad.justPressed(1) ||
-            gamepad.justPressed(9);
-
-        input.pause = input.pause ||
-            gamepad.justPressed("START") ||
-            gamepad.justPressed(9);
-
-        input.up = input.up ||
-            gamepad.justPressed("UP") ||
-            gamepad.justPressed(12);
-
-        input.down = input.down ||
-            gamepad.justPressed("DOWN") ||
-            gamepad.justPressed(13);
-
-        input.left = input.left ||
-            gamepad.justPressed("LEFT") ||
-            gamepad.justPressed(14);
-
-        input.right = input.right ||
-            gamepad.justPressed("RIGHT") ||
-            gamepad.justPressed(15);
-
-        input.hint = input.hint ||
-            gamepad.justPressed("Y") ||
-            gamepad.justPressed("TRIANGLE") ||
-            gamepad.justPressed(3);
-    }
-
-    /*
-     * Analog joystick.
-     */
+    this.readKeyboard(keyboard, input);
+    this.readGamepadButtons(gamepad, input);
     this.applyStickInput(gamepad, input);
 
     return input;
+};
+
+//------------------------------------------------------------------------------
+// KEYBOARD
+//------------------------------------------------------------------------------
+
+/**
+ * Läser tangentbord.
+ *
+ * @param {?Object} keyboard
+ * @param {!Object} input
+ * @return {void}
+ */
+runmysteriet.input.GameInput.prototype.readKeyboard = function(keyboard, input) {
+
+    if (!keyboard || typeof keyboard.justPressed !== "function") {
+        return;
+    }
+
+    input.up = input.up || keyboard.justPressed("UP");
+    input.down = input.down || keyboard.justPressed("DOWN");
+    input.left = input.left || keyboard.justPressed("LEFT");
+    input.right = input.right || keyboard.justPressed("RIGHT");
+
+    input.choose = input.choose ||
+        keyboard.justPressed("ENTER") ||
+        keyboard.justPressed("SPACE");
+
+    input.back = input.back ||
+        keyboard.justPressed("ESCAPE");
+
+    input.hint = input.hint ||
+        keyboard.justPressed("T");
+
+    input.pause = input.pause ||
+        keyboard.justPressed("P") ||
+        keyboard.justPressed("ESCAPE");
+
+    input.volumeUp = input.volumeUp ||
+        keyboard.justPressed("E") ||
+        keyboard.justPressed("e");
+
+    input.volumeDown = input.volumeDown ||
+        keyboard.justPressed("Q") ||
+        keyboard.justPressed("q");
+};
+
+//------------------------------------------------------------------------------
+// GAMEPAD BUTTONS
+//------------------------------------------------------------------------------
+
+/**
+ * Läser gamepad-knappar.
+ *
+ * @param {?Object} gamepad
+ * @param {!Object} input
+ * @return {void}
+ */
+runmysteriet.input.GameInput.prototype.readGamepadButtons = function(gamepad, input) {
+
+    if (!gamepad || typeof gamepad.justPressed !== "function") {
+        return;
+    }
+
+    input.choose = input.choose ||
+        gamepad.justPressed("A") ||
+        gamepad.justPressed("CROSS") ||
+        gamepad.justPressed(0);
+
+    input.back = input.back ||
+        gamepad.justPressed("B") ||
+        gamepad.justPressed("CIRCLE") ||
+        gamepad.justPressed(1);
+
+    input.pause = input.pause ||
+        gamepad.justPressed("START") ||
+        gamepad.justPressed(9);
+
+    input.up = input.up ||
+        gamepad.justPressed("UP") ||
+        gamepad.justPressed("DPAD_UP") ||
+        gamepad.justPressed(12);
+
+    input.down = input.down ||
+        gamepad.justPressed("DOWN") ||
+        gamepad.justPressed("DPAD_DOWN") ||
+        gamepad.justPressed(13);
+
+    input.left = input.left ||
+        gamepad.justPressed("LEFT") ||
+        gamepad.justPressed("DPAD_LEFT") ||
+        gamepad.justPressed(14);
+
+    input.right = input.right ||
+        gamepad.justPressed("RIGHT") ||
+        gamepad.justPressed("DPAD_RIGHT") ||
+        gamepad.justPressed(15);
+
+    input.hint = input.hint ||
+        gamepad.justPressed("Y") ||
+        gamepad.justPressed("TRIANGLE") ||
+        gamepad.justPressed(3);
+
+    input.volumeUp = input.volumeUp ||
+        gamepad.justPressed("RB") ||
+        gamepad.justPressed(5);
+
+    input.volumeDown = input.volumeDown ||
+        gamepad.justPressed("LB") ||
+        gamepad.justPressed(4);
 };
 
 //------------------------------------------------------------------------------
@@ -155,20 +177,8 @@ runmysteriet.input.GameInput.prototype.read = function(keyboard) {
  * @return {?Object}
  */
 runmysteriet.input.GameInput.prototype.getGamepad = function() {
-
-    if (this.application &&
-        this.application.inputs &&
-        this.application.inputs.gamepads) {
-
-        return this.application.inputs.gamepads.get(0);
-    }
-
-    return null;
+    return this.getGamepadByIndex(0);
 };
-
-//--------------------------------------------------------------------------------
-// GAMEPAD BY INDEX
-//------------------------------------------------------------------------------
 
 /**
  * Hämtar gamepad utifrån spelarens index.
@@ -187,6 +197,31 @@ runmysteriet.input.GameInput.prototype.getGamepadByIndex = function(index) {
 
     return null;
 };
+
+/**
+ * Hämtar analog axel.
+ *
+ * @param {?Object} gamepad
+ * @param {number} index
+ * @return {number}
+ */
+runmysteriet.input.GameInput.prototype.getAxis = function(gamepad, index) {
+
+    if (!gamepad) {
+        return 0;
+    }
+
+    if (gamepad.axes && gamepad.axes.length > index) {
+        return gamepad.axes[index] || 0;
+    }
+
+    if (typeof gamepad.axis === "function") {
+        return gamepad.axis(index) || 0;
+    }
+
+    return 0;
+};
+
 //------------------------------------------------------------------------------
 // STICK INPUT
 //------------------------------------------------------------------------------
@@ -207,24 +242,12 @@ runmysteriet.input.GameInput.prototype.applyStickInput = function(gamepad, input
         return;
     }
 
-    /*
-     * Standard: axes[0] = vänster spak X
-     *           axes[1] = vänster spak Y
-     */
-    if (gamepad.axes && gamepad.axes.length > 1) {
-        x = gamepad.axes[0];
-        y = gamepad.axes[1];
-    } else if (typeof gamepad.axis === "function") {
-        x = gamepad.axis(0);
-        y = gamepad.axis(1);
-    }
-
-    /*
-     * cooldown är för att inte scrolla för snabbt
-     */
     if (this.m_scrollCooldown > 0) {
         return;
     }
+
+    x = this.getAxis(gamepad, 0);
+    y = this.getAxis(gamepad, 1);
 
     if (y < -0.5) {
         input.up = true;
@@ -271,81 +294,99 @@ runmysteriet.input.GameInput.prototype.readPlayer = function(keyboard, playerInd
         attack: false
     };
 
-    /*
-     * Tangentbord spelare 1.
-     */
-    if (keyboard) {
-
-        if (playerIndex === 0) {
-
-            if (typeof keyboard.pressed === "function") {
-                input.left = input.left || keyboard.pressed("LEFT");
-                input.right = input.right || keyboard.pressed("RIGHT");
-                input.down = input.down || keyboard.pressed("DOWN");
-            }
-
-            if (typeof keyboard.justPressed === "function") {
-                input.jump = input.jump || keyboard.justPressed("UP");
-                input.attack = input.attack || keyboard.justPressed("SPACE");
-            }
-        }
-
-        /*
-         * Tangentbord spelare 2.
-         */
-        if (playerIndex === 1) {
-
-            if (typeof keyboard.pressed === "function") {
-                input.left = input.left || keyboard.pressed("A");
-                input.right = input.right || keyboard.pressed("D");
-                input.down = input.down || keyboard.pressed("S");
-            }
-
-            if (typeof keyboard.justPressed === "function") {
-                input.jump = input.jump || keyboard.justPressed("W");
-                input.attack = input.attack || keyboard.justPressed("E");
-            }
-        }
-    }
-
-    /*
-     * Gamepad-knappar.
-     */
-    if (gamepad) {
-
-        if (typeof gamepad.pressed === "function") {
-            input.left = input.left ||
-                gamepad.pressed("LEFT") ||
-                gamepad.pressed(14);
-
-            input.right = input.right ||
-                gamepad.pressed("RIGHT") ||
-                gamepad.pressed(15);
-        }
-
-        if (typeof gamepad.justPressed === "function") {
-            input.jump = input.jump ||
-                gamepad.justPressed("A") ||
-                gamepad.justPressed("CROSS") ||
-                gamepad.justPressed(0);
-
-            input.attack = input.attack ||
-                gamepad.justPressed("X") ||
-                gamepad.justPressed("SQUARE") ||
-                gamepad.justPressed(2);
-        }
-
-        this.applyPlayerStickInput(gamepad, input);
-    }
+    this.readPlayerKeyboard(keyboard, playerIndex, input);
+    this.readPlayerGamepad(gamepad, input);
+    this.applyPlayerStickInput(gamepad, input);
 
     return input;
 };
 
+/**
+ * Läser tangentbord för spelare.
+ *
+ * @param {?Object} keyboard
+ * @param {number} playerIndex
+ * @param {!Object} input
+ * @return {void}
+ */
+runmysteriet.input.GameInput.prototype.readPlayerKeyboard = function(keyboard, playerIndex, input) {
+
+    if (!keyboard) {
+        return;
+    }
+
+    if (playerIndex === 0) {
+        if (typeof keyboard.pressed === "function") {
+            input.left = input.left || keyboard.pressed("LEFT");
+            input.right = input.right || keyboard.pressed("RIGHT");
+            input.down = input.down || keyboard.pressed("DOWN");
+        }
+
+        if (typeof keyboard.justPressed === "function") {
+            input.jump = input.jump || keyboard.justPressed("UP");
+            input.attack = input.attack || keyboard.justPressed("SPACE");
+        }
+    }
+
+    if (playerIndex === 1) {
+        if (typeof keyboard.pressed === "function") {
+            input.left = input.left || keyboard.pressed("A");
+            input.right = input.right || keyboard.pressed("D");
+            input.down = input.down || keyboard.pressed("S");
+        }
+
+        if (typeof keyboard.justPressed === "function") {
+            input.jump = input.jump || keyboard.justPressed("W");
+            input.attack = input.attack || keyboard.justPressed("E");
+        }
+    }
+};
+
+/**
+ * Läser gamepad för spelare.
+ *
+ * @param {?Object} gamepad
+ * @param {!Object} input
+ * @return {void}
+ */
+runmysteriet.input.GameInput.prototype.readPlayerGamepad = function(gamepad, input) {
+
+    if (!gamepad) {
+        return;
+    }
+
+    if (typeof gamepad.pressed === "function") {
+        input.left = input.left ||
+            gamepad.pressed("LEFT") ||
+            gamepad.pressed("DPAD_LEFT") ||
+            gamepad.pressed(14);
+
+        input.right = input.right ||
+            gamepad.pressed("RIGHT") ||
+            gamepad.pressed("DPAD_RIGHT") ||
+            gamepad.pressed(15);
+
+        input.down = input.down ||
+            gamepad.pressed("DOWN") ||
+            gamepad.pressed("DPAD_DOWN") ||
+            gamepad.pressed(13);
+    }
+
+    if (typeof gamepad.justPressed === "function") {
+        input.jump = input.jump ||
+            gamepad.justPressed("A") ||
+            gamepad.justPressed("CROSS") ||
+            gamepad.justPressed(0);
+
+        input.attack = input.attack ||
+            gamepad.justPressed("X") ||
+            gamepad.justPressed("SQUARE") ||
+            gamepad.justPressed(2);
+    }
+};
 
 /**
  * Läser analog joystick för spelarrörelse.
- *
- * OBS: Ingen cooldown här, eftersom spelaren ska kunna röra sig mjukt.
  *
  * @param {?Object} gamepad
  * @param {!Object} input
@@ -354,20 +395,22 @@ runmysteriet.input.GameInput.prototype.readPlayer = function(keyboard, playerInd
 runmysteriet.input.GameInput.prototype.applyPlayerStickInput = function(gamepad, input) {
 
     var x = 0;
+    var y = 0;
 
     if (!gamepad) {
         return;
     }
 
-    if (gamepad.axes && gamepad.axes.length > 0) {
-        x = gamepad.axes[0];
-    } else if (typeof gamepad.axis === "function") {
-        x = gamepad.axis(0);
-    }
+    x = this.getAxis(gamepad, 0);
+    y = this.getAxis(gamepad, 1);
 
     if (x < -0.5) {
         input.left = true;
     } else if (x > 0.5) {
         input.right = true;
+    }
+
+    if (y > 0.5) {
+        input.down = true;
     }
 };

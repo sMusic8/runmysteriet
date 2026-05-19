@@ -10,9 +10,12 @@ runmysteriet.scene.More = function() {
     this.m_backButton = null;
     this.m_text = null;
     this.m_background = null;
+    this.m_box = null;
 
     this.backgroundMusic = null;
     this.menuSound = null;
+    this.m_gameInput = null;
+    this.m_volumeHud = null;    
 };
 
 runmysteriet.scene.More.prototype = Object.create(rune.scene.Scene.prototype);
@@ -26,16 +29,38 @@ runmysteriet.scene.More.prototype.init = function() {
 
     rune.scene.Scene.prototype.init.call(this);
 
+    this.m_gameInput = new runmysteriet.input.GameInput(this.application);
+
     this.backgroundMusic = this.application.sounds.sound.get("sound_musicMenu");
     this.menuSound = this.application.sounds.sound.get("sound_menu");
 
-    if (this.backgroundMusic) {
+    this.m_volumeHud = new runmysteriet.ui.graphic.VolumeHud(
+    this.application,
+    this.backgroundMusic
+);
+
+    this.stage.addChild(this.m_volumeHud);
+
+     if (this.backgroundMusic) {
         this.backgroundMusic.loop = true;
         this.backgroundMusic.volume = 0.5;
         this.backgroundMusic.play();
     }
+   
+    this.createBackground();
+    this.createBox();
+    this.createText();
+    this.createBackButton();
+    this.createVolumeText();
+    this.updateVolumeText();
+};
 
-    // BACKGROUND
+//------------------------------------------------------------------------------
+// CREATE
+//------------------------------------------------------------------------------
+
+runmysteriet.scene.More.prototype.createBackground = function() {
+
     this.m_background = new rune.display.Graphic(
         0,
         0,
@@ -45,21 +70,55 @@ runmysteriet.scene.More.prototype.init = function() {
     );
 
     this.stage.addChild(this.m_background);
+};
 
-    // BOX
+runmysteriet.scene.More.prototype.createVolumeText = function() {
+
+    this.m_volumeText = new rune.text.BitmapField("VOLUME: 50%");
+    this.m_volumeText.autoSize = true;
+
+    this.m_volumeText.x = 15;
+    this.m_volumeText.y = 15;
+
+    this.stage.addChild(this.m_volumeText);
+};
+
+runmysteriet.scene.More.prototype.updateVolumeText = function() {
+
+    var volume = 0;
+
+    if (!this.m_volumeText || !this.backgroundMusic) {
+        return;
+    }
+
+    volume = Math.round(this.backgroundMusic.volume * 100);
+
+    this.m_volumeText.text = "VOLUME: " + volume + "%";
+};
+
+runmysteriet.scene.More.prototype.createBox = function() {
+
     var boxWidth = 520;
     var boxHeight = 300;
 
-    var box = new rune.display.Graphic(0, 0, boxWidth, boxHeight);
-    box.fill = true;
-    box.fillColor = "#ffffff";
+    this.m_box = new rune.display.Graphic(
+        0,
+        0,
+        boxWidth,
+        boxHeight
+    );
 
-    box.x = this.application.screen.center.x - boxWidth / 2;
-    box.y = this.application.screen.center.y - boxHeight / 2;
+    this.m_box.fill = true;
+    this.m_box.fillColor = "#ffffff";
 
-    this.stage.addChild(box);
+    this.m_box.x = this.application.screen.center.x - boxWidth / 2;
+    this.m_box.y = this.application.screen.center.y - boxHeight / 2;
 
-    // TEXT
+    this.stage.addChild(this.m_box);
+};
+
+runmysteriet.scene.More.prototype.createText = function() {
+
     this.m_text = new rune.text.BitmapField(
         "This is the game where you help the Vikings\n" +
         "reach their home ship while avoiding obstacles.\n\n" +
@@ -69,24 +128,29 @@ runmysteriet.scene.More.prototype.init = function() {
         "the secret password.\n\n" +
         "Collect shields with runes along the way.\n\n" +
         "< BACK\n" +
-        "Press ENTER / SPACE / ESC\n" +
+        "Press A / ENTER / SPACE / ESC\n" +
         "E/Q = Volume"
     );
 
     this.m_text.autoSize = true;
     this.stage.addChild(this.m_text);
 
-    this.m_text.x = box.x + (boxWidth - this.m_text.width) / 2;
-    this.m_text.y = box.y + (boxHeight - this.m_text.height) / 2;
+    this.m_text.x = this.m_box.x + (this.m_box.width - this.m_text.width) / 2;
+    this.m_text.y = this.m_box.y + (this.m_box.height - this.m_text.height) / 2;
+};
 
-    // BACK BUTTON
+runmysteriet.scene.More.prototype.createBackButton = function() {
+
     this.m_backButton = new rune.text.BitmapField("BACK");
     this.m_backButton.autoSize = true;
 
     this.stage.addChild(this.m_backButton);
 
-    this.m_backButton.x = this.application.screen.center.x - this.m_backButton.width / 2;
-    this.m_backButton.y = box.y + boxHeight + 15;
+    this.m_backButton.x =
+        this.application.screen.center.x - this.m_backButton.width / 2;
+
+    this.m_backButton.y =
+        this.m_box.y + this.m_box.height + 15;
 };
 
 //------------------------------------------------------------------------------
@@ -97,59 +161,77 @@ runmysteriet.scene.More.prototype.update = function(step) {
 
     rune.scene.Scene.prototype.update.call(this, step);
 
-    var keyboard = this.keyboard;
-    var gamepad = this.gamepads.get(0);
+    this.handleInput();
+};
 
-    // 🔥 DEBUG (så du SER att input funkar)
-    if (keyboard.justPressed("E")) {
-        console.log("E pressed");
+//------------------------------------------------------------------------------
+// INPUT
+//------------------------------------------------------------------------------
+
+runmysteriet.scene.More.prototype.handleInput = function() {
+
+    var input = null;
+
+    if (!this.m_gameInput) {
+        return;
     }
 
-    if (keyboard.justPressed("Q")) {
-        console.log("Q pressed");
+    input = this.m_gameInput.read(this.keyboard);
+
+    this.handleVolumeInput(input);
+    this.handleBackInput(input);
+};
+
+runmysteriet.scene.More.prototype.handleBackInput = function(input) {
+
+    if (!input) {
+        return;
     }
 
-    // -----------------------
-    // VOLUME CONTROL
-    // -----------------------
-    if (this.backgroundMusic) {
-
-        var stepVol = 0.1;
-
-        if (keyboard.justPressed("e") || (gamepad && gamepad.justPressed(5))) {
-
-            this.backgroundMusic.volume += stepVol;
-
-            if (this.backgroundMusic.volume > 1) {
-                this.backgroundMusic.volume = 0;
-            }
-
-            console.log("Volym:", this.backgroundMusic.volume.toFixed(2));
-        }
-
-        if (keyboard.justPressed("q") || (gamepad && gamepad.justPressed(4))) {
-
-            this.backgroundMusic.volume -= stepVol;
-
-            if (this.backgroundMusic.volume < 0) {
-                this.backgroundMusic.volume = 1;
-            }
-
-            console.log("Volym:", this.backgroundMusic.volume.toFixed(2));
-        }
-    }
-
-    // BACK NAVIGATION
-    if (
-        keyboard.justPressed("ESCAPE") ||
-        keyboard.justPressed("ENTER") ||
-        keyboard.justPressed("SPACE")
-    ) {
+    if (input.choose || input.back) {
+        this.playMenuSound();
         this.goToMenu();
     }
+};
 
-    if (gamepad && (gamepad.justPressed(9) || gamepad.justPressed(0))) {
-        this.goToMenu();
+runmysteriet.scene.More.prototype.handleVolumeInput = function(input) {
+
+    var stepVol = 0.1;
+
+    if (!this.backgroundMusic || !input) {
+        return;
+    }
+
+    if (input.volumeUp) {
+        this.backgroundMusic.volume += stepVol;
+
+        if (this.backgroundMusic.volume > 1) {
+            this.backgroundMusic.volume = 0;
+        }
+
+        this.updateVolumeText();
+    }
+
+    if (input.volumeDown) {
+        this.backgroundMusic.volume -= stepVol;
+
+        if (this.backgroundMusic.volume < 0) {
+            this.backgroundMusic.volume = 1;
+        }
+
+        if (this.m_volumeHud) {
+         this.m_volumeHud.updateText();
+}
+    }
+};
+//------------------------------------------------------------------------------
+// SOUND
+//------------------------------------------------------------------------------
+
+runmysteriet.scene.More.prototype.playMenuSound = function() {
+
+    if (this.menuSound) {
+        this.menuSound.play();
     }
 };
 
@@ -162,4 +244,23 @@ runmysteriet.scene.More.prototype.goToMenu = function() {
     this.application.scenes.load([
         new runmysteriet.scene.Menu()
     ]);
+};
+
+//------------------------------------------------------------------------------
+// DISPOSE
+//------------------------------------------------------------------------------
+
+runmysteriet.scene.More.prototype.dispose = function() {
+
+    this.m_backButton = null;
+    this.m_text = null;
+    this.m_background = null;
+    this.m_box = null;
+
+    this.backgroundMusic = null;
+    this.menuSound = null;
+    this.m_gameInput = null;
+    this.m_volumeText = null;
+
+    rune.scene.Scene.prototype.dispose.call(this);
 };

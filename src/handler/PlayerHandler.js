@@ -359,6 +359,7 @@ runmysteriet.handler.PlayerHandler.prototype.areAllActivePlayersOnPlatform = fun
 //------------------------------------------------------------------------------
 // PLATFORM COLLISION
 //------------------------------------------------------------------------------
+
 runmysteriet.handler.PlayerHandler.prototype.checkPlatform = function(player, platform) {
 
     var offsetY = 0;
@@ -374,6 +375,7 @@ runmysteriet.handler.PlayerHandler.prototype.checkPlatform = function(player, pl
 
     var playerPaddingX = 6;
     var platformPaddingX = 2;
+    var toleranceY = 2;
 
     var isFalling = false;
     var wasAbove = false;
@@ -382,6 +384,12 @@ runmysteriet.handler.PlayerHandler.prototype.checkPlatform = function(player, pl
 
     if (!player || !platform) {
         return false;
+    }
+
+    if (platform.isRaft === true) {
+        playerPaddingX = 3;
+        platformPaddingX = 0;
+        toleranceY = 10;
     }
 
     offsetY = this.getPlatformOffsetY(platform);
@@ -401,8 +409,8 @@ runmysteriet.handler.PlayerHandler.prototype.checkPlatform = function(player, pl
         return false;
     }
 
-    wasAbove = playerPreviousFootY <= platformTop;
-    hasReachedPlatform = playerFootY >= platformTop;
+    wasAbove = playerPreviousFootY <= platformTop + toleranceY;
+    hasReachedPlatform = playerFootY >= platformTop - toleranceY;
 
     playerLeft = player.x + playerPaddingX;
     playerRight = player.x + player.width - playerPaddingX;
@@ -446,6 +454,7 @@ runmysteriet.handler.PlayerHandler.prototype.checkPlatform = function(player, pl
 
     return false;
 };
+
 //------------------------------------------------------------------------------
 // PLAYER HITBOX HELPERS
 //------------------------------------------------------------------------------
@@ -696,22 +705,15 @@ runmysteriet.handler.PlayerHandler.prototype.getStandingY = function(player, pla
     if (!player || !platform) {
         return 0;
     }
-
-    /*
-     * Vanliga plattformar behöver större offset eftersom avatarens sprite/hitbox
-     * annars kan se ut att sjunka ner i marken.
-     */
-    offsetY = this.getPlatformOffsetY(platform);
-    /*
-     * Flotten är tunnare och ska ha egen offset.
-     * Lägre offset gör att avataren hamnar längre ner och ser ut att stå på flotten.
-     */
     if (platform.isRaft === true) {
         offsetY = this.m_raftPlatformOffsetY;
     }
+    offsetY = this.getPlatformOffsetY(platform);
 
     return platform.y - player.height / 2 - offsetY;
 };
+
+
 runmysteriet.handler.PlayerHandler.prototype.getPlatformOffsetY = function(platform) {
     if (platform && platform.isRaft === true) {
         return this.m_raftPlatformOffsetY;
@@ -863,11 +865,14 @@ runmysteriet.handler.PlayerHandler.prototype.killPlayer = function(player, index
         return;
     }
 
+    player.hasArmor = false;
     player.isDead = true;
     player.visible = false;
     player.active = false;
     player.velocityY = 0;
     player.hp = 0;
+    player.currentPlatform = null;
+    player.isOnGround = false;
 
     if (player.hpBar) {
         player.hpBar.visible = false;
