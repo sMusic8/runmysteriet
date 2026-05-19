@@ -27,22 +27,23 @@ runmysteriet.ui.graphic.Hole = function(x, y, width, height, fallLimitY) {
      */
   var lavaBleedX = 2;
 var lavaBleedY = 2;
+var lavaOffsetY = -25;
 
 this.lava = new rune.display.Graphic(
     x - lavaBleedX,
-    y - lavaBleedY,
+    y - lavaBleedY + lavaOffsetY,
     width + lavaBleedX * 2,
     height + lavaBleedY,
-    "lava_ny_komprimerad"
+    "lava"
 );
 
+this.lava.baseY = y - lavaBleedY + lavaOffsetY;
     /*
      * Enkel lava-effekt.
      */
-this.lava.baseY = y - lavaBleedY;
-this.lava.time = Math.random() * 100;
-this.lava.alpha = 0.9;
-};
+    this.lava.time = Math.random() * 100;
+    this.lava.alpha = 0.9;
+    };
 
 runmysteriet.ui.graphic.Hole.prototype =
     Object.create(rune.display.DisplayObject.prototype);
