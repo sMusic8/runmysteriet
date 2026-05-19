@@ -52,19 +52,69 @@ runmysteriet.handler.AutoScrollCameraHandler = function(camera, playerHandler, p
  * @param {number=} step
  * @return {void}
  */
+
 runmysteriet.handler.AutoScrollCameraHandler.prototype.update = function(step) {
 
     if (!this.camera || !this.camera.viewport) {
         return;
     }
 
-    this.updateWaterPause();
+    /*
+     * Om kameran är pausad vid vatten/flotte:
+     * starta igen endast när alla levande spelare står på flotten.
+     */
+    if (this.isPausedForWater === true) {
 
-    if (this.isPausedForWater !== true) {
-        this.moveCamera();
+        if (this.areAllActivePlayersOnRaft() === true) {
+            this.isPausedForWater = false;
+
+            if (this.currentWaterArea) {
+                this.currentWaterArea.autoScrollDone = true;
+            }
+
+            this.currentWaterArea = null;
+        } else {
+            return;
+        }
     }
+
+    /*
+     * Om kameran inte är pausad:
+     * kontrollera om den ska stanna vid vattenområdet.
+     */
+    this.checkWaterPause();
+
+    if (this.isPausedForWater === true) {
+        return;
+    }
+
+    this.moveCamera();
 };
 
+runmysteriet.handler.AutoScrollCameraHandler.prototype.isAnyActivePlayerOnRaft = function() {
+
+    var i = 0;
+    var player = null;
+
+    if (!this.playerHandler || !this.playerHandler.players) {
+        return false;
+    }
+
+    for (i = 0; i < this.playerHandler.players.length; i++) {
+
+        player = this.playerHandler.players[i];
+
+        if (!player || player.isDead === true) {
+            continue;
+        }
+
+        if (player.currentPlatform && player.currentPlatform.isRaft === true) {
+            return true;
+        }
+    }
+
+    return false;
+};
 //------------------------------------------------------------------------------
 // CAMERA MOVEMENT
 //------------------------------------------------------------------------------
@@ -151,11 +201,39 @@ runmysteriet.handler.AutoScrollCameraHandler.prototype.updateWaterPause = functi
     }
 };
 
-/**
- * Hittar vattenområde som kameran snart når.
- *
- * @return {?Object}
- */
+
+
+//------------------------------------------------------------------------------
+// WATER PAUSE
+//------------------------------------------------------------------------------
+
+runmysteriet.handler.AutoScrollCameraHandler.prototype.checkWaterPause = function() {
+
+    var water = null;
+
+    if (!this.platformHandler || !this.platformHandler.waterAreas) {
+        return;
+    }
+
+    water = this.findNextWaterAreaToPauseAt();
+
+    if (!water) {
+        return;
+    }
+
+    this.currentWaterArea = water;
+    this.isPausedForWater = true;
+
+    /*
+     * Kameran stannar precis före vatten/flotte-delen.
+     */
+    this.camera.viewport.x = water.x - this.waterStopOffsetX;
+
+    if (this.camera.viewport.x < 0) {
+        this.camera.viewport.x = 0;
+    }
+};
+
 runmysteriet.handler.AutoScrollCameraHandler.prototype.findNextWaterAreaToPauseAt = function() {
 
     var i = 0;
@@ -172,10 +250,6 @@ runmysteriet.handler.AutoScrollCameraHandler.prototype.findNextWaterAreaToPauseA
             continue;
         }
 
-        /*
-         * När kamerans vänsterkant når vattenområdet,
-         * pausa autoscroll.
-         */
         if (nextCameraX >= water.x - this.waterStopOffsetX) {
             return water;
         }
@@ -184,25 +258,15 @@ runmysteriet.handler.AutoScrollCameraHandler.prototype.findNextWaterAreaToPauseA
     return null;
 };
 
-/**
- * Kollar om alla levande spelare har kommit förbi vattenområdet.
- *
- * @param {!Object} water
- * @return {boolean}
- */
-runmysteriet.handler.AutoScrollCameraHandler.prototype.haveAllActivePlayersPassedWater = function(water) {
+runmysteriet.handler.AutoScrollCameraHandler.prototype.areAllActivePlayersOnRaft = function() {
 
     var i = 0;
     var player = null;
-    var playerCenterX = 0;
-    var waterEndX = 0;
     var hasActivePlayer = false;
 
     if (!this.playerHandler || !this.playerHandler.players) {
         return false;
     }
-
-    waterEndX = water.x + water.width + this.waterResumeMarginX;
 
     for (i = 0; i < this.playerHandler.players.length; i++) {
 
@@ -215,16 +279,11 @@ runmysteriet.handler.AutoScrollCameraHandler.prototype.haveAllActivePlayersPasse
         hasActivePlayer = true;
 
         /*
-         * Om någon levande spelare fortfarande står på flotten,
-         * ska autoscroll inte starta.
+         * Viktigt:
+         * Det räcker inte att spelaren står på en vanlig plattform.
+         * Spelaren måste stå på flotten.
          */
-        if (player.currentPlatform && player.currentPlatform.isRaft === true) {
-            return false;
-        }
-
-        playerCenterX = player.x + player.width / 2;
-
-        if (playerCenterX < waterEndX) {
+        if (!player.currentPlatform || player.currentPlatform.isRaft !== true) {
             return false;
         }
     }
