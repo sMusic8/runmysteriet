@@ -21,7 +21,6 @@ npx google-closure-compiler \
 --js "./../../src/ui/graphic/Platform.js" \
 --js "./../../src/ui/graphic/MenuList.js" \
 --js "./../../src/ui/graphic/Hole.js" \
---js "./../../src/ui/graphic/TextInput.js" \
 --js "./../../src/ui/graphic/Water.js" \
 --js "./../../src/ui/graphic/Rune.js" \
 --js "./../../src/ui/graphic/Shield.js" \
@@ -52,7 +51,7 @@ npx google-closure-compiler \
 --js "./../../src/segments/Segment_4.js" \
 --js "./../../src/segments/Segment_5.js" \
 --js "./../../src/segments/Segment_6.js" \
---js"./../../src/segments/Segment_Start.js" \
+--js "./../../src/segments/Segment_Start.js" \
 --js "./../../src/segments/Segment_End.js" \
 --js "./../../src/segments/Segment_Water.js" \
 --js "./../../src/scene/menu/TextInputView.js" \

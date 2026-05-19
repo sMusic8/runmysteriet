@@ -2,7 +2,27 @@
 // GAME INPUT
 //------------------------------------------------------------------------------
 
-runmysteriet.input = runmysteriet.input || {};
+/**
+ * Gemensam input-klass för keyboard och gamepad.
+ *
+ * @constructor
+ * @param {!Object} application
+ */
+runmysteriet.input.GameInput = function(application) {
+
+    this.application = application;
+
+    /*
+     * Cooldown gör att joystick/D-pad inte scrollar för snabbt.
+     */
+    this.m_scrollCooldown = 0;
+    this.m_scrollDelay = 8;
+};
+
+//------------------------------------------------------------------------------
+// GAME INPUT
+//------------------------------------------------------------------------------
+
 
 /**
  * Gemensam input-klass för keyboard och gamepad.
