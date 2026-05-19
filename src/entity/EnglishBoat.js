@@ -7,8 +7,8 @@
  * @param {number=} y
  */
 
-//avstånd mellan båten och vattnet: 32 (vattnets höjd) + 100 (båtens höjd) = 132
-//ändras i water.js och segmnt_water.js
+//Avstånd mellan båten och vattnet: 32 (vattnets höjd) + 100 (båtens höjd) = 132
+//Ändras i water.js och segmnt_water.js
 runmysteriet.entity.EnglishBoat = function(x, y) {
 
     rune.display.Graphic.call(
@@ -29,9 +29,9 @@ runmysteriet.entity.EnglishBoat = function(x, y) {
     /** @type {number} */
     this.damage = 999;
     /*
-     * egen hitbox för båten
-     * detta gör att bara själva vilden av båten dödar spelaren 
-     * inte hela 100x100-rutan.
+     * Egen hitbox för båten
+     * Detta gör att bara själva vilden av båten dödar spelaren 
+     * Inte hela 100x100-rutan.
      */
     this.hitboxOffsetX = 10;
     this.hitboxOffsetY = 45;
@@ -63,9 +63,9 @@ runmysteriet.entity.EnglishBoat.prototype.isTouchingPlayer = function(player) {
     }
 
     /*
-     * båtens riktiga farliga område
+     * Båtens riktiga farliga område
      * this.x och this.y är hela bildens position.
-     * offset flyttar in hitboxen till där själva båten syns.
+     * Offset flyttar in hitboxen till där själva båten syns.
      */
     var boatX = this.x + this.hitboxOffsetX;
     var boatY = this.y + this.hitboxOffsetY;

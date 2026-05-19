@@ -50,7 +50,7 @@ runmysteriet.scene.Menu.prototype.init = function() {
     this.m_controller = new rune.display.Graphic(
         250,
         110,
-        128,
+        140,
         100,
         "testing"
     );

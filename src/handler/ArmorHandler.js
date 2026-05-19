@@ -2,15 +2,36 @@
 // ARMOR HANDLER
 //------------------------------------------------------------------------------
 
+/**
+ * Handler som ansvarar för att skapa, uppdatera och hantera armor-objekt i spelet.
+ *
+ * @constructor
+ * @param {rune.scene.Scene} stage - Stage där armors renderas.
+ * @param {Object} application - Spelapplikationen (för ljud m.m.).
+ * @param {number=} levelNumber - Nivånummer som påverkar antal armors.
+ * @param {Array=} armorSpawns - Lista över möjliga spawnpunkter.
+ */
 runmysteriet.handler.ArmorHandler = function(stage, application, levelNumber, armorSpawns) {
 
+    /** @type {rune.scene.Scene} */
     this.m_stage = stage;
+
+    /** @type {Object} */
     this.application = application;
+
+    /** @type {number} */
     this.m_levelNumber = levelNumber || 1;
+
+    /** @type {Array} */
     this.m_armorSpawns = armorSpawns || [];
 
+    /** @type {Array.<rune.display.Graphic>} */
     this.m_armors = [];
 
+    /**
+     * Callback när armor samlas upp.
+     * @type {Function|null}
+     */
     this.onArmorCollected = null;
 };
 
@@ -18,6 +39,9 @@ runmysteriet.handler.ArmorHandler = function(stage, application, levelNumber, ar
 // INIT
 //------------------------------------------------------------------------------
 
+/**
+ * Skapar armor baserat på valda spawnpunkter.
+ */
 runmysteriet.handler.ArmorHandler.prototype.init = function() {
     var selectedSpawns = this.getSelectedArmorSpawns();
     var i = 0;
@@ -34,6 +58,11 @@ runmysteriet.handler.ArmorHandler.prototype.init = function() {
 // ARMOR COUNT
 //------------------------------------------------------------------------------
 
+/**
+ * Returnerar antal armor som ska spawnas beroende på nivå.
+ *
+ * @return {number}
+ */
 runmysteriet.handler.ArmorHandler.prototype.getArmorCount = function() {
     if (this.m_levelNumber >= 11) {
         return 4;
@@ -50,6 +79,11 @@ runmysteriet.handler.ArmorHandler.prototype.getArmorCount = function() {
 // SPAWNS
 //------------------------------------------------------------------------------
 
+/**
+ * Väljer slumpmässiga spawnpunkter för armor.
+ *
+ * @return {Array}
+ */
 runmysteriet.handler.ArmorHandler.prototype.getSelectedArmorSpawns = function() {
     var copy = this.m_armorSpawns.slice();
     var result = [];
@@ -70,6 +104,12 @@ runmysteriet.handler.ArmorHandler.prototype.getSelectedArmorSpawns = function() 
 // CREATE
 //------------------------------------------------------------------------------
 
+/**
+ * Skapar ett armor-objekt och dess visuella box.
+ *
+ * @param {number} x - X-position.
+ * @param {number} y - Y-position.
+ */
 runmysteriet.handler.ArmorHandler.prototype.addArmor = function(x, y) {
     var box = null;
     var armor = null;
@@ -81,7 +121,6 @@ runmysteriet.handler.ArmorHandler.prototype.addArmor = function(x, y) {
         36
     );
 
-    //box.backgroundColor = "#1d37ad";
     box.alpha = 0.45;
     box.active = false;
 
@@ -110,6 +149,11 @@ runmysteriet.handler.ArmorHandler.prototype.addArmor = function(x, y) {
 // UPDATE
 //------------------------------------------------------------------------------
 
+/**
+ * Uppdaterar armor och hanterar kollision med spelare.
+ *
+ * @param {Array.<Object>} players - Lista med spelare.
+ */
 runmysteriet.handler.ArmorHandler.prototype.update = function(players) {
     var i = 0;
     var j = 0;
@@ -160,6 +204,15 @@ runmysteriet.handler.ArmorHandler.prototype.update = function(players) {
     }
 };
 
+//------------------------------------------------------------------------------
+// BLINK
+//------------------------------------------------------------------------------
+
+/**
+ * Hanterar blink-effekt för armor.
+ *
+ * @param {rune.display.Graphic} armor
+ */
 runmysteriet.handler.ArmorHandler.prototype.updateBlink = function(armor) {
     if (!armor) {
         return;
@@ -187,23 +240,32 @@ runmysteriet.handler.ArmorHandler.prototype.updateBlink = function(armor) {
 // COLLECT
 //------------------------------------------------------------------------------
 
+/**
+ * Hanterar insamling av armor.
+ *
+ * @param {rune.display.Graphic} armor
+ * @param {Object} player
+ */
 runmysteriet.handler.ArmorHandler.prototype.collectArmor = function(armor, player) {
     var index = 0;
 
     if (!armor || armor.__collected === true) {
         return;
     }
-if (this.application &&
-            this.application.sounds &&
-            this.application.sounds.sound) {
 
-          this.catchsound =
+    // Spela ljud vid insamling
+    if (this.application &&
+        this.application.sounds &&
+        this.application.sounds.sound) {
+
+        this.catchsound =
             this.application.sounds.sound.get("sound_catch");
 
-          if (this.catchsound) {
+        if (this.catchsound) {
             this.catchsound.play();
-          }
         }
+    }
+
     armor.__collected = true;
     armor.active = false;
     armor.visible = false;
@@ -231,6 +293,9 @@ if (this.application &&
 // CLEAR
 //------------------------------------------------------------------------------
 
+/**
+ * Tar bort alla armor från scenen och rensar listan.
+ */
 runmysteriet.handler.ArmorHandler.prototype.clear = function() {
     var i = 0;
     var armor = null;
