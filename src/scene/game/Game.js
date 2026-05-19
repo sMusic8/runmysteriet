@@ -76,7 +76,7 @@ runmysteriet.scene.Game.prototype.init = function () {
     this.stage,
     this.camera,
     this.application.screen.width,
-    this.application.screen.height,
+    this.application.screen.height
   );
 
   this.m_backgroundHandler.init();
@@ -86,7 +86,7 @@ runmysteriet.scene.Game.prototype.init = function () {
    */
   this.m_platformHandler = new runmysteriet.handler.PlatformHandler(
     this.stage,
-    this.application.screen.width,
+    this.application.screen.width
   );
 
   this.m_platformHandler.init(this.m_levelNumber);
@@ -100,7 +100,7 @@ runmysteriet.scene.Game.prototype.init = function () {
   this.m_cloudHandler = new runmysteriet.handler.CloudHandler(
     this.stage,
     this.application.screen.width,
-    this.m_platformHandler.levelWidth,
+    this.m_platformHandler.levelWidth
   );
 
   this.m_cloudHandler.init();
@@ -113,7 +113,7 @@ runmysteriet.scene.Game.prototype.init = function () {
     this.m_platformHandler,
     this.application,
     this.m_gameInput,
-    this.keyboard,
+    this.keyboard
   );
 
   this.m_playerHandler.init();
@@ -130,7 +130,7 @@ runmysteriet.scene.Game.prototype.init = function () {
 
   this.m_enemyHandler.init(
     this.m_levelConfig,
-    this.m_platformHandler.getEnemySpawns(),
+    this.m_platformHandler.getEnemySpawns()
   );
 
   this.m_playerHandler.setEnemyHandler(this.m_enemyHandler);
@@ -141,7 +141,7 @@ runmysteriet.scene.Game.prototype.init = function () {
   this.m_cameraHandler = new runmysteriet.handler.CameraHandler(
     this.camera,
     this.m_playerHandler,
-    this.m_platformHandler.levelWidth,
+    this.m_platformHandler.levelWidth
   );
 
   this.m_playerHandler.setCamera(this.camera);
@@ -153,26 +153,31 @@ runmysteriet.scene.Game.prototype.init = function () {
 
   this.m_diseaseHandler.init(
     this.m_levelNumber,
-    this.m_platformHandler.getDiseaseSpawns(),
+    this.m_platformHandler.getDiseaseSpawns()
   );
 
-  /**
-   * Rustning
-   */
-  this.m_armorHandler = new runmysteriet.handler.ArmorHandler(
+/*
+ * Rustning
+ */
+
+this.m_armorHandler = new runmysteriet.handler.ArmorHandler(
     this.stage,
     this.application,
     this.m_levelNumber,
-    this.m_platformHandler.getArmorSpawns(),
-  );
+    this.m_platformHandler.getArmorSpawns()
+);
 
-  this.m_armorHandler.init();
+this.m_armorHandler.init();
 
-  this.m_armorHandler.onArmorCollected = function (player, armor) {
-    if (player) {
-      player.hasArmor = true;
+this.m_armorHandler.onArmorCollected = function(player, armor) {
+    if (!player) {
+        return;
     }
-  };
+
+    if (player.maxHp !== undefined) {
+        player.hp = player.maxHp;
+    }
+};
 
   /*
    * Sköldar / runor
@@ -182,7 +187,7 @@ runmysteriet.scene.Game.prototype.init = function () {
     this.application,
     this.m_platformHandler.levelWidth,
     this.m_levelNumber,
-    this.m_platformHandler.getRuneSpawns(),
+    this.m_platformHandler.getRuneSpawns()
   );
 
   this.m_shieldHandler.init();
@@ -293,7 +298,7 @@ runmysteriet.scene.Game.prototype.createHUD = function () {
   this.m_hudHandler = new runmysteriet.handler.HudHandler(
     this.stage,
     this.application,
-    this.cameras,
+    this.cameras
   );
 
   this.m_hudHandler.init();
@@ -323,7 +328,7 @@ runmysteriet.scene.Game.prototype.updateHoles = function () {
       this.m_playerHandler.players,
       function (player, index) {
         self.m_playerHandler.killPlayer(player, index);
-      },
+      }
     );
   }
 };
@@ -419,7 +424,7 @@ runmysteriet.scene.Game.prototype.createPauseMenu = function () {
     0,
     0,
     this.application.screen.width,
-    this.application.screen.height,
+    this.application.screen.height
   );
 
   this.m_pauseOverlay.backgroundColor = "#000000";
@@ -440,7 +445,7 @@ runmysteriet.scene.Game.prototype.createPauseMenu = function () {
     ["CONTINUE", "QUIT GAME"],
     0,
     22,
-    1,
+    1
   );
 
   this.m_pauseMenu.setVisible(false);
@@ -546,7 +551,7 @@ runmysteriet.scene.Game.prototype.playMenuSound = function () {
 
 runmysteriet.scene.Game.prototype.handleMenuListInput = function (
   menuList,
-  onChoose,
+  onChoose
 ) {
   var input = null;
 
@@ -590,7 +595,7 @@ runmysteriet.scene.Game.prototype.updateTimer = function () {
     }
 
     this.m_hudHandler.setScoreText(
-      "LEVEL " + this.m_levelNumber + " SCORE " + this.m_score,
+      "LEVEL " + this.m_levelNumber + " SCORE " + this.m_score
     );
   }
 };
@@ -715,7 +720,7 @@ runmysteriet.scene.Game.prototype.saveHighscore = function () {
 
   entry = new runmysteriet.logic.HighscoreEntry(
     this.m_playerName,
-    this.m_score,
+    this.m_score
   );
 
   manager = new runmysteriet.logic.HighscoreManager(this.application);
@@ -767,7 +772,7 @@ runmysteriet.scene.Game.prototype.winGame = function (winningPlayer) {
       earnedScore,
       totalScore,
       guessData,
-      this.m_playerName,
+      this.m_playerName
     ),
   ]);
 };
@@ -793,8 +798,8 @@ runmysteriet.scene.Game.prototype.loseGame = function (reason) {
     new runmysteriet.scene.GameOver(
       this.m_playerName,
       this.m_score,
-      reason || "GAME OVER",
-    ),
+      reason || "GAME OVER"
+    )
   ]);
 };
 
@@ -873,7 +878,7 @@ runmysteriet.scene.Game.prototype.restartLevel = function () {
 
   this.m_enemyHandler.init(
     this.m_levelConfig,
-    this.m_platformHandler.getEnemySpawns(),
+    this.m_platformHandler.getEnemySpawns()
   );
 
   if (this.m_playerHandler) {

@@ -113,6 +113,14 @@ var runmysteriet = function() {
     */
     m_this.logic = {};
 
+    /**
+     * This package includes 
+     * @namespace input
+     * @memberof runmysteriet
+     * @since 1.0
+     */
+    m_this.input = {};
+
 
     /**
      * This package includes 

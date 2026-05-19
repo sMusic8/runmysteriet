@@ -7,6 +7,7 @@ runmysteriet.scene.Menu = function() {
     this.m_highscoreHud = null;
 
     this.backgroundMusic = null;
+    this.m_gameInput = null;
 };
 
 //------------------------------------------------------------------------------
@@ -23,6 +24,7 @@ runmysteriet.scene.Menu.prototype.constructor = runmysteriet.scene.Menu;
 runmysteriet.scene.Menu.prototype.init = function() {
 
     rune.scene.Scene.prototype.init.call(this);
+    this.m_gameInput = new runmysteriet.input.GameInput(this.application);
 
     this.menuSound = this.application.sounds.sound.get("sound_menu");
     this.backgroundMusic = this.application.sounds.sound.get("sound_musicMenu");
@@ -155,11 +157,11 @@ runmysteriet.scene.Menu.prototype.update = function(step) {
     // MENU INPUT
     // ----------------------------
 
-    if (!this.menuList || typeof this.menuList.readInput !== "function") {
+    if (!this.menuList || !this.m_gameInput) {
         return;
     }
 
-    var input = this.menuList.readInput(this.keyboard);
+    var input = this.m_gameInput.read(this.keyboard);
 
     if (input.down) {
         this.playMenuSound();
@@ -218,6 +220,7 @@ runmysteriet.scene.Menu.prototype.dispose = function() {
 
     this.m_highscoreHud = null;
     this.m_background = null;
+    this.m_gameInput = null;
 
     rune.scene.Scene.prototype.dispose.call(this);
 };

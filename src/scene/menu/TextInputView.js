@@ -7,7 +7,7 @@ runmysteriet.scene.TextInputView = function(getHelpText) {
     rune.scene.Scene.call(this);
 
     this.getHelpText = getHelpText || function() {
-        return "UP/DOWN = CHOOSE LETTER     ENTER/X = VALIDATE     BACK/ESC = DELETE";
+        return "UP/DOWN = CHOOSE LETTER   ENTER/X = VALIDATE   BACK/ESC = DELETE";
     };
 
     this.m_gameInput = null;
@@ -124,7 +124,7 @@ runmysteriet.scene.TextInputView.prototype.update = function(step) {
     rune.scene.Scene.prototype.update.call(this, step);
 
     // -------------------------------------------------
-    // VOLUME CONTROL (added like other scenes)
+    // VOLUME CONTROL 
     // -------------------------------------------------
     if (this.backgroundMusic) {
 

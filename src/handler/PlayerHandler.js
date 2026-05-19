@@ -362,27 +362,76 @@ runmysteriet.handler.PlayerHandler.prototype.areAllActivePlayersOnPlatform = fun
 
 runmysteriet.handler.PlayerHandler.prototype.checkPlatform = function(player, platform) {
 
-    var playerBottom = 0;
+    var offsetY = 0;
+
+    var playerFootY = 0;
+    var playerPreviousFootY = 0;
     var platformTop = 0;
-    var playerPreviousBottom = 0;
+
+    var playerLeft = 0;
+    var playerRight = 0;
+    var platformLeft = 0;
+    var platformRight = 0;
+
+    var playerPaddingX = 6;
+    var platformPaddingX = 2;
+    var toleranceY = 2;
+
+    var isFalling = false;
+    var wasAbove = false;
+    var hasReachedPlatform = false;
+    var overlapsX = false;
 
     if (!player || !platform) {
         return false;
     }
 
-    if (!player.hitTestObject(platform)) {
+    if (platform.isRaft === true) {
+        playerPaddingX = 3;
+        platformPaddingX = 0;
+        toleranceY = 10;
+    }
+
+    offsetY = this.getPlatformOffsetY(platform);
+
+    playerFootY = player.y + player.height / 2 + offsetY;
+    playerPreviousFootY = player.previousY + player.height / 2 + offsetY;
+
+    if (typeof platform.getCollisionTop === "function") {
+        platformTop = platform.getCollisionTop();
+    } else {
+        platformTop = platform.y;
+    }
+
+    isFalling = player.velocityY >= 0;
+
+    if (isFalling !== true) {
         return false;
     }
 
-    playerBottom = player.y + player.height / 2;
-    platformTop = platform.y;
-    playerPreviousBottom = player.previousY + player.height / 2;
+    wasAbove = playerPreviousFootY <= platformTop + toleranceY;
+    hasReachedPlatform = playerFootY >= platformTop - toleranceY;
 
-    /*
-     * Spelaren ska bara landa om den faller nedåt
-     * och kom ovanifrån plattformen.
-     */
-    if (player.velocityY >= 0 && playerPreviousBottom <= platformTop + 10) {
+    playerLeft = player.x + playerPaddingX;
+    playerRight = player.x + player.width - playerPaddingX;
+
+    if (typeof platform.getCollisionLeft === "function") {
+        platformLeft = platform.getCollisionLeft();
+    } else {
+        platformLeft = platform.x + platformPaddingX;
+    }
+
+    if (typeof platform.getCollisionRight === "function") {
+        platformRight = platform.getCollisionRight();
+    } else {
+        platformRight = platform.x + platform.width - platformPaddingX;
+    }
+
+    overlapsX =
+        playerRight > platformLeft &&
+        playerLeft < platformRight;
+
+    if (wasAbove && hasReachedPlatform && overlapsX) {
 
         player.y = this.getStandingY(player, platform);
         player.velocityY = 0;
@@ -405,7 +454,6 @@ runmysteriet.handler.PlayerHandler.prototype.checkPlatform = function(player, pl
 
     return false;
 };
-
 
 //------------------------------------------------------------------------------
 // PLAYER HITBOX HELPERS
@@ -657,24 +705,22 @@ runmysteriet.handler.PlayerHandler.prototype.getStandingY = function(player, pla
     if (!player || !platform) {
         return 0;
     }
-
-    /*
-     * Vanliga plattformar behöver större offset eftersom avatarens sprite/hitbox
-     * annars kan se ut att sjunka ner i marken.
-     */
-    offsetY = this.m_avatarPlatformOffsetY;
-
-    /*
-     * Flotten är tunnare och ska ha egen offset.
-     * Lägre offset gör att avataren hamnar längre ner och ser ut att stå på flotten.
-     */
     if (platform.isRaft === true) {
         offsetY = this.m_raftPlatformOffsetY;
     }
+    offsetY = this.getPlatformOffsetY(platform);
 
     return platform.y - player.height / 2 - offsetY;
 };
 
+
+runmysteriet.handler.PlayerHandler.prototype.getPlatformOffsetY = function(platform) {
+    if (platform && platform.isRaft === true) {
+        return this.m_raftPlatformOffsetY;
+    }
+
+    return this.m_avatarPlatformOffsetY;
+};
 //------------------------------------------------------------------------------
 // DEATH CHECKS
 //------------------------------------------------------------------------------
@@ -819,11 +865,14 @@ runmysteriet.handler.PlayerHandler.prototype.killPlayer = function(player, index
         return;
     }
 
+    player.hasArmor = false;
     player.isDead = true;
     player.visible = false;
     player.active = false;
     player.velocityY = 0;
     player.hp = 0;
+    player.currentPlatform = null;
+    player.isOnGround = false;
 
     if (player.hpBar) {
         player.hpBar.visible = false;

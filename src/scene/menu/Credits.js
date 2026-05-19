@@ -29,7 +29,7 @@ runmysteriet.scene.Credits = function () {
 //------------------------------------------------------------------------------
 
 runmysteriet.scene.Credits.prototype = Object.create(
-  rune.scene.Scene.prototype,
+  rune.scene.Scene.prototype
 );
 runmysteriet.scene.Credits.prototype.constructor = runmysteriet.scene.Credits;
 
@@ -142,7 +142,7 @@ runmysteriet.scene.Credits.prototype.m_initBackground = function () {
     0,
     this.application.screen.width,
     this.application.screen.height,
-    "background_menu",
+    "background_menu"
   );
 
   this.stage.addChild(this.m_background);
@@ -160,7 +160,7 @@ runmysteriet.scene.Credits.prototype.m_initTitle = function () {
     "This game was created by\n" +
     "Frida Bergstrom and Sabina Music\n" +
     "as part of Project Course 2\n" +
-    "in media technology.",
+    "in media technology."
   );
 
   this.m_title.autoSize = true;
@@ -170,7 +170,7 @@ runmysteriet.scene.Credits.prototype.m_initTitle = function () {
   this.m_title.y = center.y - this.m_title.height / 2 - 40;
 
   this.m_back = new rune.text.BitmapField(
-    "< BACK\nPress ENTER / SPACE / ESC\nGamepad: START or X",
+    "< BACK\nPress ENTER / SPACE / ESC\nGamepad: START or X"
   );
 
   this.m_back.autoSize = true;

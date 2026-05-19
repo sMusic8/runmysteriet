@@ -171,7 +171,7 @@ runmysteriet.segments.Segment_Water.prototype.addWater = function(stage, waterAr
 runmysteriet.segments.Segment_Water.prototype.addRaft = function(stage, platforms, water) {
     var raft = new runmysteriet.ui.graphic.Raft(
         water.x + 5,
-        water.y - 8
+        water.y - 9
     );
 
     raft.minX = water.x - 5;
