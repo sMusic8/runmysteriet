@@ -38,6 +38,12 @@ runmysteriet.scene.Game = function (levelNumber, score, playerName) {
 
   this.m_hudHandler = null;
   this.m_highscoreSaved = false;
+
+this.m_startCountdownActive = false;
+this.m_startCountdownTimer = 0;
+this.m_startCountdownOverlay = null;
+this.m_startCountdownText = null;
+
 };
 
 //------------------------------------------------------------------------------
@@ -46,6 +52,34 @@ runmysteriet.scene.Game = function (levelNumber, score, playerName) {
 
 runmysteriet.scene.Game.prototype = Object.create(rune.scene.Scene.prototype);
 runmysteriet.scene.Game.prototype.constructor = runmysteriet.scene.Game;
+
+//------------------------------------------------------------------------------
+// HUD
+//------------------------------------------------------------------------------
+
+runmysteriet.scene.Game.prototype.createHUD = function() {
+
+    this.m_hudHandler = new runmysteriet.handler.HudHandler(
+        this.stage,
+        this.application,
+        this.cameras
+    );
+
+    this.m_hudHandler.init();
+
+    if (this.m_shieldHandler) {
+        this.m_hudHandler.connectShieldHandler(this.m_shieldHandler);
+    }
+
+    this.updateHUD();
+};
+
+runmysteriet.scene.Game.prototype.updateHUD = function() {
+
+    if (this.m_hudHandler) {
+        this.m_hudHandler.update();
+    }
+};
 
 //------------------------------------------------------------------------------
 // INIT
@@ -138,11 +172,13 @@ runmysteriet.scene.Game.prototype.init = function () {
   /*
    * Kamera
    */
-  this.m_cameraHandler = new runmysteriet.handler.CameraHandler(
+  this.m_cameraHandler = new runmysteriet.handler.AutoScrollCameraHandler(
     this.camera,
     this.m_playerHandler,
+    this.m_platformHandler,
     this.m_platformHandler.levelWidth
-  );
+);
+  
 
   this.m_playerHandler.setCamera(this.camera);
 
@@ -193,141 +229,179 @@ this.m_armorHandler.onArmorCollected = function(player, armor) {
   this.m_shieldHandler.init();
 
   /*
-   * HUD
-   */
+  * HUD
+  */
   this.createHUD();
+
+  /*
+  * Start countdown.
+  */
+  this.createStartCountdown();
 };
 
 //------------------------------------------------------------------------------
 // UPDATE
 //------------------------------------------------------------------------------
 
-runmysteriet.scene.Game.prototype.update = function (step) {
+runmysteriet.scene.Game.prototype.update = function(step) {
 
+    /*
+     * Debug-snabbval.
+     */
     if (this.keyboard.justPressed("F1")) {
-  this.application.scenes.load([
-    new runmysteriet.scene.Game(6, this.m_score, this.m_playerName)
-  ]);
-}
-
-if (this.keyboard.justPressed("F2")) {
-  this.application.scenes.load([
-    new runmysteriet.scene.Game(15, this.m_score, this.m_playerName)
-  ]);
-}
-
-if (this.keyboard.justPressed("F3")) {
-  this.application.scenes.load([
-    new runmysteriet.scene.Game(19, this.m_score, this.m_playerName)
-  ]);
-}
-
-
-  this.updatePauseInput();
-// -------------------------------------------------
-// VOLUME CONTROL (same system as other scenes)
-// -------------------------------------------------
-if (this.backgroundMusic) {
-
-    var keyboard = this.keyboard;
-    var gamepad = this.application.inputs.gamepads.get(0);
-
-    var stepVol = 0.1;
-
-    if (keyboard.justPressed("E") || (gamepad && gamepad.justPressed(5))) {
-
-        this.backgroundMusic.volume += stepVol;
-
-        if (this.backgroundMusic.volume > 1) {
-            this.backgroundMusic.volume = 0;
-        }
-
-        console.log("Volym:", this.backgroundMusic.volume.toFixed(2));
+        this.application.scenes.load([
+            new runmysteriet.scene.Game(6, this.m_score, this.m_playerName)
+        ]);
+        return;
     }
 
-    if (keyboard.justPressed("Q") || (gamepad && gamepad.justPressed(4))) {
+    if (this.keyboard.justPressed("F2")) {
+        this.application.scenes.load([
+            new runmysteriet.scene.Game(15, this.m_score, this.m_playerName)
+        ]);
+        return;
+    }
 
-        this.backgroundMusic.volume -= stepVol;
+    if (this.keyboard.justPressed("F3")) {
+        this.application.scenes.load([
+            new runmysteriet.scene.Game(19, this.m_score, this.m_playerName)
+        ]);
+        return;
+    }
 
-        if (this.backgroundMusic.volume < 0) {
-            this.backgroundMusic.volume = 1;
+    this.updatePauseInput();
+
+    /*
+     * Volume control.
+     */
+    if (this.backgroundMusic) {
+
+        var keyboard = this.keyboard;
+        var gamepad = this.application.inputs.gamepads.get(0);
+        var stepVol = 0.1;
+
+        if (keyboard.justPressed("R") || (gamepad && gamepad.justPressed(5))) {
+
+            this.backgroundMusic.volume += stepVol;
+
+            if (this.backgroundMusic.volume > 1) {
+                this.backgroundMusic.volume = 0;
+            }
+
+            console.log("Volym:", this.backgroundMusic.volume.toFixed(2));
         }
 
-        console.log("Volym:", this.backgroundMusic.volume.toFixed(2));
+        if (keyboard.justPressed("Q") || (gamepad && gamepad.justPressed(4))) {
+
+            this.backgroundMusic.volume -= stepVol;
+
+            if (this.backgroundMusic.volume < 0) {
+                this.backgroundMusic.volume = 1;
+            }
+
+            console.log("Volym:", this.backgroundMusic.volume.toFixed(2));
+        }
     }
+
+    if (this.m_startCountdownActive === true) {
+    rune.scene.Scene.prototype.update.call(this, step);
+
+    this.updateStartCountdown();
+
+    if (this.m_backgroundHandler) {
+        this.m_backgroundHandler.update();
+    }
+
+    this.updateHUD();
+    return;
 }
-  if (this.m_isPaused === true) {
+
+    if (this.m_isPaused === true) {
+        this.updateHUD();
+        return;
+    }
+
+    if (this.m_gameEnd === true) {
+        this.updateHUD();
+        return;
+    }
+
+    rune.scene.Scene.prototype.update.call(this, step);
+
+    /*
+     * Visuella system som inte styr spelaren.
+     */
+    if (this.m_cloudHandler) {
+        this.m_cloudHandler.update();
+    }
+
+    /*
+     * Plattformar / holes.
+     * Detta uppdaterar bland annat lavaeffekten i Hole.
+     */
+    if (
+        this.m_platformHandler &&
+        typeof this.m_platformHandler.update === "function"
+    ) {
+        this.m_platformHandler.update(step);
+    }
+
+    /*
+     * Spelaren uppdateras före kameran.
+     * Då rör sig avatarerna först.
+     */
+    if (this.m_playerHandler) {
+        this.m_playerHandler.update();
+    }
+
+    /*
+     * Kollisioner / game logic.
+     */
+    this.updateHoles();
+    this.updateEnemies();
+    this.updateDiseases(step);
+    this.updateArmor();
+    this.updateShields();
+
+    /*
+     * Autoscroll-kameran flyttas efter spelaren.
+     */
+    if (this.m_cameraHandler) {
+        this.m_cameraHandler.update(step);
+    }
+
+    /*
+     * Efter att kameran flyttats:
+     * håll spelare inom kamerans vänster/högerkant.
+     */
+    if (
+        this.m_playerHandler &&
+        typeof this.m_playerHandler.handleAutoScrollCameraBounds === "function"
+    ) {
+        this.m_playerHandler.handleAutoScrollCameraBounds();
+    }
+
+    /*
+     * Uppdatera Rune-kameran.
+     */
+    if (this.camera && typeof this.camera.update === "function") {
+        this.camera.update(0);
+    }
+
+    /*
+     * Bakgrund efter kamera så den följer rätt.
+     */
+    if (this.m_backgroundHandler) {
+        this.m_backgroundHandler.update();
+    }
+
+    /*
+     * Kolla level completion efter att kamera/bounds är rättade.
+     */
+    this.checkLevelCompletion();
+
+    this.updateTimer();
     this.updateHUD();
-    return;
-  }
-
-  if (this.m_gameEnd === true) {
-    this.updateHUD();
-    return;
-  }
-
-  rune.scene.Scene.prototype.update.call(this, step);
-
-  if (this.m_cloudHandler) {
-    this.m_cloudHandler.update();
-  }
-
-  if (
-    this.m_platformHandler &&
-    typeof this.m_platformHandler.update === "function"
-  ) {
-    this.m_platformHandler.update(step);
-  }
-
-  if (this.m_playerHandler) {
-    this.m_playerHandler.update();
-  }
-
-  this.updateHoles();
-  this.updateEnemies();
-  this.updateDiseases(step);
-  this.updateArmor();
-  this.updateShields();
-  this.checkLevelCompletion();
-
-  if (this.m_playerHandler) {
-    this.m_playerHandler.keepPlayersInsideCamera();
-  }
-
-  if (this.m_cameraHandler) {
-    this.m_cameraHandler.update();
-  }
-
-  if (this.camera && typeof this.camera.update === "function") {
-    this.camera.update(0);
-  }
-
-  if (this.m_backgroundHandler) {
-    this.m_backgroundHandler.update();
-  }
-
-  this.updateTimer();
-  this.updateHUD();
-};
-
-//------------------------------------------------------------------------------
-// HUD
-//------------------------------------------------------------------------------
-
-runmysteriet.scene.Game.prototype.createHUD = function () {
-  this.m_hudHandler = new runmysteriet.handler.HudHandler(
-    this.stage,
-    this.application,
-    this.cameras
-  );
-
-  this.m_hudHandler.init();
-
-  if (this.m_shieldHandler) {
-    this.m_hudHandler.connectShieldHandler(this.m_shieldHandler);
-  }
-
-  this.updateHUD();
 };
 
 runmysteriet.scene.Game.prototype.updateHUD = function () {
@@ -376,6 +450,149 @@ runmysteriet.scene.Game.prototype.updateArmor = function () {
     this.m_armorHandler.update(this.m_playerHandler.players);
   }
 };
+
+//------------------------------------------------------------------------------
+// START COUNTDOWN
+//------------------------------------------------------------------------------
+
+/**
+ * Skapar start-countdown innan spelet börjar.
+ *
+ * @return {void}
+ */
+runmysteriet.scene.Game.prototype.createStartCountdown = function() {
+
+    var cameraX = 0;
+    var cameraY = 0;
+
+    this.m_startCountdownActive = true;
+    this.m_startCountdownTimer = 120;
+
+    if (this.camera && this.camera.viewport) {
+        cameraX = this.camera.viewport.x;
+        cameraY = this.camera.viewport.y;
+    }
+
+    /*
+     * Mörk overlay som ger blur-/pauskänsla.
+     */
+    this.m_startCountdownOverlay = new rune.display.Graphic(
+        cameraX,
+        cameraY,
+        this.application.screen.width,
+        this.application.screen.height
+    );
+
+    this.m_startCountdownOverlay.backgroundColor = "#000000";
+    this.m_startCountdownOverlay.alpha = 0.55;
+
+    this.stage.addChild(this.m_startCountdownOverlay);
+
+    /*
+     * Countdown-text.
+     */
+    this.m_startCountdownText = new rune.text.BitmapField("3");
+    this.m_startCountdownText.autoSize = true;
+
+    this.stage.addChild(this.m_startCountdownText);
+
+    this.updateStartCountdownPosition();
+
+    /*
+     * Pausa tweens under countdown så båt/flotte inte börjar röra sig direkt.
+     */
+    if (this.tweens) {
+        this.tweens.paused = true;
+    }
+};
+
+/**
+ * Uppdaterar start-countdown.
+ *
+ * @return {void}
+ */
+runmysteriet.scene.Game.prototype.updateStartCountdown = function() {
+
+    if (this.m_startCountdownActive !== true) {
+        return;
+    }
+
+    this.m_startCountdownTimer--;
+
+    this.updateStartCountdownPosition();
+
+    if (this.m_startCountdownTimer > 90) {
+        this.m_startCountdownText.text = "3";
+    } else if (this.m_startCountdownTimer > 60) {
+        this.m_startCountdownText.text = "2";
+    } else if (this.m_startCountdownTimer > 30) {
+        this.m_startCountdownText.text = "1";
+    } else if (this.m_startCountdownTimer > 0) {
+        this.m_startCountdownText.text = "GO";
+    } else {
+        this.closeStartCountdown();
+    }
+};
+
+/**
+ * Håller countdown-overlay och text låsta mot kameran.
+ *
+ * @return {void}
+ */
+runmysteriet.scene.Game.prototype.updateStartCountdownPosition = function() {
+
+    var cameraX = 0;
+    var cameraY = 0;
+
+    if (this.camera && this.camera.viewport) {
+        cameraX = this.camera.viewport.x;
+        cameraY = this.camera.viewport.y;
+    }
+
+    if (this.m_startCountdownOverlay) {
+        this.m_startCountdownOverlay.x = cameraX;
+        this.m_startCountdownOverlay.y = cameraY;
+    }
+
+    if (this.m_startCountdownText) {
+        this.m_startCountdownText.x = cameraX + this.application.screen.width / 2 - 12;
+        this.m_startCountdownText.y = cameraY + this.application.screen.height / 2 - 12;
+
+        if (this.m_startCountdownText.text === "GO") {
+            this.m_startCountdownText.x = cameraX + this.application.screen.width / 2 - 22;
+        }
+    }
+};
+
+/**
+ * Tar bort countdown och startar spelet.
+ *
+ * @return {void}
+ */
+runmysteriet.scene.Game.prototype.closeStartCountdown = function() {
+
+    this.m_startCountdownActive = false;
+    this.m_startCountdownTimer = 0;
+
+    if (this.m_startCountdownOverlay && this.m_startCountdownOverlay.stage) {
+        this.m_startCountdownOverlay.stage.removeChild(this.m_startCountdownOverlay);
+    }
+
+    if (this.m_startCountdownText && this.m_startCountdownText.stage) {
+        this.m_startCountdownText.stage.removeChild(this.m_startCountdownText);
+    }
+
+    this.m_startCountdownOverlay = null;
+    this.m_startCountdownText = null;
+
+    /*
+     * Starta tweens igen.
+     */
+    if (this.tweens) {
+        this.tweens.paused = false;
+    }
+};
+
 //------------------------------------------------------------------------------
 // PAUSE
 //------------------------------------------------------------------------------
@@ -753,23 +970,7 @@ runmysteriet.scene.Game.prototype.saveHighscore = function () {
 //------------------------------------------------------------------------------
 
 runmysteriet.scene.Game.prototype.winGame = function (winningPlayer) {
-  var earnedScore = 0;if (this.keyboard.justPressed("F1")) {
-  this.application.scenes.load([
-    new runmysteriet.scene.Game(6, this.m_score, this.m_playerName)
-  ]);
-}
-
-if (this.keyboard.justPressed("F2")) {
-  this.application.scenes.load([
-    new runmysteriet.scene.Game(15, this.m_score, this.m_playerName)
-  ]);
-}
-
-if (this.keyboard.justPressed("F3")) {
-  this.application.scenes.load([
-    new runmysteriet.scene.Game(19, this.m_score, this.m_playerName)
-  ]);
-}
+  var earnedScore = 0;
   var totalScore = 0;
   var guessData = null;
 
@@ -934,6 +1135,17 @@ runmysteriet.scene.Game.prototype.dispose = function () {
   if (this.m_armorHandler) {
     this.m_armorHandler.clear();
   }
+
+  if (this.m_startCountdownOverlay && this.m_startCountdownOverlay.stage) {
+    this.m_startCountdownOverlay.stage.removeChild(this.m_startCountdownOverlay);
+}
+
+if (this.m_startCountdownText && this.m_startCountdownText.stage) {
+    this.m_startCountdownText.stage.removeChild(this.m_startCountdownText);
+}
+
+this.m_startCountdownOverlay = null;
+this.m_startCountdownText = null;
 
   rune.scene.Scene.prototype.dispose.call(this);
 };
