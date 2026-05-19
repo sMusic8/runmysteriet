@@ -44,17 +44,43 @@ runmysteriet.handler.DiseaseHandler.prototype.init = function (
 //------------------------------------------------------------------------------
 // ADD DISEASE
 //------------------------------------------------------------------------------
-
 runmysteriet.handler.DiseaseHandler.prototype.addDisease = function (
   type,
   x,
   y
 ) {
-
   var disease = new runmysteriet.entity.Disease(x, y, type);
 
   this.diseases.push(disease);
   this.stage.addChild(disease);
+
+  // -------------------------------------------------
+  // PULSE DATA (stör inte sprite animation)
+  // -------------------------------------------------
+  disease.m_baseScale = 1.5;
+  disease.m_pulseSpeed = 0.006;
+  disease.m_pulseValue = Math.random() * Math.PI * 2;
+
+  // -------------------------------------------------
+  // WRAP update istället för att ersätta den
+  // -------------------------------------------------
+  var originalUpdate = disease.update;
+
+  disease.update = function (step) {
+
+    // kör sprite animationen först (VIKTIGT)
+    if (typeof originalUpdate === "function") {
+      originalUpdate.call(this, step);
+    }
+
+    // sedan pulse
+    this.m_pulseValue += this.m_pulseSpeed;
+
+    var scale = this.m_baseScale + Math.sin(this.m_pulseValue) * 0.22;
+
+    this.scaleX = scale;
+    this.scaleY = scale;
+  };
 
   return disease;
 };
@@ -68,18 +94,13 @@ runmysteriet.handler.DiseaseHandler.prototype.update = function (
   step
 ) {
 
-  var i = 0;
-  var j = 0;
-  var disease = null;
-  var player = null;
-
   if (!players) {
     return;
   }
 
-  for (i = this.diseases.length - 1; i >= 0; i--) {
+  for (var i = this.diseases.length - 1; i >= 0; i--) {
 
-    disease = this.diseases[i];
+    var disease = this.diseases[i];
 
     if (!disease || disease.isActive !== true) {
       this.diseases.splice(i, 1);
@@ -90,9 +111,9 @@ runmysteriet.handler.DiseaseHandler.prototype.update = function (
       disease.update(step);
     }
 
-    for (j = 0; j < players.length; j++) {
+    for (var j = 0; j < players.length; j++) {
 
-      player = players[j];
+      var player = players[j];
 
       if (!player || player.isDead === true) {
         continue;
@@ -110,17 +131,17 @@ runmysteriet.handler.DiseaseHandler.prototype.update = function (
         }
 
         // -------------------------------------------------
-        // SOUND (SAFE FIX)
+        // SOUND (SAFE)
         // -------------------------------------------------
         if (this.application &&
             this.application.sounds &&
             this.application.sounds.sound) {
 
-          this.snezSound =
+          var snezSound =
             this.application.sounds.sound.get("sound_snez");
 
-          if (this.snezSound) {
-            this.snezSound.play();
+          if (snezSound) {
+            snezSound.play();
           }
         }
 
@@ -142,12 +163,9 @@ runmysteriet.handler.DiseaseHandler.prototype.update = function (
 
 runmysteriet.handler.DiseaseHandler.prototype.clear = function () {
 
-  var i = 0;
-  var disease = null;
+  for (var i = 0; i < this.diseases.length; i++) {
 
-  for (i = 0; i < this.diseases.length; i++) {
-
-    disease = this.diseases[i];
+    var disease = this.diseases[i];
 
     if (disease && disease.parent) {
       disease.parent.removeChild(disease);
@@ -164,45 +182,28 @@ runmysteriet.handler.DiseaseHandler.prototype.clear = function () {
 runmysteriet.handler.DiseaseHandler.prototype.hitTestPlayerDisease =
 function (player, disease) {
 
-  var playerLeft = 0;
-  var playerRight = 0;
-  var playerTop = 0;
-  var playerBottom = 0;
-
-  var diseaseLeft = 0;
-  var diseaseRight = 0;
-  var diseaseTop = 0;
-  var diseaseBottom = 0;
-
-  var playerHitboxHeight = 0;
+  if (!player || !disease) {
+    return false;
+  }
 
   var playerPaddingX = 8;
   var diseasePaddingX = 2;
   var diseasePaddingTop = 2;
   var diseasePaddingBottom = 4;
 
-  if (!player || !disease) {
-    return false;
-  }
+  var playerLeft = player.x + playerPaddingX;
+  var playerRight = player.x + player.width - playerPaddingX;
 
-  playerLeft = player.x + playerPaddingX;
-  playerRight = player.x + player.width - playerPaddingX;
+  var playerBottom = player.y + player.height / 2;
 
-  playerBottom = player.y + player.height / 2;
+  var playerHitboxHeight = player.isCrouching ? 10 : player.height - 6;
+  var playerTop = playerBottom - playerHitboxHeight;
 
-  if (player.isCrouching === true) {
-    playerHitboxHeight = 10;
-  } else {
-    playerHitboxHeight = player.height - 6;
-  }
+  var diseaseLeft = disease.x + diseasePaddingX;
+  var diseaseRight = disease.x + disease.width - diseasePaddingX;
 
-  playerTop = playerBottom - playerHitboxHeight;
-
-  diseaseLeft = disease.x + diseasePaddingX;
-  diseaseRight = disease.x + disease.width - diseasePaddingX;
-
-  diseaseTop = disease.y + diseasePaddingTop;
-  diseaseBottom = disease.y + disease.height - diseasePaddingBottom;
+  var diseaseTop = disease.y + diseasePaddingTop;
+  var diseaseBottom = disease.y + disease.height - diseasePaddingBottom;
 
   return (
     playerRight > diseaseLeft &&
