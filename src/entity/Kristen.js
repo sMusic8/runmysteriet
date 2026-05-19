@@ -6,7 +6,11 @@
  */
 runmysteriet.entity.Kristen = function (texture, x, y) {
   rune.display.Sprite.call(this, x || 0, y || 0, 32, 40, texture);
+this.speed = 0.5;
+this.direction = 1; // 1 = höger, -1 = vänster
 
+this.startX = x || 0;
+this.patrolDistance = 60; // hur långt hon går
   this.hp = 100;
   this.maxHp = 100;
   this.hitCooldown = 0;
@@ -99,12 +103,21 @@ runmysteriet.entity.Kristen.prototype.update = function (step) {
       }
     }
   }
+
+  this.x += this.speed * this.direction;
+
+if (this.x > this.startX + this.patrolDistance) {
+  this.direction = -1;
+}
+
+if (this.x < this.startX - this.patrolDistance) {
+  this.direction = 1;
+}
 };
 
 //------------------------------------------------------------------------------
 // COLLISION
 //------------------------------------------------------------------------------
-
 runmysteriet.entity.Kristen.prototype.handleCollision = function (player) {
   if (!player || player.isDead === true) return;
 
@@ -116,12 +129,8 @@ runmysteriet.entity.Kristen.prototype.handleCollision = function (player) {
   if (this.hitCooldown > 0) return;
 
   this.hitCooldown = 20;
-
-  if (player.hp !== undefined) {
-    player.hp -= 10;
-  }
+  this.takeDamage(10);
 };
-
 runmysteriet.entity.Kristen.prototype.takeDamage = function (damage) {
   if (this.isDead) return;
 
@@ -129,14 +138,25 @@ runmysteriet.entity.Kristen.prototype.takeDamage = function (damage) {
 
   console.log("Kristen tog skada:", damage, "HP kvar:", this.hp);
 
+  // 🔊 HIT LJUD (fix: stop så det alltid spelas)
+  if (!this.hitsound) {
+    this.hitsound = this.application.sounds.sound.get("sound_hit_flesh");
+  }
+
+  if (this.hitsound) {
+    this.hitsound.stop();
+    this.hitsound.play();
+  }
+
   if (this.hp <= 0) {
     if (!this.deadSound) {
-        this.deadSound = this.application.sounds.sound.get("sound_enemydead");
+      this.deadSound = this.application.sounds.sound.get("sound_enemydead");
     }
 
     if (this.deadSound) {
-        this.deadSound.play();
+      this.deadSound.play();
     }
+
     this.die();
   }
 };
@@ -217,7 +237,6 @@ runmysteriet.entity.Kristen.prototype.faceNearestPlayer = function(players) {
 
     /*
      * Om spelaren är till vänster om Kristen ska Kristen titta vänster.
-     * Om din sprite blir felvänd, byt true/false här.
      */
     if (playerCenterX < kristenCenterX) {
         this.flippedX = true;

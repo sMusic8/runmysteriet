@@ -203,6 +203,26 @@ this.m_armorHandler.onArmorCollected = function(player, armor) {
 //------------------------------------------------------------------------------
 
 runmysteriet.scene.Game.prototype.update = function (step) {
+
+    if (this.keyboard.justPressed("F1")) {
+  this.application.scenes.load([
+    new runmysteriet.scene.Game(6, this.m_score, this.m_playerName)
+  ]);
+}
+
+if (this.keyboard.justPressed("F2")) {
+  this.application.scenes.load([
+    new runmysteriet.scene.Game(15, this.m_score, this.m_playerName)
+  ]);
+}
+
+if (this.keyboard.justPressed("F3")) {
+  this.application.scenes.load([
+    new runmysteriet.scene.Game(19, this.m_score, this.m_playerName)
+  ]);
+}
+
+
   this.updatePauseInput();
 // -------------------------------------------------
 // VOLUME CONTROL (same system as other scenes)
@@ -733,7 +753,23 @@ runmysteriet.scene.Game.prototype.saveHighscore = function () {
 //------------------------------------------------------------------------------
 
 runmysteriet.scene.Game.prototype.winGame = function (winningPlayer) {
-  var earnedScore = 0;
+  var earnedScore = 0;if (this.keyboard.justPressed("F1")) {
+  this.application.scenes.load([
+    new runmysteriet.scene.Game(6, this.m_score, this.m_playerName)
+  ]);
+}
+
+if (this.keyboard.justPressed("F2")) {
+  this.application.scenes.load([
+    new runmysteriet.scene.Game(15, this.m_score, this.m_playerName)
+  ]);
+}
+
+if (this.keyboard.justPressed("F3")) {
+  this.application.scenes.load([
+    new runmysteriet.scene.Game(19, this.m_score, this.m_playerName)
+  ]);
+}
   var totalScore = 0;
   var guessData = null;
 
