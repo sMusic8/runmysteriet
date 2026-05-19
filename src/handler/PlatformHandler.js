@@ -287,8 +287,27 @@ runmysteriet.handler.PlatformHandler.prototype.startBoatTweens = function(tweens
 };
 
 //------------------------------------------------------------------------------
-// SEGMENT LOGIC
+// UPDATE
 //------------------------------------------------------------------------------
+
+runmysteriet.handler.PlatformHandler.prototype.update = function(step) {
+
+    var i = 0;
+    var hole = null;
+
+    for (i = 0; i < this.holes.length; i++) {
+        hole = this.holes[i];
+
+        if (hole && typeof hole.update === "function") {
+            hole.update(step);
+        }
+    }
+};
+
+
+
+//
+
 
 /**
  * @return {number}

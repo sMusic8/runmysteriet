@@ -11,13 +11,13 @@ npx google-closure-compiler \
 --js "./../../src/data/resource/Requests.js" \
 --js "./../../src/attack/Attacks.js" \
 --js "./../../src/attack/AttackParticle.js" \
---js "./../../src/ui/graphic/Raft.js" \
 --js "./../../src/config/LevelConfig.js" \
 --js "./../../src/config/GameInput.js" \
 --js "./../../src/entity/Kristen.js" \
 --js "./../../src/entity/EnglishBoat.js" \
 --js "./../../src/entity/Player.js" \
 --js "./../../src/entity/Disease.js" \
+--js "./../../src/ui/graphic/Raft.js" \
 --js "./../../src/ui/graphic/Platform.js" \
 --js "./../../src/ui/graphic/MenuList.js" \
 --js "./../../src/ui/graphic/Hole.js" \
