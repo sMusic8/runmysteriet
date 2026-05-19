@@ -204,8 +204,6 @@ runmysteriet.handler.PlayerHandler.prototype.update = function() {
 //------------------------------------------------------------------------------
 
 runmysteriet.handler.PlayerHandler.prototype.updateInput = function() {
-
-
     
     for (var i = 0; i < this.players.length; i++) {
 
@@ -215,10 +213,10 @@ runmysteriet.handler.PlayerHandler.prototype.updateInput = function() {
             continue;
         }
 
+        player.previousX = player.x;
         player.previousY = player.y;
         player.isMoving = false;
-
-        this.handleInput(player, i);
+            this.handleInput(player, i);
     }
 };
 
@@ -1041,6 +1039,87 @@ runmysteriet.handler.PlayerHandler.prototype.setEnemyHandler = function(enemyHan
 // CAMERA
 //------------------------------------------------------------------------------
 
+
+//------------------------------------------------------------------------------
+// AUTO SCROLL CAMERA BOUNDS
+//------------------------------------------------------------------------------
+
+/**
+ * Håller spelarna inom kamerans synliga område vid autoscroll.
+ * Spelare stoppas vid vänster och höger kamerakant.
+ *
+ * @return {void}
+ */
+runmysteriet.handler.PlayerHandler.prototype.handleAutoScrollCameraBounds = function() {
+
+    var i = 0;
+    var player = null;
+
+    var cameraX = 0;
+    var cameraWidth = 0;
+
+    var leftLimit = 0;
+    var rightLimit = 0;
+
+    var marginLeft = 4;
+    var marginRight = 8;
+    var playerWidth = 32;
+
+    if (!this.camera || !this.camera.viewport) {
+        return;
+    }
+
+    cameraX = Math.round(this.camera.viewport.x);
+    cameraWidth = this.camera.viewport.width || 0;
+
+    if (cameraWidth <= 0) {
+        return;
+    }
+
+    leftLimit = cameraX + marginLeft;
+
+    for (i = 0; i < this.players.length; i++) {
+
+        player = this.players[i];
+
+        if (!player || player.isDead === true) {
+            continue;
+        }
+
+        playerWidth = player.width || 32;
+
+        rightLimit =
+            cameraX +
+            cameraWidth -
+            marginRight -
+            playerWidth;
+
+        /*
+         * Säkerhet:
+         * Om kameran av någon anledning är för smal,
+         * ska högergränsen aldrig hamna före vänstergränsen.
+         */
+        if (rightLimit < leftLimit) {
+            rightLimit = leftLimit;
+        }
+
+        /*
+         * Stoppa spelaren vid kamerans vänsterkant.
+         * Spelaren dör alltså inte av autoscroll,
+         * utan trycks med kameran.
+         */
+        if (player.x < leftLimit) {
+            player.x = leftLimit;
+        }
+
+        /*
+         * Stoppa spelaren vid kamerans högerkant.
+         */
+        if (player.x > rightLimit) {
+            player.x = rightLimit;
+        }
+    }
+};
 /**
  * Kopplar kameran till PlayerHandler.
  *
