@@ -65,10 +65,6 @@ runmysteriet.scene.Credits.prototype.update = function (step) {
   var gamepad = this.gamepads.get(0);
   var keyboard = this.keyboard;
 
-  // ----------------------------
-  // 🎮 / ⌨️ VOLUME CONTROL
-  // ----------------------------
-
   if (this.backgroundMusic) {
 
     var stepVol = 0.1;
