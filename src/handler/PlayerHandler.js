@@ -154,7 +154,7 @@ runmysteriet.handler.PlayerHandler.prototype.update = function() {
         }
 
         // ---------------------------
-        // 🔥 HP BAR TEXTURE SYSTEM (FIX)
+        // HP BAR TEXTURE SYSTEM (FIX)
         // ---------------------------
         var newTexture;
 
@@ -653,7 +653,7 @@ runmysteriet.handler.PlayerHandler.prototype.createHpBar = function() {
     bar.anchorX = 0;
     bar.anchorY = 0;
 
-    // 🔥 Spara nuvarande texture (viktigt för att undvika konstant recreation)
+    //Spara nuvarande texture
     bar.currentHpTexture = "hpbar1";
 
     // Default scale

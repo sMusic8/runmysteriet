@@ -98,12 +98,6 @@ runmysteriet.entity.Player.prototype.init = function() {
     this.groundY = this.y;
     this.isOnGround = true;
 
-    /*
-        Eftersom dina move-spritesheets har 2 frames:
-        frame 0 = står still / första bild
-        frame 1 = rörelse / andra bild
-    */
-
     this.animation.create("idle", [0], 1, true);
     this.animation.create("run", [0, 1], 6, true);
     this.animation.create("jump", [1], 1, false);
@@ -127,15 +121,6 @@ runmysteriet.entity.Player.prototype.update = function(step) {
 
     rune.display.Sprite.prototype.update.call(this, step);
 
-    /*
-        Game.js sköter:
-        - handleInput()
-        - gravitation
-        - plattformskollision
-        - updateAnimation()
-
-        Därför ska vi inte göra det här också.
-    */
 };
 
 //------------------------------------------------------------------------------
