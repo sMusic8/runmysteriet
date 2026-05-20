@@ -27,6 +27,9 @@ runmysteriet.segments.Segment_Start = function() {
 
     /** @type {string} */
     this.jumpTileTexture = "grass_block";
+
+        console.log("segmentStart");
+
 };
 
 //------------------------------------------------------------------------------

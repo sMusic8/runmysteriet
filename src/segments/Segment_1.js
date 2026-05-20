@@ -30,6 +30,8 @@ runmysteriet.segments.Segment_1 = function() {
 
     /** @type {string} */
     this.lavaTexture = "lava";
+
+    console.log("segment1");
 };
 
 //------------------------------------------------------------------------------
@@ -164,6 +166,7 @@ runmysteriet.segments.Segment_1.prototype.addRemainingGround = function(stage, p
         type: "kristen",
         x: x + 80,
         y: this.groundY - 40
+
     });
 };
 

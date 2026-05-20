@@ -21,6 +21,9 @@ runmysteriet.segments.Segment_Water = function() {
 
     /** @type {number} */
     this.waterHeight = 32;
+
+    console.log("segmentWater");
+
 };
 
 //------------------------------------------------------------------------------

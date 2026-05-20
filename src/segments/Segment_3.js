@@ -30,6 +30,9 @@ runmysteriet.segments.Segment_3 = function() {
 
     /** @type {string} */
     this.lavaTexture = "lava";
+
+        console.log("segment3");
+
 };
 
 //------------------------------------------------------------------------------
@@ -133,7 +136,7 @@ runmysteriet.segments.Segment_3.prototype.addLandingGround = function(stage, pla
 
     enemySpawns.push({
         type: "kristen",
-        x: x + 100,
+        x: x + 250,
         y: this.groundY - 40
     });
 };
@@ -307,23 +310,23 @@ runmysteriet.segments.Segment_3.prototype.getDiseasePositions = function(segment
     return [
         {
             type: "gray",
-            x: segmentStart + 80,
-            y: this.groundY - 40
+            x: segmentStart + 680,
+            y: this.groundY - 20
         },
         {
             type: "brown",
             x: segmentStart + 760,
-            y: this.groundY - 40
+            y: this.groundY - 25
         },
         {
             type: "red",
             x: segmentStart + 850,
-            y: this.groundY - 40
+            y: this.groundY - 30
         },
         {
             type: "gray",
             x: segmentStart + 930,
-            y: this.groundY - 40
+            y: this.groundY - 35
         }
     ];
 };

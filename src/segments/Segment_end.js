@@ -36,6 +36,9 @@ runmysteriet.segments.Segment_End = function() {
 
     /** @type {string} */
     this.markerTexture = "grass_block";
+
+        console.log("segmentEnd");
+
 };
 
 //------------------------------------------------------------------------------

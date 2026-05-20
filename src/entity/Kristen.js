@@ -129,7 +129,7 @@ runmysteriet.entity.Kristen.prototype.handleCollision = function (player) {
   if (this.hitCooldown > 0) return;
 
   this.hitCooldown = 20;
-  this.takeDamage(10);
+  this.takeDamage(35);
 };
 runmysteriet.entity.Kristen.prototype.takeDamage = function (damage) {
   if (this.isDead) return;

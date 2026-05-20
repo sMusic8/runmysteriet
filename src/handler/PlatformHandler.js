@@ -355,6 +355,7 @@ runmysteriet.handler.PlatformHandler.prototype.getSegmentPool = function() {
     }
 
     return [
+        runmysteriet.segments.Segment_3,
         runmysteriet.segments.Segment_4,
         runmysteriet.segments.Segment_5,
         runmysteriet.segments.Segment_6
