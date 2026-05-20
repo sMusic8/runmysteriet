@@ -55,6 +55,9 @@ runmysteriet.handler.PlayerHandler = function(stage, platformHandler, applicatio
 
     
     this.deathEffects = [];
+
+    this.cameraHandler = null;
+    this.deathSound = this.application.sounds.sound.get("lose_");
 };
 
 //------------------------------------------------------------------------------
@@ -326,6 +329,7 @@ runmysteriet.handler.PlayerHandler.prototype.updateCollisions = function() {
         this.checkCaveBlockers(player);
         this.checkWaterDeath(player, i);
         this.checkBoatDeath(player, i);
+        this.checkFallDeath(player, i);
     }
 };
 //------------------------------------------------------------------------------
@@ -723,8 +727,30 @@ runmysteriet.handler.PlayerHandler.prototype.getPlatformOffsetY = function(platf
 
     return this.m_avatarPlatformOffsetY;
 };
+
+
+
 //------------------------------------------------------------------------------
-// DEATH CHECKS
+// FALL DEATH
+//------------------------------------------------------------------------------
+
+runmysteriet.handler.PlayerHandler.prototype.checkFallDeath = function(player, index) {
+
+    var fallLimitY = 360;
+
+    if (!player || player.isDead === true) {
+        return;
+    }
+
+    /*
+     * när spelaren faller i tomma hål så dör den 
+     */
+    if (player.y + player.height > fallLimitY) {
+        this.killPlayer(player, index);
+    }
+};
+//------------------------------------------------------------------------------
+// DEATH CHECK WATER
 //------------------------------------------------------------------------------
 
 runmysteriet.handler.PlayerHandler.prototype.checkWaterDeath = function(player, index) {
@@ -879,6 +905,16 @@ runmysteriet.handler.PlayerHandler.prototype.killPlayer = function(player, index
      */
     this.createDeathEffect(player);
 
+    if (this.deathSound) {
+    this.deathSound.play();
+    }
+
+    if (this.cameraHandler &&
+        typeof this.cameraHandler.startDeathSlowMotion === "function"
+    ) {
+        this.cameraHandler.startDeathSlowMotion();
+    }
+
     player.isDead = true;
     player.visible = false;
     player.active = false;
@@ -906,45 +942,82 @@ runmysteriet.handler.PlayerHandler.prototype.killPlayer = function(player, index
 runmysteriet.handler.PlayerHandler.prototype.createDeathEffect = function(player) {
 
     var effect = null;
+    var effectX = 0;
+    var effectY = 0;
+    var cameraY = 0;
+    var screenH = 225;
 
     if (!player) {
         return;
     }
 
+    effectX = player.x - 24;
+    effectY = player.y - 32;
+
+    /*
+     * Om spelaren dör långt ner, håll effekten synlig på skärmen.
+     */
+    if (this.camera && this.camera.viewport) {
+        cameraY = this.camera.viewport.y;
+
+        if (this.application && this.application.screen) {
+            screenH = this.application.screen.height;
+        }
+
+        if (effectY > cameraY + screenH - 90) {
+            effectY = cameraY + screenH - 90;
+        }
+
+        if (effectY < cameraY + 20) {
+            effectY = cameraY + 20;
+        }
+    }
+
     effect = new rune.display.Graphic(
-        player.x - 16,
-        player.y - 16,
-        64,
-        64,
+        effectX,
+        effectY,
+        96,
+        96,
         "death_effect"
     );
 
     /*
-     * 30 fps * 2 sekunder = 60 frames.
+     * 30 fps * 3 sekunder = 90 frames.
      */
-    effect.life = 60;
-    effect.maxLife = 60;
+    effect.life = 90;
+    effect.maxLife = 90;
 
     /*
-     * Rörelse uppåt.
-     * Negativ y = uppåt.
+     * Rörelse:
+     * X positivt = åt höger.
+     * Y negativt = uppåt.
      */
-    effect.velocityY = -1.2;
+    effect.velocityX = 2.3;
+    effect.velocityY = -1.3;
 
     /*
-     * Skala upp bilden.
+     * Liten acceleration uppåt, som att den lyfter mer.
      */
-    effect.scaleX = 1.5;
-    effect.scaleY = 1.5;
+    effect.accelerationY = -0.015;
 
     /*
-     * Hur snabbt den växer lite extra.
+     * Liten drift åt höger.
      */
+    effect.accelerationX = 0.005;
+
+    /*
+     * Storlek och växning.
+     */
+    effect.scaleX = 1;
+    effect.scaleY = 1;
     effect.scaleSpeed = 0.01;
+
+    effect.alpha = 1;
 
     this.deathEffects.push(effect);
     this.stage.addChild(effect);
 };
+
 runmysteriet.handler.PlayerHandler.prototype.createAttack = function(player) {
        
     console.log("Attack skapas");
@@ -1333,8 +1406,12 @@ runmysteriet.handler.PlayerHandler.prototype.updateDeathEffects = function() {
         effect.life--;
 
         /*
-         * Flyg uppåt.
+         * Rörelse mot höger och uppåt.
          */
+        effect.velocityX += effect.accelerationX;
+        effect.velocityY += effect.accelerationY;
+
+        effect.x += effect.velocityX;
         effect.y += effect.velocityY;
 
         /*
@@ -1346,8 +1423,8 @@ runmysteriet.handler.PlayerHandler.prototype.updateDeathEffects = function() {
         /*
          * Fade-out sista delen.
          */
-        if (effect.life < 30) {
-            effect.alpha = effect.life / 30;
+        if (effect.life < 40) {
+            effect.alpha = effect.life / 40;
         }
 
         if (effect.life <= 0) {
@@ -1359,4 +1436,7 @@ runmysteriet.handler.PlayerHandler.prototype.updateDeathEffects = function() {
             this.deathEffects.splice(i, 1);
         }
     }
+};
+runmysteriet.handler.PlayerHandler.prototype.setCameraHandler = function(cameraHandler) {
+    this.cameraHandler = cameraHandler;
 };

@@ -4,8 +4,9 @@
 
 /**
  * Hanterar autoscroll-kamera.
- * Kameran rör sig automatiskt åt höger,
- * men pausas vid vattensegmentet med flotte/båt.
+ * Kameran rör sig automatiskt åt höger.
+ * Kameran pausas när flotten hamnar i mitten av skärmen.
+ * Autoscroll startar igen när alla levande spelare står på flotten.
  *
  * @constructor
  * @param {!rune.camera.Camera} camera
@@ -22,24 +23,34 @@ runmysteriet.handler.AutoScrollCameraHandler = function(camera, playerHandler, p
     this.levelWidth = levelWidth || 0;
 
     /*
-     * Hastighet för autoscroll.
-     * Börja lågt för att inte göra spelet orättvist.
+     * Flytta med hela pixlar för att undvika HUD/text-skakar
      */
-    this.speed = 1.5;
+    this.speed = 2;
 
     /*
-     * Kameran stannar lite före vattenområdet.
+     * 1 = varje frame
+     * 2 = varannan frame
+     * 3 = var tredje frame
      */
-    this.waterStopOffsetX = 20;
+    this.scrollDelay = 1;
+    this.scrollCounter = 0;
+   // this.normalSpeed = this.speed;
+    //this.normalScrollDelay = this.scrollDelay;
+    this.deathSlowTimer = 0;
+    this.deathSlowDuration = 90; // 30 fps * 3 sekunder
+    this.deathSlowScrollDelay = 6;
 
     /*
-     * Spelarna måste passera lite efter vattenområdet
-     * innan autoscroll startar igen.
+     * Raft-paus.
      */
-    this.waterResumeMarginX = 30;
+    this.isPausedForRaft = false;
+    this.currentRaft = null;
 
-    this.isPausedForWater = false;
-    this.currentWaterArea = null;
+    /*
+     * Justering om flotten ska hamna lite mer vänster/höger
+     * när kameran pausar.
+     */
+    this.raftStopOffsetX = 0;
 };
 
 //------------------------------------------------------------------------------
@@ -52,69 +63,41 @@ runmysteriet.handler.AutoScrollCameraHandler = function(camera, playerHandler, p
  * @param {number=} step
  * @return {void}
  */
-
 runmysteriet.handler.AutoScrollCameraHandler.prototype.update = function(step) {
 
     if (!this.camera || !this.camera.viewport) {
         return;
     }
+    this.updateDeathSlowMotion();
 
     /*
-     * Om kameran är pausad vid vatten/flotte:
-     * starta igen endast när alla levande spelare står på flotten.
+     * Om kameran är pausad vid flotten:
+     * vänta tills alla levande spelare står på flotten.
      */
-    if (this.isPausedForWater === true) {
+    if (this.isPausedForRaft === true) {
 
         if (this.areAllActivePlayersOnRaft() === true) {
-            this.isPausedForWater = false;
 
-            if (this.currentWaterArea) {
-                this.currentWaterArea.autoScrollDone = true;
+            if (this.currentRaft) {
+                this.currentRaft.autoScrollDone = true;
             }
 
-            this.currentWaterArea = null;
+            this.currentRaft = null;
+            this.isPausedForRaft = false;
         } else {
             return;
         }
     }
 
     /*
-     * Om kameran inte är pausad:
-     * kontrollera om den ska stanna vid vattenområdet.
+     * Kameran rör sig först.
+     * Sedan kollar vi om flotten nu ligger i mitten.
      */
-    this.checkWaterPause();
-
-    if (this.isPausedForWater === true) {
-        return;
-    }
-
     this.moveCamera();
+
+    this.checkRaftPause();
 };
 
-runmysteriet.handler.AutoScrollCameraHandler.prototype.isAnyActivePlayerOnRaft = function() {
-
-    var i = 0;
-    var player = null;
-
-    if (!this.playerHandler || !this.playerHandler.players) {
-        return false;
-    }
-
-    for (i = 0; i < this.playerHandler.players.length; i++) {
-
-        player = this.playerHandler.players[i];
-
-        if (!player || player.isDead === true) {
-            continue;
-        }
-
-        if (player.currentPlatform && player.currentPlatform.isRaft === true) {
-            return true;
-        }
-    }
-
-    return false;
-};
 //------------------------------------------------------------------------------
 // CAMERA MOVEMENT
 //------------------------------------------------------------------------------
@@ -134,130 +117,107 @@ runmysteriet.handler.AutoScrollCameraHandler.prototype.moveCamera = function() {
         maxX = 0;
     }
 
+    this.scrollCounter++;
+
+    if (this.scrollCounter < this.getCurrentScrollDelay()) {
+    return;
+}
+
+    this.scrollCounter = 0;
+
     this.camera.viewport.x += this.speed;
 
     if (this.camera.viewport.x > maxX) {
         this.camera.viewport.x = maxX;
     }
+
+    /*
+     * Viktigt för att minska HUD/text-skak.
+     */
+    this.camera.viewport.x = Math.round(this.camera.viewport.x);
 };
 
 //------------------------------------------------------------------------------
-// WATER PAUSE
+// RAFT PAUSE
 //------------------------------------------------------------------------------
 
 /**
- * Pausar autoscroll vid vattenområdet och startar igen
- * när alla levande spelare kommit förbi vattnet.
+ * Pausar kameran när flotten hamnar ungefär i mitten av skärmen.
  *
  * @return {void}
  */
-runmysteriet.handler.AutoScrollCameraHandler.prototype.updateWaterPause = function() {
+runmysteriet.handler.AutoScrollCameraHandler.prototype.checkRaftPause = function() {
 
-    var water = null;
+    var raft = null;
 
-    if (!this.platformHandler || !this.platformHandler.waterAreas) {
+    raft = this.findNextRaftToPauseAt();
+
+    if (!raft) {
         return;
     }
 
     /*
-     * Om kameran redan är pausad vid ett vattenområde,
-     * vänta tills alla levande spelare har passerat.
+     * Ingen snap/flytt av kameran här.
+     * Vi pausar bara kameran där den redan är.
      */
-    if (this.isPausedForWater === true) {
-
-        water = this.currentWaterArea;
-
-        if (!water) {
-            this.isPausedForWater = false;
-            return;
-        }
-
-        if (this.haveAllActivePlayersPassedWater(water) === true) {
-            water.autoScrollDone = true;
-            this.currentWaterArea = null;
-            this.isPausedForWater = false;
-        }
-
-        return;
-    }
-
-    /*
-     * Leta efter nästa vattenområde där autoscroll ska pausas.
-     */
-    water = this.findNextWaterAreaToPauseAt();
-
-    if (water) {
-        this.currentWaterArea = water;
-        this.isPausedForWater = true;
-
-        /*
-         * Lås kameran ungefär vid början av vattnet.
-         */
-        this.camera.viewport.x = water.x - this.waterStopOffsetX;
-
-        if (this.camera.viewport.x < 0) {
-            this.camera.viewport.x = 0;
-        }
-    }
+    this.currentRaft = raft;
+    this.isPausedForRaft = true;
 };
 
-
-
-//------------------------------------------------------------------------------
-// WATER PAUSE
-//------------------------------------------------------------------------------
-
-runmysteriet.handler.AutoScrollCameraHandler.prototype.checkWaterPause = function() {
-
-    var water = null;
-
-    if (!this.platformHandler || !this.platformHandler.waterAreas) {
-        return;
-    }
-
-    water = this.findNextWaterAreaToPauseAt();
-
-    if (!water) {
-        return;
-    }
-
-    this.currentWaterArea = water;
-    this.isPausedForWater = true;
-
-    /*
-     * Kameran stannar precis före vatten/flotte-delen.
-     */
-    this.camera.viewport.x = water.x - this.waterStopOffsetX;
-
-    if (this.camera.viewport.x < 0) {
-        this.camera.viewport.x = 0;
-    }
-};
-
-runmysteriet.handler.AutoScrollCameraHandler.prototype.findNextWaterAreaToPauseAt = function() {
+/**
+ * Hittar nästa flotte som kameran ska pausa vid.
+ *
+ * @return {?Object}
+ */
+runmysteriet.handler.AutoScrollCameraHandler.prototype.findNextRaftToPauseAt = function() {
 
     var i = 0;
-    var water = null;
-    var nextCameraX = 0;
+    var platform = null;
+    var raft = null;
 
-    nextCameraX = this.camera.viewport.x + this.speed;
+    var cameraCenterX = 0;
+    var raftCenterX = 0;
 
-    for (i = 0; i < this.platformHandler.waterAreas.length; i++) {
+    if (!this.platformHandler || !this.platformHandler.platforms) {
+        return null;
+    }
 
-        water = this.platformHandler.waterAreas[i];
+    cameraCenterX =
+        this.camera.viewport.x +
+        this.camera.viewport.width / 2;
 
-        if (!water || water.autoScrollDone === true) {
+    for (i = 0; i < this.platformHandler.platforms.length; i++) {
+
+        platform = this.platformHandler.platforms[i];
+
+        if (!platform || platform.isRaft !== true) {
             continue;
         }
 
-        if (nextCameraX >= water.x - this.waterStopOffsetX) {
-            return water;
+        raft = platform;
+
+        if (raft.autoScrollDone === true) {
+            continue;
+        }
+
+        raftCenterX = raft.x + raft.width / 2;
+
+        /*
+         * Pausa först när kamerans mitt har nått flotten.
+         * Ingen kamera-snappning.
+         */
+        if (cameraCenterX >= raftCenterX) {
+            return raft;
         }
     }
 
     return null;
 };
-
+/**
+ * Returnerar true bara när alla levande spelare står på flotten.
+ *
+ * @return {boolean}
+ */
 runmysteriet.handler.AutoScrollCameraHandler.prototype.areAllActivePlayersOnRaft = function() {
 
     var i = 0;
@@ -279,8 +239,7 @@ runmysteriet.handler.AutoScrollCameraHandler.prototype.areAllActivePlayersOnRaft
         hasActivePlayer = true;
 
         /*
-         * Viktigt:
-         * Det räcker inte att spelaren står på en vanlig plattform.
+         * Vanlig plattform räcker inte.
          * Spelaren måste stå på flotten.
          */
         if (!player.currentPlatform || player.currentPlatform.isRaft !== true) {
@@ -289,4 +248,35 @@ runmysteriet.handler.AutoScrollCameraHandler.prototype.areAllActivePlayersOnRaft
     }
 
     return hasActivePlayer;
+};
+
+//------------------------------------------------------------------------------
+// DEATH SLOW MOTION
+//------------------------------------------------------------------------------
+
+runmysteriet.handler.AutoScrollCameraHandler.prototype.startDeathSlowMotion = function() {
+
+    console.log("DEATH SLOW MOTION START");
+
+    this.deathSlowTimer = this.deathSlowDuration;
+
+    /*
+     * Nollställ räknaren så slowmotion märks direkt.
+     */
+    this.scrollCounter = 0;
+};
+
+runmysteriet.handler.AutoScrollCameraHandler.prototype.updateDeathSlowMotion = function() {
+
+    if (this.deathSlowTimer > 0) {
+        this.deathSlowTimer--;
+    }
+};
+runmysteriet.handler.AutoScrollCameraHandler.prototype.getCurrentScrollDelay = function() {
+
+    if (this.deathSlowTimer > 0) {
+        return this.deathSlowScrollDelay;
+    }
+
+    return this.scrollDelay;
 };

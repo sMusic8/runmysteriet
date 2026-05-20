@@ -181,6 +181,7 @@ runmysteriet.scene.Game.prototype.init = function () {
   
 
   this.m_playerHandler.setCamera(this.camera);
+  this.m_playerHandler.setCameraHandler(this.m_cameraHandler);
 
   /*
    * Sjukdomar / hazards
