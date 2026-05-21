@@ -208,55 +208,34 @@ runmysteriet.scene.GuessWord.prototype.updateLetterBoxes = function() {
 
 runmysteriet.scene.GuessWord.prototype.update = function(step) {
 
+    var input = null;
+
     rune.scene.Scene.prototype.update.call(this, step);
 
-    var keyboard = this.keyboard;
-    var gamepad = this.application.inputs.gamepads.get(0);
-
-    // -------------------------------------------------
-    // VOLUME CONTROL (SAME AS MORE SCENE)
-    // -------------------------------------------------
-    if (this.backgroundMusic) {
-
-        var stepVol = 0.1;
-
-        if (keyboard.justPressed("E") || (gamepad && gamepad.justPressed(5))) {
-
-            this.backgroundMusic.volume += stepVol;
-
-            if (this.backgroundMusic.volume > 1) {
-                this.backgroundMusic.volume = 0;
-            }
-
-            console.log("Volym:", this.backgroundMusic.volume.toFixed(2));
-        }
-
-        if (keyboard.justPressed("Q") || (gamepad && gamepad.justPressed(4))) {
-
-            this.backgroundMusic.volume -= stepVol;
-
-            if (this.backgroundMusic.volume < 0) {
-                this.backgroundMusic.volume = 1;
-            }
-
-            console.log("Volym:", this.backgroundMusic.volume.toFixed(2));
-        }
+    if (!this.m_gameInput) {
+        return;
     }
+
+    /*
+     * Läs input EN gång.
+     * GameInput ska läsa keyboard + gamepad 0 + gamepad 1.
+     */
+    input = this.m_gameInput.read(this.keyboard);
+
+    this.updateVolumeInput(input);
 
     if (this.m_answeredCorrect === true) {
 
-        if (this.isConfirmPressed()) {
+        if (this.isConfirmPressed(input)) {
             this.goToLevelComplete();
         }
 
         return;
     }
 
-    if (!this.m_gameInput || !this.m_alphabetSelector || !this.m_puzzle) {
+    if (!this.m_alphabetSelector || !this.m_puzzle) {
         return;
     }
-
-    var input = this.m_gameInput.read(this.keyboard);
 
     if (input.hint) {
         this.buyHint();
@@ -278,6 +257,42 @@ runmysteriet.scene.GuessWord.prototype.update = function(step) {
     if (input.choose) {
         this.checkAnswer(this.m_alphabetSelector.getLetter());
         return;
+    }
+};
+
+//------------------------------------------------------------------------------
+// VOLUME
+//------------------------------------------------------------------------------
+
+runmysteriet.scene.GuessWord.prototype.updateVolumeInput = function(input) {
+
+    var stepVol = 0.1;
+
+    if (!input || !this.backgroundMusic) {
+        return;
+    }
+
+    if (input.volumeUp === true) {
+
+        this.backgroundMusic.volume += stepVol;
+
+        if (this.backgroundMusic.volume > 1) {
+            this.backgroundMusic.volume = 0;
+        }
+
+        console.log("Volym:", this.backgroundMusic.volume.toFixed(2));
+        return;
+    }
+
+    if (input.volumeDown === true) {
+
+        this.backgroundMusic.volume -= stepVol;
+
+        if (this.backgroundMusic.volume < 0) {
+            this.backgroundMusic.volume = 1;
+        }
+
+        console.log("Volym:", this.backgroundMusic.volume.toFixed(2));
     }
 };
 
@@ -344,26 +359,14 @@ runmysteriet.scene.GuessWord.prototype.checkAnswer = function(letter) {
 // CONFIRM
 //------------------------------------------------------------------------------
 
-runmysteriet.scene.GuessWord.prototype.isConfirmPressed = function() {
+runmysteriet.scene.GuessWord.prototype.isConfirmPressed = function(input) {
 
-    var gamepad = this.application.inputs.gamepads.get(0);
-
-    if (this.keyboard.justPressed("ENTER") ||
-        this.keyboard.justPressed("SPACE")) {
-        return true;
+    if (!input) {
+        return false;
     }
 
-    if (gamepad &&
-        (gamepad.justPressed("A") ||
-         gamepad.justPressed("START") ||
-         gamepad.justPressed(0) ||
-         gamepad.justPressed(9))) {
-        return true;
-    }
-
-    return false;
+    return input.choose === true || input.pause === true;
 };
-
 //------------------------------------------------------------------------------
 // LEVEL COMPLETE
 //------------------------------------------------------------------------------

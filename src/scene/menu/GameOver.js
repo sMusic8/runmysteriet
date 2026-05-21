@@ -2,21 +2,47 @@
 // GAME OVER SCENE
 //------------------------------------------------------------------------------
 
+/**
+ * Game over scene.
+ *
+ * @constructor
+ * @extends {rune.scene.Scene}
+ * @param {string=} playerName
+ * @param {number=} score
+ * @param {string=} reason
+ */
 runmysteriet.scene.GameOver = function(playerName, score, reason) {
 
     rune.scene.Scene.call(this);
 
+    /** @type {string} */
     this.m_playerName = playerName || "PLAYER";
+
+    /** @type {number} */
     this.m_score = score || 0;
+
+    /** @type {string} */
     this.m_reason = reason || "GAME OVER";
 
+    /** @type {?rune.text.BitmapField} */
     this.m_title = null;
+
+    /** @type {?rune.text.BitmapField} */
     this.m_scoreText = null;
+
+    /** @type {?runmysteriet.ui.graphic.HighscoreHud} */
     this.m_highscoreHud = null;
+
+    /** @type {?runmysteriet.ui.graphic.MenuList} */
     this.m_menu = null;
 
+    /** @type {?Object} */
     this.m_menuSound = null;
+
+    /** @type {?runmysteriet.input.GameInput} */
     this.m_gameInput = null;
+
+    /** @type {?Object} */
     this.backgroundMusic = null;
 };
 
@@ -34,6 +60,9 @@ runmysteriet.scene.GameOver.prototype.constructor =
 // INIT
 //------------------------------------------------------------------------------
 
+/**
+ * @inheritDoc
+ */
 runmysteriet.scene.GameOver.prototype.init = function() {
 
     rune.scene.Scene.prototype.init.call(this);
@@ -60,6 +89,11 @@ runmysteriet.scene.GameOver.prototype.init = function() {
 // CREATE
 //------------------------------------------------------------------------------
 
+/**
+ * Skapar titeltext.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.GameOver.prototype.createTitle = function() {
 
     this.m_title = new rune.text.BitmapField("GAME OVER");
@@ -72,6 +106,11 @@ runmysteriet.scene.GameOver.prototype.createTitle = function() {
     this.stage.addChild(this.m_title);
 };
 
+/**
+ * Skapar scoretext.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.GameOver.prototype.createScoreText = function() {
 
     this.m_scoreText = new rune.text.BitmapField(
@@ -85,6 +124,11 @@ runmysteriet.scene.GameOver.prototype.createScoreText = function() {
     this.stage.addChild(this.m_scoreText);
 };
 
+/**
+ * Skapar meny.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.GameOver.prototype.createMenu = function() {
 
     this.m_menu = new runmysteriet.ui.graphic.MenuList(
@@ -97,6 +141,11 @@ runmysteriet.scene.GameOver.prototype.createMenu = function() {
     );
 };
 
+/**
+ * Skapar highscore-listan.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.GameOver.prototype.createHighscoreHud = function() {
 
     this.m_highscoreHud = new runmysteriet.ui.graphic.HighscoreHud(
@@ -110,6 +159,11 @@ runmysteriet.scene.GameOver.prototype.createHighscoreHud = function() {
     this.stage.addChild(this.m_highscoreHud);
 };
 
+/**
+ * Positionerar menyn.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.GameOver.prototype.positionMenu = function() {
 
     var camera = this.cameras.getCameraAt(0);
@@ -120,42 +174,46 @@ runmysteriet.scene.GameOver.prototype.positionMenu = function() {
 
     if (this.m_menu.setCameraPosition && camera) {
         this.m_menu.setCameraPosition(camera, 155, 95);
-        return;
     }
-
-    this.m_menu.x = 155;
-    this.m_menu.y = 95;
 };
 
 //------------------------------------------------------------------------------
 // UPDATE
 //------------------------------------------------------------------------------
 
+/**
+ * @inheritDoc
+ */
 runmysteriet.scene.GameOver.prototype.update = function(step) {
 
-    rune.scene.Scene.prototype.update.call(this, step);
-
-    this.handleInput();
-};
-
-//------------------------------------------------------------------------------
-// INPUT
-//------------------------------------------------------------------------------
-
-runmysteriet.scene.GameOver.prototype.handleInput = function() {
-
     var input = null;
+
+    rune.scene.Scene.prototype.update.call(this, step);
 
     if (!this.m_gameInput) {
         return;
     }
 
+    /*
+     * Läs input en gång.
+     * GameInput ska läsa keyboard + gamepad 0 + gamepad 1.
+     */
     input = this.m_gameInput.read(this.keyboard);
 
     this.handleMenuInput(input);
     this.handleVolumeInput(input);
 };
 
+//------------------------------------------------------------------------------
+// INPUT
+//------------------------------------------------------------------------------
+
+/**
+ * Hanterar menyinput.
+ *
+ * @param {!Object} input
+ * @return {void}
+ */
 runmysteriet.scene.GameOver.prototype.handleMenuInput = function(input) {
 
     if (!this.m_menu || !input) {
@@ -177,6 +235,12 @@ runmysteriet.scene.GameOver.prototype.handleMenuInput = function(input) {
     }
 };
 
+/**
+ * Hanterar volym.
+ *
+ * @param {!Object} input
+ * @return {void}
+ */
 runmysteriet.scene.GameOver.prototype.handleVolumeInput = function(input) {
 
     var stepVol = 0.1;
@@ -186,19 +250,26 @@ runmysteriet.scene.GameOver.prototype.handleVolumeInput = function(input) {
     }
 
     if (input.volumeUp) {
+
         this.backgroundMusic.volume += stepVol;
 
         if (this.backgroundMusic.volume > 1) {
             this.backgroundMusic.volume = 0;
         }
+
+        console.log("Volym:", this.backgroundMusic.volume.toFixed(2));
+        return;
     }
 
     if (input.volumeDown) {
+
         this.backgroundMusic.volume -= stepVol;
 
         if (this.backgroundMusic.volume < 0) {
             this.backgroundMusic.volume = 1;
         }
+
+        console.log("Volym:", this.backgroundMusic.volume.toFixed(2));
     }
 };
 
@@ -206,6 +277,11 @@ runmysteriet.scene.GameOver.prototype.handleVolumeInput = function(input) {
 // CHOOSE
 //------------------------------------------------------------------------------
 
+/**
+ * Utför valt menyval.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.GameOver.prototype.chooseMenuItem = function() {
 
     var selectedIndex = 0;
@@ -217,10 +293,20 @@ runmysteriet.scene.GameOver.prototype.chooseMenuItem = function() {
     selectedIndex = this.m_menu.getSelectedIndex();
 
     if (selectedIndex === 0) {
+
+        this.stopBackgroundMusic();
+
         this.application.scenes.load([
-            new runmysteriet.scene.Game(1, 0, this.m_playerName)
+            new runmysteriet.scene.AvatarSelect()        
         ]);
-    } else if (selectedIndex === 1) {
+
+        return;
+    }
+
+    if (selectedIndex === 1) {
+
+        this.stopBackgroundMusic();
+
         this.application.scenes.load([
             new runmysteriet.scene.Menu()
         ]);
@@ -231,6 +317,11 @@ runmysteriet.scene.GameOver.prototype.chooseMenuItem = function() {
 // SOUND
 //------------------------------------------------------------------------------
 
+/**
+ * Spelar menyljud.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.GameOver.prototype.playMenuSound = function() {
 
     if (this.m_menuSound) {
@@ -238,29 +329,11 @@ runmysteriet.scene.GameOver.prototype.playMenuSound = function() {
     }
 };
 
-//------------------------------------------------------------------------------
-// DISPOSE
-//------------------------------------------------------------------------------
-
-runmysteriet.scene.GameOver.prototype.dispose = function() {
-
-    if (this.m_menu) {
-        this.m_menu.clear();
-        this.m_menu = null;
-    }
-
-    this.stopBackgroundMusic();
-
-    this.m_title = null;
-    this.m_scoreText = null;
-    this.m_highscoreHud = null;
-    this.m_menuSound = null;
-    this.m_gameInput = null;
-    this.backgroundMusic = null;
-
-    rune.scene.Scene.prototype.dispose.call(this);
-};
-
+/**
+ * Stoppar bakgrundsmusik.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.GameOver.prototype.stopBackgroundMusic = function() {
 
     if (!this.backgroundMusic) {
@@ -281,4 +354,47 @@ runmysteriet.scene.GameOver.prototype.stopBackgroundMusic = function() {
             }
         }
     }
+};
+
+//------------------------------------------------------------------------------
+// DISPOSE
+//------------------------------------------------------------------------------
+
+/**
+ * @inheritDoc
+ */
+runmysteriet.scene.GameOver.prototype.dispose = function() {
+
+    this.stopBackgroundMusic();
+
+    if (this.m_menu) {
+        if (typeof this.m_menu.dispose === "function") {
+            this.m_menu.dispose();
+        } else {
+            this.m_menu.clear();
+        }
+
+        this.m_menu = null;
+    }
+
+    if (this.m_title && this.m_title.stage) {
+        this.m_title.stage.removeChild(this.m_title);
+    }
+
+    if (this.m_scoreText && this.m_scoreText.stage) {
+        this.m_scoreText.stage.removeChild(this.m_scoreText);
+    }
+
+    if (this.m_highscoreHud && this.m_highscoreHud.stage) {
+        this.m_highscoreHud.stage.removeChild(this.m_highscoreHud);
+    }
+
+    this.m_title = null;
+    this.m_scoreText = null;
+    this.m_highscoreHud = null;
+    this.m_menuSound = null;
+    this.m_gameInput = null;
+    this.backgroundMusic = null;
+
+    rune.scene.Scene.prototype.dispose.call(this);
 };

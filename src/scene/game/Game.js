@@ -1,8 +1,7 @@
 //------------------------------------------------------------------------------
 // GAME SCENE
 //------------------------------------------------------------------------------
-
-runmysteriet.scene.Game = function (levelNumber, score, playerName) {
+runmysteriet.scene.Game = function (levelNumber, score, avatarData) {
   rune.scene.Scene.call(this);
 
   this.m_playerHandler = null;
@@ -18,7 +17,8 @@ runmysteriet.scene.Game = function (levelNumber, score, playerName) {
   this.m_levelConfig = null;
   this.m_levelNumber = levelNumber || 1;
   this.m_score = score || 0;
-  this.m_playerName = playerName || "PLAYER";
+  this.m_avatarData = avatarData || null;
+  this.m_playerName = "PLAYER";
 
   this.m_isPaused = false;
   this.m_pauseTitle = null;
@@ -91,6 +91,17 @@ runmysteriet.scene.Game.prototype.init = function () {
   this.m_gameInput = new runmysteriet.input.GameInput(this.application);
   this.camera = this.cameras.getCameraAt(0);
 
+
+    var p1Texture = "spritesheet_freya_all";
+  var p2Texture = "spritesheet_thor_all";
+
+  if (this.avatarData && this.avatarData.player1) {
+      p1Texture = this.avatarData.player1.texture;
+  }
+
+  if (this.avatarData && this.avatarData.player2) {
+      p2Texture = this.avatarData.player2.texture;
+  }
   /*
    * Musik
    */
@@ -147,7 +158,8 @@ runmysteriet.scene.Game.prototype.init = function () {
     this.m_platformHandler,
     this.application,
     this.m_gameInput,
-    this.keyboard
+    this.keyboard,
+    this.m_avatarData
   );
 
   this.m_playerHandler.init();
@@ -245,7 +257,7 @@ this.m_armorHandler.onArmorCollected = function(player, armor) {
 //------------------------------------------------------------------------------
 
 runmysteriet.scene.Game.prototype.update = function(step) {
-
+        var input = this.m_gameInput.read(this.keyboard);
     /*
      * Debug-snabbval.
      */
@@ -270,44 +282,23 @@ runmysteriet.scene.Game.prototype.update = function(step) {
         return;
     }
 
-    this.updatePauseInput();
+    this.updatePauseInput(input);
+    this.updateVolumeInput(input);
 
-    /*
-     * Volume control.
-     */
-    if (this.backgroundMusic) {
+    if (this.m_isPaused === true) {
+        this.updatePauseMenuPosition();
+        this.updateHUD();
+        return;
+    }
 
-        var keyboard = this.keyboard;
-        var gamepad = this.application.inputs.gamepads.get(0);
-        var stepVol = 0.1;
-
-        if (keyboard.justPressed("R") || (gamepad && gamepad.justPressed(5))) {
-
-            this.backgroundMusic.volume += stepVol;
-
-            if (this.backgroundMusic.volume > 1) {
-                this.backgroundMusic.volume = 0;
-            }
-
-            console.log("Volym:", this.backgroundMusic.volume.toFixed(2));
-        }
-
-        if (keyboard.justPressed("Q") || (gamepad && gamepad.justPressed(4))) {
-
-            this.backgroundMusic.volume -= stepVol;
-
-            if (this.backgroundMusic.volume < 0) {
-                this.backgroundMusic.volume = 1;
-            }
-
-            console.log("Volym:", this.backgroundMusic.volume.toFixed(2));
-        }
+    if (this.m_gameEnd === true) {
+        this.updateHUD();
+        return;
     }
 
     if (this.m_startCountdownActive === true) {
-    rune.scene.Scene.prototype.update.call(this, step);
-
-    this.updateStartCountdown();
+        rune.scene.Scene.prototype.update.call(this, step);
+        this.updateStartCountdown();
 
     if (this.m_backgroundHandler) {
         this.m_backgroundHandler.update();
@@ -317,15 +308,7 @@ runmysteriet.scene.Game.prototype.update = function(step) {
     return;
 }
 
-    if (this.m_isPaused === true) {
-        this.updateHUD();
-        return;
-    }
 
-    if (this.m_gameEnd === true) {
-        this.updateHUD();
-        return;
-    }
 
     rune.scene.Scene.prototype.update.call(this, step);
 
@@ -340,8 +323,7 @@ runmysteriet.scene.Game.prototype.update = function(step) {
      * Plattformar / holes.
      * Detta uppdaterar bland annat lavaeffekten i Hole.
      */
-    if (
-        this.m_platformHandler &&
+    if (this.m_platformHandler &&
         typeof this.m_platformHandler.update === "function"
     ) {
         this.m_platformHandler.update(step);
@@ -403,12 +385,6 @@ runmysteriet.scene.Game.prototype.update = function(step) {
 
     this.updateTimer();
     this.updateHUD();
-};
-
-runmysteriet.scene.Game.prototype.updateHUD = function () {
-  if (this.m_hudHandler) {
-    this.m_hudHandler.update();
-  }
 };
 
 //------------------------------------------------------------------------------
@@ -595,62 +571,81 @@ runmysteriet.scene.Game.prototype.closeStartCountdown = function() {
 };
 
 //------------------------------------------------------------------------------
+// VOLUME
+//------------------------------------------------------------------------------
+
+runmysteriet.scene.Game.prototype.updateVolumeInput = function(input) {
+
+    var stepVol = 0.1;
+
+    if (!input || !this.backgroundMusic) {
+        return;
+    }
+
+    if (input.volumeUp === true) {
+
+        this.backgroundMusic.volume += stepVol;
+
+        if (this.backgroundMusic.volume > 1) {
+            this.backgroundMusic.volume = 0;
+        }
+
+        console.log("Volym:", this.backgroundMusic.volume.toFixed(2));
+        return;
+    }
+
+    if (input.volumeDown === true) {
+
+        this.backgroundMusic.volume -= stepVol;
+
+        if (this.backgroundMusic.volume < 0) {
+            this.backgroundMusic.volume = 1;
+        }
+
+        console.log("Volym:", this.backgroundMusic.volume.toFixed(2));
+    }
+};
+
+//------------------------------------------------------------------------------
 // PAUSE
 //------------------------------------------------------------------------------
 
-runmysteriet.scene.Game.prototype.updatePauseInput = function () {
-  if (this.m_gameEnd === true) {
-    return;
-  }
+runmysteriet.scene.Game.prototype.updatePauseInput = function(input) {
 
-  if (this.isPauseButtonPressed()) {
-    if (this.m_isPaused === true) {
-      this.closePauseMenu();
-    } else {
-      this.openPauseMenu();
+    if (this.m_gameEnd === true) {
+        return;
     }
 
-    return;
-  }
-
-  if (this.m_isPaused !== true) {
-    return;
-  }
-
-  this.updatePauseMenuPosition();
-
-  this.handleMenuListInput(this.m_pauseMenu, function (selectedIndex) {
-    if (selectedIndex === 0) {
-      this.closePauseMenu();
-    } else if (selectedIndex === 1) {
-      this.quitToMenu();
+    if (!input) {
+        input = this.m_gameInput.read(this.keyboard);
     }
-  });
-};
 
-runmysteriet.scene.Game.prototype.isPauseButtonPressed = function () {
-  var gamepad = null;
-  var startIsPressed = false;
+    if (input.pause === true) {
 
-  if (
-    this.application &&
-    this.application.inputs &&
-    this.application.inputs.gamepads
-  ) {
-    gamepad = this.application.inputs.gamepads.get(0);
-  }
+        if (this.m_isPaused === true) {
+            this.closePauseMenu();
+        } else {
+            this.openPauseMenu();
+        }
 
-  if (gamepad !== null && gamepad !== undefined) {
-    if (typeof gamepad.justPressed === "function") {
-      startIsPressed = gamepad.justPressed("START") || gamepad.justPressed(9);
+        return;
     }
-  }
 
-  return (
-    this.keyboard.justPressed("P") ||
-    this.keyboard.justPressed("ESCAPE") ||
-    startIsPressed
-  );
+    if (this.m_isPaused !== true) {
+        return;
+    }
+
+    this.updatePauseMenuPosition();
+
+    this.handleMenuListInput(this.m_pauseMenu, 
+      input,
+      function(selectedIndex) {
+        if (selectedIndex === 0) {
+            this.closePauseMenu();
+        } else if (selectedIndex === 1) {
+            this.quitToMenu();
+        }
+    });
 };
 
 runmysteriet.scene.Game.prototype.createPauseMenu = function () {
@@ -787,33 +782,26 @@ runmysteriet.scene.Game.prototype.playMenuSound = function () {
   }
 };
 
-runmysteriet.scene.Game.prototype.handleMenuListInput = function (
-  menuList,
-  onChoose
-) {
-  var input = null;
+runmysteriet.scene.Game.prototype.handleMenuListInput = function(menuList, input, onChoose) {
 
-  if (!menuList) {
-    return;
-  }
+    if (!menuList || !input) {
+        return;
+    }
 
-  input = this.m_gameInput.read(this.keyboard);
+    if (input.down) {
+        this.playMenuSound();
+        menuList.moveNext();
+    }
 
-  if (input.down) {
-    this.playMenuSound();
-    menuList.moveNext();
-  }
+    if (input.up) {
+        this.playMenuSound();
+        menuList.movePrevious();
+    }
 
-  if (input.up) {
-    this.playMenuSound();
-    menuList.movePrevious();
-  }
-
-  if (input.choose) {
-    onChoose.call(this, menuList.getSelectedIndex());
-  }
+    if (input.choose) {
+        onChoose.call(this, menuList.getSelectedIndex());
+    }
 };
-
 //------------------------------------------------------------------------------
 // TIMER
 //------------------------------------------------------------------------------

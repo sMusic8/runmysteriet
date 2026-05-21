@@ -188,7 +188,7 @@ runmysteriet.scene.Menu.prototype.chooseSelected = function() {
 
     if (selectedIndex === 0) {
         this.application.scenes.load([
-            new runmysteriet.scene.TextInputView()
+            new runmysteriet.scene.AvatarSelect()
         ]);
     } else if (selectedIndex === 1) {
         this.application.scenes.load([new runmysteriet.scene.More()]);

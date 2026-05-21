@@ -12,8 +12,7 @@
  * @param {!Object} platformHandler
  * @param {!Object} application
  */
-runmysteriet.handler.PlayerHandler = function(stage, platformHandler, application, input,keyboard) {
-
+runmysteriet.handler.PlayerHandler = function(stage, platformHandler, application, input, keyboard, avatarData) {
     /** @type {!rune.display.Stage} */
     this.stage = stage;
 
@@ -58,6 +57,8 @@ runmysteriet.handler.PlayerHandler = function(stage, platformHandler, applicatio
 
     this.cameraHandler = null;
     this.deathSound = this.application.sounds.sound.get("lose_");
+
+    this.avatarData = avatarData || null;
 };
 
 //------------------------------------------------------------------------------
@@ -66,20 +67,33 @@ runmysteriet.handler.PlayerHandler = function(stage, platformHandler, applicatio
 
 runmysteriet.handler.PlayerHandler.prototype.init = function() {
 
+
+    var player1Texture = "spritesheet_freya_all";
+    var player2Texture = "spritesheet_thor_all";
+
+    if (
+        this.avatarData &&
+        this.avatarData.player1 &&
+        this.avatarData.player1.texture
+    ) {
+        player1Texture = this.avatarData.player1.texture;
+    }
+
+    if (
+        this.avatarData &&
+        this.avatarData.player2 &&
+        this.avatarData.player2.texture
+    ) {
+        player2Texture = this.avatarData.player2.texture;
+    }
     var player1 = new runmysteriet.entity.Player(
         { left: "LEFT", right: "RIGHT", jump: "UP", down: "DOWN" },
-        {
-            texture: "spritesheet_freya_all",
-            start: "idle"
-        }
+        { texture: player1Texture, start: "idle" }
 );
 
     var player2 = new runmysteriet.entity.Player(
         { left: "A", right: "D", jump: "W", down: "S" },
-        {
-            texture: "spritesheet_thor_all",
-            start: "idle"
-        }
+        { texture: player2Texture, start: "idle" }
 );
 
     player1.direction = 1;

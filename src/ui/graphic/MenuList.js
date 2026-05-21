@@ -1,5 +1,3 @@
-var runmysteriet = runmysteriet || {};
-runmysteriet.ui = runmysteriet.ui || {};
 
 /**
  * Menu list UI component.
@@ -62,8 +60,7 @@ runmysteriet.ui.graphic.MenuList.prototype.create = function() {
 
     for (i = 0; i < this.labels.length; i++) {
 
-        item = new rune.text.BitmapField(this.labels[i]);
-        item.autoSize = true;
+        item = new rune.text.BitmapField(String(this.labels[i] || ""));        item.autoSize = true;
 /*
          * Rune använder scaleX och scaleY.
          * item.scale fungerar inte som riktig Rune-skalning.
@@ -103,7 +100,7 @@ runmysteriet.ui.graphic.MenuList.prototype.moveNext = function() {
 };
 
 /**
- * Move selection up.
+ * flytta markören uppåt
  * @return {void}
  */
 runmysteriet.ui.graphic.MenuList.prototype.movePrevious = function() {
@@ -124,26 +121,27 @@ runmysteriet.ui.graphic.MenuList.prototype.movePrevious = function() {
  */
 runmysteriet.ui.graphic.MenuList.prototype.updateSelection = function() {
 
-    /** @type {?rune.text.BitmapField} */
     var item = null;
-
-    /** @type {string} */
-    var text = "";
-
+    var label = "";
     var i = 0;
 
     for (i = 0; i < this.items.length; i++) {
+
         item = this.items[i];
-        text = item.text.replace("> ", "");
+
+        if (!item) {
+            continue;
+        }
+
+        label = String(this.labels[i] || "");
 
         if (i === this.selectedIndex) {
-            item.text = "> " + text;
+            item.text = "> " + label;
         } else {
-            item.text = text;
+            item.text = "  " + label;
         }
     }
 };
-
 /**
  * @return {number}
  */
@@ -225,77 +223,39 @@ runmysteriet.ui.graphic.MenuList.prototype.setCameraPosition = function(camera, 
 //------------------------------------------------------------------------------
 
 /**
- * Removes all items.
+ * tar bort alla menyval från scenen och tömmer items-arrayen
  * @return {void}
  */
 runmysteriet.ui.graphic.MenuList.prototype.clear = function() {
 
-    /** @type {?rune.text.BitmapField} */
     var item = null;
-
     var i = 0;
 
     for (i = 0; i < this.items.length; i++) {
         item = this.items[i];
 
-        if (item && item.parent) {
-            item.parent.removeChild(item);
+        if (item && item.stage) {
+            item.stage.removeChild(item);
         }
     }
 
     this.items = [];
 };
-
 //------------------------------------------------------------------------------
-// INPUT
+// DISPOSE
 //------------------------------------------------------------------------------
 
 /**
- * Reads input from keyboard/gamepad.
- * @param {?Object} keyboard
- * @return {{up:boolean, down:boolean, choose:boolean}}
+ * Rensar menylistan och släpper referenser.
+ *
+ * @return {void}
  */
-runmysteriet.ui.graphic.MenuList.prototype.readInput = function(keyboard) {
+runmysteriet.ui.graphic.MenuList.prototype.dispose = function() {
 
-    /** @type {?Object} */
-    var gamepad = null;
+    this.clear();
 
-    /** @type {{up:boolean, down:boolean, choose:boolean}} */
-    var input = {
-        up: false,
-        down: false,
-        choose: false
-    };
-
-    if (this.application && this.application.inputs && this.application.inputs.gamepads) {
-        gamepad = this.application.inputs.gamepads.get(0);
-    }
-
-    if (gamepad !== null && gamepad !== undefined) {
-        if (typeof gamepad.justPressed === "function") {
-
-            input.choose =
-                gamepad.justPressed("START") ||
-                gamepad.justPressed(9) ||
-                gamepad.justPressed(0);
-
-            input.down =
-                gamepad.justPressed("DOWN") ||
-                gamepad.justPressed(13);
-
-            input.up =
-                gamepad.justPressed("UP") ||
-                gamepad.justPressed(12);
-        }
-    }
-
-    if (keyboard) {
-        input.down = input.down || keyboard.justPressed("DOWN");
-        input.up = input.up || keyboard.justPressed("UP");
-        input.choose = input.choose ||
-            keyboard.justPressed("SPACE") ||
-            keyboard.justPressed("ENTER");
-    }
-
-    return input;
+    this.stage = null;
+    this.application = null;
+    this.labels = [];
+    this.items = [];
 };

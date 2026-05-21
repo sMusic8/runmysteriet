@@ -5,9 +5,10 @@ runmysteriet.scene = runmysteriet.scene || {};
 // LEVEL COMPLETE SCENE
 //------------------------------------------------------------------------------
 
-runmysteriet.scene.LevelComplete = function(levelNumber, totalScore, earnedScore, playerName) {
-console.log("grus")
+runmysteriet.scene.LevelComplete = function(levelNumber, totalScore, earnedScore, playerName, avatarData) {
+    console.log("grus")
     rune.scene.Scene.call(this);
+    this.m_avatarData = avatarData || null;
 
     this.levelNumber = levelNumber || 1;
     this.totalScore = totalScore || 0;
@@ -189,7 +190,7 @@ runmysteriet.scene.LevelComplete.prototype.chooseSelected = function() {
             new runmysteriet.scene.Game(
                 this.levelNumber + 1,
                 this.totalScore,
-                this.playerName
+                this.m_avatarData
             )
         ]);
 

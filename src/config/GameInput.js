@@ -31,8 +31,6 @@ runmysteriet.input.GameInput = function(application) {
  */
 runmysteriet.input.GameInput.prototype.read = function(keyboard) {
 
-    var gamepad = this.getGamepad();
-
     var input = {
         up: false,
         down: false,
@@ -50,13 +48,44 @@ runmysteriet.input.GameInput.prototype.read = function(keyboard) {
         this.m_scrollCooldown--;
     }
 
+    /*
+     * Keyboard.
+     */
     this.readKeyboard(keyboard, input);
-    this.readGamepadButtons(gamepad, input);
-    this.applyStickInput(gamepad, input);
+
+    /*
+     * Båda gamepads används för meny/global input.
+     * Det gör att både joystick 1 och joystick 2 kan pausa,
+     * välja i menyer och ändra volym.
+     */
+    this.readGamepadByIndex(0, input);
+    this.readGamepadByIndex(1, input);
 
     return input;
 };
+/**
+ * Läser en specifik gamepad för global/meny-input.
+ *
+ * @param {number} index
+ * @param {!Object} input
+ * @return {void}
+ */
 
+
+//------------------------------------------------------------------------------
+// GAMEPAD
+//------------------------------------------------------------------------------
+runmysteriet.input.GameInput.prototype.readGamepadByIndex = function(index, input) {
+
+    var gamepad = this.getGamepadByIndex(index);
+
+    if (!gamepad) {
+        return;
+    }
+
+    this.readGamepadButtons(gamepad, input);
+    this.applyStickInput(gamepad, input);
+};
 //------------------------------------------------------------------------------
 // KEYBOARD
 //------------------------------------------------------------------------------
@@ -94,8 +123,8 @@ runmysteriet.input.GameInput.prototype.readKeyboard = function(keyboard, input) 
         keyboard.justPressed("ESCAPE");
 
     input.volumeUp = input.volumeUp ||
-        keyboard.justPressed("E") ||
-        keyboard.justPressed("e");
+        keyboard.justPressed("R") ||
+        keyboard.justPressed("r");
 
     input.volumeDown = input.volumeDown ||
         keyboard.justPressed("Q") ||
@@ -294,6 +323,32 @@ runmysteriet.input.GameInput.prototype.readPlayer = function(keyboard, playerInd
         attack: false
     };
 
+    var axisX = 0;
+    var axisY = 0;
+    var deadZone = 0.35;
+
+    axisX = this.getGamepadAxis(gamepad, 0);
+    axisY = this.getGamepadAxis(gamepad, 1);
+
+    /*
+    * Vänster analogspak.
+    */
+    if (axisX < -deadZone) {
+        input.left = true;
+    }
+
+    if (axisX > deadZone) {
+        input.right = true;
+    }
+
+    if (axisY < -deadZone) {
+        input.up = true;
+    }
+
+    if (axisY > deadZone) {
+        input.down = true;
+    }
+
     this.readPlayerKeyboard(keyboard, playerIndex, input);
     this.readPlayerGamepad(gamepad, input);
     this.applyPlayerStickInput(gamepad, input);
@@ -365,6 +420,12 @@ runmysteriet.input.GameInput.prototype.readPlayerGamepad = function(gamepad, inp
             gamepad.pressed("RIGHT") ||
             gamepad.pressed("DPAD_RIGHT") ||
             gamepad.pressed(15);
+            
+        input.up = input.up ||
+            gamepad.pressed("UP") ||
+            gamepad.pressed("DPAD_UP") ||
+            gamepad.pressed(12);
+
 
         input.down = input.down ||
             gamepad.pressed("DOWN") ||
@@ -413,4 +474,36 @@ runmysteriet.input.GameInput.prototype.applyPlayerStickInput = function(gamepad,
     if (y > 0.5) {
         input.down = true;
     }
+};
+
+//------------------------------------------------------------------------------
+// GAMEPAD AXIS
+//------------------------------------------------------------------------------
+
+/**
+ * Läser analoga spak från gamepad
+ *
+ * @param {!Object} gamepad
+ * @param {number} index
+ * @return {number}
+ */
+runmysteriet.input.GameInput.prototype.getGamepadAxis = function(gamepad, index) {
+
+    if (!gamepad) {
+        return 0;
+    }
+
+    if (typeof gamepad.axis === "function") {
+        return gamepad.axis(index) || 0;
+    }
+
+    if (typeof gamepad.getAxis === "function") {
+        return gamepad.getAxis(index) || 0;
+    }
+
+    if (gamepad.axes && gamepad.axes.length > index) {
+        return gamepad.axes[index] || 0;
+    }
+
+    return 0;
 };

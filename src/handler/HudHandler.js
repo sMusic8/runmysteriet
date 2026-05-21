@@ -202,9 +202,9 @@ runmysteriet.handler.HudHandler.prototype.update = function() {
  */
 runmysteriet.handler.HudHandler.prototype.setTimerText = function(text) {
 
-    if (this.m_timerText) {
-        this.m_timerText.text = text;
-    }
+    if (this.m_timerText && this.m_timerText.text !== text) {
+    this.m_timerText.text = text;
+}
 };
 
 /**
