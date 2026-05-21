@@ -51,14 +51,6 @@ runmysteriet.ui.graphic.Raft.prototype.start = function() {
 runmysteriet.ui.graphic.Raft.prototype = Object.create(rune.display.Graphic.prototype);
 runmysteriet.ui.graphic.Raft.prototype.constructor = runmysteriet.ui.graphic.Raft;
 
-runmysteriet.ui.graphic.Raft.prototype.start = function() {
-     if (this.hasArrived === true) {
-        return;
-    }
-
-    this.hasStarted = true;
-};
-
 runmysteriet.ui.graphic.Raft.prototype.update = function(step) {
 
     /*

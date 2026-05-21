@@ -131,47 +131,6 @@ runmysteriet.handler.EnemyHandler.prototype.update = function(players) {
     }
 };
 
-//------------------------------------------------------------------------------
-// CLEAR
-//------------------------------------------------------------------------------
-
-/**
- * Removes all enemies from stage.
- *
- * @return {void}
- */
-runmysteriet.handler.EnemyHandler.prototype.clear = function() {
-
-    var i = 0;
-    var enemy = null;
-
-    for (i = 0; i < this.enemies.length; i++) {
-
-        enemy = this.enemies[i];
-
-        if (!enemy) {
-            continue;
-        }
-
-        /*
-         * Kristen skapar hpBar separat och lägger den direkt på stage.
-         * Därför måste hpBar tas bort separat innan fienden tas bort.
-         */
-        if (enemy.hpBar && enemy.hpBar.stage) {
-            enemy.hpBar.stage.removeChild(enemy.hpBar);
-            enemy.hpBar = null;
-        }
-
-        /*
-         * Ta bort själva fienden från stage.
-         */
-        if (enemy.stage) {
-            enemy.stage.removeChild(enemy);
-        }
-    }
-
-    this.enemies = [];
-};
 
 runmysteriet.handler.EnemyHandler.prototype.createKristenCave = function(spawn) {
 
@@ -223,4 +182,65 @@ runmysteriet.handler.EnemyHandler.prototype.createKristenCave = function(spawn) 
         cave: cave,
         blocker: blocker
     };
+};
+
+//------------------------------------------------------------------------------
+// CLEAR
+//------------------------------------------------------------------------------
+
+/**
+ * Removes all enemies from stage.
+ *
+ * @return {void}
+ */
+runmysteriet.handler.EnemyHandler.prototype.clear = function() {
+
+    var i = 0;
+    var enemy = null;
+
+    for (i = 0; i < this.enemies.length; i++) {
+
+        enemy = this.enemies[i];
+
+        if (!enemy) {
+            continue;
+        }
+
+        /*
+         * Kristen skapar hpBar separat och lägger den direkt på stage.
+         * Därför måste hpBar tas bort separat innan fienden tas bort.
+         */
+        if (enemy.hpBar && enemy.hpBar.stage) {
+            enemy.hpBar.stage.removeChild(enemy.hpBar);
+            enemy.hpBar = null;
+        }
+
+        /*
+         * Ta bort själva fienden från stage.
+         */
+        if (enemy.stage) {
+            enemy.stage.removeChild(enemy);
+        }
+    }
+
+    for (i = 0; i < this.caves.length; i++) {
+    cave = this.caves[i];
+
+    if (cave !== null && cave.parent !== null) {
+        cave.parent.removeChild(cave);
+    }
+}
+
+for (i = 0; i < this.caveBlockers.length; i++) {
+    blocker = this.caveBlockers[i];
+
+    if (blocker !== null && blocker.parent !== null) {
+        blocker.parent.removeChild(blocker);
+    }
+}
+
+this.caves = [];
+this.caveBlockers = [];
+
+    this.enemies = [];
 };

@@ -90,3 +90,17 @@ runmysteriet.handler.CloudHandler.prototype.update = function() {
         }
     }
 };
+runmysteriet.handler.CloudHandler.prototype.clear = function() {
+    var i = 0;
+    var cloud = null;
+
+    for (i = 0; i < this.m_clouds.length; i++) {
+        cloud = this.m_clouds[i];
+
+        if (cloud !== null && cloud.parent !== null) {
+            cloud.parent.removeChild(cloud);
+        }
+    }
+
+    this.m_clouds = [];
+};

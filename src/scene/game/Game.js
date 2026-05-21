@@ -1113,28 +1113,208 @@ runmysteriet.scene.Game.prototype.restartLevel = function () {
 };
 
 //------------------------------------------------------------------------------
+// REMOVE DISPLAY OBJECT
+//------------------------------------------------------------------------------
+
+/**
+ * Tar bort ett objekt från scenen om det finns där.
+ *
+ * @param {?Object} object
+ * @return {void}
+ */
+runmysteriet.scene.Game.prototype.removeDisplayObject = function(object) {
+
+    if (!object) {
+        return;
+    }
+
+    if (object.parent) {
+        object.parent.removeChild(object);
+        return;
+    }
+
+    if (object.stage) {
+        object.stage.removeChild(object);
+    }
+};
+
+//------------------------------------------------------------------------------
 // DISPOSE
 //------------------------------------------------------------------------------
 
-runmysteriet.scene.Game.prototype.dispose = function () {
-  if (this.m_enemyHandler) {
-    this.m_enemyHandler.clear();
-  }
+/**
+ * Rensar Game-scenen.
+ *
+ * Ordningen är motsatt mot init:
+ * det som skapas sist i init rensas först här.
+ *
+ * @return {void}
+ */
+runmysteriet.scene.Game.prototype.dispose = function() {
 
-  if (this.m_armorHandler) {
-    this.m_armorHandler.clear();
-  }
+    /*
+     * Start countdown skapades sist i init.
+     */
+    this.m_startCountdownActive = false;
+    this.m_startCountdownTimer = 0;
 
-  if (this.m_startCountdownOverlay && this.m_startCountdownOverlay.stage) {
-    this.m_startCountdownOverlay.stage.removeChild(this.m_startCountdownOverlay);
-}
+    this.removeDisplayObject(this.m_startCountdownText);
+    this.removeDisplayObject(this.m_startCountdownOverlay);
 
-if (this.m_startCountdownText && this.m_startCountdownText.stage) {
-    this.m_startCountdownText.stage.removeChild(this.m_startCountdownText);
-}
+    this.m_startCountdownText = null;
+    this.m_startCountdownOverlay = null;
 
-this.m_startCountdownOverlay = null;
-this.m_startCountdownText = null;
+    /*
+     * Pause UI kan ha skapats senare under spelet.
+     */
+    if (this.m_pauseMenu) {
+        if (typeof this.m_pauseMenu.dispose === "function") {
+            this.m_pauseMenu.dispose();
+        } else if (typeof this.m_pauseMenu.clear === "function") {
+            this.m_pauseMenu.clear();
+        }
+    }
 
-  rune.scene.Scene.prototype.dispose.call(this);
+    this.removeDisplayObject(this.m_pauseTitle);
+    this.removeDisplayObject(this.m_pauseOverlay);
+
+    this.m_pauseMenu = null;
+    this.m_pauseTitle = null;
+    this.m_pauseOverlay = null;
+    this.m_isPaused = false;
+
+    /*
+     * HUD skapades efter shields.
+     */
+    if (this.m_hudHandler &&
+        typeof this.m_hudHandler.clear === "function") {
+
+        this.m_hudHandler.clear();
+    }
+
+    this.m_hudHandler = null;
+
+    /*
+     * Shields / runor.
+     */
+    if (this.m_shieldHandler &&
+        typeof this.m_shieldHandler.clear === "function") {
+
+        this.m_shieldHandler.clear();
+    }
+
+    this.m_shieldHandler = null;
+
+    /*
+     * Armor.
+     */
+    if (this.m_armorHandler &&
+        typeof this.m_armorHandler.clear === "function") {
+
+        this.m_armorHandler.clear();
+    }
+
+    this.m_armorHandler = null;
+
+    /*
+     * Sjukdomar.
+     */
+    if (this.m_diseaseHandler &&
+        typeof this.m_diseaseHandler.clear === "function") {
+
+        this.m_diseaseHandler.clear();
+    }
+
+    this.m_diseaseHandler = null;
+
+    /*
+     * Kamera-handler äger inga stage-objekt, men referensen ska släppas.
+     */
+    this.m_cameraHandler = null;
+
+    /*
+     * Fiender.
+     */
+    if (this.m_enemyHandler &&
+        typeof this.m_enemyHandler.clear === "function") {
+
+        this.m_enemyHandler.clear();
+    }
+
+    this.m_enemyHandler = null;
+
+    /*
+     * Level config.
+     */
+    this.m_levelConfig = null;
+
+    /*
+     * Spelare.
+     */
+    if (this.m_playerHandler &&
+        typeof this.m_playerHandler.clear === "function") {
+
+        this.m_playerHandler.clear();
+    }
+
+    this.m_playerHandler = null;
+
+    /*
+     * Moln.
+     */
+    if (this.m_cloudHandler &&
+        typeof this.m_cloudHandler.clear === "function") {
+
+        this.m_cloudHandler.clear();
+    }
+
+    this.m_cloudHandler = null;
+
+    /*
+     * Plattformar, lava, vatten, båtar.
+     */
+    if (this.m_platformHandler &&
+        typeof this.m_platformHandler.clear === "function") {
+
+        this.m_platformHandler.clear();
+    }
+
+    this.m_platformHandler = null;
+
+    /*
+     * Bakgrund skapades tidigt i init, därför rensas den sent.
+     */
+    if (this.m_backgroundHandler &&
+        typeof this.m_backgroundHandler.clear === "function") {
+
+        this.m_backgroundHandler.clear();
+    }
+
+    this.m_backgroundHandler = null;
+
+    /*
+     * Ljud.
+     */
+    if (this.backgroundMusic) {
+        if (typeof this.backgroundMusic.stop === "function") {
+            this.backgroundMusic.stop();
+        } else if (typeof this.backgroundMusic.pause === "function") {
+            this.backgroundMusic.pause();
+        }
+    }
+
+    this.backgroundMusic = null;
+    this.menuSound = null;
+
+    /*
+     * Grundreferenser.
+     */
+    this.m_gameInput = null;
+    this.camera = null;
+    this.m_avatarData = null;
+
+    /*
+     * Viktigt: Scene dispose ska ligga sist.
+     */
+    rune.scene.Scene.prototype.dispose.call(this);
 };
