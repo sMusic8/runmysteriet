@@ -98,5 +98,73 @@
     {
         "word": "crystal",
         "Subword": ["shiny", "stone"]
+    },
+        {
+        "word": "burning",
+        "Subword": ["fire heat", "flame rage"]
+    },
+    {
+        "word": "crossed",
+        "Subword": ["paths met", "overlapped fate"]
+    },
+    {
+        "word": "darkens",
+        "Subword": ["grows dark", "shadow spread"]
+    },
+    {
+        "word": "echoing",
+        "Subword": ["repeated sound", "distant call"]
+    },
+    {
+        "word": "falcons",
+        "Subword": ["hunting birds", "sky predators"]
+    },
+        {
+        "word": "glacier",
+        "Subword": ["ice mountain", "frozen river"]
+    },
+    {
+        "word": "howling",
+        "Subword": ["wolf sound", "wind cry"]
+    },
+    {
+        "word": "knights",
+        "Subword": ["armored warriors", "royal fighters"]
+    },
+    {
+        "word": "longing",
+        "Subword": ["deep desire", "missing feeling"]
+    },
+    {
+        "word": "marking",
+        "Subword": ["sign making", "symbol trace"]
+    },
+        {
+        "word": "plunder",
+        "Subword": ["steal loot", "raid wealth"]
+    },
+    {
+        "word": "sailing",
+        "Subword": ["ship travel", "sea journey"]
+    },
+    {
+        "word": "shadows",
+        "Subword": ["dark forms", "hidden figures"]
+    },
+    {
+        "word": "standing",
+        "Subword": ["upright state", "position fixed"]
+    },
+        {
+        "word": "tension",
+        "Subword": ["stress force", "tight feeling"]
+    },
+    {
+        "word": "tracking",
+        "Subword": ["following path", "hunt trail"]
+    },
+    {
+        "word": "unbroken",
+        "Subword": ["not broken", "whole strong"]
     }
 ]
