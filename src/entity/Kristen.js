@@ -1,35 +1,102 @@
+//------------------------------------------------------------------------------
+// KRISTEN ENTITY
+//------------------------------------------------------------------------------
+
 /**
- * Kristen entity.
+ * Fiende-enhet (Kristen).
+ *
+ * Funktioner:
+ * - Patrullerar fram och tillbaka
+ * - Har HP + HP-bar
+ * - Kan ta skada och dö
+ * - Skadar spelare vid kollision
+ * - Kan vända sig mot närmaste spelare
  *
  * @constructor
  * @extends {rune.display.Sprite}
+ * @param {string} texture - Sprite-textur
+ * @param {number=} x - Startposition X
+ * @param {number=} y - Startposition Y
  */
 runmysteriet.entity.Kristen = function (texture, x, y) {
-  rune.display.Sprite.call(this, x || 0, y || 0, 32, 40, texture);
-this.speed = 0.5;
-this.direction = 1; // 1 = höger, -1 = vänster
 
-this.startX = x || 0;
-this.patrolDistance = 60; // hur långt hon går
+  rune.display.Sprite.call(this, x || 0, y || 0, 32, 40, texture);
+
+  /** @type {number} */
+  this.speed = 0.5;
+
+  /** @type {number} */
+  this.direction = 1;
+
+  /** @type {number} */
+  this.startX = x || 0;
+
+  /**
+   * Hur långt fienden rör sig från startpunkt.
+   * @type {number}
+   */
+  this.patrolDistance = 60;
+
+  /** @type {number} */
   this.hp = 100;
+
+  /** @type {number} */
   this.maxHp = 100;
+
+  /**
+   * Cooldown mellan träffar.
+   * @type {number}
+   */
   this.hitCooldown = 0;
+
+  /**
+   * HP-bar grafik.
+   * @type {?rune.display.Graphic}
+   */
   this.hpBar = null;
+
+  /** @type {boolean} */
   this.isDead = false;
 
-  /** @type {string} */
+  /**
+   * Nuvarande HP-bar textur.
+   * @type {string}
+   */
   this.currentHpTexture = "hpbar1";
 
+  /**
+   * Ljud (lazy init).
+   * @type {?Object}
+   */
+  this.hitsound = null;
+
+  /** @type {?Object} */
+  this.deadSound = null;
+
+  /**
+   * Referens till application (kan sättas externt).
+   * @type {?Object}
+   */
+  this.application = null;
+
+  // Physics stöd
   if (rune.physics && rune.physics.Space) {
     this.allowCollisions = rune.physics.Space.ANY;
   }
 
+  /** @type {boolean} */
   this.immovable = true;
 };
+
+//------------------------------------------------------------------------------
+// INHERITANCE
+//------------------------------------------------------------------------------
 
 runmysteriet.entity.Kristen.prototype = Object.create(
   rune.display.Sprite.prototype
 );
+
+/** @override */
 runmysteriet.entity.Kristen.prototype.constructor =
   runmysteriet.entity.Kristen;
 
@@ -37,12 +104,19 @@ runmysteriet.entity.Kristen.prototype.constructor =
 // INIT
 //------------------------------------------------------------------------------
 
+/**
+ * Initierar animationer och HP-bar.
+ * @return {void}
+ */
 runmysteriet.entity.Kristen.prototype.init = function () {
+
   rune.display.Sprite.prototype.init.call(this);
 
+  // Animation
   this.animation.create("start", [0, 1, 2], 3, true);
   this.animation.gotoAndPlay("start");
 
+  // HP bar
   this.hpBar = new rune.display.Graphic(0, 0, 32, 4, "hpbar1");
   this.hpBar.anchorX = 0;
 };
@@ -51,30 +125,45 @@ runmysteriet.entity.Kristen.prototype.init = function () {
 // UPDATE
 //------------------------------------------------------------------------------
 
+/**
+ * Uppdaterar fienden varje frame.
+ *
+ * - Hanterar HP-bar
+ * - Cooldowns
+ * - Rörelse (patrol)
+ *
+ * @param {number} step
+ * @return {void}
+ */
 runmysteriet.entity.Kristen.prototype.update = function (step) {
+
   if (this.isDead) return;
 
   rune.display.Sprite.prototype.update.call(this, step);
 
+  // Cooldown tick
   if (this.hitCooldown > 0) {
     this.hitCooldown--;
   }
 
-  // Lägg till hpBar EN gång
+  // Lägg till hpBar om den inte redan finns i stage
   if (this.hpBar && this.stage && !this.hpBar.stage) {
     this.stage.addChild(this.hpBar);
   }
 
   if (this.hpBar) {
+
+    // Position
     this.hpBar.x = this.x;
     this.hpBar.y = this.y - 8;
 
-    // skala hp
+    // Skala HP
     var p = this.hp / this.maxHp;
     if (p < 0) p = 0;
+
     this.hpBar.scaleX = p;
 
-    // 🔥 BESTÄM RÄTT TEXTUR
+    // Texture baserat på HP
     var newTexture;
 
     if (this.hp > 80) {
@@ -87,8 +176,9 @@ runmysteriet.entity.Kristen.prototype.update = function (step) {
       newTexture = "hpbar4";
     }
 
-    // 🔥 BYT ENDAST OM DEN ÄNDRAS
+    // Byt texture om behövs
     if (newTexture !== this.currentHpTexture) {
+
       this.currentHpTexture = newTexture;
 
       if (this.hpBar.stage) {
@@ -104,21 +194,30 @@ runmysteriet.entity.Kristen.prototype.update = function (step) {
     }
   }
 
+  // Patrol rörelse
   this.x += this.speed * this.direction;
 
-if (this.x > this.startX + this.patrolDistance) {
-  this.direction = -1;
-}
+  if (this.x > this.startX + this.patrolDistance) {
+    this.direction = -1;
+  }
 
-if (this.x < this.startX - this.patrolDistance) {
-  this.direction = 1;
-}
+  if (this.x < this.startX - this.patrolDistance) {
+    this.direction = 1;
+  }
 };
 
 //------------------------------------------------------------------------------
 // COLLISION
 //------------------------------------------------------------------------------
+
+/**
+ * Hanterar kollision med spelare.
+ *
+ * @param {!Object} player
+ * @return {void}
+ */
 runmysteriet.entity.Kristen.prototype.handleCollision = function (player) {
+
   if (!player || player.isDead === true) return;
 
   if (typeof player.hitTestAndSeparate !== "function") return;
@@ -129,17 +228,29 @@ runmysteriet.entity.Kristen.prototype.handleCollision = function (player) {
   if (this.hitCooldown > 0) return;
 
   this.hitCooldown = 20;
+
+  // OBS: just nu skadar Kristen sig själv (kan vara bug)
   this.takeDamage(35);
 };
+
+//------------------------------------------------------------------------------
+// DAMAGE
+//------------------------------------------------------------------------------
+
+/**
+ * Applicerar skada på fienden.
+ *
+ * @param {number} damage
+ * @return {void}
+ */
 runmysteriet.entity.Kristen.prototype.takeDamage = function (damage) {
+
   if (this.isDead) return;
 
   this.hp -= damage;
 
-  console.log("Kristen tog skada:", damage, "HP kvar:", this.hp);
-
-  // 🔊 HIT LJUD (fix: stop så det alltid spelas)
-  if (!this.hitsound) {
+  // Lazy init ljud
+  if (!this.hitsound && this.application) {
     this.hitsound = this.application.sounds.sound.get("sound_hit_flesh");
   }
 
@@ -149,7 +260,8 @@ runmysteriet.entity.Kristen.prototype.takeDamage = function (damage) {
   }
 
   if (this.hp <= 0) {
-    if (!this.deadSound) {
+
+    if (!this.deadSound && this.application) {
       this.deadSound = this.application.sounds.sound.get("sound_enemydead");
     }
 
@@ -165,12 +277,15 @@ runmysteriet.entity.Kristen.prototype.takeDamage = function (damage) {
 // DIE
 //------------------------------------------------------------------------------
 
+/**
+ * Dödar fienden och rensar grafik.
+ * @return {void}
+ */
 runmysteriet.entity.Kristen.prototype.die = function () {
+
   if (this.isDead) return;
 
   this.isDead = true;
-
-  console.log("Kristen död");
 
   this.visible = false;
   this.active = false;
@@ -235,9 +350,6 @@ runmysteriet.entity.Kristen.prototype.faceNearestPlayer = function(players) {
 
     playerCenterX = nearestPlayer.x + nearestPlayer.width / 2;
 
-    /*
-     * Om spelaren är till vänster om Kristen ska Kristen titta vänster.
-     */
     if (playerCenterX < kristenCenterX) {
         this.flippedX = true;
     } else {
@@ -249,7 +361,14 @@ runmysteriet.entity.Kristen.prototype.faceNearestPlayer = function(players) {
 // PLAYER COLLISION LOOP
 //------------------------------------------------------------------------------
 
+/**
+ * Loopar igenom spelare och kollar kollision.
+ *
+ * @param {!Array<!Object>} players
+ * @return {void}
+ */
 runmysteriet.entity.Kristen.prototype.checkPlayerCollisions = function (players) {
+
   if (!players) return;
 
   for (var i = 0; i < players.length; i++) {

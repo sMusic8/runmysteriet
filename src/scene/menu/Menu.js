@@ -107,14 +107,24 @@ runmysteriet.scene.Menu.prototype.init = function() {
 
 runmysteriet.scene.Menu.prototype.update = function(step) {
 
+if (this.keyboard && this.keyboard.justPressed("F4")) {
+
+    if (this.backgroundMusic && typeof this.backgroundMusic.stop === "function") {
+        this.backgroundMusic.stop();
+    }
+
+    this.application.scenes.load([
+        new runmysteriet.scene.Game(2)
+    ]);
+
+    return;
+}
+
     rune.scene.Scene.prototype.update.call(this, step);
 
     var keyboard = this.keyboard;
     var gamepad = this.gamepads.get(0);
 
-    // ----------------------------
-    // 🔊 VOLUME CONTROL (FIXED)
-    // ----------------------------
 
     if (this.backgroundMusic) {
 
