@@ -28,12 +28,15 @@ runmysteriet.scene.Menu.prototype.init = function() {
 
     this.menuSound = this.application.sounds.sound.get("sound_menu");
     this.backgroundMusic = this.application.sounds.sound.get("sound_musicMenu");
+if (this.backgroundMusic) {
+    this.backgroundMusic.loop = true;
+    this.backgroundMusic.volume = 0.5;
+    this.backgroundMusic.play();
+}
 
-    if (this.backgroundMusic) {
-        this.backgroundMusic.loop = true;
-        this.backgroundMusic.volume = 0.5;
-        this.backgroundMusic.play();
-    }
+// ✅ LÄGG IN HÄR
+this.m_volumeHandler = new runmysteriet.handler.VolumeHandler(null);
+this.m_volumeHandler.setAudio(this.backgroundMusic);
 
     // BACKGROUND
     this.m_background = new rune.display.Graphic(
@@ -107,51 +110,33 @@ runmysteriet.scene.Menu.prototype.init = function() {
 
 runmysteriet.scene.Menu.prototype.update = function(step) {
 
+if (this.keyboard && this.keyboard.justPressed("F4")) {
+
+    if (this.backgroundMusic && typeof this.backgroundMusic.stop === "function") {
+        this.backgroundMusic.stop();
+    }
+
+    this.application.scenes.load([
+        new runmysteriet.scene.Game(2)
+    ]);
+
+    return;
+}
+
     rune.scene.Scene.prototype.update.call(this, step);
 
     var keyboard = this.keyboard;
     var gamepad = this.gamepads.get(0);
 
-    // ----------------------------
-    // 🔊 VOLUME CONTROL (FIXED)
-    // ----------------------------
 
-    if (this.backgroundMusic) {
+if (this.m_volumeHandler) {
 
-        var stepVol = 0.1;
-
-        var increasePressed =
-            keyboard.justPressed("E") ||
-            keyboard.justPressed("e") ||
-            (gamepad && (gamepad.justPressed("RB") || gamepad.justPressed(5)));
-
-        var decreasePressed =
-            keyboard.justPressed("Q") ||
-            keyboard.justPressed("q") ||
-            (gamepad && (gamepad.justPressed("LB") || gamepad.justPressed(4)));
-
-        if (increasePressed) {
-
-            this.backgroundMusic.volume += stepVol;
-
-            if (this.backgroundMusic.volume > 1) {
-                this.backgroundMusic.volume = 0;
-            }
-
-            console.log("Volym:", this.backgroundMusic.volume.toFixed(2));
-        }
-
-        if (decreasePressed) {
-
-            this.backgroundMusic.volume -= stepVol;
-
-            if (this.backgroundMusic.volume < 0) {
-                this.backgroundMusic.volume = 1;
-            }
-
-            console.log("Volym:", this.backgroundMusic.volume.toFixed(2));
-        }
-    }
+    this.m_volumeHandler.update(
+        this.m_gameInput.read(this.keyboard),
+        this.gamepads.get(0),
+        this.keyboard
+    );
+}
 
     // ----------------------------
     // MENU INPUT

@@ -78,5 +78,55 @@
     {
         "word": "honey",
         "Subword": ["sweet food", "bees"]
+    },
+       {
+        "word": "blade",
+        "Subword": ["sharp edge", "cutting steel"]
+    },
+    {
+        "word": "armor",
+        "Subword": ["body protection", "war gear"]
+    },
+    {
+        "word": "skull",
+        "Subword": ["bone head", "death symbol"]
+    },
+    {
+        "word": "bones",
+        "Subword": ["skeleton parts", "body structure"]
+    }, {
+        "word": "honor",
+        "Subword": ["respect code", "warrior value"]
+    },  {
+        "word": "vital",
+        "Subword": ["life force", "strong energy"]
+    },
+    {
+        "word": "elder",
+        "Subword": ["old leader", "wise person"]
+    },
+    {
+        "word": "fjord",
+        "Subword": ["narrow sea", "icy inlet"]
+    },
+       {
+        "word": "beast",
+        "Subword": ["wild creature", "danger animal"]
+    },
+    {
+        "word": "ocean",
+        "Subword": ["deep sea", "water world"]
+    },
+      {
+        "word": "drift",
+        "Subword": ["move slowly", "float away"]
+    },
+    {
+        "word": "flint",
+        "Subword": ["spark stone", "fire starter"]
+    },
+    {
+        "word": "ashen",
+        "Subword": ["gray pale", "burned remains"]
     }
 ]

@@ -98,5 +98,73 @@
     {
         "word": "tunnel",
         "Subword": ["underground", "path"]
+    },
+     {
+        "word": "ravens",
+        "Subword": ["black birds", "omens sky"]
+    },
+    {
+        "word": "stones",
+        "Subword": ["rock pieces", "ancient ground"]
+    },
+    {
+        "word": "wolves",
+        "Subword": ["pack hunters", "wild beasts"]
+    },
+    {
+        "word": "beacon",
+        "Subword": ["light signal", "warning fire"]
+    },
+     {
+        "word": "spirit",
+        "Subword": ["soul force", "inner energy"]
+    },
+    {
+        "word": "raider",
+        "Subword": ["attack warrior", "sea plunderer"]
+    },
+    {
+        "word": "mythic",
+        "Subword": ["legendary", "ancient tale"]
+    },
+      {
+        "word": "frosty",
+        "Subword": ["ice cold", "winter air"]
+    },
+    {
+        "word": "nordic",
+        "Subword": ["northern land", "scandinavian"]
+    },
+      {
+        "word": "legend",
+        "Subword": ["old story", "hero tale"]
+    },
+        {
+        "word": "shadow",
+        "Subword": ["dark shape", "light absence"]
+    },
+    {
+        "word": "beasts",
+        "Subword": ["wild animals", "fierce creatures"]
+    },
+     {
+        "word": "warden",
+        "Subword": ["guard keeper", "protector role"]
+    },
+    {
+        "word": "ancient",
+        "Subword": ["very old", "past era"]
+    },
+     {
+        "word": "valley",
+        "Subword": ["low land", "between hills"]
+    },
+    {
+        "word": "winter",
+        "Subword": ["cold season", "snow time"]
+    },
+    {
+        "word": "stormy",
+        "Subword": ["bad weather", "wind chaos"]
     }
 ]

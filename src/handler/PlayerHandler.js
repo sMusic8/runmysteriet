@@ -1033,9 +1033,16 @@ runmysteriet.handler.PlayerHandler.prototype.createDeathEffect = function(player
 };
 
 runmysteriet.handler.PlayerHandler.prototype.createAttack = function(player) {
-       
-    console.log("Attack skapas");
 
+    if (!this.attackSound && this.application) {
+        this.attackSound = this.application.sounds.sound.get("sword_slash");
+    }
+
+    if (this.attackSound) {
+        this.attackSound.stop();
+        this.attackSound.play();
+    }
+    
     var attack = new runmysteriet.attack.Attack(player);
 
     this.stage.addChild(attack);

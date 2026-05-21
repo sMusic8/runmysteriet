@@ -29,7 +29,7 @@ runmysteriet.scene.Credits = function () {
 //------------------------------------------------------------------------------
 
 runmysteriet.scene.Credits.prototype = Object.create(
-  rune.scene.Scene.prototype
+  rune.scene.Scene.prototype,
 );
 runmysteriet.scene.Credits.prototype.constructor = runmysteriet.scene.Credits;
 
@@ -38,11 +38,13 @@ runmysteriet.scene.Credits.prototype.constructor = runmysteriet.scene.Credits;
 //------------------------------------------------------------------------------
 
 runmysteriet.scene.Credits.prototype.init = function () {
-
   rune.scene.Scene.prototype.init.call(this);
 
   this.backgroundMusic = this.application.sounds.sound.get("sound_musicMenu");
   this.menuSound = this.application.sounds.sound.get("sound_menu");
+
+  this.m_volumeHandler = new runmysteriet.handler.VolumeHandler(null);
+  this.m_volumeHandler.setAudio(this.backgroundMusic);
 
   if (this.backgroundMusic) {
     this.backgroundMusic.loop = true;
@@ -57,7 +59,6 @@ runmysteriet.scene.Credits.prototype.init = function () {
 //------------------------------------------------------------------------------
 // UPDATE
 //------------------------------------------------------------------------------
-
 runmysteriet.scene.Credits.prototype.update = function (step) {
 
   rune.scene.Scene.prototype.update.call(this, step);
@@ -65,54 +66,25 @@ runmysteriet.scene.Credits.prototype.update = function (step) {
   var gamepad = this.gamepads.get(0);
   var keyboard = this.keyboard;
 
-  if (this.backgroundMusic) {
-
-    var stepVol = 0.1;
-
-    var increasePressed =
-      keyboard.justPressed("E") ||
-      keyboard.justPressed("e") ||
-      (gamepad && (gamepad.justPressed("RB") || gamepad.justPressed(5)));
-
-    var decreasePressed =
-      keyboard.justPressed("Q") ||
-      keyboard.justPressed("q") ||
-      (gamepad && (gamepad.justPressed("LB") || gamepad.justPressed(4)));
-
-    if (increasePressed) {
-
-      this.backgroundMusic.volume += stepVol;
-
-      if (this.backgroundMusic.volume > 1) {
-        this.backgroundMusic.volume = 0;
-      }
-
-      console.log("Volym:", this.backgroundMusic.volume.toFixed(2));
-    }
-
-    if (decreasePressed) {
-
-      this.backgroundMusic.volume -= stepVol;
-
-      if (this.backgroundMusic.volume < 0) {
-        this.backgroundMusic.volume = 1;
-      }
-
-      console.log("Volym:", this.backgroundMusic.volume.toFixed(2));
-    }
+  // ----------------------------
+  // 🔊 volume handler (fixad)
+  // ----------------------------
+  if (this.m_volumeHandler) {
+    this.m_volumeHandler.update(null, gamepad, keyboard);
   }
 
   // ----------------------------
   // BACK TO MENU
   // ----------------------------
-
   if (
-    keyboard.justPressed("ENTER") ||
-    keyboard.justPressed("SPACE") ||
-    keyboard.justPressed("ESCAPE") ||
+    (keyboard && keyboard.justPressed("ENTER")) ||
+    (keyboard && keyboard.justPressed("SPACE")) ||
+    (keyboard && keyboard.justPressed("ESCAPE")) ||
     (gamepad && (gamepad.justPressed(9) || gamepad.justPressed(0)))
   ) {
-    this.application.scenes.load([new runmysteriet.scene.Menu()]);
+    this.application.scenes.load([
+      new runmysteriet.scene.Menu()
+    ]);
   }
 };
 
@@ -121,7 +93,6 @@ runmysteriet.scene.Credits.prototype.update = function (step) {
 //------------------------------------------------------------------------------
 
 runmysteriet.scene.Credits.prototype.dispose = function () {
-
   this.m_background = null;
   this.m_title = null;
   this.m_back = null;
@@ -136,13 +107,12 @@ runmysteriet.scene.Credits.prototype.dispose = function () {
 //------------------------------------------------------------------------------
 
 runmysteriet.scene.Credits.prototype.m_initBackground = function () {
-
   this.m_background = new rune.display.Graphic(
     0,
     0,
     this.application.screen.width,
     this.application.screen.height,
-    "background_menu"
+    "background_menu",
   );
 
   this.stage.addChild(this.m_background);
@@ -153,14 +123,13 @@ runmysteriet.scene.Credits.prototype.m_initBackground = function () {
 //------------------------------------------------------------------------------
 
 runmysteriet.scene.Credits.prototype.m_initTitle = function () {
-
   var center = this.application.screen.center;
 
   this.m_title = new rune.text.BitmapField(
     "This game was created by\n" +
-    "Frida Bergstrom and Sabina Music\n" +
-    "as part of Project Course 2\n" +
-    "in media technology."
+      "Frida Bergstrom and Sabina Music\n" +
+      "as part of Project Course 2\n" +
+      "in media technology.",
   );
 
   this.m_title.autoSize = true;
@@ -170,7 +139,7 @@ runmysteriet.scene.Credits.prototype.m_initTitle = function () {
   this.m_title.y = center.y - this.m_title.height / 2 - 40;
 
   this.m_back = new rune.text.BitmapField(
-    "< BACK\nPress ENTER / SPACE / ESC\nGamepad: START or X"
+    "< BACK\nPress ENTER / SPACE / ESC\nGamepad: START or X",
   );
 
   this.m_back.autoSize = true;
