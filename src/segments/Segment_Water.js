@@ -17,10 +17,20 @@ runmysteriet.segments.Segment_Water = function() {
     this.groundY = 200;
 
     /** @type {number} */
-    this.waterWidth = 402;
+    this.waterWidth = 405;
 
     /** @type {number} */
     this.waterHeight = 32;
+
+    /** @type {number} */
+this.backgroundWidth = 405;
+
+/** @type {number} */
+this.backgroundHeight = 225;
+
+/** @type {string} */
+
+this.backgroundTexture = "backgroundWater";
 
     console.log("segmentWater");
 
@@ -48,7 +58,7 @@ runmysteriet.segments.Segment_Water = function() {
  */
 runmysteriet.segments.Segment_Water.prototype.ground = function(stage, startX, levelNumber) {
     var x = startX || 0;
-
+this.addBackground(stage, x);
     var platforms = [];
     var holes = [];
     var enemySpawns = [];
@@ -118,7 +128,28 @@ runmysteriet.segments.Segment_Water.prototype.addLeftLand = function(stage, plat
     stage.addChild(platform);
     platforms.push(platform);
 };
+//------------------------------------------------------------------------------
+// BACKGROUND
+//------------------------------------------------------------------------------
 
+/**
+ * Lägger till bakgrunden för vattensegmentet.
+ *
+ * @param {!rune.display.Stage} stage
+ * @param {number} segmentStart
+ */
+runmysteriet.segments.Segment_Water.prototype.addBackground = function(stage, segmentStart) {
+
+    var background = new rune.display.Graphic(
+        segmentStart,
+        0,
+        this.backgroundWidth,
+        this.backgroundHeight,
+        this.backgroundTexture
+    );
+
+    stage.addChild(background);
+};
 /**
  * Lägger till höger mark.
  *
