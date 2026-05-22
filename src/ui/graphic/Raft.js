@@ -34,6 +34,11 @@ runmysteriet.ui.graphic.Raft = function(x, y) {
     this.hasArrived = false;    
 };
 
+
+
+runmysteriet.ui.graphic.Raft.prototype = Object.create(rune.display.Graphic.prototype);
+runmysteriet.ui.graphic.Raft.prototype.constructor = runmysteriet.ui.graphic.Raft;
+
 runmysteriet.ui.graphic.Raft.prototype.start = function() {
 
     /*
@@ -46,12 +51,7 @@ runmysteriet.ui.graphic.Raft.prototype.start = function() {
     }
 
     this.hasStarted = true;
-};
-
-runmysteriet.ui.graphic.Raft.prototype = Object.create(rune.display.Graphic.prototype);
-runmysteriet.ui.graphic.Raft.prototype.constructor = runmysteriet.ui.graphic.Raft;
-
-runmysteriet.ui.graphic.Raft.prototype.update = function(step) {
+};runmysteriet.ui.graphic.Raft.prototype.update = function(step) {
 
     /*
      * Spara position före rörelse.

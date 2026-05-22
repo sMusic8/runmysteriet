@@ -294,6 +294,7 @@ runmysteriet.handler.PlatformHandler.prototype.update = function(step) {
 
     var i = 0;
     var hole = null;
+    var platform = null;
 
     for (i = 0; i < this.holes.length; i++) {
         hole = this.holes[i];
@@ -302,12 +303,19 @@ runmysteriet.handler.PlatformHandler.prototype.update = function(step) {
             hole.update(step);
         }
     }
+
+    for (i = 0; i < this.platforms.length; i++) {
+        platform = this.platforms[i];
+
+        if (!platform || platform.isRaft !== true) {
+            continue;
+        }
+
+        if (typeof platform.update === "function") {
+            platform.update(step);
+        }
+    }
 };
-
-
-
-//
-
 
 /**
  * @return {number}

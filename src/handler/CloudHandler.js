@@ -90,17 +90,36 @@ runmysteriet.handler.CloudHandler.prototype.update = function() {
         }
     }
 };
+//------------------------------------------------------------------------------
+// CLEAR
+//------------------------------------------------------------------------------
+
+/**
+ * Tar bort alla moln från stage.
+ *
+ * @return {void}
+ */
 runmysteriet.handler.CloudHandler.prototype.clear = function() {
+
     var i = 0;
     var cloud = null;
 
-    for (i = 0; i < this.m_clouds.length; i++) {
-        cloud = this.m_clouds[i];
+    if (!this.clouds) {
+        this.clouds = [];
+        return;
+    }
 
-        if (cloud !== null && cloud.parent !== null) {
+    for (i = 0; i < this.clouds.length; i++) {
+        cloud = this.clouds[i];
+
+        if (!cloud) {
+            continue;
+        }
+
+        if (cloud.parent) {
             cloud.parent.removeChild(cloud);
         }
     }
 
-    this.m_clouds = [];
+    this.clouds = [];
 };

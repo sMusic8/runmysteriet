@@ -34,8 +34,7 @@ runmysteriet.handler.AutoScrollCameraHandler = function(camera, playerHandler, p
      */
     this.scrollDelay = 1;
     this.scrollCounter = 0;
-   // this.normalSpeed = this.speed;
-    //this.normalScrollDelay = this.scrollDelay;
+
     this.deathSlowTimer = 0;
     this.deathSlowDuration = 90; // 30 fps * 3 sekunder
     this.deathSlowScrollDelay = 6;
@@ -256,13 +255,11 @@ runmysteriet.handler.AutoScrollCameraHandler.prototype.areAllActivePlayersOnRaft
 
 runmysteriet.handler.AutoScrollCameraHandler.prototype.startDeathSlowMotion = function() {
 
-    console.log("DEATH SLOW MOTION START");
+    if (this.deathSlowTimer > 0) {
+        return;
+    }
 
     this.deathSlowTimer = this.deathSlowDuration;
-
-    /*
-     * Nollställ räknaren så slowmotion märks direkt.
-     */
     this.scrollCounter = 0;
 };
 

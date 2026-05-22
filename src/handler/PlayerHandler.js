@@ -938,8 +938,6 @@ runmysteriet.handler.PlayerHandler.prototype.killPlayer = function(player, index
     if (player.hpBar) {
         player.hpBar.visible = false;
     }
-
-    console.log("Spelaren " + index + " dog");
 };
 
 /**

@@ -17,8 +17,14 @@ runmysteriet.scene.Game = function (levelNumber, score, avatarData) {
   this.m_levelConfig = null;
   this.m_levelNumber = levelNumber || 1;
   this.m_score = score || 0;
-  this.m_avatarData = avatarData || null;
-  this.m_playerName = "PLAYER";
+
+
+if (avatarData && typeof avatarData === "object") {
+    this.m_avatarData = avatarData;
+} else {
+    this.m_avatarData = null;
+}  
+this.m_playerName = "PLAYER";
 
   this.m_isPaused = false;
   this.m_pauseTitle = null;
@@ -95,13 +101,13 @@ runmysteriet.scene.Game.prototype.init = function () {
     var p1Texture = "spritesheet_freya_all";
   var p2Texture = "spritesheet_thor_all";
 
-  if (this.avatarData && this.avatarData.player1) {
-      p1Texture = this.avatarData.player1.texture;
-  }
+if (this.m_avatarData && this.m_avatarData.player1) {
+    p1Texture = this.m_avatarData.player1.texture;
+}
 
-  if (this.avatarData && this.avatarData.player2) {
-      p2Texture = this.avatarData.player2.texture;
-  }
+if (this.m_avatarData && this.m_avatarData.player2) {
+    p2Texture = this.m_avatarData.player2.texture;
+}
   /*
    * Musik
    */
@@ -263,21 +269,21 @@ runmysteriet.scene.Game.prototype.update = function(step) {
      */
     if (this.keyboard.justPressed("F1")) {
         this.application.scenes.load([
-            new runmysteriet.scene.Game(6, this.m_score, this.m_playerName)
+            new runmysteriet.scene.Game(6, this.m_score, this.m_avatarData)
         ]);
         return;
     }
 
     if (this.keyboard.justPressed("F2")) {
         this.application.scenes.load([
-            new runmysteriet.scene.Game(15, this.m_score, this.m_playerName)
+            new runmysteriet.scene.Game(15, this.m_score, this.m_avatarData)
         ]);
         return;
     }
 
     if (this.keyboard.justPressed("F3")) {
         this.application.scenes.load([
-            new runmysteriet.scene.Game(19, this.m_score, this.m_playerName)
+            new runmysteriet.scene.Game(19, this.m_score, this.m_avatarData)
         ]);
         return;
     }
@@ -765,7 +771,7 @@ runmysteriet.scene.Game.prototype.quitToMenu = function () {
 
   if (this.backgroundMusic) {
     if (typeof this.backgroundMusic.stop === "function") {
-      this.backgroundMusic.stop();
+      this.stopSound(this.backgroundMusic);
     } else if (typeof this.backgroundMusic.pause === "function") {
       this.backgroundMusic.pause();
     }
@@ -979,7 +985,7 @@ runmysteriet.scene.Game.prototype.winGame = function (winningPlayer) {
 
   if (this.backgroundMusic) {
     if (typeof this.backgroundMusic.stop === "function") {
-      this.backgroundMusic.stop();
+      this.stopSound(this.backgroundMusic);
     } else if (typeof this.backgroundMusic.pause === "function") {
       this.backgroundMusic.pause();
     }
@@ -1012,7 +1018,7 @@ runmysteriet.scene.Game.prototype.loseGame = function (reason) {
 
   if (this.backgroundMusic) {
     if (typeof this.backgroundMusic.stop === "function") {
-      this.backgroundMusic.stop();
+      this.stopSound(this.backgroundMusic);
     } else if (typeof this.backgroundMusic.pause === "function") {
       this.backgroundMusic.pause();
     }
@@ -1150,6 +1156,43 @@ runmysteriet.scene.Game.prototype.removeDisplayObject = function(object) {
  *
  * @return {void}
  */
+
+//------------------------------------------------------------------------------
+// SOUND
+//------------------------------------------------------------------------------
+
+/**
+ * Stoppar ett Rune-ljud säkert.
+ *
+ * Använder inte sound.stop(), eftersom Rune kan krascha
+ * om ljudets interna mediaElement redan är null.
+ *
+ * @param {?Object} sound
+ * @return {void}
+ */
+runmysteriet.scene.Game.prototype.stopSound = function(sound) {
+
+    var mediaElement = null;
+
+    if (!sound) {
+        return;
+    }
+
+    if (!sound.m_source || !sound.m_source.mediaElement) {
+        return;
+    }
+
+    mediaElement = sound.m_source.mediaElement;
+
+    if (typeof mediaElement.pause === "function") {
+        mediaElement.pause();
+    }
+
+    try {
+        mediaElement.currentTime = 0;
+    } catch (error) {
+    }
+};
 runmysteriet.scene.Game.prototype.dispose = function() {
 
     /*
@@ -1297,8 +1340,8 @@ runmysteriet.scene.Game.prototype.dispose = function() {
      */
     if (this.backgroundMusic) {
         if (typeof this.backgroundMusic.stop === "function") {
-            this.backgroundMusic.stop();
-        } else if (typeof this.backgroundMusic.pause === "function") {
+            this.stopSound(this.backgroundMusic);        
+            } else if (typeof this.backgroundMusic.pause === "function") {
             this.backgroundMusic.pause();
         }
     }

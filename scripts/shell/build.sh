@@ -25,7 +25,7 @@ npx google-closure-compiler \
 --js "./../../src/ui/graphic/Rune.js" \
 --js "./../../src/ui/graphic/Shield.js" \
 --js "./../../src/ui/graphic/HighscoreHud.js" \
---js "./../..src/ui/graphic/VolumeHud.js" \
+--js "./../../src/ui/graphic/VolumeHud.js" \
 --js "./../../src/handler/AutoScrollCameraHandler.js" \
 --js "./../../src/handler/BackgroundHandler.js" \
 --js "./../../src/handler/ShieldHandler.js" \
