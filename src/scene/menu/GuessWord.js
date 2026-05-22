@@ -12,15 +12,14 @@
  * @param {number=} totalScore
  * @param {Object|string=} wordData
  */
-runmysteriet.scene.GuessWord = function(levelNumber, earnedScore, totalScore, wordData, playerName) {
-
+runmysteriet.scene.GuessWord = function(levelNumber, earnedScore, totalScore, wordData, avatarData) {
     rune.scene.Scene.call(this);
 
     this.m_gameInput = null;
     this.m_levelNumber = levelNumber || 1;
     this.m_earnedScore = earnedScore || 0;
     this.m_totalScore = totalScore || 0;
-    this.m_playerName = playerName || "PLAYER";
+    this.m_avatarData = avatarData || null;    
     this.m_wrongGuessPenalty = 10;
 
     this.m_scoreBeforeLevel = this.m_totalScore - this.m_earnedScore;
@@ -378,8 +377,7 @@ runmysteriet.scene.GuessWord.prototype.goToLevelComplete = function() {
             this.m_levelNumber,
             this.m_totalScore,
             this.m_earnedScore,
-            this.m_playerName
-        )
+            this.m_avatarData        )
     ]);
 };
 
@@ -400,7 +398,6 @@ runmysteriet.scene.GuessWord.prototype.applyWrongGuessPenalty = function() {
     this.m_scoreText.text = "SCORE: " + this.m_totalScore;
 
     if (this.m_earnedScore <= 0) {
-        this.saveHighscore();
         this.goToGameOver();
     }
 };
@@ -413,23 +410,8 @@ runmysteriet.scene.GuessWord.prototype.goToGameOver = function() {
 
     this.application.scenes.load([
         new runmysteriet.scene.GameOver(
-            this.m_playerName,
-            this.m_totalScore
+            this.m_totalScore,
+            "NO SCORE LEFT"
         )
     ]);
-};
-
-//------------------------------------------------------------------------------
-// HIGHSCORE
-//------------------------------------------------------------------------------
-
-runmysteriet.scene.GuessWord.prototype.saveHighscore = function() {
-
-    var entry = new runmysteriet.logic.HighscoreEntry(
-        this.m_playerName,
-        this.m_totalScore
-    );
-
-    var manager = new runmysteriet.logic.HighscoreManager(this.application);
-    manager.save(entry);
 };

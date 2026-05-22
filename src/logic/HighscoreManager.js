@@ -5,7 +5,8 @@
 /**
  * Hanterar highscore via Rune SDK.
  *
- * Rune SDK sparar highscores i localStorage.
+ * Rune SDK sparar highscores i localStorage. Spelet ska inte skriva
+ * tillbaka till JSON-filen i asset-mappen.
  *
  * @constructor
  * @param {!Object} application
@@ -18,7 +19,7 @@ runmysteriet.logic.HighscoreManager = function(application) {
 /**
  * Sparar score till Rune highscore.
  *
- * Rune SDK ansvarar själv för att bara behålla de bästa resultaten.
+ * Rune SDK ansvarar för själva highscore-listan.
  *
  * @param {!runmysteriet.logic.HighscoreEntry} entry
  * @return {number}
@@ -39,9 +40,6 @@ runmysteriet.logic.HighscoreManager.prototype.save = function(entry) {
         return -1;
     }
 
-    /*
-     * Hindrar samma namn + score från att sparas flera gånger.
-     */
     if (this.hasSameEntry(name, score)) {
         return -1;
     }
@@ -54,7 +52,7 @@ runmysteriet.logic.HighscoreManager.prototype.save = function(entry) {
 };
 
 /**
- * Hämtar alla highscores som Rune har sparat.
+ * Hämtar alla highscores från Rune, max 5.
  *
  * @return {!Array<!Object>}
  */
@@ -62,6 +60,7 @@ runmysteriet.logic.HighscoreManager.prototype.getAll = function() {
 
     var highscores = [];
     var item = null;
+    var score = 0;
     var i = 0;
 
     if (!this.application || !this.application.highscores) {
@@ -75,11 +74,9 @@ runmysteriet.logic.HighscoreManager.prototype.getAll = function() {
             continue;
         }
 
-        if (!item.name && !item.score) {
-            continue;
-        }
+        score = parseInt(item.score, 10) || 0;
 
-        if ((parseInt(item.score, 10) || 0) <= 0) {
+        if (score <= 0) {
             continue;
         }
 
@@ -87,6 +84,45 @@ runmysteriet.logic.HighscoreManager.prototype.getAll = function() {
     }
 
     return highscores;
+};
+
+/**
+ * Kollar om score hamnar på top 5-listan.
+ *
+ * @param {number} score
+ * @return {boolean}
+ */
+runmysteriet.logic.HighscoreManager.prototype.isNewRecord = function(score) {
+
+    var highscores = null;
+    var lowestTopScore = 0;
+
+    score = parseInt(score, 10) || 0;
+
+    if (score <= 0) {
+        return false;
+    }
+
+    highscores = this.getAll();
+
+    /*
+     * Om färre än 5 finns sparade ska spelaren få skriva namn.
+     */
+    if (highscores.length < 5) {
+        return true;
+    }
+
+    /*
+     * Rune-listan ligger på:
+     * 0 = plats 1
+     * 1 = plats 2
+     * 2 = plats 3
+     * 3 = plats 4
+     * 4 = plats 5
+     */
+    lowestTopScore = parseInt(highscores[4].score, 10) || 0;
+
+    return score > lowestTopScore;
 };
 
 /**
@@ -113,7 +149,7 @@ runmysteriet.logic.HighscoreManager.prototype.hasSameEntry = function(name, scor
         }
 
         if (
-            String(item.name || "").toUpperCase() === name &&
+            String(item.name || item.username || "").toUpperCase() === name &&
             parseInt(item.score, 10) === score
         ) {
             return true;
@@ -131,6 +167,7 @@ runmysteriet.logic.HighscoreManager.prototype.hasSameEntry = function(name, scor
 runmysteriet.logic.HighscoreManager.prototype.getBest = function() {
 
     var item = null;
+    var score = 0;
 
     if (!this.application || !this.application.highscores) {
         return null;
@@ -138,52 +175,15 @@ runmysteriet.logic.HighscoreManager.prototype.getBest = function() {
 
     item = this.application.highscores.get(0, 0);
 
-    if (!item || item.score <= 0) {
+    if (!item) {
+        return null;
+    }
+
+    score = parseInt(item.score, 10) || 0;
+
+    if (score <= 0) {
         return null;
     }
 
     return item;
-};
-
-/**
- * Kollar om score hamnar bland de 5 bästa.
- *
- * @param {number} score
- * @return {boolean}
- */
-runmysteriet.logic.HighscoreManager.prototype.isNewRecord = function(score) {
-
-    var highscores = null;
-    var lowestTopScore = 0;
-
-    score = parseInt(score, 10) || 0;
-
-    if (score <= 0) {
-        return false;
-    }
-
-    highscores = this.getAll();
-
-    /*
-     * Om Rune har färre än 5 sparade resultat,
-     * ska spelaren få skriva namn.
-     */
-    if (highscores.length < 5) {
-        return true;
-    }
-
-    /*
-     * Rune sparar topplistan på index:
-     * 0 = plats 1
-     * 1 = plats 2
-     * 2 = plats 3
-     * 3 = plats 4
-     * 4 = plats 5
-     */
-    lowestTopScore = parseInt(highscores[4].score, 10) || 0;
-
-    /*
-     * Score måste vara bättre än plats 5.
-     */
-    return score > lowestTopScore;
 };

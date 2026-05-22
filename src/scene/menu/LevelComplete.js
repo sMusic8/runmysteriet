@@ -1,6 +1,3 @@
-var runmysteriet = runmysteriet || {};
-runmysteriet.scene = runmysteriet.scene || {};
-
 //------------------------------------------------------------------------------
 // LEVEL COMPLETE SCENE
 //------------------------------------------------------------------------------
@@ -13,7 +10,6 @@ runmysteriet.scene.LevelComplete = function(levelNumber, totalScore, earnedScore
     this.levelNumber = levelNumber || 1;
     this.totalScore = totalScore || 0;
     this.earnedScore = earnedScore || 0;
-    this.playerName = playerName || "PLAYER";
 
     this.levelConfig = new runmysteriet.config.LevelConfig(this.levelNumber);
     this.maxLevel = this.levelConfig.getMaxLevel();

@@ -101,13 +101,13 @@ runmysteriet.scene.Game.prototype.init = function () {
     var p1Texture = "spritesheet_freya_all";
   var p2Texture = "spritesheet_thor_all";
 
-if (this.m_avatarData && this.m_avatarData.player1) {
+  if (this.m_avatarData && this.m_avatarData.player1) {
     p1Texture = this.m_avatarData.player1.texture;
-}
+  }
 
-if (this.m_avatarData && this.m_avatarData.player2) {
-    p2Texture = this.m_avatarData.player2.texture;
-}
+  if (this.m_avatarData && this.m_avatarData.player2) {
+      p2Texture = this.m_avatarData.player2.texture;
+  }
   /*
    * Musik
    */
@@ -1000,11 +1000,11 @@ runmysteriet.scene.Game.prototype.winGame = function (winningPlayer) {
 
   this.application.scenes.load([
     new runmysteriet.scene.GuessWord(
-      this.m_levelNumber,
-      earnedScore,
-      totalScore,
-      guessData,
-      this.m_playerName
+    this.m_levelNumber,
+    earnedScore,
+    totalScore,
+    guessData,
+    this.m_avatarData
     ),
   ]);
 };
@@ -1028,13 +1028,11 @@ runmysteriet.scene.Game.prototype.loseGame = function (reason) {
 
   this.application.scenes.load([
     new runmysteriet.scene.GameOver(
-      this.m_playerName,
-      this.m_score,
-      reason || "GAME OVER"
+        this.m_score,
+        reason || "GAME OVER"
     )
-  ]);
+]);
 };
-
 //------------------------------------------------------------------------------
 // RUNES
 //------------------------------------------------------------------------------
