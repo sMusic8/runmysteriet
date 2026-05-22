@@ -34,27 +34,22 @@ runmysteriet.scene.More.prototype.init = function() {
     this.backgroundMusic = this.application.sounds.sound.get("sound_musicMenu");
     this.menuSound = this.application.sounds.sound.get("sound_menu");
 
-    this.m_volumeHud = new runmysteriet.ui.graphic.VolumeHud(
-    this.application,
-    this.backgroundMusic
-);
-
-    this.stage.addChild(this.m_volumeHud);
-
-     if (this.backgroundMusic) {
+    if (this.backgroundMusic) {
         this.backgroundMusic.loop = true;
         this.backgroundMusic.volume = 0.5;
         this.backgroundMusic.play();
     }
-   
+
     this.createBackground();
     this.createBox();
     this.createText();
     this.createBackButton();
-    this.createVolumeText();
-    this.updateVolumeText();
-};
 
+    /*
+     * VolumeHud ska skapas sist så den hamnar över bakgrund/box/text.
+     */
+    this.createVolumeHud();
+};
 //------------------------------------------------------------------------------
 // CREATE
 //------------------------------------------------------------------------------
@@ -70,30 +65,6 @@ runmysteriet.scene.More.prototype.createBackground = function() {
     );
 
     this.stage.addChild(this.m_background);
-};
-
-runmysteriet.scene.More.prototype.createVolumeText = function() {
-
-    this.m_volumeText = new rune.text.BitmapField("VOLUME: 50%");
-    this.m_volumeText.autoSize = true;
-
-    this.m_volumeText.x = 15;
-    this.m_volumeText.y = 15;
-
-    this.stage.addChild(this.m_volumeText);
-};
-
-runmysteriet.scene.More.prototype.updateVolumeText = function() {
-
-    var volume = 0;
-
-    if (!this.m_volumeText || !this.backgroundMusic) {
-        return;
-    }
-
-    volume = Math.round(this.backgroundMusic.volume * 100);
-
-    this.m_volumeText.text = "VOLUME: " + volume + "%";
 };
 
 runmysteriet.scene.More.prototype.createBox = function() {
@@ -209,7 +180,9 @@ runmysteriet.scene.More.prototype.handleVolumeInput = function(input) {
             this.backgroundMusic.volume = 0;
         }
 
-        this.updateVolumeText();
+        if (this.m_volumeHud) {
+            this.m_volumeHud.updateText();
+        }
     }
 
     if (input.volumeDown) {
@@ -220,8 +193,8 @@ runmysteriet.scene.More.prototype.handleVolumeInput = function(input) {
         }
 
         if (this.m_volumeHud) {
-         this.m_volumeHud.updateText();
-}
+            this.m_volumeHud.updateText();
+        }
     }
 };
 //------------------------------------------------------------------------------
@@ -245,7 +218,19 @@ runmysteriet.scene.More.prototype.goToMenu = function() {
         new runmysteriet.scene.Menu()
     ]);
 };
+//------------------------------------------------------------------------------
+// VOLUME HUD
+//------------------------------------------------------------------------------
 
+runmysteriet.scene.More.prototype.createVolumeHud = function() {
+
+    this.m_volumeHud = new runmysteriet.ui.graphic.VolumeHud(
+        this.application,
+        this.backgroundMusic
+    );
+
+    this.stage.addChild(this.m_volumeHud);
+};
 //------------------------------------------------------------------------------
 // DISPOSE
 //------------------------------------------------------------------------------
@@ -260,7 +245,7 @@ runmysteriet.scene.More.prototype.dispose = function() {
     this.backgroundMusic = null;
     this.menuSound = null;
     this.m_gameInput = null;
-    this.m_volumeText = null;
+    this.m_volumeHud = null;
 
     rune.scene.Scene.prototype.dispose.call(this);
 };
