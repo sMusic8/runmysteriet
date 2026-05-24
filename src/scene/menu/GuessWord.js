@@ -51,6 +51,8 @@ runmysteriet.scene.GuessWord = function(levelNumber, earnedScore, totalScore, wo
     this.m_hintText = null;
     this.m_scoreText = null;
     this.m_messageText = null;
+    this.m_correctWordText = null;
+    this.m_failedGuess = false;
 
     this.m_currentHintIndex = 0;
     this.m_hintCost = 20;
@@ -234,6 +236,15 @@ runmysteriet.scene.GuessWord.prototype.update = function(step) {
         return;
     }
 
+    if (this.m_failedGuess === true) {
+
+    if (this.isConfirmPressed(input)) {
+        this.goToGameOver();
+    }
+
+    return;
+}
+
     if (!this.m_alphabetSelector || !this.m_puzzle) {
         return;
     }
@@ -377,19 +388,14 @@ runmysteriet.scene.GuessWord.prototype.goToLevelComplete = function() {
             this.m_levelNumber,
             this.m_totalScore,
             this.m_earnedScore,
-            this.m_avatarData        )
+            this.m_avatarData
+        )
     ]);
 };
-
 //------------------------------------------------------------------------------
 // WRONG GUESS
 //------------------------------------------------------------------------------
 
-/**
- * Hanterar fel gissning.
- *
- * @return {void}
- */
 runmysteriet.scene.GuessWord.prototype.applyWrongGuessPenalty = function() {
 
     var triesLeft = 0;
@@ -410,7 +416,7 @@ runmysteriet.scene.GuessWord.prototype.applyWrongGuessPenalty = function() {
     this.updateScoreText();
 
     if (this.m_wrongGuesses >= this.m_maxWrongGuesses) {
-        this.goToGameOver();
+        this.showCorrectWordText();
         return;
     }
 
@@ -422,6 +428,33 @@ runmysteriet.scene.GuessWord.prototype.applyWrongGuessPenalty = function() {
         " POINTS. TRIES LEFT " +
         triesLeft
     );
+};
+
+//------------------------------------------------------------------------------
+// CORRECT WORD TEXT
+//------------------------------------------------------------------------------
+
+runmysteriet.scene.GuessWord.prototype.showCorrectWordText = function() {
+
+    this.m_failedGuess = true;
+
+    if (!this.m_correctWordText) {
+        this.m_correctWordText = new rune.text.BitmapField("");
+        this.m_correctWordText.autoSize = true;
+        this.m_correctWordText.scale = 0.8;
+
+        this.stage.addChild(this.m_correctWordText);
+    }
+
+    this.m_correctWordText.text = "THE WORD WAS:  " + this.m_word.toUpperCase();
+    /*
+     * Placera texten precis ovanför bokstavsboxarna.
+     * Boxarna ligger på center.y - 35.
+     */
+    this.m_correctWordText.center = this.application.screen.center;
+    this.m_correctWordText.y = this.application.screen.center.y - 65;
+
+    this.updateMessageText("PRESS ENTER / CROSS TO CONTINUE");
 };
 //------------------------------------------------------------------------------
 // GAME OVER
@@ -466,4 +499,120 @@ runmysteriet.scene.GuessWord.prototype.updateScoreText = function() {
     }
 
     this.m_scoreText.text = "SCORE: " + this.m_totalScore;
+};
+//------------------------------------------------------------------------------
+// REMOVE DISPLAY OBJECT
+//------------------------------------------------------------------------------
+
+runmysteriet.scene.GuessWord.prototype.removeDisplayObject = function(object) {
+
+    if (!object) {
+        return;
+    }
+
+    if (object.parent) {
+        object.parent.removeChild(object);
+        return;
+    }
+
+    if (object.stage) {
+        object.stage.removeChild(object);
+    }
+};
+//------------------------------------------------------------------------------
+// SOUND
+//------------------------------------------------------------------------------
+
+runmysteriet.scene.GuessWord.prototype.stopBackgroundMusic = function() {
+
+    var mediaElement = null;
+
+    if (!this.backgroundMusic) {
+        return;
+    }
+
+    if (
+        this.backgroundMusic.m_source &&
+        this.backgroundMusic.m_source.mediaElement
+    ) {
+        mediaElement = this.backgroundMusic.m_source.mediaElement;
+
+        if (typeof mediaElement.pause === "function") {
+            mediaElement.pause();
+        }
+
+        try {
+            mediaElement.currentTime = 0;
+        } catch (error) {
+        }
+    }
+};
+//------------------------------------------------------------------------------
+// DISPOSE
+//------------------------------------------------------------------------------
+
+runmysteriet.scene.GuessWord.prototype.dispose = function() {
+
+    var i = 0;
+    var box = null;
+
+    this.stopBackgroundMusic();
+
+    if (this.m_letterBoxes) {
+        for (i = 0; i < this.m_letterBoxes.length; i++) {
+            box = this.m_letterBoxes[i];
+
+            if (!box) {
+                continue;
+            }
+
+            if (typeof box.dispose === "function") {
+                box.dispose();
+                continue;
+            }
+
+            if (typeof box.clear === "function") {
+                box.clear();
+            }
+
+            this.removeDisplayObject(box.m_box);
+            this.removeDisplayObject(box.m_text);
+            this.removeDisplayObject(box.m_background);
+            this.removeDisplayObject(box.m_letterText);
+        }
+    }
+
+    this.removeDisplayObject(this.m_titleText);
+    this.removeDisplayObject(this.m_letterText);
+    this.removeDisplayObject(this.m_hintText);
+    this.removeDisplayObject(this.m_scoreText);
+    this.removeDisplayObject(this.m_messageText);
+    this.removeDisplayObject(this.m_correctWordText);
+
+    this.m_gameInput = null;
+
+    this.m_puzzle = null;
+    this.m_alphabetSelector = null;
+    this.m_letterBoxes = [];
+
+    this.m_titleText = null;
+    this.m_letterText = null;
+    this.m_hintText = null;
+    this.m_scoreText = null;
+    this.m_messageText = null;
+    this.m_correctWordText = null;
+
+    this.m_wordData = null;
+    this.m_word = "";
+    this.m_hints = [];
+
+    this.m_avatarData = null;
+
+    this.backgroundMusic = null;
+    this.menuSound = null;
+
+    this.m_failedGuess = false;
+    this.m_answeredCorrect = false;
+
+    rune.scene.Scene.prototype.dispose.call(this);
 };
