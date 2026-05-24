@@ -286,9 +286,9 @@ runmysteriet.entity.EnglishBoat.prototype.startTween = function(tweens, minX, ma
 
     tweens.create({
         target: this,
-        duration: 15000,
+        duration: 10000,
         behavior: rune.tween.Tween.REVERSE,
-        cycles: 999999,
+        cycles: 100,
         easing: rune.tween.Sine.easeInOut,
         args: {
             x: maxX

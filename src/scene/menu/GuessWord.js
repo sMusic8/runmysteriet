@@ -20,7 +20,6 @@ runmysteriet.scene.GuessWord = function(levelNumber, earnedScore, totalScore, wo
     this.m_earnedScore = earnedScore || 0;
     this.m_totalScore = totalScore || 0;
     this.m_avatarData = avatarData || null;    
-    this.m_wrongGuessPenalty = 10;
 
     this.m_scoreBeforeLevel = this.m_totalScore - this.m_earnedScore;
 
@@ -56,11 +55,14 @@ runmysteriet.scene.GuessWord = function(levelNumber, earnedScore, totalScore, wo
     this.m_currentHintIndex = 0;
     this.m_hintCost = 20;
     this.m_wrongGuessPenalty = 10;
-
+    this.m_wrongGuesses = 0;
+    this.m_maxWrongGuesses = 3;
     this.m_answeredCorrect = false;
 
     this.backgroundMusic = null;
     this.menuSound = null;
+
+    
 };
 
 //------------------------------------------------------------------------------
@@ -133,7 +135,7 @@ runmysteriet.scene.GuessWord.prototype.createText = function() {
     this.m_scoreText.scale = 0.8;
     this.stage.addChild(this.m_scoreText);
 
-    this.m_messageText = new rune.text.BitmapField("UP/DOWN = LETTER, ENTER/CROSS = GUESS, T/TRIANGLE = HINT");    
+    this.m_messageText = new rune.text.BitmapField("TRIES LEFT 3   UP/DOWN = LETTER, ENTER/CROSS = GUESS");    
     this.m_messageText.autoSize = true;
     this.m_messageText.center = this.application.screen.center;
     this.m_messageText.y += 90;
@@ -351,9 +353,7 @@ runmysteriet.scene.GuessWord.prototype.checkAnswer = function(letter) {
     }
 
     this.applyWrongGuessPenalty();
-    this.m_messageText.text = "WRONG LETTER. -10 POINTS.";
 };
-
 //------------------------------------------------------------------------------
 // CONFIRM
 //------------------------------------------------------------------------------
@@ -382,26 +382,47 @@ runmysteriet.scene.GuessWord.prototype.goToLevelComplete = function() {
 };
 
 //------------------------------------------------------------------------------
-// WRONG PENALTY
+// WRONG GUESS
 //------------------------------------------------------------------------------
 
+/**
+ * Hanterar fel gissning.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.GuessWord.prototype.applyWrongGuessPenalty = function() {
 
+    var triesLeft = 0;
+
+    this.m_wrongGuesses++;
+
     this.m_earnedScore -= this.m_wrongGuessPenalty;
+    this.m_totalScore -= this.m_wrongGuessPenalty;
 
     if (this.m_earnedScore < 0) {
         this.m_earnedScore = 0;
     }
 
-    this.m_totalScore = this.m_scoreBeforeLevel + this.m_earnedScore;
-
-    this.m_scoreText.text = "SCORE: " + this.m_totalScore;
-
-    if (this.m_earnedScore <= 0) {
-        this.goToGameOver();
+    if (this.m_totalScore < 0) {
+        this.m_totalScore = 0;
     }
-};
 
+    this.updateScoreText();
+
+    if (this.m_wrongGuesses >= this.m_maxWrongGuesses) {
+        this.goToGameOver();
+        return;
+    }
+
+    triesLeft = this.m_maxWrongGuesses - this.m_wrongGuesses;
+
+    this.updateMessageText(
+        "WRONG LETTER. -" +
+        this.m_wrongGuessPenalty +
+        " POINTS. TRIES LEFT " +
+        triesLeft
+    );
+};
 //------------------------------------------------------------------------------
 // GAME OVER
 //------------------------------------------------------------------------------
@@ -411,7 +432,38 @@ runmysteriet.scene.GuessWord.prototype.goToGameOver = function() {
     this.application.scenes.load([
         new runmysteriet.scene.GameOver(
             this.m_totalScore,
-            "NO SCORE LEFT"
+            "TOO MANY WRONG GUESSES"
         )
     ]);
+};
+/**
+ * Uppdaterar meddelandetext.
+ *
+ * @param {string} text
+ * @return {void}
+ */
+runmysteriet.scene.GuessWord.prototype.updateMessageText = function(text) {
+
+    if (!this.m_messageText) {
+        return;
+    }
+
+    this.m_messageText.text = text;
+};
+//------------------------------------------------------------------------------
+// SCORE TEXT
+//------------------------------------------------------------------------------
+
+/**
+ * Uppdaterar scoretext.
+ *
+ * @return {void}
+ */
+runmysteriet.scene.GuessWord.prototype.updateScoreText = function() {
+
+    if (!this.m_scoreText) {
+        return;
+    }
+
+    this.m_scoreText.text = "SCORE: " + this.m_totalScore;
 };

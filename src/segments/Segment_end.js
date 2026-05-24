@@ -88,7 +88,7 @@ runmysteriet.segments.Segment_End.prototype.ground = function(stage, startX, lev
      * Marken byggs i delar så små lavahål kan finnas mellan markbitarna.
      */
     this.addGroundWithSmallLavaHoles(stage, platforms, holes, segmentStart);
-
+    this.addJumpPlatforms(stage, platforms, segmentStart);
     this.addGoalMarkers(stage, gateX, gateY);
     this.addDiseases(diseaseSpawns, segmentStart, levelNumber);
     this.addRuneSpawns(runeSpawns, segmentStart);
@@ -462,4 +462,78 @@ runmysteriet.segments.Segment_End.prototype.getArmorPositions = function(segment
             y: this.groundY - 45
         }
     ];
+};
+
+//------------------------------------------------------------------------------
+// JUMP PLATFORMS
+//------------------------------------------------------------------------------
+
+/**
+ * Lägger till extra plattformar i slutsegmentet.
+ *
+ * @param {!rune.display.Stage} stage
+ * @param {!Array<!Object>} platforms
+ * @param {number} segmentStart
+ */
+runmysteriet.segments.Segment_End.prototype.addJumpPlatforms = function(stage, platforms, segmentStart) {
+
+    this.addPlatform(
+        stage,
+        platforms,
+        segmentStart + 180,
+        this.groundY - 55,
+        3
+    );
+
+    this.addPlatform(
+        stage,
+        platforms,
+        segmentStart + 340,
+        this.groundY - 85,
+        3
+    );
+
+    this.addPlatform(
+        stage,
+        platforms,
+        segmentStart + 520,
+        this.groundY - 65,
+        4
+    );
+
+    this.addPlatform(
+        stage,
+        platforms,
+        segmentStart + 720,
+        this.groundY - 95,
+        3
+    );
+};
+
+/**
+ * Skapar en hoppplattform.
+ *
+ * @param {!rune.display.Stage} stage
+ * @param {!Array<!Object>} platforms
+ * @param {number} x
+ * @param {number} y
+ * @param {number} amount
+ */
+runmysteriet.segments.Segment_End.prototype.addPlatform = function(stage, platforms, x, y, amount) {
+
+    var i = 0;
+    var tile = null;
+
+    for (i = 0; i < amount; i++) {
+        tile = new rune.display.Graphic(
+            x + i * this.tileW,
+            y,
+            this.tileW,
+            this.tileH,
+            this.markerTexture
+        );
+
+        stage.addChild(tile);
+        platforms.push(tile);
+    }
 };

@@ -68,7 +68,7 @@ runmysteriet.scene.LevelComplete.prototype.init = function() {
     var total = new rune.text.BitmapField("TOTAL SCORE " + this.totalScore);
     total.autoSize = true;
     total.center = this.application.screen.center;
-    total.y -= 5;
+    total.y -= 25;
     this.stage.addChild(total);
 
     this.createMenu();
