@@ -17,12 +17,11 @@ runmysteriet.handler.EnemyHandler = function(stage) {
     this.enemies = [];
 
     /*
-     * Grottbilder som skapas vid varje Kristen.
-     */
-    this.caves = [];
-
-    /*
-     * Osynliga blockeringar som hindrar spelaren från att hoppa över.
+     * Osynliga blockeringar ovanför Kristen.
+     * Dessa ersätter grottan och hindrar spelaren från att hoppa över.
+     *
+     * Namnet caveBlockers behålls tills vidare för att inte riskera
+     * att annan kod som redan använder detta namn går sönder.
      */
     this.caveBlockers = [];
 };
@@ -40,17 +39,19 @@ runmysteriet.handler.EnemyHandler = function(stage) {
  */
 runmysteriet.handler.EnemyHandler.prototype.init = function(levelConfig, enemySpawns) {
 
+    var kristenCount = 0;
+    var created = 0;
+    var i = 0;
+
     this.clear();
 
     if (!levelConfig || !enemySpawns) {
         return;
     }
 
-    var kristenCount = levelConfig.getKristenCount();
-    var created = 0; 
+    kristenCount = levelConfig.getKristenCount();
 
-    for (var i = 0; i < enemySpawns.length; i++) {
-
+    for (i = 0; i < enemySpawns.length; i++) {
         if (created >= kristenCount) {
             break;
         }
@@ -74,33 +75,74 @@ runmysteriet.handler.EnemyHandler.prototype.init = function(levelConfig, enemySp
  */
 runmysteriet.handler.EnemyHandler.prototype.createKristen = function(spawn) {
 
-    var caveData = null;
+    var kristen = null;
+    var blocker = null;
 
-    /*
-     * Skapa grottan först så den hamnar bakom Kristen.
-     */
-    caveData = this.createKristenCave(spawn);
-
-    var kristen = new runmysteriet.entity.Kristen(
+    kristen = new runmysteriet.entity.Kristen(
         "spritesheet_kristen",
         spawn.x,
         spawn.y
     );
 
     /*
-     * Koppla grotta och blocker till just denna Kristen.
+     * Skapa osynlig blocker ovanför Kristen.
+     * Den ersätter grottan.
      */
-    kristen.cave = caveData.cave;
-    kristen.caveBlocker = caveData.blocker;
+    blocker = this.createKristenBlocker(kristen);
 
-    caveData.cave.enemy = kristen;
-    caveData.blocker.enemy = kristen;
+    /*
+     * Koppla blocker till just denna Kristen.
+     */
+    kristen.cave = null;
+    kristen.caveBlocker = blocker;
 
+    blocker.enemy = kristen;
+
+    this.caveBlockers.push(blocker);
     this.enemies.push(kristen);
+
+    /*
+     * Blocker läggs till före Kristen.
+     * Den är osynlig, men finns i stage för hitTest/separation.
+     */
+    this.stage.addChild(blocker);
     this.stage.addChild(kristen);
 
     return kristen;
 };
+
+/**
+ * Skapar osynlig blocker ovanför Kristen.
+ *
+ * Blockern ska inte ligga på marknivå, för då stoppar den spelaren
+ * från att gå fram och slåss. Den ligger ovanför Kristen och stoppar
+ * hopp över honom.
+ *
+ * @param {!runmysteriet.entity.Kristen} kristen
+ * @return {!rune.display.Graphic}
+ */
+runmysteriet.handler.EnemyHandler.prototype.createKristenBlocker = function(kristen) {
+
+    var blocker = null;
+
+    blocker = new rune.display.Graphic(
+        kristen.x - 20,
+        kristen.y - 120,
+        kristen.width + 40, 
+        120
+    );
+
+    blocker.alpha = 0;
+    blocker.immovable = true;
+    blocker.isKristenBlocker = true;
+
+    if (rune.physics && rune.physics.Space) {
+        blocker.allowCollisions = rune.physics.Space.ANY;
+    }
+
+    return blocker;
+};
+
 //------------------------------------------------------------------------------
 // UPDATE
 //------------------------------------------------------------------------------
@@ -113,75 +155,88 @@ runmysteriet.handler.EnemyHandler.prototype.createKristen = function(spawn) {
  */
 runmysteriet.handler.EnemyHandler.prototype.update = function(players) {
 
-    for (var i = 0; i < this.enemies.length; i++) {
+    var i = 0;
+    var enemy = null;
 
-        var enemy = this.enemies[i];
+    for (i = 0; i < this.enemies.length; i++) {
+        enemy = this.enemies[i];
 
         if (!enemy || enemy.isDead === true) {
             continue;
         }
 
-      if (typeof enemy.faceNearestPlayer === "function") {
-         enemy.faceNearestPlayer(players);
-}
+        this.updateKristenBlocker(enemy);
+
+        if (typeof enemy.faceNearestPlayer === "function") {
+            enemy.faceNearestPlayer(players);
+        }
 
         if (typeof enemy.checkPlayerCollisions === "function") {
             enemy.checkPlayerCollisions(players);
-}
+        }
+
+        this.checkBlockerCollisions(enemy, players);
     }
 };
 
+/**
+ * Flyttar blockern så den följer Kristen när han patrullerar.
+ *
+ * @param {!runmysteriet.entity.Kristen} kristen
+ * @return {void}
+ */
+runmysteriet.handler.EnemyHandler.prototype.updateKristenBlocker = function(kristen) {
 
-runmysteriet.handler.EnemyHandler.prototype.createKristenCave = function(spawn) {
-
-    var cave = null;
     var blocker = null;
 
-    var caveWidth = 100;
-    var caveHeight = 100;
+    if (!kristen) {
+        return;
+    }
 
-    var caveX = spawn.x + 32;//// Justera så Kristen hamnar i mitten av grottan.
-    var caveY = spawn.y - 68;// Justera så Kristen hamnar i mitten av grottan.
+    blocker = kristen.caveBlocker;
 
-    cave = new rune.display.Graphic(
-        caveX,
-        caveY,
-        caveWidth,
-        caveHeight,
-        "grottan"
-    );
+    if (!blocker) {
+        return;
+    }
 
-    /*
-     * Osynlig blocker-zon.
-     * Den används inte som vanlig plattform, utan som logisk spärr.
-     */
-    blocker = new rune.display.Graphic(
-        caveX,
-        caveY,
-        caveWidth,
-        caveHeight
-    );
+    blocker.x = kristen.x - 20;
+    blocker.y = kristen.y - 120;
+};
 
-    blocker.alpha = 0;
+/**
+ * Stoppar spelaren om han försöker hoppa över Kristen.
+ *
+ * @param {!runmysteriet.entity.Kristen} kristen
+ * @param {!Array<!Object>} players
+ * @return {void}
+ */
+runmysteriet.handler.EnemyHandler.prototype.checkBlockerCollisions = function(kristen, players) {
 
-    /*
-     * Spelaren får bara passera om fötterna är under denna gräns.
-     * Är spelaren högre upp än detta, räknas det som att spelaren försöker hoppa över.
-     *
-     * Justera detta värde om öppningen känns för låg/hög.
-     */
-    blocker.openingY = spawn.y + 55;
+    var blocker = null;
+    var player = null;
+    var i = 0;
 
-    this.caves.push(cave);
-    this.caveBlockers.push(blocker);
+    if (!kristen || !players) {
+        return;
+    }
 
-    this.stage.addChild(cave);
-    this.stage.addChild(blocker);
+    blocker = kristen.caveBlocker;
 
-    return {
-        cave: cave,
-        blocker: blocker
-    };
+    if (!blocker) {
+        return;
+    }
+
+    for (i = 0; i < players.length; i++) {
+        player = players[i];
+
+        if (!player || player.isDead === true) {
+            continue;
+        }
+
+        if (typeof player.hitTestAndSeparate === "function") {
+            player.hitTestAndSeparate(blocker);
+        }
+    }
 };
 
 //------------------------------------------------------------------------------
@@ -197,9 +252,9 @@ runmysteriet.handler.EnemyHandler.prototype.clear = function() {
 
     var i = 0;
     var enemy = null;
+    var blocker = null;
 
     for (i = 0; i < this.enemies.length; i++) {
-
         enemy = this.enemies[i];
 
         if (!enemy) {
@@ -221,26 +276,25 @@ runmysteriet.handler.EnemyHandler.prototype.clear = function() {
         if (enemy.stage) {
             enemy.stage.removeChild(enemy);
         }
+
+        enemy.cave = null;
+        enemy.caveBlocker = null;
     }
 
-    for (i = 0; i < this.caves.length; i++) {
-    cave = this.caves[i];
+    for (i = 0; i < this.caveBlockers.length; i++) {
+        blocker = this.caveBlockers[i];
 
-    if (cave !== null && cave.parent !== null) {
-        cave.parent.removeChild(cave);
+        if (!blocker) {
+            continue;
+        }
+
+        if (blocker.parent) {
+            blocker.parent.removeChild(blocker);
+        } else if (blocker.stage) {
+            blocker.stage.removeChild(blocker);
+        }
     }
-}
-
-for (i = 0; i < this.caveBlockers.length; i++) {
-    blocker = this.caveBlockers[i];
-
-    if (blocker !== null && blocker.parent !== null) {
-        blocker.parent.removeChild(blocker);
-    }
-}
-
-this.caves = [];
-this.caveBlockers = [];
 
     this.enemies = [];
+    this.caveBlockers = [];
 };

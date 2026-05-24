@@ -130,6 +130,18 @@ var runmysteriet = function() {
      */
 
     m_this.attack = {};
+
+
+     /**
+     * This package includes 
+     * @namespace particle
+     * @memberof runmysteriet
+     * @since 1.0
+     */
+
+    m_this.particle = {};
+
+
     /**
      * Public scope.
      */

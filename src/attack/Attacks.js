@@ -46,7 +46,7 @@ runmysteriet.attack.Attack = function(player) {
      *
      * @type {number}
      */
-    this.damage = 25;
+    this.damage = 35;
 
     /**
      * Hur länge attacken syns.

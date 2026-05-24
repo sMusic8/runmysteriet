@@ -218,7 +218,6 @@ runmysteriet.segments.Segment_Water.prototype.addRaft = function(stage, platform
      */
     platforms.push(raft);
 };
-
 //------------------------------------------------------------------------------
 // BOAT
 //------------------------------------------------------------------------------
@@ -231,18 +230,24 @@ runmysteriet.segments.Segment_Water.prototype.addRaft = function(stage, platform
  * @param {!runmysteriet.ui.graphic.Water} water
  */
 runmysteriet.segments.Segment_Water.prototype.addBoat = function(stage, boats, water) {
+
+    var boatX = water.x - 150;
+    var boatY = water.y - 75;
+
+    var boatMinX = water.x - 150;
+    var boatMaxX = water.x + 50;
+
     var boat = new runmysteriet.entity.EnglishBoat(
-        water.x + 60,
-        water.y - 75
+        boatX,
+        boatY
     );
 
-    boat.minX = water.x - 160;
-    boat.maxX = water.x + this.waterWidth - boat.width - 120;
+    boat.minX = boatMinX;
+    boat.maxX = boatMaxX;
 
     stage.addChild(boat);
     boats.push(boat);
 };
-
 //------------------------------------------------------------------------------
 // DISEASES
 //------------------------------------------------------------------------------

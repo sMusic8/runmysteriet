@@ -2,7 +2,7 @@
 // LEVEL COMPLETE SCENE
 //------------------------------------------------------------------------------
 
-runmysteriet.scene.LevelComplete = function(levelNumber, totalScore, earnedScore, playerName, avatarData) {
+runmysteriet.scene.LevelComplete = function(levelNumber, totalScore, earnedScore, avatarData) {
     console.log("grus")
     rune.scene.Scene.call(this);
     this.m_avatarData = avatarData || null;
@@ -59,17 +59,10 @@ runmysteriet.scene.LevelComplete.prototype.init = function() {
     title.y -= 75;
     this.stage.addChild(title);
 
-    var nameText = new rune.text.BitmapField("NAME " + this.playerName);
-    nameText.autoSize = true;
-    nameText.center = this.application.screen.center;
-    nameText.y -= 50;
-    nameText.scale = 0.75;
-    this.stage.addChild(nameText);
-
     var earned = new rune.text.BitmapField("EARNED SCORE +" + this.earnedScore);
     earned.autoSize = true;
     earned.center = this.application.screen.center;
-    earned.y -= 25;
+    earned.y -= 45;
     this.stage.addChild(earned);
 
     var total = new rune.text.BitmapField("TOTAL SCORE " + this.totalScore);
@@ -83,7 +76,7 @@ runmysteriet.scene.LevelComplete.prototype.init = function() {
 };
 
 //------------------------------------------------------------------------------
-// VOLUME CONTROL (EXAKT SOM MORE)
+// VOLUME CONTROL
 //------------------------------------------------------------------------------
 
 runmysteriet.scene.LevelComplete.prototype.update = function(step) {

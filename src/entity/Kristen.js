@@ -216,21 +216,41 @@ runmysteriet.entity.Kristen.prototype.update = function (step) {
  * @param {!Object} player
  * @return {void}
  */
-runmysteriet.entity.Kristen.prototype.handleCollision = function (player) {
+runmysteriet.entity.Kristen.prototype.handleCollision = function(player) {
 
-  if (!player || player.isDead === true) return;
+    var hit = false;
 
-  if (typeof player.hitTestAndSeparate !== "function") return;
+    if (!player || player.isDead === true) {
+        return;
+    }
 
-  var hit = player.hitTestAndSeparate(this);
-  if (!hit) return;
+    if (typeof player.hitTestAndSeparate !== "function") {
+        return;
+    }
 
-  if (this.hitCooldown > 0) return;
+    hit = player.hitTestAndSeparate(this);
 
-  this.hitCooldown = 20;
+    if (!hit) {
+        return;
+    }
 
-  // OBS: just nu skadar Kristen sig själv (kan vara bug)
-  this.takeDamage(35);
+    if (this.hitCooldown > 0) {
+        return;
+    }
+
+    this.hitCooldown = 20;
+
+    /*
+     * Kristen ska inte ta skada av kroppskollision.
+     * Skada på Kristen ska bara ske via spelarens attack.
+     */
+    if (player.hp !== undefined) {
+        player.hp -= 10;
+
+        if (player.hp < 0) {
+            player.hp = 0;
+        }
+    }
 };
 
 //------------------------------------------------------------------------------
