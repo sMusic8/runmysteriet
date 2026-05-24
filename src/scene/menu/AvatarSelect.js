@@ -280,11 +280,10 @@ runmysteriet.scene.AvatarSelect.prototype.updatePlayer1Selection = function(inpu
 
         if (input.left || input.right) {
             this.m_player1Index = this.getNextAvatarIndex(this.m_player1Index);
-            this.fixSameAvatarSelection(0);
             this.m_inputCooldown1 = this.m_inputDelay;
             this.playMenuSound();
             this.updateView();
-        }
+}
     }
 
     if (input.choose || input.jump) {
@@ -317,11 +316,10 @@ runmysteriet.scene.AvatarSelect.prototype.updatePlayer2Selection = function(inpu
 
         if (input.left || input.right) {
             this.m_player2Index = this.getNextAvatarIndex(this.m_player2Index);
-            this.fixSameAvatarSelection(1);
             this.m_inputCooldown2 = this.m_inputDelay;
             this.playMenuSound();
             this.updateView();
-        }
+}
     }
 
     if (input.choose || input.jump) {
@@ -344,28 +342,6 @@ runmysteriet.scene.AvatarSelect.prototype.getNextAvatarIndex = function(index) {
     }
 
     return index;
-};
-
-/**
- * Gör så att båda spelarna inte väljer samma avatar.
- * Om player 1 väljer Thor, flyttas player 2 automatiskt till Freya.
- *
- * @param {number} changedPlayerIndex
- * @return {void}
- */
-runmysteriet.scene.AvatarSelect.prototype.fixSameAvatarSelection = function(changedPlayerIndex) {
-
-    if (this.m_player1Index !== this.m_player2Index) {
-        return;
-    }
-
-    if (changedPlayerIndex === 0) {
-        this.m_player2Index = this.getNextAvatarIndex(this.m_player2Index);
-        this.m_player2Ready = false;
-    } else {
-        this.m_player1Index = this.getNextAvatarIndex(this.m_player1Index);
-        this.m_player1Ready = false;
-    }
 };
 
 //------------------------------------------------------------------------------

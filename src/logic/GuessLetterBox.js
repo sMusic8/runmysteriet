@@ -127,7 +127,7 @@ runmysteriet.logic.GuessLetterBox.prototype.setActive = function(active) {
         if (active === true) {
             this.box.backgroundColor = "#0000ff";
         } else {
-            this.box.backgroundColor = "#ffffff";
+            this.box.backgroundColor = "#008100";
         }
     }
 
