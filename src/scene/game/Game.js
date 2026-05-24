@@ -17,21 +17,28 @@ runmysteriet.scene.Game = function (levelNumber, score, avatarData) {
   this.m_levelConfig = null;
   this.m_levelNumber = levelNumber || 1;
   this.m_score = score || 0;
-
+  this.m_levelScore = 0;
+  this.m_scoreLevelComplete = 100;
+  this.m_scoreHealthPercent = 1;
+  this.m_avatarData = avatarData || null;
 
 if (avatarData && typeof avatarData === "object") {
     this.m_avatarData = avatarData;
 } else {
     this.m_avatarData = null;
 }  
-this.m_playerName = "PLAYER";
 
+  this.m_highscoreManager = null;
+  this.m_highscoreSound = null;
+  this.m_highscoreText = null;
+  this.m_highscoreTimer = 0;
+  this.m_highscoreNotified = false;
+
+  this.m_playerName = "PLAYER";
   this.m_isPaused = false;
   this.m_pauseTitle = null;
   this.m_pauseMenu = null;
   this.m_pauseOverlay = null;
-
-  this.m_timeLeft = 200;
 
   this.m_gameEnd = false;
   this.m_finishX = 0;
@@ -58,7 +65,95 @@ this.m_startCountdownText = null;
 
 runmysteriet.scene.Game.prototype = Object.create(rune.scene.Scene.prototype);
 runmysteriet.scene.Game.prototype.constructor = runmysteriet.scene.Game;
+//------------------------------------------------------------------------------
+// HIGHSCORE NOTICE
+//------------------------------------------------------------------------------
 
+runmysteriet.scene.Game.prototype.createHighscoreNotice = function() {
+
+    this.m_highscoreText = new rune.text.BitmapField("NEW HIGHSCORE!");
+    this.m_highscoreText.autoSize = true;
+    this.m_highscoreText.visible = false;
+
+    this.stage.addChild(this.m_highscoreText);
+};
+
+runmysteriet.scene.Game.prototype.showHighscoreNotice = function() {
+
+    if (this.m_highscoreNotified === true) {
+        return;
+    }
+
+    this.m_highscoreNotified = true;
+    this.m_highscoreTimer = 90;
+
+    if (this.m_highscoreText) {
+        this.m_highscoreText.visible = true;
+        this.m_highscoreText.alpha = 1;
+        this.m_highscoreText.scaleX = 1;
+        this.m_highscoreText.scaleY = 1;
+    }
+
+    if (this.m_highscoreSound) {
+        this.m_highscoreSound.play();
+    }
+};
+
+runmysteriet.scene.Game.prototype.updateHighscoreNotice = function() {
+
+    var cameraX = 0;
+    var cameraY = 0;
+    var pulse = 0;
+
+    if (!this.m_highscoreText || this.m_highscoreText.visible !== true) {
+        return;
+    }
+
+    if (this.camera && this.camera.viewport) {
+        cameraX = this.camera.viewport.x;
+        cameraY = this.camera.viewport.y;
+    }
+
+    this.m_highscoreTimer--;
+
+    pulse = 1 + Math.sin(this.m_highscoreTimer * 0.25) * 0.15;
+
+    this.m_highscoreText.scaleX = pulse;
+    this.m_highscoreText.scaleY = pulse;
+
+    this.m_highscoreText.x =
+        cameraX +
+        this.application.screen.width / 2 -
+        this.m_highscoreText.width / 2;
+
+    this.m_highscoreText.y = cameraY + 35;
+
+    if (this.m_highscoreTimer < 30) {
+        this.m_highscoreText.alpha = this.m_highscoreTimer / 30;
+    }
+
+    if (this.m_highscoreTimer <= 0) {
+        this.m_highscoreText.visible = false;
+        this.m_highscoreText.alpha = 1;
+        this.m_highscoreText.scaleX = 1;
+        this.m_highscoreText.scaleY = 1;
+    }
+};
+
+runmysteriet.scene.Game.prototype.checkHighscoreNotice = function(score) {
+
+    if (this.m_highscoreNotified === true) {
+        return;
+    }
+
+    if (!this.m_highscoreManager) {
+        return;
+    }
+
+    if (this.m_highscoreManager.isNewRecord(score) === true) {
+        this.showHighscoreNotice();
+    }
+};
 //------------------------------------------------------------------------------
 // HUD
 //------------------------------------------------------------------------------
@@ -119,6 +214,14 @@ runmysteriet.scene.Game.prototype.init = function () {
     this.backgroundMusic.volume = 0.5;
     this.backgroundMusic.play();
   }
+
+  this.m_highscoreManager =
+      new runmysteriet.logic.HighscoreManager(this.application);
+
+  this.m_highscoreSound =
+      this.application.sounds.sound.get("sound_highscore");
+
+  this.createHighscoreNotice();
 
   /*
    * Bakgrund
@@ -388,8 +491,8 @@ runmysteriet.scene.Game.prototype.update = function(step) {
      * Kolla level completion efter att kamera/bounds är rättade.
      */
     this.checkLevelCompletion();
-
-    this.updateTimer();
+    this.updateGameInfo();
+    this.updateHighscoreNotice();
     this.updateHUD();
 };
 
@@ -808,30 +911,28 @@ runmysteriet.scene.Game.prototype.handleMenuListInput = function(menuList, input
         onChoose.call(this, menuList.getSelectedIndex());
     }
 };
+
 //------------------------------------------------------------------------------
-// TIMER
+// GAME INFO
 //------------------------------------------------------------------------------
 
-runmysteriet.scene.Game.prototype.updateTimer = function () {
-  this.m_timeLeft -= 1 / 30;
+runmysteriet.scene.Game.prototype.updateGameInfo = function() {
 
-  if (this.m_timeLeft < 0) {
-    this.m_timeLeft = 0;
-  }
+    if (!this.m_hudHandler) {
+        return;
+    }
 
-  if (this.m_hudHandler) {
     if (this.allRunesColected()) {
-      this.m_hudHandler.setTimerText("ALL RUNES FOUND - REACH THE END");
+        this.m_hudHandler.setTimerText("ALL RUNES FOUND - REACH THE END");
     } else {
-      this.m_hudHandler.setTimerText("TIME LEFT " + Math.ceil(this.m_timeLeft));
+        this.m_hudHandler.setTimerText("COLLECT ALL RUNES");
     }
 
     this.m_hudHandler.setScoreText(
-      "LEVEL " + this.m_levelNumber + " SCORE " + this.m_score
+        "LEVEL " + this.m_levelNumber +
+        " SCORE " + this.getTotalScore()
     );
-  }
 };
-
 //------------------------------------------------------------------------------
 // LEVEL COMPLETION
 //------------------------------------------------------------------------------
@@ -867,10 +968,6 @@ runmysteriet.scene.Game.prototype.checkLevelCompletion = function () {
   if (this.areAllPlayersDead()) {
     this.loseGame("ALL PLAYERS ARE DEAD");
     return;
-  }
-
-  if (this.m_timeLeft <= 0) {
-    this.loseGame("TIME IS UP");
   }
 };
 
@@ -932,6 +1029,82 @@ runmysteriet.scene.Game.prototype.areAllPlayersDead = function () {
 };
 
 //------------------------------------------------------------------------------
+// SCORE
+//------------------------------------------------------------------------------
+
+runmysteriet.scene.Game.prototype.addScore = function(amount) {
+
+    amount = parseInt(amount, 10) || 0;
+
+    if (amount <= 0) {
+        return;
+    }
+
+    this.m_levelScore += amount;
+    this.checkHighscoreNotice(this.getTotalScore());
+};
+
+runmysteriet.scene.Game.prototype.getTotalScore = function() {
+
+    return this.m_score + this.m_levelScore;
+};
+
+runmysteriet.scene.Game.prototype.getHealthScore = function() {
+
+    var players = null;
+    var player = null;
+    var i = 0;
+
+    var hp = 0;
+    var maxHp = 0;
+    var percent = 0;
+    var score = 0;
+
+    if (!this.m_playerHandler || !this.m_playerHandler.players) {
+        return 0;
+    }
+
+    players = this.m_playerHandler.players;
+
+    for (i = 0; i < players.length; i++) {
+        player = players[i];
+
+        if (!player) {
+            continue;
+        }
+
+        if (player.isDead === true) {
+            continue;
+        }
+
+        hp = parseInt(player.hp, 10) || 0;
+        maxHp = parseInt(player.maxHp, 10) || 100;
+
+        if (hp <= 0) {
+            continue;
+        }
+
+        if (maxHp <= 0) {
+            maxHp = 100;
+        }
+
+        percent = Math.round((hp / maxHp) * 100);
+
+        if (percent < 0) {
+            percent = 0;
+        }
+
+        if (percent > 100) {
+            percent = 100;
+        }
+
+        score += percent * this.m_scoreHealthPercent;
+    }
+
+    return score;
+};
+
+//------------------------------------------------------------------------------
 // HIGHSCORE
 //------------------------------------------------------------------------------
 
@@ -964,74 +1137,60 @@ runmysteriet.scene.Game.prototype.saveHighscore = function () {
 // WIN / LOSE
 //------------------------------------------------------------------------------
 
-runmysteriet.scene.Game.prototype.winGame = function (winningPlayer) {
-  var earnedScore = 0;
-  var totalScore = 0;
-  var guessData = null;
+runmysteriet.scene.Game.prototype.winGame = function(winningPlayer) {
 
-  if (this.m_gameEnd === true) {
-    return;
-  }
+    var earnedScore = 0;
+    var totalScore = 0;
+    var guessData = null;
 
-  this.m_gameEnd = true;
-
-  earnedScore = Math.ceil(this.m_timeLeft);
-
-  if (earnedScore < 0) {
-    earnedScore = 0;
-  }
-
-  totalScore = this.m_score + earnedScore;
-
-  if (this.backgroundMusic) {
-    if (typeof this.backgroundMusic.stop === "function") {
-      this.stopSound(this.backgroundMusic);
-    } else if (typeof this.backgroundMusic.pause === "function") {
-      this.backgroundMusic.pause();
+    if (this.m_gameEnd === true) {
+        return;
     }
-  }
 
-  if (
-    this.m_shieldHandler &&
-    typeof this.m_shieldHandler.getGuessData === "function"
-  ) {
-    guessData = this.m_shieldHandler.getGuessData();
-  }
+    this.m_gameEnd = true;
 
-  this.application.scenes.load([
-    new runmysteriet.scene.GuessWord(
-    this.m_levelNumber,
-    earnedScore,
-    totalScore,
-    guessData,
-    this.m_avatarData
-    ),
-  ]);
+    this.addScore(this.m_scoreLevelComplete);
+    this.addScore(this.getHealthScore());
+
+    earnedScore = this.m_levelScore;
+    totalScore = this.getTotalScore();
+
+    this.stopSound(this.backgroundMusic);
+
+    if (
+        this.m_shieldHandler &&
+        typeof this.m_shieldHandler.getGuessData === "function"
+    ) {
+        guessData = this.m_shieldHandler.getGuessData();
+    }
+
+    this.application.scenes.load([
+        new runmysteriet.scene.GuessWord(
+            this.m_levelNumber,
+            earnedScore,
+            totalScore,
+            guessData,
+            this.m_avatarData
+        )
+    ]);
 };
 
-runmysteriet.scene.Game.prototype.loseGame = function (reason) {
-  if (this.m_gameEnd === true) {
-    return;
-  }
+runmysteriet.scene.Game.prototype.loseGame = function(reason) {
 
-  this.m_gameEnd = true;
-
-  if (this.backgroundMusic) {
-    if (typeof this.backgroundMusic.stop === "function") {
-      this.stopSound(this.backgroundMusic);
-    } else if (typeof this.backgroundMusic.pause === "function") {
-      this.backgroundMusic.pause();
+    if (this.m_gameEnd === true) {
+        return;
     }
-  }
 
-  this.saveHighscore();
+    this.m_gameEnd = true;
 
-  this.application.scenes.load([
-    new runmysteriet.scene.GameOver(
-        this.m_score,
-        reason || "GAME OVER"
-    )
-]);
+    this.stopSound(this.backgroundMusic);
+
+    this.application.scenes.load([
+        new runmysteriet.scene.GameOver(
+            this.getTotalScore(),
+            reason || "GAME OVER"
+        )
+    ]);
 };
 //------------------------------------------------------------------------------
 // RUNES
