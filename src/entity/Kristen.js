@@ -1,16 +1,9 @@
 //------------------------------------------------------------------------------
-// KRISTEN ENTITY
+// KRISTEN
 //------------------------------------------------------------------------------
 
 /**
  * Fiende-enhet (Kristen).
- *
- * Funktioner:
- * - Patrullerar fram och tillbaka
- * - Har HP + HP-bar
- * - Kan ta skada och dö
- * - Skadar spelare vid kollision
- * - Kan vända sig mot närmaste spelare
  *
  * @constructor
  * @extends {rune.display.Sprite}
@@ -65,7 +58,7 @@ runmysteriet.entity.Kristen = function (texture, x, y) {
   this.currentHpTexture = "hpbar1";
 
   /**
-   * Ljud (lazy init).
+   * Ljud.
    * @type {?Object}
    */
   this.hitsound = null;
@@ -74,7 +67,7 @@ runmysteriet.entity.Kristen = function (texture, x, y) {
   this.deadSound = null;
 
   /**
-   * Referens till application (kan sättas externt).
+   * Referens till application.
    * @type {?Object}
    */
   this.application = null;
@@ -88,10 +81,6 @@ runmysteriet.entity.Kristen = function (texture, x, y) {
   this.immovable = true;
 };
 
-//------------------------------------------------------------------------------
-// INHERITANCE
-//------------------------------------------------------------------------------
-
 runmysteriet.entity.Kristen.prototype = Object.create(
   rune.display.Sprite.prototype
 );
@@ -99,10 +88,6 @@ runmysteriet.entity.Kristen.prototype = Object.create(
 /** @override */
 runmysteriet.entity.Kristen.prototype.constructor =
   runmysteriet.entity.Kristen;
-
-//------------------------------------------------------------------------------
-// INIT
-//------------------------------------------------------------------------------
 
 /**
  * Initierar animationer och HP-bar.
@@ -121,16 +106,12 @@ runmysteriet.entity.Kristen.prototype.init = function () {
   this.hpBar.anchorX = 0;
 };
 
-//------------------------------------------------------------------------------
-// UPDATE
-//------------------------------------------------------------------------------
-
 /**
  * Uppdaterar fienden varje frame.
  *
- * - Hanterar HP-bar
- * - Cooldowns
- * - Rörelse (patrol)
+ * Hanterar HP-bar
+ * Cooldowns
+ * Rörelse (patrol)
  *
  * @param {number} step
  * @return {void}
@@ -163,7 +144,7 @@ runmysteriet.entity.Kristen.prototype.update = function (step) {
 
     this.hpBar.scaleX = p;
 
-    // Texture baserat på HP
+    // Textur baserat på HP så den byter färg
     var newTexture;
 
     if (this.hp > 80) {
@@ -205,10 +186,6 @@ runmysteriet.entity.Kristen.prototype.update = function (step) {
     this.direction = 1;
   }
 };
-
-//------------------------------------------------------------------------------
-// COLLISION
-//------------------------------------------------------------------------------
 
 /**
  * Hanterar kollision med spelare.
@@ -253,10 +230,6 @@ runmysteriet.entity.Kristen.prototype.handleCollision = function(player) {
     }
 };
 
-//------------------------------------------------------------------------------
-// DAMAGE
-//------------------------------------------------------------------------------
-
 /**
  * Applicerar skada på fienden.
  *
@@ -269,7 +242,6 @@ runmysteriet.entity.Kristen.prototype.takeDamage = function (damage) {
 
   this.hp -= damage;
 
-  // Lazy init ljud
   if (!this.hitsound && this.application) {
     this.hitsound = this.application.sounds.sound.get("sound_hit_flesh");
   }
@@ -292,10 +264,6 @@ runmysteriet.entity.Kristen.prototype.takeDamage = function (damage) {
     this.die();
   }
 };
-
-//------------------------------------------------------------------------------
-// DIE
-//------------------------------------------------------------------------------
 
 /**
  * Dödar fienden och rensar grafik.
@@ -321,10 +289,6 @@ runmysteriet.entity.Kristen.prototype.die = function () {
     this.stage.removeChild(this);
   }
 };
-
-//------------------------------------------------------------------------------
-// FACE PLAYER
-//------------------------------------------------------------------------------
 
 /**
  * Vänder Kristen mot närmaste levande spelare.
@@ -376,10 +340,6 @@ runmysteriet.entity.Kristen.prototype.faceNearestPlayer = function(players) {
         this.flippedX = false;
     }
 };
-
-//------------------------------------------------------------------------------
-// PLAYER COLLISION LOOP
-//------------------------------------------------------------------------------
 
 /**
  * Loopar igenom spelare och kollar kollision.

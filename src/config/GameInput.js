@@ -19,10 +19,6 @@ runmysteriet.input.GameInput = function(application) {
     this.m_scrollDelay = 8;
 };
 
-//------------------------------------------------------------------------------
-// READ
-//------------------------------------------------------------------------------
-
 /**
  * Läser tangentbord och gamepad.
  *
@@ -48,9 +44,7 @@ runmysteriet.input.GameInput.prototype.read = function(keyboard) {
         this.m_scrollCooldown--;
     }
 
-    /*
-     * Keyboard.
-     */
+   //Läser tangentbordet
     this.readKeyboard(keyboard, input);
 
     /*
@@ -71,10 +65,6 @@ runmysteriet.input.GameInput.prototype.read = function(keyboard) {
  * @return {void}
  */
 
-
-//------------------------------------------------------------------------------
-// GAMEPAD
-//------------------------------------------------------------------------------
 runmysteriet.input.GameInput.prototype.readGamepadByIndex = function(index, input) {
 
     var gamepad = this.getGamepadByIndex(index);
@@ -86,9 +76,6 @@ runmysteriet.input.GameInput.prototype.readGamepadByIndex = function(index, inpu
     this.readGamepadButtons(gamepad, input);
     this.applyStickInput(gamepad, input);
 };
-//------------------------------------------------------------------------------
-// KEYBOARD
-//------------------------------------------------------------------------------
 
 /**
  * Läser tangentbord.
@@ -130,10 +117,6 @@ runmysteriet.input.GameInput.prototype.readKeyboard = function(keyboard, input) 
         keyboard.justPressed("Q") ||
         keyboard.justPressed("q");
 };
-
-//------------------------------------------------------------------------------
-// GAMEPAD BUTTONS
-//------------------------------------------------------------------------------
 
 /**
  * Läser gamepad-knappar.
@@ -196,10 +179,6 @@ runmysteriet.input.GameInput.prototype.readGamepadButtons = function(gamepad, in
         gamepad.justPressed(4);
 };
 
-//------------------------------------------------------------------------------
-// GAMEPAD
-//------------------------------------------------------------------------------
-
 /**
  * Hämtar första gamepaden.
  *
@@ -251,10 +230,6 @@ runmysteriet.input.GameInput.prototype.getAxis = function(gamepad, index) {
     return 0;
 };
 
-//------------------------------------------------------------------------------
-// STICK INPUT
-//------------------------------------------------------------------------------
-
 /**
  * Läser analog joystick och lägger till riktning i input-objektet.
  *
@@ -295,16 +270,8 @@ runmysteriet.input.GameInput.prototype.applyStickInput = function(gamepad, input
     }
 };
 
-//------------------------------------------------------------------------------
-// PLAYER INPUT
-//------------------------------------------------------------------------------
-
 /**
  * Läser input för en spelare.
- *
- * Skillnad från read():
- * - read() används för menyer och använder justPressed.
- * - readPlayer() används för spelaren och använder pressed/hållen knapp.
  *
  * @param {?Object} keyboard
  * @param {number} playerIndex
@@ -330,9 +297,7 @@ runmysteriet.input.GameInput.prototype.readPlayer = function(keyboard, playerInd
     axisX = this.getGamepadAxis(gamepad, 0);
     axisY = this.getGamepadAxis(gamepad, 1);
 
-    /*
-    * Vänster analogspak.
-    */
+   //Vänster spak
     if (axisX < -deadZone) {
         input.left = true;
     }
@@ -475,10 +440,6 @@ runmysteriet.input.GameInput.prototype.applyPlayerStickInput = function(gamepad,
         input.down = true;
     }
 };
-
-//------------------------------------------------------------------------------
-// GAMEPAD AXIS
-//------------------------------------------------------------------------------
 
 /**
  * Läser analoga spak från gamepad
