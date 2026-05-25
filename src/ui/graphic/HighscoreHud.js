@@ -31,19 +31,12 @@ runmysteriet.ui.graphic.HighscoreHud = function(application, maxItems) {
     this.reload();
 };
 
-//------------------------------------------------------------------------------
-// INHERITANCE
-//------------------------------------------------------------------------------
-
 runmysteriet.ui.graphic.HighscoreHud.prototype =
     Object.create(rune.text.BitmapField.prototype);
 
 runmysteriet.ui.graphic.HighscoreHud.prototype.constructor =
     runmysteriet.ui.graphic.HighscoreHud;
 
-//------------------------------------------------------------------------------
-// PUBLIC METHODS
-//------------------------------------------------------------------------------
 
 /**
  * Laddar om highscore-texten.

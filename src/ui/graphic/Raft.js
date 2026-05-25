@@ -9,10 +9,8 @@ runmysteriet.ui.graphic.Raft = function(x, y) {
         "flotte"
     );
     this.isRaft = true; 
-    /*
-     * Gör att spelaren kan följa med flotten
-     * när spelaren står ovanpå den.
-     */
+    //Gör att spelaren kan följa med flotten när spelaren står ovanpå den.
+    
     this.sticky = true;
     this.immovable = true;
 
@@ -27,9 +25,8 @@ runmysteriet.ui.graphic.Raft = function(x, y) {
     this.previousX = this.x;
     this.deltaX = 0;
 
-     /*
-     * Flotten ska inte röra sig direkt.
-     */
+     //Flotten ska inte röra sig direkt.
+     
     this.hasStarted = false;
     this.hasArrived = false;    
 };
@@ -41,11 +38,6 @@ runmysteriet.ui.graphic.Raft.prototype.constructor = runmysteriet.ui.graphic.Raf
 
 runmysteriet.ui.graphic.Raft.prototype.start = function() {
 
-    /*
-     * VIKTIGT - ta inte bortdenna checken
-     * så startar inte flotten flera gånger
-     * annars kan tween/rörelse startas om varje frame och då hackar flotten 
-     */
     if (this.hasStarted === true || this.hasArrived === true) {
         return;
     }
@@ -53,35 +45,29 @@ runmysteriet.ui.graphic.Raft.prototype.start = function() {
     this.hasStarted = true;
 };runmysteriet.ui.graphic.Raft.prototype.update = function(step) {
 
-    /*
-     * Spara position före rörelse.
-     */
+    //Spara position före rörelse.
+     
     this.previousX = this.x;
 
-    /*
-     * Om flotten inte har startat ska den stå still.
-     */
+    //Om flotten inte har startat ska den stå still.
+     
     if (this.hasStarted !== true || this.hasArrived === true) {
         this.deltaX = 0;
         return;
     }
 
-    /*
-     * Flytta flotten mjukt åt höger.
-     */
+    //Flytta flotten mjukt åt höger.
+     
     this.x += this.speed;
 
-    /*
-     * Stoppa vid maxX.
-     */
+    //Stoppa vid maxX.
+     
     if (this.x >= this.maxX) {
         this.x = this.maxX;
         this.hasArrived = true;
     }
 
-    /*
-     * Hur mycket flotten flyttade denna frame.
-     * Spelaren använder detta för att följa med.
-     */
+    //Hur mycket flotten flyttade denna frame. Spelaren använder detta för att följa med.
+     
     this.deltaX = this.x - this.previousX;
 };

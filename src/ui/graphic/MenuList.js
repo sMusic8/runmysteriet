@@ -1,6 +1,5 @@
-
 /**
- * Menu list UI component.
+ * Menylistans ui.
  * @constructor
  * @param {!Object} stage
  * @param {!Object} application
@@ -42,10 +41,6 @@ runmysteriet.ui.graphic.MenuList = function(stage, application, labels, yOffset,
     this.updateSelection();
 };
 
-//------------------------------------------------------------------------------
-// CREATE
-//------------------------------------------------------------------------------
-
 /**
  * Creates menu items.
  * @return {void}
@@ -61,16 +56,11 @@ runmysteriet.ui.graphic.MenuList.prototype.create = function() {
     for (i = 0; i < this.labels.length; i++) {
 
         item = new rune.text.BitmapField(String(this.labels[i] || ""));        item.autoSize = true;
-/*
-         * Rune använder scaleX och scaleY.
-         * item.scale fungerar inte som riktig Rune-skalning.
-         */
+
         item.scaleX = this.scale;
         item.scaleY = this.scale;
 
-        /*
-         * Centrera efter skalning, annars kan placeringen bli fel.
-         */
+        //Centrera efter skalning
         item.center = this.application.screen.center;
         item.y += this.yOffset + i * this.spacing;
 
@@ -79,12 +69,8 @@ runmysteriet.ui.graphic.MenuList.prototype.create = function() {
     }
 };
 
-//------------------------------------------------------------------------------
-// SELECTION
-//------------------------------------------------------------------------------
-
 /**
- * Move selection down.
+ * Flytta ner section.
  * @return {void}
  */
 runmysteriet.ui.graphic.MenuList.prototype.moveNext = function() {
@@ -100,7 +86,7 @@ runmysteriet.ui.graphic.MenuList.prototype.moveNext = function() {
 };
 
 /**
- * flytta markören uppåt
+ * Flytta markören uppåt
  * @return {void}
  */
 runmysteriet.ui.graphic.MenuList.prototype.movePrevious = function() {
@@ -143,16 +129,14 @@ runmysteriet.ui.graphic.MenuList.prototype.updateSelection = function() {
     }
 };
 /**
- * @return {number}
+ * Returnerar index för det nuvarande valda menyobjektet.
+ *
+ * @this {runmysteriet.ui.graphic.MenuList}
+ * @return {number} Det valda indexet i listan.
  */
 runmysteriet.ui.graphic.MenuList.prototype.getSelectedIndex = function() {
     return this.selectedIndex;
 };
-
-//------------------------------------------------------------------------------
-// VISIBILITY / POSITION
-//------------------------------------------------------------------------------
-
 /**
  * @param {boolean} value
  * @return {void}
@@ -167,8 +151,6 @@ runmysteriet.ui.graphic.MenuList.prototype.setVisible = function(value) {
         this.items[i].visible = value;
     }
 };
-
-
 
 /**
  * Skalar alla menyval.
@@ -218,12 +200,8 @@ runmysteriet.ui.graphic.MenuList.prototype.setCameraPosition = function(camera, 
     }
 };
 
-//------------------------------------------------------------------------------
-// CLEAR
-//------------------------------------------------------------------------------
-
 /**
- * tar bort alla menyval från scenen och tömmer items-arrayen
+ * Tar bort alla menyval från scenen och tömmer items-arrayen
  * @return {void}
  */
 runmysteriet.ui.graphic.MenuList.prototype.clear = function() {
@@ -241,9 +219,6 @@ runmysteriet.ui.graphic.MenuList.prototype.clear = function() {
 
     this.items = [];
 };
-//------------------------------------------------------------------------------
-// DISPOSE
-//------------------------------------------------------------------------------
 
 /**
  * Rensar menylistan och släpper referenser.

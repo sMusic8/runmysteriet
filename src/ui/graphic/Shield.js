@@ -13,7 +13,6 @@ runmysteriet.ui.Shield = function() {
         "shield"
     );
 
-    // Rune manager
     this.runes = new runmysteriet.ui.Rune();
 
     this.runes.makeAllRunes();
@@ -21,14 +20,14 @@ runmysteriet.ui.Shield = function() {
     var randomRune = this.runes.getOneRune();
     console.log("Slumpad rune:", randomRune);
 
-    // Spara runan
+    //Spara runan
     this.runeGraphic = randomRune;
 
-    // Lägg till som child om den finns
+    //Lägg till som child om den finns
     if (this.runeGraphic) {
         this.addChild(this.runeGraphic);
 
-        // centrera i 40x40 sköld
+        //Centrera i 40x40 sköld
         this.runeGraphic.x = (22 - this.runeGraphic.width) / 2;
         this.runeGraphic.y = (20 - this.runeGraphic.height) / 2;
     }
@@ -41,8 +40,6 @@ runmysteriet.ui.Shield = function() {
 
     /** @type {boolean} */
     this.active = true;
-
-    // TEXT
 
     /** @type {rune.text.BitmapField} */
     this.m_text = new rune.text.BitmapField(" ");
@@ -57,15 +54,20 @@ runmysteriet.ui.Shield = function() {
     this.m_pulseValue = 0;
 };
 
-// inheritance
+//Inheritance
 runmysteriet.ui.Shield.prototype = Object.create(rune.display.Graphic.prototype);
 runmysteriet.ui.Shield.prototype.constructor = runmysteriet.ui.Shield;
 
 /**
- * Update loop.
+ * Uppdateringsloop för shield.
+ * Sköter pulserande animation och scaling.
+ *
+ * @this {runmysteriet.ui.Shield}
+ * @return {void}
  */
 runmysteriet.ui.Shield.prototype.update = function() {
 
+    //Hoppa över update om skölden redan är insamlad
     if (this.__collected) return;
 
     this.m_pulseValue += this.m_pulseSpeed;
@@ -77,16 +79,22 @@ runmysteriet.ui.Shield.prototype.update = function() {
 };
 
 /**
- * Centers the text inside the shield.
+ * Centrerar texten inne i skölden.
+ *
+ * @this {runmysteriet.ui.Shield}
+ * @return {void}
  */
 runmysteriet.ui.Shield.prototype.centerText = function() {
 
     this.m_text.x = (this.width - this.m_text.width) / 2;
     this.m_text.y = (this.height - this.m_text.height) / 2;
 };
-
 /**
- * Sets the rune letter.
+ * Sätter runans bokstav och uppdaterar texten i shielden.
+ *
+ * @this {runmysteriet.ui.Shield}
+ * @param {string} letter Bokstaven som ska visas på runan.
+ * @return {void}
  */
 runmysteriet.ui.Shield.prototype.setRune = function(letter) {
 
@@ -94,9 +102,16 @@ runmysteriet.ui.Shield.prototype.setRune = function(letter) {
 
     this.m_text.text = letter;
 
+    // Recentrera texten efter uppdatering
     this.centerText();
 };
 
+/**
+ * Returnerar aktuell rune-bokstav.
+ *
+ * @this {runmysteriet.ui.Shield}
+ * @return {string} Den aktuella runan.
+ */
 runmysteriet.ui.Shield.prototype.getRune = function () {
     return this.rune;
 };

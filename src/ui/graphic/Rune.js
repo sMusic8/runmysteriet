@@ -1,9 +1,47 @@
+/**
+ * Hanterar skapande och utdelning av runor i UI.
+ *
+ * @constructor
+ */
 runmysteriet.ui.Rune = function () {
+
+    /**
+     * Lista med alla skapade runor.
+     * @type {!Array<!rune.display.Graphic>}
+     */
     this.allRunes = [];
+
+    /**
+     * Senast utdelade rune.
+     * @type {?rune.display.Graphic}
+     */
     this.oneRune = null;
+
+    /**
+     * Index för nuvarande position (används ej aktivt i denna implementation).
+     * @type {number}
+     */
     this.currentIndex = 0;
+
+    /**
+     * Prefix för sprite-filer.
+     * @type {string}
+     */
+    this.filePrefix = "";
+
+    /**
+     * Filnamnsdelar för run-sprites.
+     * @type {!Array<string>}
+     */
+    this.fileName = [];
 };
 
+/**
+ * Skapar alla runor, shufflar dem och returnerar listan.
+ *
+ * @this {runmysteriet.ui.Rune}
+ * @return {!Array<!rune.display.Graphic>} Lista med rune-sprites.
+ */
 runmysteriet.ui.Rune.prototype.makeAllRunes = function () {
 
     this.filePrefix = "rune_";
@@ -30,6 +68,12 @@ runmysteriet.ui.Rune.prototype.makeAllRunes = function () {
     return this.allRunes;
 };
 
+/**
+ * Blandar runorna slumpmässigt (Fisher–Yates shuffle).
+ *
+ * @this {runmysteriet.ui.Rune}
+ * @return {void}
+ */
 runmysteriet.ui.Rune.prototype.shuffleRunes = function () {
 
     for (var i = this.allRunes.length - 1; i > 0; i--) {
@@ -42,13 +86,19 @@ runmysteriet.ui.Rune.prototype.shuffleRunes = function () {
     }
 };
 
+/**
+ * Returnerar nästa rune från listan (efter shuffle).
+ *
+ * @this {runmysteriet.ui.Rune}
+ * @return {?rune.display.Graphic} En rune eller null om inga finns kvar.
+ */
 runmysteriet.ui.Rune.prototype.getOneRune = function () {
 
     if (this.allRunes.length === 0) {
         return null;
     }
 
-    // ta första runan (efter shuffle)
+    // Ta första runan (efter shuffle)
     this.oneRune = this.allRunes.shift();
 
     return this.oneRune;

@@ -24,9 +24,6 @@ runmysteriet.ui.graphic.VolumeHud = function(application, sound) {
     this.updateText();
 };
 
-//------------------------------------------------------------------------------
-// INHERITANCE
-//------------------------------------------------------------------------------
 
 runmysteriet.ui.graphic.VolumeHud.prototype =
     Object.create(rune.text.BitmapField.prototype);
@@ -34,24 +31,35 @@ runmysteriet.ui.graphic.VolumeHud.prototype =
 runmysteriet.ui.graphic.VolumeHud.prototype.constructor =
     runmysteriet.ui.graphic.VolumeHud;
 
-//------------------------------------------------------------------------------
-// PUBLIC METHODS
-//------------------------------------------------------------------------------
-
+/**
+ * Sätter ljudobjektet som styr volymen.
+ *
+ * @this {runmysteriet.ui.graphic.VolumeHud}
+ * @param {?Object} sound Ljudobjektet som innehåller volyminformation.
+ * @return {void}
+ */
 runmysteriet.ui.graphic.VolumeHud.prototype.setSound = function(sound) {
     this.sound = sound;
     this.updateText();
 };
 
+/**
+ * Uppdaterar texten som visar aktuell volym.
+ *
+ * @this {runmysteriet.ui.graphic.VolumeHud}
+ * @return {void}
+ */
 runmysteriet.ui.graphic.VolumeHud.prototype.updateText = function() {
 
     var volume = 0;
 
+    // Om inget ljud finns, visa 0%
     if (!this.sound) {
         this.text = "VOLUME: 0%";
         return;
     }
 
+    // Konvertera volym (0–1) till procent
     volume = Math.round(this.sound.volume * 100);
 
     this.text = "VOLUME: " + volume + "%";
