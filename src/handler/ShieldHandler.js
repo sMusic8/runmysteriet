@@ -60,10 +60,6 @@ runmysteriet.handler.ShieldHandler = function(stage, application, levelWidth, le
     this.onCollectedChanged = null;
 };
 
-//------------------------------------------------------------------------------
-// WORD RESOURCE
-//------------------------------------------------------------------------------
-
 /**
  * Returnerar namn på ordresurs beroende på nivå.
  *
@@ -81,10 +77,6 @@ runmysteriet.handler.ShieldHandler.prototype.getWordResourceName = function() {
 
     return "words5";
 };
-
-//------------------------------------------------------------------------------
-// INIT
-//------------------------------------------------------------------------------
 
 /**
  * Initierar shields och genererar ordet som ska samlas.
@@ -142,10 +134,6 @@ runmysteriet.handler.ShieldHandler.prototype.init = function() {
     }
 };
 
-//------------------------------------------------------------------------------
-// FALLBACK WORD
-//------------------------------------------------------------------------------
-
 /**
  * Sätter ett fallback-ord om resurser saknas.
  */
@@ -162,10 +150,6 @@ runmysteriet.handler.ShieldHandler.prototype.setFallbackWord = function() {
     this.m_word = String(this.m_wordData.word || "").toUpperCase();
     this.m_hints = this.m_wordData.Subword || [];
 };
-
-//------------------------------------------------------------------------------
-// RUNE SPAWNS
-//------------------------------------------------------------------------------
 
 /**
  * Returnerar spawnpunkt för en rune.
@@ -209,10 +193,6 @@ runmysteriet.handler.ShieldHandler.prototype.getFallbackRuneSpawn = function(ind
         y: 150
     };
 };
-
-//------------------------------------------------------------------------------
-// RANDOM WORD DATA
-//------------------------------------------------------------------------------
 
 /**
  * Hämtar slumpmässigt ord från resource systemet.
@@ -261,15 +241,25 @@ runmysteriet.handler.ShieldHandler.prototype.getRandomWordData = function() {
     return data[index];
 };
 
-//------------------------------------------------------------------------------
-// UPDATE
-//------------------------------------------------------------------------------
-
+/**
+ * Uppdaterar alla shields och kontrollerar om någon spelare samlar upp dem.
+ *
+ * @this {runmysteriet.handler.ShieldHandler}
+ * @param {Array<runmysteriet.entity.Player>} players Lista av spelare att testa mot
+ * @return {void}
+ */
 runmysteriet.handler.ShieldHandler.prototype.update = function(players) {
 
+    /** @type {number} */
     var i = 0;
+
+    /** @type {number} */
     var j = 0;
+
+    /** @type {?runmysteriet.entity.Shield} */
     var shield = null;
+
+    /** @type {?runmysteriet.entity.Player} */
     var player = null;
 
     if (!players) return;
@@ -298,13 +288,16 @@ runmysteriet.handler.ShieldHandler.prototype.update = function(players) {
         }
     }
 };
-
-//------------------------------------------------------------------------------
-// COLLECT
-//------------------------------------------------------------------------------
-
+/**
+ * Hanterar insamling av en shield (pickup) och uppdaterar spelets state.
+ *
+ * @this {runmysteriet.handler.ShieldHandler}
+ * @param {runmysteriet.entity.Shield} shield Shield som ska samlas in
+ * @return {void}
+ */
 runmysteriet.handler.ShieldHandler.prototype.collectShield = function(shield) {
 
+    /** @type {number} */
     var index = 0;
 
     if (!shield || shield.__collected) return;
@@ -335,13 +328,17 @@ runmysteriet.handler.ShieldHandler.prototype.collectShield = function(shield) {
     }
 };
 
-//------------------------------------------------------------------------------
-// STRING BUILDER
-//------------------------------------------------------------------------------
-
+/**
+ * Genererar en sammansatt rune-sträng baserat på insamlade shields.
+ * @this {runmysteriet.handler.ShieldHandler}
+ * @return {string} Den sammansatta rune-strängen
+ */
 runmysteriet.handler.ShieldHandler.prototype.getRuneString = function() {
 
+    /** @type {string} */
     var result = "";
+
+    /** @type {number} */
     var i = 0;
 
     for (i = 0; i < this.m_collected.length; i++) {
@@ -350,9 +347,15 @@ runmysteriet.handler.ShieldHandler.prototype.getRuneString = function() {
 
     return result;
 };
-
+/**
+ * Kontrollerar om alla nödvändiga runor har samlats in.
+ *
+ * @this {runmysteriet.handler.ShieldHandler}
+ * @return {boolean} True om alla nödvändiga runor är insamlade, annars false
+ */
 runmysteriet.handler.ShieldHandler.prototype.allRunesColected = function() {
 
+    /** @type {number} */
     var placedRuneCount = 0;
 
     if (!this.m_word || this.m_word.length <= 0) return false;
@@ -366,10 +369,17 @@ runmysteriet.handler.ShieldHandler.prototype.allRunesColected = function() {
     return this.m_collected.length >= placedRuneCount;
 };
 
-//------------------------------------------------------------------------------
-// GETTERS
-//------------------------------------------------------------------------------
-
+/**
+ * Returnerar aktuell state-data för rune-/word-guess-systemet.
+ *
+ * @this {runmysteriet.handler.ShieldHandler}
+ * @return {{
+ *   word: (string|Array<string>),
+ *   Subword: (*),
+ *   collectedMap: Object<string, boolean>,
+ *   hiddenIndex: number
+ * }} Objekt som beskriver aktuell guess-state
+ */
 runmysteriet.handler.ShieldHandler.prototype.getGuessData = function() {
 
     return {
@@ -379,10 +389,6 @@ runmysteriet.handler.ShieldHandler.prototype.getGuessData = function() {
         hiddenIndex: this.m_hiddenIndex
     };
 };
-
-//------------------------------------------------------------------------------
-// CLEAR
-//------------------------------------------------------------------------------
 
 /**
  * Tar bort alla sköldar/runor från stage och rensar referenser.
