@@ -20,7 +20,6 @@ runmysteriet.scene.Game = function (levelNumber, score, avatarData) {
   this.m_levelScore = 0;
   this.m_scoreLevelComplete = 100;
   this.m_scoreHealthPercent = 1;
-  this.m_avatarData = avatarData || null;
 
 if (avatarData && typeof avatarData === "object") {
     this.m_avatarData = avatarData;
@@ -34,7 +33,6 @@ if (avatarData && typeof avatarData === "object") {
   this.m_highscoreTimer = 0;
   this.m_highscoreNotified = false;
 
-  this.m_playerName = "PLAYER";
   this.m_isPaused = false;
   this.m_pauseTitle = null;
   this.m_pauseMenu = null;
@@ -48,14 +46,12 @@ if (avatarData && typeof avatarData === "object") {
 
   this.m_gameInput = null;
   this.camera = null;
-
   this.m_hudHandler = null;
-  this.m_highscoreSaved = false;
 
-this.m_startCountdownActive = false;
-this.m_startCountdownTimer = 0;
-this.m_startCountdownOverlay = null;
-this.m_startCountdownText = null;
+  this.m_startCountdownActive = false;
+  this.m_startCountdownTimer = 0;
+  this.m_startCountdownOverlay = null;
+  this.m_startCountdownText = null;
 
 };
 
@@ -221,8 +217,6 @@ runmysteriet.scene.Game.prototype.init = function () {
   this.m_highscoreSound =
       this.application.sounds.sound.get("sound_highscore");
 
-  this.createHighscoreNotice();
-
   /*
    * Bakgrund
    */
@@ -297,7 +291,8 @@ runmysteriet.scene.Game.prototype.init = function () {
     this.camera,
     this.m_playerHandler,
     this.m_platformHandler,
-    this.m_platformHandler.levelWidth
+    this.m_platformHandler.levelWidth,
+    this.m_levelNumber
 );
   
 
@@ -354,6 +349,11 @@ this.m_armorHandler.onArmorCollected = function(player, armor) {
   * HUD
   */
   this.createHUD();
+
+  /*
+ * Highscore notice ska ligga över spel/HUD.
+ */
+  this.createHighscoreNotice();
 
   /*
   * Start countdown.
@@ -644,7 +644,7 @@ runmysteriet.scene.Game.prototype.updateStartCountdownPosition = function() {
         this.m_startCountdownText.x = cameraX + this.application.screen.width / 2 - 12;
         this.m_startCountdownText.y = cameraY + this.application.screen.height / 2 - 12;
 
-        if (this.m_startCountdownText.text === "GO") {
+        if (this.m_startCountdownText.text === "  GO") {
             this.m_startCountdownText.x = cameraX + this.application.screen.width / 2 - 22;
         }
     }
@@ -1105,35 +1105,6 @@ runmysteriet.scene.Game.prototype.getHealthScore = function() {
 };
 
 //------------------------------------------------------------------------------
-// HIGHSCORE
-//------------------------------------------------------------------------------
-
-/**
- * Sparar nuvarande score i highscore-listan.
- *
- * @return {number}
- */
-runmysteriet.scene.Game.prototype.saveHighscore = function () {
-  var entry = null;
-  var manager = null;
-
-  if (this.m_highscoreSaved === true) {
-    return -1;
-  }
-
-  this.m_highscoreSaved = true;
-
-  entry = new runmysteriet.logic.HighscoreEntry(
-    this.m_playerName,
-    this.m_score
-  );
-
-  manager = new runmysteriet.logic.HighscoreManager(this.application);
-
-  return manager.save(entry);
-};
-
-//------------------------------------------------------------------------------
 // WIN / LOSE
 //------------------------------------------------------------------------------
 
@@ -1149,8 +1120,9 @@ runmysteriet.scene.Game.prototype.winGame = function(winningPlayer) {
 
     this.m_gameEnd = true;
 
-    this.addScore(this.m_scoreLevelComplete);
-    this.addScore(this.getHealthScore());
+    this.addScore(
+        this.m_scoreLevelComplete + this.getHealthScore()
+    );
 
     earnedScore = this.m_levelScore;
     totalScore = this.getTotalScore();
@@ -1364,6 +1336,14 @@ runmysteriet.scene.Game.prototype.dispose = function() {
     this.m_startCountdownText = null;
     this.m_startCountdownOverlay = null;
 
+    this.removeDisplayObject(this.m_highscoreText);
+
+    this.m_highscoreText = null;
+    this.m_highscoreManager = null;
+    this.m_highscoreSound = null;
+    this.m_highscoreTimer = 0;
+    this.m_highscoreNotified = false;
+
     /*
      * Pause UI kan ha skapats senare under spelet.
      */
@@ -1491,30 +1471,13 @@ runmysteriet.scene.Game.prototype.dispose = function() {
     }
 
     this.m_backgroundHandler = null;
-
-    /*
-     * Ljud.
-     */
-    if (this.backgroundMusic) {
-        if (typeof this.backgroundMusic.stop === "function") {
-            this.stopSound(this.backgroundMusic);        
-            } else if (typeof this.backgroundMusic.pause === "function") {
-            this.backgroundMusic.pause();
-        }
-    }
-
+    
+    this.stopSound(this.backgroundMusic);
     this.backgroundMusic = null;
     this.menuSound = null;
-
-    /*
-     * Grundreferenser.
-     */
     this.m_gameInput = null;
     this.camera = null;
     this.m_avatarData = null;
 
-    /*
-     * Viktigt: Scene dispose ska ligga sist.
-     */
     rune.scene.Scene.prototype.dispose.call(this);
 };
