@@ -2,8 +2,6 @@
 // PLAYER HANDLER
 //------------------------------------------------------------------------------
 
-//Klassen där alla spelare i spelet hanteras.
-
 /**
  * Handles all players in the game.
  *
@@ -48,7 +46,7 @@ runmysteriet.handler.PlayerHandler = function(stage, platformHandler, applicatio
     /** @type {!Array<!Object>} */
     this.attacks = [];
 
-    /// Kameran behöver referens till spelare för att kunna följa dem.
+    // Kamerans referens till spelare för att kunna följa dem.
     /** @type {?rune.camera.Camera} */
     this.camera = null;
 
@@ -61,14 +59,19 @@ runmysteriet.handler.PlayerHandler = function(stage, platformHandler, applicatio
     this.avatarData = avatarData || null;
 };
 
-//------------------------------------------------------------------------------
-// INIT
-//------------------------------------------------------------------------------
-
+/**
+ * Initierar spelarna och placerar dem på startplattformar.
+ *
+ * Skapar två spelare, sätter kontroller, HP, fysikvärden och HUD (HP-bars) samt lägger till dem i scenen.
+ *
+ * @return {void}
+ */
 runmysteriet.handler.PlayerHandler.prototype.init = function() {
 
-
+    /** @type {string} */
     var player1Texture = "spritesheet_freya_all";
+
+    /** @type {string} */
     var player2Texture = "spritesheet_thor_all";
 
     if (
@@ -86,15 +89,18 @@ runmysteriet.handler.PlayerHandler.prototype.init = function() {
     ) {
         player2Texture = this.avatarData.player2.texture;
     }
+
+    /** @type {runmysteriet.entity.Player} */
     var player1 = new runmysteriet.entity.Player(
         { left: "LEFT", right: "RIGHT", jump: "UP", down: "DOWN" },
         { texture: player1Texture, start: "idle" }
-);
+    );
 
+    /** @type {runmysteriet.entity.Player} */
     var player2 = new runmysteriet.entity.Player(
         { left: "A", right: "D", jump: "W", down: "S" },
         { texture: player2Texture, start: "idle" }
-);
+    );
 
     player1.direction = 1;
     player1.flippedX = false;
@@ -136,14 +142,14 @@ runmysteriet.handler.PlayerHandler.prototype.init = function() {
         this.stage.addChild(this.players[i]);
     }
 };
-
-//------------------------------------------------------------------------------
-// UPDATE
-//------------------------------------------------------------------------------
-
+/**
+ * Uppdaterar alla spelare varje frame.
+ * Kör hela spel-loopens player-logik i rätt ordning
+ *
+ * @return {void}
+ */
 runmysteriet.handler.PlayerHandler.prototype.update = function() {
 
-    
     this.updateInput();
     this.updateMovement();
     this.updateBoatDangerState();
@@ -154,31 +160,34 @@ runmysteriet.handler.PlayerHandler.prototype.update = function() {
 
     for (var i = 0; i < this.players.length; i++) {
 
+        /** @type {runmysteriet.entity.Player} */
         var p = this.players[i];
 
-        if (!p) continue;
+        if (!p) {
+            continue;
+        }
 
+        /**
+         * Uppdaterar attack cooldown om metoden finns.
+         * @type {Function|undefined}
+         */
         if (typeof p.updateAttackCooldown === "function") {
             p.updateAttackCooldown();
         }
 
-        // ---------------------------
-        // HP BAR POSITION + SCALE
-        // ---------------------------
         if (p.hpBar) {
 
             p.hpBar.x = p.x;
             p.hpBar.y = p.y - 12;
 
             var hpPercent = p.hp / p.maxHp;
-            if (hpPercent < 0) hpPercent = 0;
+            if (hpPercent < 0) {
+                hpPercent = 0;
+            }
 
             p.hpBar.scaleX = hpPercent;
         }
 
-        // ---------------------------
-        //  HP BAR TEXTURE SYSTEM
-        // ---------------------------
         var newTexture;
 
         if (p.hp > 80) {
@@ -207,9 +216,7 @@ runmysteriet.handler.PlayerHandler.prototype.update = function() {
             this.stage.addChild(p.hpBar);
         }
 
-        // ---------------------------
-        // DEATH
-        // ---------------------------
+
         if (p.hp <= 0 && p.isDead !== true) {
             this.killPlayer(p, i);
             continue;
@@ -218,14 +225,16 @@ runmysteriet.handler.PlayerHandler.prototype.update = function() {
         p.updateAnimation();
     }
 };
-//------------------------------------------------------------------------------
-// INPUT
-//------------------------------------------------------------------------------
 
+/**
+ * Uppdaterar input för alla aktiva spelare.
+ * @return {void}
+ */
 runmysteriet.handler.PlayerHandler.prototype.updateInput = function() {
     
     for (var i = 0; i < this.players.length; i++) {
 
+        /** @type {runmysteriet.entity.Player} */
         var player = this.players[i];
 
         if (!player || player.isDead === true) {
@@ -234,40 +243,72 @@ runmysteriet.handler.PlayerHandler.prototype.updateInput = function() {
 
         player.previousX = player.x;
         player.previousY = player.y;
+
+        /**
+         * Reset rörelsestatus innan input.
+         * @type {boolean}
+         */
         player.isMoving = false;
-            this.handleInput(player, i);
+
+        /**
+         * Hanterar faktisk input-logik för spelaren.
+         * @type {Function}
+         */
+        this.handleInput(player, i);
     }
 };
 
-//------------------------------------------------------------------------------
-// MOVEMENT
-//------------------------------------------------------------------------------
-
+/**
+ * Uppdaterar spelarnas rörelse.
+ *
+ * @return {void}
+ */
 runmysteriet.handler.PlayerHandler.prototype.updateMovement = function() {
 
     for (var i = 0; i < this.players.length; i++) {
 
+        /** @type {runmysteriet.entity.Player} */
         var player = this.players[i];
 
         if (!player || player.isDead === true) {
             continue;
         }
 
+        /**
+         * Gravitation påverkar vertikal hastighet.
+         * @type {number}
+         */
         player.velocityY += player.gravity;
+
+        /**
+         * Applicera vertikal rörelse.
+         * @type {number}
+         */
         player.y += player.velocityY;
 
+        /**
+         * Nollställ ground-state innan collision checks.
+         * @type {boolean}
+         */
         player.isOnGround = false;
     }
 };
-
-//------------------------------------------------------------------------------
-// LEVEL BOUNDS
-//------------------------------------------------------------------------------
-
+/**
+ * Håller alla aktiva spelare inom levelns horisontella gränser.
+ * Spelare som är null eller döda (isDead === true) ignoreras.
+ *
+ * @this {runmysteriet.handler.PlayerHandler}
+ * @return {void}
+ */
 runmysteriet.handler.PlayerHandler.prototype.keepPlayersInsideLevel = function() {
 
+    /** @type {number} */
     var i = 0;
+
+    /** @type {?runmysteriet.entity.Player} */
     var player = null;
+
+    /** @type {number} */
     var maxX = 0;
 
     if (!this.platformHandler || !this.platformHandler.levelWidth) {
@@ -282,16 +323,12 @@ runmysteriet.handler.PlayerHandler.prototype.keepPlayersInsideLevel = function()
             continue;
         }
 
-        /*
-         * Stoppa spelaren från att gå utanför vänster sida.
-         */
+        //Stoppa spelaren från att gå utanför vänster sida.
         if (player.x < 0) {
             player.x = 0;
         }
 
-        /*
-         * Stoppa spelaren från att gå utanför höger sida av leveln.
-         */
+        //Stoppa spelaren från att gå utanför höger sida av leveln.
         maxX = this.platformHandler.levelWidth - player.width;
 
         if (player.x > maxX) {
@@ -300,14 +337,17 @@ runmysteriet.handler.PlayerHandler.prototype.keepPlayersInsideLevel = function()
     }
 };
 
-//------------------------------------------------------------------------------
-// COLLISIONS
-//------------------------------------------------------------------------------
-
+/**
+ * Uppdaterar alla kollisioner för samtliga spelare.
+ *
+ * @this {runmysteriet.handler.PlayerHandler}
+ * @return {void}
+ */
 runmysteriet.handler.PlayerHandler.prototype.updateCollisions = function() {
 
     for (var i = 0; i < this.players.length; i++) {
 
+        /** @type {?runmysteriet.entity.Player} */
         var player = this.players[i];
 
         if (!player || player.isDead === true) {
@@ -318,6 +358,7 @@ runmysteriet.handler.PlayerHandler.prototype.updateCollisions = function() {
 
         for (var j = 0; j < this.platforms.length; j++) {
 
+            /** @type {?runmysteriet.entity.Platform} */
             var platform = this.platforms[j];
 
             if (!platform) {
@@ -333,6 +374,7 @@ runmysteriet.handler.PlayerHandler.prototype.updateCollisions = function() {
 
         for (var k = 0; k < this.players.length; k++) {
 
+            /** @type {?runmysteriet.entity.Player} */
             var other = this.players[k];
 
             if (!other || player === other || other.isDead === true) {
@@ -348,28 +390,32 @@ runmysteriet.handler.PlayerHandler.prototype.updateCollisions = function() {
         this.checkFallDeath(player, i);
     }
 };
-//------------------------------------------------------------------------------
-// ALL PLAYERS ON PLATFORM
-//------------------------------------------------------------------------------    
-
+/**
+ * Kontrollerar om alla levande spelare står på en specifik plattform.
+ *
+ * @this {runmysteriet.handler.PlayerHandler}
+ * @param {runmysteriet.entity.Platform} platform Plattformen som ska kontrolleras
+ * @return {boolean} True om alla aktiva spelare står på plattformen, annars false
+ */
 runmysteriet.handler.PlayerHandler.prototype.areAllActivePlayersOnPlatform = function(platform) {
+    /** @type {?runmysteriet.entity.Player} */
     var player = null;
+
+    /** @type {number} */
     var i = 0;
 
     for (i = 0; i < this.players.length; i++) {
+
         player = this.players[i];
 
-        /*
-         * hoppa över spelare som inte finns eller är döda
-         */
+        //hoppa över spelare som inte finns eller är döda
+         
         if (!player || player.isDead === true) {
             continue;
         }
 
-        /*
-         * om levande spelare INTE står på plattform,
-         * då ska flotten inte starta
-         */
+        //Om levande spelare INTE står på plattform ska flotten inte starta
+        
         if (player.currentPlatform !== platform) {
             return false;
         }
@@ -377,31 +423,59 @@ runmysteriet.handler.PlayerHandler.prototype.areAllActivePlayersOnPlatform = fun
 
     return true;
 };
-
-//------------------------------------------------------------------------------
-// PLATFORM COLLISION
-//------------------------------------------------------------------------------
-
+/**
+ * Kontrollerar och hanterar kollision mellan en spelare och en plattform.
+ *
+ * @this {runmysteriet.handler.PlayerHandler}
+ * @param {runmysteriet.entity.Player} player Spelaren som kontrolleras
+ * @param {runmysteriet.entity.Platform} platform Plattformen som testas mot
+ * @return {boolean} True om kollision (landning) inträffade, annars false
+ */
 runmysteriet.handler.PlayerHandler.prototype.checkPlatform = function(player, platform) {
 
+    /** @type {number} */
     var offsetY = 0;
 
+    /** @type {number} */
     var playerFootY = 0;
+
+    /** @type {number} */
     var playerPreviousFootY = 0;
+
+    /** @type {number} */
     var platformTop = 0;
 
+    /** @type {number} */
     var playerLeft = 0;
+
+    /** @type {number} */
     var playerRight = 0;
+
+    /** @type {number} */
     var platformLeft = 0;
+
+    /** @type {number} */
     var platformRight = 0;
 
+    /** @type {number} */
     var playerPaddingX = 6;
+
+    /** @type {number} */
     var platformPaddingX = 2;
+
+    /** @type {number} */
     var toleranceY = 2;
 
+    /** @type {boolean} */
     var isFalling = false;
+
+    /** @type {boolean} */
     var wasAbove = false;
+
+    /** @type {boolean} */
     var hasReachedPlatform = false;
+
+    /** @type {boolean} */
     var overlapsX = false;
 
     if (!player || !platform) {
@@ -476,24 +550,28 @@ runmysteriet.handler.PlayerHandler.prototype.checkPlatform = function(player, pl
 
     return false;
 };
-
-//------------------------------------------------------------------------------
-// PLAYER HITBOX HELPERS
-//------------------------------------------------------------------------------
-
+/**
+ * Returnerar spelarens position.
+ * @this {runmysteriet.handler.PlayerHandler}
+ * @param {runmysteriet.entity.Player} player Spelaren vars fotposition ska beräknas
+ * @return {number} Fotens Y-position, eller 0 om spelaren saknas
+ */
 runmysteriet.handler.PlayerHandler.prototype.getPlayerFootY = function(player) {
 
     if (!player) {
         return 0;
     }
-
-    /*
-     * Samma fotpunktstänk som används i checkPlatform:
-     * player.y + player.height / 2
-     */
     return player.y + player.height / 2;
 };
 
+
+/**
+ * Returnerar spelarens tidigare Y-position för kollisionsdetektering.
+ *
+ * @this {runmysteriet.handler.PlayerHandler}
+ * @param {runmysteriet.entity.Player} player Spelaren vars tidigare fotposition ska beräknas
+ * @return {number} Tidigare fot-Y-position, eller aktuell fot-Y om previousY saknas
+ */
 runmysteriet.handler.PlayerHandler.prototype.getPlayerPreviousFootY = function(player) {
 
     if (!player) {
@@ -507,38 +585,67 @@ runmysteriet.handler.PlayerHandler.prototype.getPlayerPreviousFootY = function(p
     return player.previousY + player.height / 2;
 };
 
+/**
+ * Returnerar spelarens "head Y"-position (övre kollisionspunkt).
+ *
+ * @this {runmysteriet.handler.PlayerHandler}
+ * @param {runmysteriet.entity.Player} player Spelaren vars huvudposition ska beräknas
+ * @return {number} Head Y-position, eller 0 om spelaren saknas
+ */
 runmysteriet.handler.PlayerHandler.prototype.getPlayerHeadY = function(player) {
 
     if (!player) {
         return 0;
     }
-
-    /*
-     * Spelarens övre kollisionspunkt.
-     */
     return player.y - player.height / 2;
 };
-//------------------------------------------------------------------------------
-// PLAYER ON PLAYER
-//------------------------------------------------------------------------------
-
+/**
+ * Kontrollerar och hanterar kollision mellan två spelare där en spelare kan stå ovanpå en annan spelare.
+ *
+ * @this {runmysteriet.handler.PlayerHandler}
+ * @param {runmysteriet.entity.Player} player Spelaren som faller
+ * @param {runmysteriet.entity.Player} other Spelaren som kan fungera som plattform
+ * @return {boolean} True om player landar på other, annars false
+ */
 runmysteriet.handler.PlayerHandler.prototype.checkPlayerPlatform = function(player, other) {
 
+    /** @type {number} */
     var playerFootY = 0;
+
+    /** @type {number} */
     var playerPreviousFootY = 0;
+
+    /** @type {number} */
     var otherHeadY = 0;
 
+    /** @type {number} */
     var playerLeft = 0;
+
+    /** @type {number} */
     var playerRight = 0;
+
+    /** @type {number} */
     var otherLeft = 0;
+
+    /** @type {number} */
     var otherRight = 0;
 
+    /** @type {number} */
     var hitboxPaddingX = 8;
+
+    /** @type {number} */
     var toleranceY = 3;
 
+    /** @type {boolean} */
     var isFalling = false;
+
+    /** @type {boolean} */
     var wasAbove = false;
+
+    /** @type {boolean} */
     var hasReachedOther = false;
+
+    /** @type {boolean} */
     var isOverOther = false;
 
     if (!player || !other) {
@@ -553,41 +660,34 @@ runmysteriet.handler.PlayerHandler.prototype.checkPlayerPlatform = function(play
         return false;
     }
 
-    /*
-     * Spelaren måste falla nedåt.
-     */
+    //Spelaren måste falla nedåt.
+     
     isFalling = player.velocityY >= 0;
 
     if (isFalling !== true) {
         return false;
     }
 
-    /*
-     * räknar spelarens fotpunkt på samma sätt som i checkPlatform
-     */
+    //Räknar spelarens fotpunkt på samma sätt som i checkPlatform
+     
     playerFootY = this.getPlayerFootY(player);
     playerPreviousFootY = this.getPlayerPreviousFootY(player);
 
-    /*
-     * räkna den andra spelarens huvud/överkant
-     */
+    //Räkna den andra spelarens huvud/överkant
+     
     otherHeadY = this.getPlayerHeadY(other);
 
     /*
-     * spelaren måste ha varit ovanför i förra framen
-     * detta hindrar också att spelaren snappas upp från sidan eller underifrån
+     * spelaren måste ha varit ovanför i förra framen, detta hindrar också att spelaren snappas upp från sidan eller underifrån
      */
     wasAbove = playerPreviousFootY <= otherHeadY + toleranceY;
 
-    /*
-     * spelaren måste faktiskt ha nått ner till den andra spelaren
-     */
+    //Spelaren måste faktiskt ha nått ner till den andra spelaren
+     
     hasReachedOther = playerFootY >= otherHeadY - toleranceY;
 
-    /*
-     * Horisontell kollisionsyta.
-     * och krymper hitboxen lite så spelaren inte fastnar på ytterkanter
-     */
+    //Horisontell kollisionsyta.
+     
     playerLeft = player.x + hitboxPaddingX;
     playerRight = player.x + player.width - hitboxPaddingX;
 
@@ -600,10 +700,8 @@ runmysteriet.handler.PlayerHandler.prototype.checkPlayerPlatform = function(play
 
     if (wasAbove && hasReachedOther && isOverOther) {
 
-        /*
-         * placerar spelarens fot exakt på den andra spelarens huvud
-         * placerar utifrån den andra spelarens huvud för att undvika att spelaren fastnar i huvudet
-         */
+        //Placerar utifrån den andra spelarens huvud för att undvika att spelaren fastnar i huvudet
+         
         player.y = otherHeadY - player.height / 2;
 
         player.velocityY = 0;
@@ -614,14 +712,20 @@ runmysteriet.handler.PlayerHandler.prototype.checkPlayerPlatform = function(play
 
     return false;
 };
-
-//------------------------------------------------------------------------------
-// INPUT HANDLER
-//------------------------------------------------------------------------------
-
+/**
+ * Hanterar spelarinmatning och uppdaterar spelarens rörelse.
+ *
+ * @this {runmysteriet.handler.PlayerHandler}
+ * @param {runmysteriet.entity.Player} player Spelaren som ska uppdateras
+ * @param {number} index Index för spelaren (används för input-mappning)
+ * @return {void}
+ */
 runmysteriet.handler.PlayerHandler.prototype.handleInput = function(player, index) {
 
+    /** @type {?runmysteriet.input.PlayerInput} */
     var input = this.input.readPlayer(this.keyboard, index);
+
+    /** @type {number} */
     var moveSpeed = player.speed;
 
     player.wantsToCrouch = input.down === true;
@@ -655,27 +759,30 @@ runmysteriet.handler.PlayerHandler.prototype.handleInput = function(player, inde
     }
 
     if (input.attack && player.canAttack()) {
-    player.isAttacking = true;
-    player.attackAnimationTimer = 12;
-    player.currentAnimation = "";
+        player.isAttacking = true;
+        player.attackAnimationTimer = 12;
+        player.currentAnimation = "";
 
-    this.createAttack(player);
-    player.resetAttackCooldown();
-}
+        this.createAttack(player);
+        player.resetAttackCooldown();
+    }
 };
-//------------------------------------------------------------------------------
-// HP BAR
-//------------------------------------------------------------------------------
-
+/**
+ * Skapar och returnerar en ny HP-bar (livsindikator) som grafiskt displayobjekt.
+ *
+ * @this {runmysteriet.handler.PlayerHandler}
+ * @return {rune.display.Graphic} Den skapade HP-baren
+ */
 runmysteriet.handler.PlayerHandler.prototype.createHpBar = function() {
 
+    /** @type {rune.display.Graphic} */
     var bar = new rune.display.Graphic(0, 0, 32, 4, "hpbar1");
 
     // Förankring
     bar.anchorX = 0;
     bar.anchorY = 0;
 
-    //Spara nuvarande texture
+    // Spara nuvarande texture
     bar.currentHpTexture = "hpbar1";
 
     // Default scale
@@ -686,11 +793,15 @@ runmysteriet.handler.PlayerHandler.prototype.createHpBar = function() {
 
     return bar;
 };
-
-//------------------------------------------------------------------------------
-// PLACEMENT
-//------------------------------------------------------------------------------
-
+/**
+ * Placerar en spelare exakt ovanpå en plattform.
+ * 
+ * @this {runmysteriet.handler.PlayerHandler}
+ * @param {runmysteriet.entity.Player} player Spelaren som ska placeras
+ * @param {runmysteriet.entity.Platform} platform Plattformen spelaren ska placeras på
+ * @param {number=} offsetX Valfritt X-offset relativt plattformens startposition
+ * @return {void}
+ */
 runmysteriet.handler.PlayerHandler.prototype.placePlayerOnPlatform = function(player, platform, offsetX) {
 
     if (!player || !platform) {
@@ -701,9 +812,21 @@ runmysteriet.handler.PlayerHandler.prototype.placePlayerOnPlatform = function(pl
     player.y = this.getStandingY(player, platform);
 };
 
+
+/**
+ * Placerar en spelare på startplattformen vid spawn.
+ *
+ * @this {runmysteriet.handler.PlayerHandler}
+ * @param {runmysteriet.entity.Player} player Spelaren som ska spawnas
+ * @param {number} index Spelarens index (används för positionering i spawnrad)
+ * @return {void}
+ */
 runmysteriet.handler.PlayerHandler.prototype.placePlayerOnStartPlatform = function(player, index) {
 
+    /** @type {?runmysteriet.entity.Platform} */
     var startPlatform = null;
+
+    /** @type {number} */
     var offsetX = 0;
 
     if (!player) return;
@@ -719,24 +842,42 @@ runmysteriet.handler.PlayerHandler.prototype.placePlayerOnStartPlatform = functi
 
     this.placePlayerOnPlatform(player, startPlatform, offsetX);
 };
-
+/**
+ * Beräknar exakt Y-position där en spelare ska stå ovanpå en plattform.
+ *
+ * @this {runmysteriet.handler.PlayerHandler}
+ * @param {runmysteriet.entity.Player} player Spelaren som ska placeras
+ * @param {runmysteriet.entity.Platform} platform Plattformen spelaren står på
+ * @return {number} Beräknad Y-position för stående spelare
+ */
 runmysteriet.handler.PlayerHandler.prototype.getStandingY = function(player, platform) {
 
+    /** @type {number} */
     var offsetY = 0;
 
     if (!player || !platform) {
         return 0;
     }
+
     if (platform.isRaft === true) {
         offsetY = this.m_raftPlatformOffsetY;
     }
+
     offsetY = this.getPlatformOffsetY(platform);
 
     return platform.y - player.height / 2 - offsetY;
 };
 
 
+/**
+ * Returnerar vertikalt offset som används vid placering av spelare på plattformar.
+ *
+ * @this {runmysteriet.handler.PlayerHandler}
+ * @param {runmysteriet.entity.Platform} platform Plattformen som ska analyseras
+ * @return {number} Y-offset för placering av spelare
+ */
 runmysteriet.handler.PlayerHandler.prototype.getPlatformOffsetY = function(platform) {
+
     if (platform && platform.isRaft === true) {
         return this.m_raftPlatformOffsetY;
     }
@@ -744,42 +885,50 @@ runmysteriet.handler.PlayerHandler.prototype.getPlatformOffsetY = function(platf
     return this.m_avatarPlatformOffsetY;
 };
 
-
-
-//------------------------------------------------------------------------------
-// FALL DEATH
-//------------------------------------------------------------------------------
-
+/**
+ * Kontrollerar om spelaren har fallit utanför spelvärlden och ska dö.
+ *
+ * @this {runmysteriet.handler.PlayerHandler}
+ * @param {runmysteriet.entity.Player} player Spelaren som ska kontrolleras
+ * @param {number} index Spelarens index (används vid killPlayer)
+ * @return {void}
+ */
 runmysteriet.handler.PlayerHandler.prototype.checkFallDeath = function(player, index) {
 
+    /** @type {number} */
     var fallLimitY = 360;
 
     if (!player || player.isDead === true) {
         return;
     }
 
-    /*
-     * när spelaren faller i tomma hål så dör den 
-     */
+    //När spelaren faller i tomma hål så dör den 
+     
     if (player.y + player.height > fallLimitY) {
         this.killPlayer(player, index);
     }
 };
-//------------------------------------------------------------------------------
-// DEATH CHECK WATER
-//------------------------------------------------------------------------------
 
+
+/**
+ * Kontrollerar om spelaren kommer i kontakt med vatten och ska dö.
+ *
+ * @this {runmysteriet.handler.PlayerHandler}
+ * @param {runmysteriet.entity.Player} player Spelaren som ska kontrolleras
+ * @param {number} index Spelarens index (används vid killPlayer)
+ * @return {void}
+ */
 runmysteriet.handler.PlayerHandler.prototype.checkWaterDeath = function(player, index) {
 
+    /** @type {?runmysteriet.entity.WaterArea} */
     var water = null;
 
     if (!player || player.isDead === true) {
         return;
     }
 
-    /*
-     * Om spelaren är på flotten ska vatten inte kunna döda.
-     */
+    //Om spelaren är på flotten ska vatten inte kunna döda.
+     
     if (player.currentPlatform && player.currentPlatform.isRaft === true) {
         return;
     }
@@ -798,14 +947,20 @@ runmysteriet.handler.PlayerHandler.prototype.checkWaterDeath = function(player, 
         }
     }
 };
-
-//------------------------------------------------------------------------------
-// BOAT DEATH
-//------------------------------------------------------------------------------
-
+/**
+ * Kontrollerar om en spelare dör vid kontakt med farliga båten.
+ *
+ * @this {runmysteriet.handler.PlayerHandler}
+ * @param {runmysteriet.entity.Player} player Spelaren som ska kontrolleras
+ * @param {number} index Spelarens index (används vid killPlayer)
+ * @return {void}
+ */
 runmysteriet.handler.PlayerHandler.prototype.checkBoatDeath = function(player, index) {
 
+    /** @type {?runmysteriet.entity.Boat} */
     var boat = null;
+
+    /** @type {number} */
     var i = 0;
 
     if (!player || player.isDead === true) {
@@ -821,6 +976,7 @@ runmysteriet.handler.PlayerHandler.prototype.checkBoatDeath = function(player, i
     }
 
     for (i = 0; i < this.platformHandler.boats.length; i++) {
+
         boat = this.platformHandler.boats[i];
 
         if (!boat) {
@@ -841,14 +997,8 @@ runmysteriet.handler.PlayerHandler.prototype.checkBoatDeath = function(player, i
     }
 };
 
-//------------------------------------------------------------------------------
-// BOAT DANGER
-//------------------------------------------------------------------------------
-
 /**
- * Uppdaterar om båtarna är farliga.
- *
- * En båt är bara farlig när den är ovanför en raft.
+ * Uppdaterar om båten är farlig
  *
  * @return {void}
  */
@@ -898,31 +1048,32 @@ runmysteriet.handler.PlayerHandler.prototype.updateBoatDangerState = function() 
         }
     }
 };
-
-//------------------------------------------------------------------------------
-// KILL PLAYER
-//------------------------------------------------------------------------------
-
+/**
+ * Dödar en spelare och hanterar alla tillhörande effekter och state-uppdateringar.
+ *
+ * @this {runmysteriet.handler.PlayerHandler}
+ * @param {runmysteriet.entity.Player} player Spelaren som ska dödas
+ * @param {number=} index Spelarens index (valfritt, används av vissa death systems)
+ * @return {void}
+ */
 runmysteriet.handler.PlayerHandler.prototype.killPlayer = function(player, index) {
 
     if (!player) {
         return;
     }
 
-    /*
-     * Om spelaren redan är död ska vi inte skapa flera dödsbilder.
-     */
+    //Om spelaren redan är död ska vi inte skapa flera dödsbilder.
+     
     if (player.isDead === true) {
         return;
     }
 
-    /*
-     * Visa dödsbilden där spelaren dog.
-     */
+    //Visa dödsbilden där spelaren dog.
+     
     this.createDeathEffect(player);
 
     if (this.deathSound) {
-    this.deathSound.play();
+        this.deathSound.play();
     }
 
     if (this.cameraHandler &&
@@ -948,11 +1099,6 @@ runmysteriet.handler.PlayerHandler.prototype.killPlayer = function(player, index
  * @param {!runmysteriet.entity.Player} player
  * @return {undefined}
  */
-
-//------------------------------------------------------------------------------
-// DEATH EFFECT
-//------------------------------------------------------------------------------
-
 runmysteriet.handler.PlayerHandler.prototype.createDeathEffect = function(player) {
 
     var effect = null;
@@ -968,9 +1114,8 @@ runmysteriet.handler.PlayerHandler.prototype.createDeathEffect = function(player
     effectX = player.x - 24;
     effectY = player.y - 32;
 
-    /*
-     * Om spelaren dör långt ner, håll effekten synlig på skärmen.
-     */
+    //Om spelaren dör långt ner, håll effekten synlig på skärmen.
+     
     if (this.camera && this.camera.viewport) {
         cameraY = this.camera.viewport.y;
 
@@ -995,9 +1140,7 @@ runmysteriet.handler.PlayerHandler.prototype.createDeathEffect = function(player
         "death_effect"
     );
 
-    /*
-     * 30 fps * 3 sekunder = 90 frames.
-     */
+    //30 fps * 3 sekunder = 90 frames.
     effect.life = 90;
     effect.maxLife = 90;
 
@@ -1009,19 +1152,16 @@ runmysteriet.handler.PlayerHandler.prototype.createDeathEffect = function(player
     effect.velocityX = 2.3;
     effect.velocityY = -1.3;
 
-    /*
-     * Liten acceleration uppåt, som att den lyfter mer.
-     */
+    //Liten acceleration uppåt, som att den lyfter mer.
+     
     effect.accelerationY = -0.015;
 
-    /*
-     * Liten drift åt höger.
-     */
+    //Liten drift åt höger.
+     
     effect.accelerationX = 0.005;
 
-    /*
-     * Storlek och växning.
-     */
+    //Storlek och växning.
+     
     effect.scaleX = 1;
     effect.scaleY = 1;
     effect.scaleSpeed = 0.01;
@@ -1031,7 +1171,13 @@ runmysteriet.handler.PlayerHandler.prototype.createDeathEffect = function(player
     this.deathEffects.push(effect);
     this.stage.addChild(effect);
 };
-
+/**
+ * Skapar en attack-instans för en spelare och lägger till den i spelet.
+ *
+ * @this {runmysteriet.handler.PlayerHandler}
+ * @param {runmysteriet.entity.Player} player Spelaren som utför attacken
+ * @return {void}
+ */
 runmysteriet.handler.PlayerHandler.prototype.createAttack = function(player) {
 
     if (!this.attackSound && this.application) {
@@ -1042,7 +1188,8 @@ runmysteriet.handler.PlayerHandler.prototype.createAttack = function(player) {
         this.attackSound.stop();
         this.attackSound.play();
     }
-    
+
+    /** @type {runmysteriet.attack.Attack} */
     var attack = new runmysteriet.attack.Attack(player);
 
     this.stage.addChild(attack);
@@ -1079,9 +1226,8 @@ runmysteriet.handler.PlayerHandler.prototype.updateAttacks = function() {
             continue;
         }
 
-        /*
-         * Kolla träff mot alla fiender.
-         */
+        //Kolla träff mot alla fiender.
+         
         for (j = enemies.length - 1; j >= 0; j--) {
 
             enemy = enemies[j];
@@ -1110,16 +1256,15 @@ runmysteriet.handler.PlayerHandler.prototype.updateAttacks = function() {
             }
         }
 
-        /*
-         * Ta bort gamla attacker.
-         */
+        //Ta bort gamla attacker.
+         
         if (attack && (attack.life <= 0 || !attack.parent)) {
             this.attacks.splice(i, 1);
         }
     }
 };
 /**
- * kopplar enemy handler till player handler.
+ * Kopplar enemy handler till player handler.
  *
  * @param {!runmysteriet.handler.EnemyHandler} enemyHandler
  * @return {void}
@@ -1128,15 +1273,6 @@ runmysteriet.handler.PlayerHandler.prototype.setEnemyHandler = function(enemyHan
 
     this.enemyHandler = enemyHandler;
 };
-
-//------------------------------------------------------------------------------
-// CAMERA
-//------------------------------------------------------------------------------
-
-
-//------------------------------------------------------------------------------
-// AUTO SCROLL CAMERA BOUNDS
-//------------------------------------------------------------------------------
 
 /**
  * Håller spelarna inom kamerans synliga område vid autoscroll.
@@ -1188,27 +1324,18 @@ runmysteriet.handler.PlayerHandler.prototype.handleAutoScrollCameraBounds = func
             marginRight -
             playerWidth;
 
-        /*
-         * Säkerhet:
-         * Om kameran av någon anledning är för smal,
-         * ska högergränsen aldrig hamna före vänstergränsen.
-         */
+    
         if (rightLimit < leftLimit) {
             rightLimit = leftLimit;
         }
 
-        /*
-         * Stoppa spelaren vid kamerans vänsterkant.
-         * Spelaren dör alltså inte av autoscroll,
-         * utan trycks med kameran.
-         */
+
         if (player.x < leftLimit) {
             player.x = leftLimit;
         }
 
-        /*
-         * Stoppa spelaren vid kamerans högerkant.
-         */
+        //Stoppa spelaren vid kamerans högerkant.
+         
         if (player.x > rightLimit) {
             player.x = rightLimit;
         }
@@ -1266,26 +1393,31 @@ runmysteriet.handler.PlayerHandler.prototype.keepPlayersInsideCamera = function(
             rightLimit = leftLimit;
         }
 
-        /*
-         * Stoppa spelaren från att lämna kamerans vänstra sida.
-         */
+        //Stoppa spelaren från att lämna kamerans vänstra sida.
+         
         if (player.x < leftLimit) {
             player.x = leftLimit;
         }
 
-        /*
-         * Stoppa spelaren från att lämna kamerans högra sida.
-         */
+        //Stoppa spelaren från att lämna kamerans högra sida.
+         
         if (player.x > rightLimit) {
             player.x = rightLimit;
         }
     }
 };
 
-// ATTACK EMITTER
-//------------------------------------------------------------------------------    
+ /**
+ * Skapar en particle emitter för attack-effekter vid en given position.
+ *
+ * @this {runmysteriet.handler.PlayerHandler}
+ * @param {number} x X-position för emittern
+ * @param {number} y Y-position för emittern
+ * @return {void}
+ */
 runmysteriet.handler.PlayerHandler.prototype.createAttackEmitter = function(x, y) {
 
+    /** @type {rune.particle.Emitter} */
     var emitter = new rune.particle.Emitter(
         x,
         y,
@@ -1318,11 +1450,6 @@ runmysteriet.handler.PlayerHandler.prototype.createAttackEmitter = function(x, y
 
     emitter.emit(10);
 };
-
-//------------------------------------------------------------------------------
-// CAVE BLOCKERS
-//------------------------------------------------------------------------------
-
 /**
  * Hindrar spelaren från att hoppa över grottan.
  * Spelaren får bara passera genom den lägre öppningen där Kristen står.
@@ -1378,28 +1505,20 @@ runmysteriet.handler.PlayerHandler.prototype.checkCaveBlockers = function(player
         overlapsX =
             playerRight > blockerLeft &&
             playerLeft < blockerRight;
-
-        /*
-         * Om spelarens fötter är ovanför öppningen,
-         * försöker spelaren passera för högt.
-         */
         isTooHigh = playerFootY < blocker.openingY;
 
         if (overlapsX && isTooHigh) {
 
-            /*
-             * Flytta tillbaka spelaren till positionen innan sidledsrörelsen.
-             * Detta stoppar hopp över grottan men tillåter gång genom öppningen.
-             */
+            //Flytta tillbaka spelaren till positionen innan sidledsrörelsen.
+            
             if (typeof player.previousX === "number") {
                 player.x = player.previousX;
             } else {
                 player.x = blockerLeft - player.width;
             }
 
-            /*
-             * Om spelaren är på väg uppåt, stoppa upphoppet lite.
-             */
+            //Om spelaren är på väg uppåt, stoppa upphoppet lite.
+             
             if (player.velocityY < 0) {
                 player.velocityY = 0;
             }
@@ -1409,10 +1528,18 @@ runmysteriet.handler.PlayerHandler.prototype.checkCaveBlockers = function(player
     }
 };
 
-
+/**
+ * Uppdaterar alla aktiva dödseffekter (death effects) per frame.
+ *
+ * @this {runmysteriet.handler.PlayerHandler}
+ * @return {void}
+ */
 runmysteriet.handler.PlayerHandler.prototype.updateDeathEffects = function() {
 
+    /** @type {number} */
     var i = 0;
+
+    /** @type {?runmysteriet.entity.DeathEffect} */
     var effect = null;
 
     for (i = this.deathEffects.length - 1; i >= 0; i--) {
@@ -1426,24 +1553,21 @@ runmysteriet.handler.PlayerHandler.prototype.updateDeathEffects = function() {
 
         effect.life--;
 
-        /*
-         * Rörelse mot höger och uppåt.
-         */
+        //Rörelse mot höger och uppåt.
+         
         effect.velocityX += effect.accelerationX;
         effect.velocityY += effect.accelerationY;
 
         effect.x += effect.velocityX;
         effect.y += effect.velocityY;
 
-        /*
-         * Väx lite medan den flyger.
-         */
+        //Väx lite medan den flyger.
+         
         effect.scaleX += effect.scaleSpeed;
         effect.scaleY += effect.scaleSpeed;
 
-        /*
-         * Fade-out sista delen.
-         */
+        //Fade-out sista delen.
+         
         if (effect.life < 40) {
             effect.alpha = effect.life / 40;
         }
@@ -1458,6 +1582,14 @@ runmysteriet.handler.PlayerHandler.prototype.updateDeathEffects = function() {
         }
     }
 };
+
+/**
+ * Sätter camera handler som används för t.ex. slow motion vid död.
+ *
+ * @this {runmysteriet.handler.PlayerHandler}
+ * @param {runmysteriet.handler.CameraHandler} cameraHandler Kamera-logic som ska kopplas in
+ * @return {void}
+ */
 runmysteriet.handler.PlayerHandler.prototype.setCameraHandler = function(cameraHandler) {
     this.cameraHandler = cameraHandler;
 };

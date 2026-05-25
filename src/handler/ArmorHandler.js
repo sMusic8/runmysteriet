@@ -35,12 +35,11 @@ runmysteriet.handler.ArmorHandler = function(stage, application, levelNumber, ar
     this.onArmorCollected = null;
 };
 
-//------------------------------------------------------------------------------
-// INIT
-//------------------------------------------------------------------------------
-
 /**
- * Skapar armor baserat på valda spawnpunkter.
+ * Skapar armor-objekt baserat på utvalda spawnpunkter.
+ * Funktionen itererar över de förvalda armor-spawns och skapar ett armor-objekt vid varje angiven position.
+ *
+ * @return {void}
  */
 runmysteriet.handler.ArmorHandler.prototype.init = function() {
     var selectedSpawns = this.getSelectedArmorSpawns();
@@ -53,10 +52,6 @@ runmysteriet.handler.ArmorHandler.prototype.init = function() {
         );
     }
 };
-
-//------------------------------------------------------------------------------
-// ARMOR COUNT
-//------------------------------------------------------------------------------
 
 /**
  * Returnerar antal armor som ska spawnas beroende på nivå.
@@ -74,10 +69,6 @@ runmysteriet.handler.ArmorHandler.prototype.getArmorCount = function() {
 
     return 2;
 };
-
-//------------------------------------------------------------------------------
-// SPAWNS
-//------------------------------------------------------------------------------
 
 /**
  * Väljer slumpmässiga spawnpunkter för armor.
@@ -99,10 +90,6 @@ runmysteriet.handler.ArmorHandler.prototype.getSelectedArmorSpawns = function() 
 
     return result;
 };
-
-//------------------------------------------------------------------------------
-// CREATE
-//------------------------------------------------------------------------------
 
 /**
  * Skapar ett armor-objekt och dess visuella box.
@@ -144,10 +131,6 @@ runmysteriet.handler.ArmorHandler.prototype.addArmor = function(x, y) {
 
     this.m_armors.push(armor);
 };
-
-//------------------------------------------------------------------------------
-// UPDATE
-//------------------------------------------------------------------------------
 
 /**
  * Uppdaterar armor och hanterar kollision med spelare.
@@ -204,10 +187,6 @@ runmysteriet.handler.ArmorHandler.prototype.update = function(players) {
     }
 };
 
-//------------------------------------------------------------------------------
-// BLINK
-//------------------------------------------------------------------------------
-
 /**
  * Hanterar blink-effekt för armor.
  *
@@ -235,10 +214,6 @@ runmysteriet.handler.ArmorHandler.prototype.updateBlink = function(armor) {
         armor.__blinkDirection = -1;
     }
 };
-
-//------------------------------------------------------------------------------
-// COLLECT
-//------------------------------------------------------------------------------
 
 /**
  * Hanterar insamling av armor.
@@ -288,13 +263,12 @@ runmysteriet.handler.ArmorHandler.prototype.collectArmor = function(armor, playe
         this.onArmorCollected(player, armor);
     }
 };
-
-//------------------------------------------------------------------------------
-// CLEAR
-//------------------------------------------------------------------------------
-
 /**
- * Tar bort alla armor från scenen och rensar listan.
+ * Tar bort alla armor-objekt från scenen och rensar interna listan.
+ *
+ * Funktionen itererar genom alla aktiva armor-objekt och tar bort själva armor-objektet och dess eventuella visuella komponenter.
+ *
+ * @return {void}
  */
 runmysteriet.handler.ArmorHandler.prototype.clear = function() {
     var i = 0;

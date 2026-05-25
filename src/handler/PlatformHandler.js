@@ -48,10 +48,6 @@ runmysteriet.handler.PlatformHandler = function(stage, screenWidth) {
     this.levelWidth = 0;
 };
 
-//------------------------------------------------------------------------------
-// INIT
-//------------------------------------------------------------------------------
-
 /**
  * Initierar levelgenerering och bygger hela banan.
  *
@@ -86,18 +82,10 @@ runmysteriet.handler.PlatformHandler.prototype.init = function(levelNumber) {
 
     var chosenSegments = this.getRandomSegments(pool, totalRandomCount);
 
-    //------------------------------------------------------------------------------
-    // START SEGMENT
-    //------------------------------------------------------------------------------
-
     segment = new runmysteriet.segments.Segment_Start();
     result = segment.ground(this.stage, x, this.levelNumber);
     this.addSegmentResult(result);
     x = result.endX;
-
-    //------------------------------------------------------------------------------
-    // SEGMENTS BEFORE WATER
-    //------------------------------------------------------------------------------
 
     for (i = 0; i < beforeWaterCount; i++) {
         SegmentClass = chosenSegments[i];
@@ -109,18 +97,10 @@ runmysteriet.handler.PlatformHandler.prototype.init = function(levelNumber) {
         x = result.endX;
     }
 
-    //------------------------------------------------------------------------------
-    // WATER SEGMENT
-    //------------------------------------------------------------------------------
-
     segment = new runmysteriet.segments.Segment_Water();
     result = segment.ground(this.stage, x, this.levelNumber);
     this.addSegmentResult(result);
     x = result.endX;
-
-    //------------------------------------------------------------------------------
-    // SEGMENTS AFTER WATER
-    //------------------------------------------------------------------------------
 
     for (i = 0; i < afterWaterCount; i++) {
         SegmentClass = chosenSegments[beforeWaterCount + i];
@@ -132,24 +112,13 @@ runmysteriet.handler.PlatformHandler.prototype.init = function(levelNumber) {
         x = result.endX;
     }
 
-    //------------------------------------------------------------------------------
-    // END SEGMENT
-    //------------------------------------------------------------------------------
-
     segment = new runmysteriet.segments.Segment_End();
     result = segment.ground(this.stage, x, this.levelNumber);
     this.addSegmentResult(result);
     x = result.endX;
 
     this.levelWidth = x;
-
-    console.log("levelWidth:", this.levelWidth);
-    console.log("runeSpawns:", this.runeSpawns.length);
 };
-
-//------------------------------------------------------------------------------
-// HELPERS
-//------------------------------------------------------------------------------
 
 /**
  * Lägger till plattformar.
@@ -165,7 +134,7 @@ runmysteriet.handler.PlatformHandler.prototype.addPlatforms = function(platforms
 };
 
 /**
- * Lägger till hål (fallzoner).
+ * Lägger till hål.
  *
  * @param {Array} holes
  */
@@ -218,28 +187,41 @@ runmysteriet.handler.PlatformHandler.prototype.addEnemySpawns = function(enemySp
 };
 
 /**
- * @return {Array}
+ * Returnerar alla enemy spawn-punkter.
+ *
+ * @return {!Array}
  */
 runmysteriet.handler.PlatformHandler.prototype.getEnemySpawns = function() {
     return this.enemySpawns;
 };
 
 /**
- * @param {Array} waterAreas
+ * Lägger till vattenområden till platform handler.
+ *
+ * @param {!Array} waterAreas
+ * @return {void}
  */
 runmysteriet.handler.PlatformHandler.prototype.addWaterAreas = function(waterAreas) {
-    if (!waterAreas) return;
+
+    if (!waterAreas) {
+        return;
+    }
 
     for (var i = 0; i < waterAreas.length; i++) {
         this.waterAreas.push(waterAreas[i]);
     }
 };
-
 /**
- * @param {Array} boats
+ * Lägger till båtar i PlatformHandler.
+ *
+ * @param {!Array} boats
+ * @return {void}
  */
 runmysteriet.handler.PlatformHandler.prototype.addBoats = function(boats) {
-    if (!boats) return;
+
+    if (!boats) {
+        return;
+    }
 
     for (var i = 0; i < boats.length; i++) {
         this.boats.push(boats[i]);
@@ -247,22 +229,26 @@ runmysteriet.handler.PlatformHandler.prototype.addBoats = function(boats) {
 };
 
 /**
- * Startar tween-animationer för båtar.
+ * Startar tween-animationer för alla registrerade båtar.
  *
- * @param {Object} tweens
+ * Använder varje båts `startTween`-metod om den finns.
+ *
+ * @param {Object} tweens Tween-manager som hanterar animationer.
+ * @return {void}
  */
 runmysteriet.handler.PlatformHandler.prototype.startBoatTweens = function(tweens) {
 
+    /** @type {number} */
     var i = 0;
+
+    /** @type {?Object} */
     var boat = null;
 
     if (!tweens) {
-        console.log("PlatformHandler.startBoatTweens: tweens saknas");
         return;
     }
 
     if (!this.boats) {
-        console.log("PlatformHandler.startBoatTweens: boats-array saknas");
         return;
     }
 
@@ -280,20 +266,24 @@ runmysteriet.handler.PlatformHandler.prototype.startBoatTweens = function(tweens
                 boat.minX,
                 boat.maxX
             );
-        } else {
-            console.log("PlatformHandler.startBoatTweens: båten saknar startTween", boat);
         }
     }
 };
-
-//------------------------------------------------------------------------------
-// UPDATE
-//------------------------------------------------------------------------------
-
+/**
+ * Uppdaterar alla holes och plattformar i scenen.
+ *
+ * @param {number} step Tidssteg från game loop
+ * @return {void}
+ */
 runmysteriet.handler.PlatformHandler.prototype.update = function(step) {
 
+    /** @type {number} */
     var i = 0;
+
+    /** @type {?Object} */
     var hole = null;
+
+    /** @type {?Object} */
     var platform = null;
 
     for (i = 0; i < this.holes.length; i++) {
@@ -318,29 +308,42 @@ runmysteriet.handler.PlatformHandler.prototype.update = function(step) {
 };
 
 /**
+ * Returnerar antal plattformssegment som ska placeras före vattenområdet.
+ * Används för att variera level-design beroende på svårighetsgrad.
+ *
  * @return {number}
  */
 runmysteriet.handler.PlatformHandler.prototype.getSegmentsBeforeWaterCount = function() {
+
     if (this.levelNumber >= 11) {
         return 3;
     }
+
     return 2;
 };
 
 /**
+ * Returnerar antal plattformssegment som ska placeras efter vattenområdet.
+ * Används för att balansera level-layout beroende på levelnummer.
+ *
  * @return {number}
  */
 runmysteriet.handler.PlatformHandler.prototype.getSegmentsAfterWaterCount = function() {
+
     if (this.levelNumber >= 6) {
         return 2;
     }
+
     return 1;
 };
-
 /**
- * @return {Array}
+ * Returnerar en pool av tillgängliga level-segment baserat på levelnummer.
+ * Högre level låser upp fler och svårare segment.
+ *
+ * @return {!Array<Function>} Array av segment-konstruktörer
  */
 runmysteriet.handler.PlatformHandler.prototype.getSegmentPool = function() {
+
     if (this.levelNumber >= 11) {
         return [
             runmysteriet.segments.Segment_1,
@@ -369,11 +372,16 @@ runmysteriet.handler.PlatformHandler.prototype.getSegmentPool = function() {
         runmysteriet.segments.Segment_6
     ];
 };
-
 /**
- * @param {Object} result
+ * Lägger till ett segment-resultat i PlatformHandler.
+ * Ett segment innehåller olika typer av level-objekt som plattformar,
+ * hål, enemies, vattenområden, båtar och spawnpunkter.
+ *
+ * @param {{platforms: Array=, holes: Array=, enemySpawns: Array=, waterAreas: Array=, boats: Array=, endZones: Array=, diseaseSpawns: Array=, runeSpawns: Array=, armorSpawns: Array=}} result
+ * @return {void}
  */
 runmysteriet.handler.PlatformHandler.prototype.addSegmentResult = function(result) {
+
     if (!result) {
         return;
     }
@@ -407,47 +415,82 @@ runmysteriet.handler.PlatformHandler.prototype.getRandomSegments = function(pool
 
     return result;
 };
-
-//------------------------------------------------------------------------------
-// SPAWN COLLECTION
-//------------------------------------------------------------------------------
-
+/**
+ * Lägger till end zones i PlatformHandler.
+ *
+ * @param {!Array} endZones
+ * @return {void}
+ */
 runmysteriet.handler.PlatformHandler.prototype.addEndZones = function(endZones) {
-    if (!endZones) return;
+
+    if (!endZones) {
+        return;
+    }
 
     for (var i = 0; i < endZones.length; i++) {
         this.endZones.push(endZones[i]);
     }
 };
 
+/**
+ * Returnerar alla end zones.
+ *
+ * @return {!Array}
+ */
 runmysteriet.handler.PlatformHandler.prototype.getEndZones = function() {
     return this.endZones;
 };
 
+/**
+ * Lägger till disease spawn-punkter i PlatformHandler.
+ *
+ * @param {!Array} diseaseSpawns
+ * @return {void}
+ */
 runmysteriet.handler.PlatformHandler.prototype.addDiseaseSpawns = function(diseaseSpawns) {
-    if (!diseaseSpawns) return;
+
+    if (!diseaseSpawns) {
+        return;
+    }
 
     for (var i = 0; i < diseaseSpawns.length; i++) {
         this.diseaseSpawns.push(diseaseSpawns[i]);
     }
 };
-
+/**
+ * Returnerar alla disease spawn-punkter.
+ *
+ * @return {!Array}
+ */
 runmysteriet.handler.PlatformHandler.prototype.getDiseaseSpawns = function() {
     return this.diseaseSpawns;
 };
 
+/**
+ * Lägger till rune spawn-punkter i PlatformHandler.
+ *
+ * @param {!Array} runeSpawns
+ * @return {void}
+ */
 runmysteriet.handler.PlatformHandler.prototype.addRuneSpawns = function(runeSpawns) {
-    if (!runeSpawns) return;
+
+    if (!runeSpawns) {
+        return;
+    }
 
     for (var i = 0; i < runeSpawns.length; i++) {
         this.runeSpawns.push(runeSpawns[i]);
     }
 };
 
+/**
+ * Returnerar alla rune spawn-punkter.
+ *
+ * @return {!Array}
+ */
 runmysteriet.handler.PlatformHandler.prototype.getRuneSpawns = function() {
     return this.runeSpawns;
 };
-
 runmysteriet.handler.PlatformHandler.prototype.addArmorSpawns = function(armorSpawns) {
     if (!armorSpawns) return;
 
@@ -455,15 +498,22 @@ runmysteriet.handler.PlatformHandler.prototype.addArmorSpawns = function(armorSp
         this.armorSpawns.push(armorSpawns[i]);
     }
 };
-
+/**
+ * Returnerar alla armor spawn-punkter.
+ *
+ * @return {!Array}
+ */
 runmysteriet.handler.PlatformHandler.prototype.getArmorSpawns = function() {
     return this.armorSpawns;
 };
 
 /**
+ * Returnerar antal armor som ska spawnas beroende på level.
+ *
  * @return {number}
  */
 runmysteriet.handler.PlatformHandler.prototype.getArmorCount = function() {
+
     if (this.levelNumber >= 11) {
         return 4;
     }

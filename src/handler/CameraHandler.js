@@ -3,7 +3,7 @@
 //------------------------------------------------------------------------------
 
 /**
- * Handles camera following logic.
+ * Hanterar logik kring kameran.
  *
  * @constructor
  * @param {!rune.camera.Camera} camera
@@ -23,8 +23,6 @@ runmysteriet.handler.CameraHandler = function(camera, playerHandler, levelWidth)
 
     /**
      * Kamerans riktiga X-värde sparas som decimal.
-     * camera.viewport.x avrundas bara när värdet skrivs ut till Rune.
-     * Detta minskar skakning som kan uppstå när smoothing blandas med Math.round.
      *
      * @type {number}
      */
@@ -49,19 +47,14 @@ runmysteriet.handler.CameraHandler = function(camera, playerHandler, levelWidth)
 
     /**
      * Säkerhetsmarginal i kameran.
-     * Samma idé som i PlayerHandler.keepPlayersInsideCamera.
      *
      * @type {number}
      */
     this.m_margin = 8;
 };
 
-//------------------------------------------------------------------------------
-// UPDATE
-//------------------------------------------------------------------------------
-
 /**
- * Updates camera position based on living players.
+ * Uppdatera kameran beroende på levande spelare.
  *
  * @return {void}
  */
@@ -93,9 +86,7 @@ runmysteriet.handler.CameraHandler.prototype.update = function() {
         return;
     }
 
-    /*
-     * Kameran ska bara följa levande spelare.
-     */
+    //Så kameran ska bara följa levande spelare.
     for (i = 0; i < players.length; i++) {
         player = players[i];
 
@@ -108,9 +99,7 @@ runmysteriet.handler.CameraHandler.prototype.update = function() {
         return;
     }
 
-    /*
-     * Räkna ut mitten mellan levande spelare.
-     */
+    //Räkna ut mitten mellan levande spelare.
     for (i = 0; i < livingPlayers.length; i++) {
         player = livingPlayers[i];
         playerWidth = player.width || 32;
@@ -121,9 +110,7 @@ runmysteriet.handler.CameraHandler.prototype.update = function() {
     centerX = centerX / livingPlayers.length;
     targetX = centerX - viewportWidth / 2;
 
-    /*
-     * Stoppa kameran från att gå utanför banan.
-     */
+    //Stoppa kameran från att gå utanför banan.
     maxX = this.levelWidth - viewportWidth;
 
     if (maxX < 0) {
@@ -158,20 +145,13 @@ runmysteriet.handler.CameraHandler.prototype.update = function() {
 
     this.m_cameraX = this.clamp(this.m_cameraX, 0, maxX);
 
-    /*
-     * Avrunda bara värdet som skickas till Rune.
-     * Smoothing fortsätter använda m_cameraX som decimal nästa frame.
-     */
+
     this.camera.viewport.x = Math.round(this.m_cameraX);
     this.camera.viewport.y = 0;
 };
 
-//------------------------------------------------------------------------------
-// HELPERS
-//------------------------------------------------------------------------------
-
 /**
- * Clamps a value between min and max.
+ * Sätter värde mellan min och max.
  *
  * @param {number} value
  * @param {number} min
@@ -192,7 +172,7 @@ runmysteriet.handler.CameraHandler.prototype.clamp = function(value, min, max) {
 };
 
 /**
- * Keeps the camera target inside the range where living players can stay visible.
+ * Gör så kameran visar de spelare som lever
  *
  * @param {number} targetX
  * @param {!Array<!Object>} players
@@ -228,14 +208,10 @@ runmysteriet.handler.CameraHandler.prototype.keepTargetInsidePlayers = function(
 
         playerWidth = player.width || 32;
 
-        /*
-         * För att spelarens högersida ska synas måste kameran minst ligga här.
-         */
+        //För att spelarens högersida ska synas
         leftAllowed = player.x + playerWidth + this.m_margin - viewportWidth;
 
-        /*
-         * För att spelarens vänstersida ska synas får kameran högst ligga här.
-         */
+        //För att spelarens vänstersida ska synas
         rightAllowed = player.x - this.m_margin;
 
         if (leftAllowed > minCameraX) {
@@ -251,8 +227,7 @@ runmysteriet.handler.CameraHandler.prototype.keepTargetInsidePlayers = function(
     maxCameraX = this.clamp(maxCameraX, 0, maxX);
 
     /*
-     * Om spelarna är längre ifrån varandra än kamerans bredd går det inte att hålla
-     * båda helt synliga. Då använder vi vanlig target-clamp istället för att skapa ryck.
+     * Om spelarna är längre ifrån varandra än kamerans bredd går det inte att hålla båda helt synliga. Då används target-clamp istället för att skapa ryck.
      */
     if (minCameraX > maxCameraX) {
         return this.clamp(targetX, 0, maxX);

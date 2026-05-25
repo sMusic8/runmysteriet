@@ -17,10 +17,14 @@ runmysteriet.handler.DiseaseHandler = function (stage, application) {
   this.diseases = [];
 };
 
-//------------------------------------------------------------------------------
-// INIT
-//------------------------------------------------------------------------------
-
+/**
+ * Initierar DiseaseHandler genom att rensa tidigare diseases och skapa nya från spawn-data.
+ *
+ * @param {number} levelNumber - Aktuellt levelnummer (används för framtida scaling/logic).
+ * @param {!Array<!Object>} diseaseSpawns - Lista med spawnpunkter för diseases.
+ *        
+ * @return {void}
+ */
 runmysteriet.handler.DiseaseHandler.prototype.init = function (
   levelNumber,
   diseaseSpawns
@@ -40,10 +44,14 @@ runmysteriet.handler.DiseaseHandler.prototype.init = function (
     );
   }
 };
-
-//------------------------------------------------------------------------------
-// ADD DISEASE
-//------------------------------------------------------------------------------
+/**
+ * Skapar en ny Disease och lägger till den i scenen och registrerar den i handlern.
+ *
+ * @param {string} type - Typ av disease (bestämmer texture och damage).
+ * @param {number} x - Position X i världen.
+ * @param {number} y - Position Y i världen.
+ * @return {!runmysteriet.entity.Disease} Den skapade disease-instansen.
+ */
 runmysteriet.handler.DiseaseHandler.prototype.addDisease = function (
   type,
   x,
@@ -54,26 +62,19 @@ runmysteriet.handler.DiseaseHandler.prototype.addDisease = function (
   this.diseases.push(disease);
   this.stage.addChild(disease);
 
-  // -------------------------------------------------
-  // PULSE DATA (stör inte sprite animation)
-  // -------------------------------------------------
   disease.m_baseScale = 1.5;
   disease.m_pulseSpeed = 0.006;
   disease.m_pulseValue = Math.random() * Math.PI * 2;
 
-  // -------------------------------------------------
-  // WRAP update istället för att ersätta den
-  // -------------------------------------------------
+
   var originalUpdate = disease.update;
 
   disease.update = function (step) {
 
-    // kör sprite animationen först (VIKTIGT)
     if (typeof originalUpdate === "function") {
       originalUpdate.call(this, step);
     }
 
-    // sedan pulse
     this.m_pulseValue += this.m_pulseSpeed;
 
     var scale = this.m_baseScale + Math.sin(this.m_pulseValue) * 0.22;
@@ -85,10 +86,13 @@ runmysteriet.handler.DiseaseHandler.prototype.addDisease = function (
   return disease;
 };
 
-//------------------------------------------------------------------------------
-// UPDATE
-//------------------------------------------------------------------------------
-
+/**
+ * Uppdaterar alla diseases, hanterar animation och collision mot spelare.
+ *
+ * @param {!Array<!runmysteriet.entity.Player>} players - Lista med aktiva spelare.
+ * @param {number} step - Game step / delta time.
+ * @return {void}
+ */
 runmysteriet.handler.DiseaseHandler.prototype.update = function (
   players,
   step
@@ -121,18 +125,12 @@ runmysteriet.handler.DiseaseHandler.prototype.update = function (
 
       if (this.hitTestPlayerDisease(player, disease)) {
 
-        // -------------------------------------------------
-        // DAMAGE
-        // -------------------------------------------------
         player.hp -= disease.damage;
 
         if (player.hp < 0) {
           player.hp = 0;
         }
 
-        // -------------------------------------------------
-        // SOUND (SAFE)
-        // -------------------------------------------------
         if (this.application &&
             this.application.sounds &&
             this.application.sounds.sound) {
@@ -145,9 +143,6 @@ runmysteriet.handler.DiseaseHandler.prototype.update = function (
           }
         }
 
-        // -------------------------------------------------
-        // REMOVE DISEASE
-        // -------------------------------------------------
         disease.remove();
         this.diseases.splice(i, 1);
 
@@ -156,11 +151,11 @@ runmysteriet.handler.DiseaseHandler.prototype.update = function (
     }
   }
 };
-
-//------------------------------------------------------------------------------
-// CLEAR
-//------------------------------------------------------------------------------
-
+/**
+ * Tar bort alla diseases från scenen och rensar interna listan.
+ *
+ * @return {void}
+ */
 runmysteriet.handler.DiseaseHandler.prototype.clear = function () {
 
   for (var i = 0; i < this.diseases.length; i++) {
@@ -174,11 +169,13 @@ runmysteriet.handler.DiseaseHandler.prototype.clear = function () {
 
   this.diseases = [];
 };
-
-//------------------------------------------------------------------------------
-// COLLISION
-//------------------------------------------------------------------------------
-
+/**
+ * Kontrollerar kollision mellan player och disease.
+ *
+ * @param {!runmysteriet.entity.Player} player - Spelaren som testas.
+ * @param {!runmysteriet.entity.Disease} disease - Disease som testas.
+ * @return {boolean} True om collision sker, annars false.
+ */
 runmysteriet.handler.DiseaseHandler.prototype.hitTestPlayerDisease =
 function (player, disease) {
 

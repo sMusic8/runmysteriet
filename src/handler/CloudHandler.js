@@ -3,7 +3,7 @@
 //------------------------------------------------------------------------------
 
 /**
- * Handles cloud spawning and movement.
+ * Hanterar molnens rörelse.
  *
  * @constructor
  * @param {!rune.display.Stage} stage
@@ -30,10 +30,13 @@ runmysteriet.handler.CloudHandler = function(stage, screenWidth, levelWidth) {
     ];
 };
 
-//------------------------------------------------------------------------------
-// INIT
-//------------------------------------------------------------------------------
-
+/**
+ * Funktionen skapar ett förutbestämt antal moln och placerar dem jämnt fördelat
+ * över levelWidth med slumpmässig offset, skala och höjdvariation.
+ * Varje moln får en individuell hastighet för att skapa parallax-effekt.
+ *
+ * @return {void}
+ */
 runmysteriet.handler.CloudHandler.prototype.init = function() {
 
     var cloudCount = 30;
@@ -63,10 +66,11 @@ runmysteriet.handler.CloudHandler.prototype.init = function() {
     }
 };
 
-//------------------------------------------------------------------------------
-// UPDATE
-//------------------------------------------------------------------------------
-
+/**
+ * Uppdaterar alla moln och flyttar dem horisontellt över leveln.
+ *
+ * @return {void}
+ */
 runmysteriet.handler.CloudHandler.prototype.update = function() {
 
     for (var i = 0; i < this.clouds.length; i++) {
@@ -79,10 +83,8 @@ runmysteriet.handler.CloudHandler.prototype.update = function() {
 
         cloud.x += cloud.speed;
 
-        /*
-         * Molnet ska röra sig under hela leveln.
-         * När det lämnar levelns högerkant börjar det om från vänster.
-         */
+        //När molnet lämnar högerkanten av leveln så placeras det om till vänster sida igen.
+         
         if (cloud.x > this.levelWidth + cloud.width) {
 
             cloud.x = -cloud.width;
@@ -90,9 +92,6 @@ runmysteriet.handler.CloudHandler.prototype.update = function() {
         }
     }
 };
-//------------------------------------------------------------------------------
-// CLEAR
-//------------------------------------------------------------------------------
 
 /**
  * Tar bort alla moln från stage.

@@ -3,7 +3,7 @@
 //------------------------------------------------------------------------------
 
 /**
- * Handles all enemies in the game world.
+ * Hanterar alla kristna i världen.
  *
  * @constructor
  * @param {!rune.display.Stage} stage
@@ -17,21 +17,13 @@ runmysteriet.handler.EnemyHandler = function(stage) {
     this.enemies = [];
 
     /*
-     * Osynliga blockeringar ovanför Kristen.
-     * Dessa ersätter grottan och hindrar spelaren från att hoppa över.
-     *
-     * Namnet caveBlockers behålls tills vidare för att inte riskera
-     * att annan kod som redan använder detta namn går sönder.
+     * Osynliga blockeringar ovanför Kristen så det inte går att hoppa över.
      */
     this.caveBlockers = [];
 };
 
-//------------------------------------------------------------------------------
-// INIT
-//------------------------------------------------------------------------------
-
 /**
- * Initializes enemies for the level.
+ * Initsierar kristna för levlen.
  *
  * @param {!runmysteriet.config.LevelConfig} levelConfig
  * @param {!Array<!Object>} enemySpawns
@@ -63,12 +55,8 @@ runmysteriet.handler.EnemyHandler.prototype.init = function(levelConfig, enemySp
     }
 };
 
-//------------------------------------------------------------------------------
-// CREATE ENEMY
-//------------------------------------------------------------------------------
-
 /**
- * Creates a Kristen enemy.
+ * Skapar en kristen.
  *
  * @param {{x: number, y: number, type: string}} spawn
  * @return {!runmysteriet.entity.Kristen}
@@ -84,15 +72,7 @@ runmysteriet.handler.EnemyHandler.prototype.createKristen = function(spawn) {
         spawn.y
     );
 
-    /*
-     * Skapa osynlig blocker ovanför Kristen.
-     * Den ersätter grottan.
-     */
-    blocker = this.createKristenBlocker(kristen);
-
-    /*
-     * Koppla blocker till just denna Kristen.
-     */
+    // Skapa osynlig blocker ovanför Kristen och kopplar den till rätt
     kristen.cave = null;
     kristen.caveBlocker = blocker;
 
@@ -101,10 +81,8 @@ runmysteriet.handler.EnemyHandler.prototype.createKristen = function(spawn) {
     this.caveBlockers.push(blocker);
     this.enemies.push(kristen);
 
-    /*
-     * Blocker läggs till före Kristen.
-     * Den är osynlig, men finns i stage för hitTest/separation.
-     */
+    //Blocker läggs till före Kristen.
+     
     this.stage.addChild(blocker);
     this.stage.addChild(kristen);
 
@@ -113,10 +91,6 @@ runmysteriet.handler.EnemyHandler.prototype.createKristen = function(spawn) {
 
 /**
  * Skapar osynlig blocker ovanför Kristen.
- *
- * Blockern ska inte ligga på marknivå, för då stoppar den spelaren
- * från att gå fram och slåss. Den ligger ovanför Kristen och stoppar
- * hopp över honom.
  *
  * @param {!runmysteriet.entity.Kristen} kristen
  * @return {!rune.display.Graphic}
@@ -143,12 +117,8 @@ runmysteriet.handler.EnemyHandler.prototype.createKristenBlocker = function(kris
     return blocker;
 };
 
-//------------------------------------------------------------------------------
-// UPDATE
-//------------------------------------------------------------------------------
-
 /**
- * Updates all enemies.
+ * Uppdaterar alla kristna.
  *
  * @param {!Array<!runmysteriet.entity.Player>} players
  * @return {void}
@@ -239,12 +209,8 @@ runmysteriet.handler.EnemyHandler.prototype.checkBlockerCollisions = function(kr
     }
 };
 
-//------------------------------------------------------------------------------
-// CLEAR
-//------------------------------------------------------------------------------
-
 /**
- * Removes all enemies from stage.
+ * Tar bort alla kristna från scenen.
  *
  * @return {void}
  */
@@ -261,18 +227,13 @@ runmysteriet.handler.EnemyHandler.prototype.clear = function() {
             continue;
         }
 
-        /*
-         * Kristen skapar hpBar separat och lägger den direkt på stage.
-         * Därför måste hpBar tas bort separat innan fienden tas bort.
-         */
+        //Kristen skapar hpBar separat och lägger den direkt på stage så därför måste hpBar tas bort separat innan fienden tas bort.
         if (enemy.hpBar && enemy.hpBar.stage) {
             enemy.hpBar.stage.removeChild(enemy.hpBar);
             enemy.hpBar = null;
         }
 
-        /*
-         * Ta bort själva fienden från stage.
-         */
+        //Ta bort själva fienden från stage.
         if (enemy.stage) {
             enemy.stage.removeChild(enemy);
         }
