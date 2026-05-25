@@ -536,7 +536,7 @@ runmysteriet.scene.GuessWord.prototype.showHighscoreNotice = function() {
     }
 
     this.m_highscoreNotified = true;
-    this.m_highscoreTimer = 90;
+    this.m_highscoreTimer = 180;
 
     if (this.m_highscoreText) {
         this.m_highscoreText.visible = true;
@@ -566,7 +566,7 @@ runmysteriet.scene.GuessWord.prototype.updateHighscoreNotice = function() {
     this.m_highscoreText.scaleY = pulse;
 
     this.m_highscoreText.center = this.application.screen.center;
-    this.m_highscoreText.y = 25;
+    this.m_highscoreText.y = 35;
 
     if (this.m_highscoreTimer < 30) {
         this.m_highscoreText.alpha = this.m_highscoreTimer / 30;

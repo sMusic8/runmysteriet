@@ -81,7 +81,7 @@ runmysteriet.scene.Game.prototype.showHighscoreNotice = function() {
     }
 
     this.m_highscoreNotified = true;
-    this.m_highscoreTimer = 90;
+    this.m_highscoreTimer = 180;
 
     if (this.m_highscoreText) {
         this.m_highscoreText.visible = true;
@@ -189,8 +189,6 @@ runmysteriet.scene.Game.prototype.init = function () {
   this.camera = this.cameras.getCameraAt(0);
 
 
-    var p1Texture = "spritesheet_freya_all";
-  var p2Texture = "spritesheet_thor_all";
 
   if (this.m_avatarData && this.m_avatarData.player1) {
     p1Texture = this.m_avatarData.player1.texture;
@@ -349,9 +347,10 @@ this.m_armorHandler.onArmorCollected = function(player, armor) {
   * HUD
   */
   this.createHUD();
+  this.updateGameInfo();
 
   /*
- * Highscore notice ska ligga över spel/HUD.
+ * Highscore notifikation
  */
   this.createHighscoreNotice();
 
@@ -409,12 +408,14 @@ runmysteriet.scene.Game.prototype.update = function(step) {
         rune.scene.Scene.prototype.update.call(this, step);
         this.updateStartCountdown();
 
-    if (this.m_backgroundHandler) {
-        this.m_backgroundHandler.update();
-    }
+        if (this.m_backgroundHandler) {
+            this.m_backgroundHandler.update();
+        }
 
-    this.updateHUD();
-    return;
+        this.updateGameInfo();
+        this.updateHighscoreNotice();
+        this.updateHUD();
+        return;
 }
 
 
@@ -1471,7 +1472,7 @@ runmysteriet.scene.Game.prototype.dispose = function() {
     }
 
     this.m_backgroundHandler = null;
-    
+
     this.stopSound(this.backgroundMusic);
     this.backgroundMusic = null;
     this.menuSound = null;

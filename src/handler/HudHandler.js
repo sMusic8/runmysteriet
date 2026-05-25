@@ -3,7 +3,7 @@
 //------------------------------------------------------------------------------
 
 /**
- * Hanterar all HUD i Game-scenen.
+ * Hanterar HUD i Game-scenen.
  *
  * @constructor
  * @param {!rune.display.DisplayObjectContainer} stage
@@ -22,6 +22,8 @@ runmysteriet.handler.HudHandler = function(stage, application, cameras) {
 
     this.m_runeTextBg = null;
     this.m_runeText = null;
+
+    this.m_shieldHandler = null;
 };
 
 //------------------------------------------------------------------------------
@@ -30,34 +32,22 @@ runmysteriet.handler.HudHandler = function(stage, application, cameras) {
 
 runmysteriet.handler.HudHandler.prototype.init = function() {
 
-    /*
-     * Timer.
-     */
-    this.m_timerText = new rune.text.BitmapField("TIME LEFT: 200");
+    this.m_timerText = new rune.text.BitmapField("COLLECT ALL RUNES");
     this.m_timerText.x = 15;
     this.m_timerText.y = 15;
     this.stage.addChild(this.m_timerText);
 
-    /*
-     * Score / level.
-     */
     this.m_scoreText = new rune.text.BitmapField(" ");
     this.m_scoreText.x = 15;
     this.m_scoreText.y = 30;
     this.stage.addChild(this.m_scoreText);
 
-    /*
-     * Bästa highscore under spelet.
-     */
     this.m_highscoreHud = new runmysteriet.ui.graphic.HighscoreHud(
         this.application
     );
 
     this.stage.addChild(this.m_highscoreHud);
 
-    /*
-     * Bakgrund bakom runtext.
-     */
     this.m_runeTextBg = new rune.display.Graphic(
         0,
         0,
@@ -70,9 +60,6 @@ runmysteriet.handler.HudHandler.prototype.init = function() {
 
     this.stage.addChild(this.m_runeTextBg);
 
-    /*
-     * Runtext.
-     */
     this.m_runeText = new rune.text.BitmapField("RUNES: ");
     this.m_runeText.autoSize = true;
 
@@ -85,12 +72,6 @@ runmysteriet.handler.HudHandler.prototype.init = function() {
 // PUBLIC METHODS
 //------------------------------------------------------------------------------
 
-/**
- * Kopplar ShieldHandler till HUD.
- *
- * @param {!runmysteriet.handler.ShieldHandler} shieldHandler
- * @return {void}
- */
 runmysteriet.handler.HudHandler.prototype.connectShieldHandler = function(shieldHandler) {
 
     var self = this;
@@ -99,16 +80,13 @@ runmysteriet.handler.HudHandler.prototype.connectShieldHandler = function(shield
         return;
     }
 
+    this.m_shieldHandler = shieldHandler;
+
     shieldHandler.onCollectedChanged = function(text) {
         self.setRuneText(text);
     };
 };
 
-/**
- * Uppdaterar HUD-positioner så de följer kameran.
- *
- * @return {void}
- */
 runmysteriet.handler.HudHandler.prototype.update = function() {
 
     var camera = null;
@@ -128,36 +106,22 @@ runmysteriet.handler.HudHandler.prototype.update = function() {
         return;
     }
 
-    /*
-     * HUD ska vara fast på skärmen.
-     * Eftersom objekt i stage renderas relativt kameran,
-     * måste deras world-position vara camera position + fast screen offset.
-     */
     cameraX = Math.round(camera.viewport.x);
     cameraY = Math.round(camera.viewport.y);
 
     screenWidth = camera.viewport.width;
     screenHeight = camera.viewport.height;
 
-    /*
-     * Timer fast uppe till vänster.
-     */
     if (this.m_timerText) {
         this.m_timerText.x = cameraX + 15;
         this.m_timerText.y = cameraY + 15;
     }
 
-    /*
-     * Level / score fast under timer.
-     */
     if (this.m_scoreText) {
         this.m_scoreText.x = cameraX + 15;
         this.m_scoreText.y = cameraY + 30;
     }
 
-    /*
-     * Highscore fast uppe till höger.
-     */
     if (this.m_highscoreHud) {
         this.m_highscoreHud.x =
             cameraX +
@@ -168,15 +132,12 @@ runmysteriet.handler.HudHandler.prototype.update = function() {
         this.m_highscoreHud.y = cameraY + 15;
     }
 
-    /*
-     * Samlade runor fast nere till vänster.
-     */
     if (this.m_runeText && this.m_runeTextBg) {
 
         runeBoxWidth = this.m_runeText.width + 10;
 
-        if (runeBoxWidth < 120) {
-            runeBoxWidth = 120;
+        if (runeBoxWidth < 190) {
+            runeBoxWidth = 190;
         }
 
         this.m_runeTextBg.width = runeBoxWidth;
@@ -194,38 +155,20 @@ runmysteriet.handler.HudHandler.prototype.update = function() {
     }
 };
 
-/**
- * Sätter timertext.
- *
- * @param {string} text
- * @return {void}
- */
 runmysteriet.handler.HudHandler.prototype.setTimerText = function(text) {
 
     if (this.m_timerText && this.m_timerText.text !== text) {
-    this.m_timerText.text = text;
-}
+        this.m_timerText.text = text;
+    }
 };
 
-/**
- * Sätter scoretext.
- *
- * @param {string} text
- * @return {void}
- */
 runmysteriet.handler.HudHandler.prototype.setScoreText = function(text) {
 
-    if (this.m_scoreText) {
+    if (this.m_scoreText && this.m_scoreText.text !== text) {
         this.m_scoreText.text = text;
     }
 };
 
-/**
- * Sätter runtext.
- *
- * @param {string} text
- * @return {void}
- */
 runmysteriet.handler.HudHandler.prototype.setRuneText = function(text) {
 
     if (this.m_runeText) {
@@ -233,16 +176,69 @@ runmysteriet.handler.HudHandler.prototype.setRuneText = function(text) {
     }
 };
 
-/**
- * Laddar om highscore.
- *
- * @return {void}
- */
 runmysteriet.handler.HudHandler.prototype.reloadHighscore = function() {
 
-    if (this.m_highscoreHud &&
-        typeof this.m_highscoreHud.reload === "function") {
-
+    if (
+        this.m_highscoreHud &&
+        typeof this.m_highscoreHud.reload === "function"
+    ) {
         this.m_highscoreHud.reload();
     }
+};
+
+//------------------------------------------------------------------------------
+// REMOVE DISPLAY OBJECT
+//------------------------------------------------------------------------------
+
+runmysteriet.handler.HudHandler.prototype.removeDisplayObject = function(object) {
+
+    if (!object) {
+        return;
+    }
+
+    if (object.parent) {
+        object.parent.removeChild(object);
+        return;
+    }
+
+    if (object.stage) {
+        object.stage.removeChild(object);
+    }
+};
+
+//------------------------------------------------------------------------------
+// CLEAR
+//------------------------------------------------------------------------------
+
+runmysteriet.handler.HudHandler.prototype.clear = function() {
+
+    if (this.m_shieldHandler) {
+        this.m_shieldHandler.onCollectedChanged = null;
+    }
+
+    if (this.m_highscoreHud) {
+        if (typeof this.m_highscoreHud.clear === "function") {
+            this.m_highscoreHud.clear();
+        } else if (typeof this.m_highscoreHud.dispose === "function") {
+            this.m_highscoreHud.dispose();
+        }
+    }
+
+    this.removeDisplayObject(this.m_runeText);
+    this.removeDisplayObject(this.m_runeTextBg);
+    this.removeDisplayObject(this.m_highscoreHud);
+    this.removeDisplayObject(this.m_scoreText);
+    this.removeDisplayObject(this.m_timerText);
+
+    this.m_timerText = null;
+    this.m_scoreText = null;
+    this.m_highscoreHud = null;
+
+    this.m_runeTextBg = null;
+    this.m_runeText = null;
+
+    this.m_shieldHandler = null;
+    this.stage = null;
+    this.application = null;
+    this.cameras = null;
 };

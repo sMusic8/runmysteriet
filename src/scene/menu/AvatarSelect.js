@@ -87,7 +87,7 @@ runmysteriet.scene.AvatarSelect.prototype.init = function() {
 
 runmysteriet.scene.AvatarSelect.prototype.createText = function() {
 
-    this.m_titleText = new rune.text.BitmapField("CHOOSE AVATAR");
+    this.m_titleText = new rune.text.BitmapField("SELECT AVATAR");
     this.m_titleText.autoSize = true;
     this.m_titleText.center = this.application.screen.center;
     this.m_titleText.y = 18;
@@ -95,13 +95,13 @@ runmysteriet.scene.AvatarSelect.prototype.createText = function() {
 
     this.m_player1Label = new rune.text.BitmapField("PLAYER 1");
     this.m_player1Label.autoSize = true;
-    this.m_player1Label.x = 70;
+    this.m_player1Label.x = 82;
     this.m_player1Label.y = 50;
     this.stage.addChild(this.m_player1Label);
 
     this.m_player2Label = new rune.text.BitmapField("PLAYER 2");
     this.m_player2Label.autoSize = true;
-    this.m_player2Label.x = 255;
+    this.m_player2Label.x = 270;
     this.m_player2Label.y = 50;
     this.stage.addChild(this.m_player2Label);
 
@@ -119,18 +119,18 @@ runmysteriet.scene.AvatarSelect.prototype.createText = function() {
 
     this.m_helpText = new rune.text.BitmapField("LEFT/RIGHT = SELECT   CROSS/A = READY");
     this.m_helpText.autoSize = true;
-    this.m_helpText.scaleX = 0.7;
-    this.m_helpText.scaleY = 0.7;
-    this.m_helpText.x = 45;
-    this.m_helpText.y = 205;
+    this.m_helpText.scaleX = 0.9;
+    this.m_helpText.scaleY = 0.9;
+    this.m_helpText.x = 65;
+    this.m_helpText.y = 195;
     this.stage.addChild(this.m_helpText);
 
     this.m_backText = new rune.text.BitmapField("CIRCLE/B/ESC = BACK OR UNREADY");
     this.m_backText.autoSize = true;
-    this.m_backText.scaleX = 0.7;
-    this.m_backText.scaleY = 0.7;
+    this.m_backText.scaleX = 0.9;
+    this.m_backText.scaleY = 0.9;
     this.m_backText.x = 65;
-    this.m_backText.y = 220;
+    this.m_backText.y = 210;
     this.stage.addChild(this.m_backText);
 
     /*
