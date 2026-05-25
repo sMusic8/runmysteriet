@@ -78,3 +78,12 @@ runmysteriet.handler.VolumeHandler.prototype.update = function(input, gamepad, k
         }
     }
 };
+/**
+ * Kopplar ett ljudobjekt till volymhanteraren.
+ *
+ * @param {Object} audio - Ljudobjektet som ska hanteras.
+ */
+runmysteriet.handler.VolumeHandler.prototype.setAudio = function (audio) {
+  // Spara referensen till ljudet så att volymhanteraren kan kontrollera det
+  this.audio = audio;
+};
