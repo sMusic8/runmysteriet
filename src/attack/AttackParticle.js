@@ -13,10 +13,10 @@ runmysteriet.particle.AttackParticle = function() {
 
     rune.particle.Particle.call(
         this,
-        0,   // x-position
-        0,   // y-position
-        16,  // bredd
-        16,  // höjd
+        0,   //X-position
+        0,   //Y-position
+        16,  //Bredd
+        16,  //Höjd
         "effect_attack"
     );
 
@@ -38,24 +38,22 @@ runmysteriet.particle.AttackParticle.prototype.constructor =
 
 /**
  * Uppdaterar partikelns logik varje frame.
- *
- * Effekter:
- * - Minskar alpha (fade out)
- * - Ökar scaleX och scaleY (zoom-effekt)
+ * Minskar alpha
+ * Ökar scaleX och scaleY 
  *
  * @param {number} step
  */
 runmysteriet.particle.AttackParticle.prototype.update = function(step) {
     rune.particle.Particle.prototype.update.call(this, step);
 
-    // fade-out effekt
+    //Fade-out effekt
     this.alpha -= 0.08;
 
-    // skala upp partikeln över tid
+    //Skala upp partikeln över tid
     this.scaleX += 0.03;
     this.scaleY += 0.03;
 
-    // säkerställ att alpha inte blir negativ
+    //Säkerställer att alpha inte blir negativ
     if (this.alpha < 0) {
         this.alpha = 0;
     }
