@@ -231,11 +231,46 @@ runmysteriet.scene.More.prototype.createVolumeHud = function() {
 
     this.stage.addChild(this.m_volumeHud);
 };
+
+//------------------------------------------------------------------------------
+// REMOVE DISPLAY OBJECT
+//------------------------------------------------------------------------------
+
+runmysteriet.scene.More.prototype.removeDisplayObject = function(object) {
+
+    if (!object) {
+        return;
+    }
+
+    if (object.parent) {
+        object.parent.removeChild(object);
+        return;
+    }
+
+    if (object.stage) {
+        object.stage.removeChild(object);
+    }
+};
+
 //------------------------------------------------------------------------------
 // DISPOSE
 //------------------------------------------------------------------------------
 
 runmysteriet.scene.More.prototype.dispose = function() {
+
+    if (
+        this.backgroundMusic &&
+        this.backgroundMusic.m_source &&
+        this.backgroundMusic.m_source.mediaElement
+    ) {
+        this.backgroundMusic.m_source.mediaElement.pause();
+    }
+
+    this.removeDisplayObject(this.m_volumeHud);
+    this.removeDisplayObject(this.m_backButton);
+    this.removeDisplayObject(this.m_text);
+    this.removeDisplayObject(this.m_box);
+    this.removeDisplayObject(this.m_background);
 
     this.m_backButton = null;
     this.m_text = null;

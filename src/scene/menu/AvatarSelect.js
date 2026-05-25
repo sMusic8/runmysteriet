@@ -119,16 +119,16 @@ runmysteriet.scene.AvatarSelect.prototype.createText = function() {
 
     this.m_helpText = new rune.text.BitmapField("LEFT/RIGHT = SELECT   CROSS/A = READY");
     this.m_helpText.autoSize = true;
-    this.m_helpText.scaleX = 0.9;
-    this.m_helpText.scaleY = 0.9;
+    this.m_helpText.scaleX = 1;
+    this.m_helpText.scaleY = 1;
     this.m_helpText.x = 65;
     this.m_helpText.y = 195;
     this.stage.addChild(this.m_helpText);
 
     this.m_backText = new rune.text.BitmapField("CIRCLE/B/ESC = BACK OR UNREADY");
     this.m_backText.autoSize = true;
-    this.m_backText.scaleX = 0.9;
-    this.m_backText.scaleY = 0.9;
+    this.m_backText.scaleX = 1;
+    this.m_backText.scaleY = 1;
     this.m_backText.x = 65;
     this.m_backText.y = 210;
     this.stage.addChild(this.m_backText);
@@ -191,8 +191,8 @@ runmysteriet.scene.AvatarSelect.prototype.createPlayerAvatarChoices = function(p
 
         nameText = new rune.text.BitmapField(avatar.name);
         nameText.autoSize = true;
-        nameText.scaleX = 0.7;
-        nameText.scaleY = 0.7;
+        nameText.scaleX = 1;
+        nameText.scaleY = 1;
         nameText.x = baseX + i * spacing - 2;
         nameText.y = y + 68;
 

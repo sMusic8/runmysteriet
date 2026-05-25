@@ -53,6 +53,7 @@ if (avatarData && typeof avatarData === "object") {
   this.m_startCountdownOverlay = null;
   this.m_startCountdownText = null;
 
+  this.m_levelCompleteSequence = null;
 };
 
 //------------------------------------------------------------------------------
@@ -188,15 +189,6 @@ runmysteriet.scene.Game.prototype.init = function () {
   this.m_gameInput = new runmysteriet.input.GameInput(this.application);
   this.camera = this.cameras.getCameraAt(0);
 
-
-
-  if (this.m_avatarData && this.m_avatarData.player1) {
-    p1Texture = this.m_avatarData.player1.texture;
-  }
-
-  if (this.m_avatarData && this.m_avatarData.player2) {
-      p2Texture = this.m_avatarData.player2.texture;
-  }
   /*
    * Musik
    */
@@ -344,6 +336,17 @@ this.m_armorHandler.onArmorCollected = function(player, armor) {
   this.m_shieldHandler.init();
 
   /*
+  * Level complete sequence
+  */
+  this.m_levelCompleteSequence =
+    new runmysteriet.handler.LevelCompleteSequence(
+        this.stage,
+        this.application,
+        this.camera,
+        this.m_playerHandler
+    );
+
+  /*
   * HUD
   */
   this.createHUD();
@@ -395,6 +398,16 @@ runmysteriet.scene.Game.prototype.update = function(step) {
 
     if (this.m_isPaused === true) {
         this.updatePauseMenuPosition();
+        this.updateHUD();
+        return;
+    }
+    if (this.m_levelCompleteSequence && this.m_levelCompleteSequence.isActive()) {
+        this.m_levelCompleteSequence.update();
+
+    if (this.m_backgroundHandler) {
+        this.m_backgroundHandler.update();
+    }
+
         this.updateHUD();
         return;
     }
@@ -924,7 +937,7 @@ runmysteriet.scene.Game.prototype.updateGameInfo = function() {
     }
 
     if (this.allRunesColected()) {
-        this.m_hudHandler.setTimerText("ALL RUNES FOUND - REACH THE END");
+        this.m_hudHandler.setTimerText("ALL RUNES FOUND");
     } else {
         this.m_hudHandler.setTimerText("COLLECT ALL RUNES");
     }
@@ -1111,6 +1124,7 @@ runmysteriet.scene.Game.prototype.getHealthScore = function() {
 
 runmysteriet.scene.Game.prototype.winGame = function(winningPlayer) {
 
+    var self = this;
     var earnedScore = 0;
     var totalScore = 0;
     var guessData = null;
@@ -1121,14 +1135,15 @@ runmysteriet.scene.Game.prototype.winGame = function(winningPlayer) {
 
     this.m_gameEnd = true;
 
+    /*
+     * Lägg till level complete-score och health bonus.
+     */
     this.addScore(
         this.m_scoreLevelComplete + this.getHealthScore()
     );
 
     earnedScore = this.m_levelScore;
     totalScore = this.getTotalScore();
-
-    this.stopSound(this.backgroundMusic);
 
     if (
         this.m_shieldHandler &&
@@ -1137,6 +1152,47 @@ runmysteriet.scene.Game.prototype.winGame = function(winningPlayer) {
         guessData = this.m_shieldHandler.getGuessData();
     }
 
+    /*
+     * Stoppa gameplay-rörelser under segersekvensen.
+     */
+    if (this.tweens) {
+        this.tweens.paused = true;
+    }
+
+    this.stopSound(this.backgroundMusic);
+
+    /*
+     * Starta segersekvensen.
+     * Den går vidare till GuessWord först när sekvensen är klar.
+     */
+    if (this.m_levelCompleteSequence) {
+        this.m_levelCompleteSequence.start(
+            {
+                levelNumber: this.m_levelNumber,
+                earnedScore: earnedScore,
+                totalScore: totalScore,
+                guessData: guessData,
+                avatarData: this.m_avatarData
+            },
+            function(data) {
+                self.application.scenes.load([
+                    new runmysteriet.scene.GuessWord(
+                        data.levelNumber,
+                        data.earnedScore,
+                        data.totalScore,
+                        data.guessData,
+                        data.avatarData
+                    )
+                ]);
+            }
+        );
+
+        return;
+    }
+
+    /*
+     * Fallback om sekvensen saknas.
+     */
     this.application.scenes.load([
         new runmysteriet.scene.GuessWord(
             this.m_levelNumber,
@@ -1387,6 +1443,16 @@ runmysteriet.scene.Game.prototype.dispose = function() {
     this.m_shieldHandler = null;
 
     /*
+     * Level complete sequence.
+     */
+
+    if (this.m_levelCompleteSequence) {
+    this.m_levelCompleteSequence.dispose();
+}
+
+this.m_levelCompleteSequence = null;
+
+    /*
      * Armor.
      */
     if (this.m_armorHandler &&
@@ -1463,7 +1529,7 @@ runmysteriet.scene.Game.prototype.dispose = function() {
     this.m_platformHandler = null;
 
     /*
-     * Bakgrund skapades tidigt i init, därför rensas den sent.
+     * Bakgrund skapas tidigt i init, därför rensas den sent.
      */
     if (this.m_backgroundHandler &&
         typeof this.m_backgroundHandler.clear === "function") {

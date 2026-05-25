@@ -1593,3 +1593,105 @@ runmysteriet.handler.PlayerHandler.prototype.updateDeathEffects = function() {
 runmysteriet.handler.PlayerHandler.prototype.setCameraHandler = function(cameraHandler) {
     this.cameraHandler = cameraHandler;
 };
+
+//------------------------------------------------------------------------------
+// CLEAR
+//------------------------------------------------------------------------------
+
+/**
+ * Tar bort spelare, hp-bars, attacker och dödseffekter från stage.
+ *
+ * @return {void}
+ */
+runmysteriet.handler.PlayerHandler.prototype.clear = function() {
+
+    var i = 0;
+    var player = null;
+    var attack = null;
+    var effect = null;
+
+    if (this.players) {
+        for (i = 0; i < this.players.length; i++) {
+            player = this.players[i];
+
+            if (!player) {
+                continue;
+            }
+
+            if (player.hpBar) {
+                this.removeDisplayObject(player.hpBar);
+                player.hpBar = null;
+            }
+
+            this.removeDisplayObject(player);
+        }
+    }
+
+    if (this.attacks) {
+        for (i = 0; i < this.attacks.length; i++) {
+            attack = this.attacks[i];
+
+            if (!attack) {
+                continue;
+            }
+
+            if (typeof attack.remove === "function") {
+                attack.remove();
+            } else {
+                this.removeDisplayObject(attack);
+            }
+        }
+    }
+
+    if (this.deathEffects) {
+        for (i = 0; i < this.deathEffects.length; i++) {
+            effect = this.deathEffects[i];
+
+            if (!effect) {
+                continue;
+            }
+
+            this.removeDisplayObject(effect);
+        }
+    }
+
+    this.players = [];
+    this.attacks = [];
+    this.deathEffects = [];
+
+    this.platforms = null;
+    this.platformHandler = null;
+    this.application = null;
+    this.input = null;
+    this.keyboard = null;
+    this.enemyHandler = null;
+    this.camera = null;
+    this.cameraHandler = null;
+
+    this.jumpSound = null;
+    this.deathSound = null;
+    this.attackSound = null;
+    this.avatarData = null;
+};
+
+/**
+ * Tar bort display-objekt från stage.
+ *
+ * @param {?Object} object
+ * @return {void}
+ */
+runmysteriet.handler.PlayerHandler.prototype.removeDisplayObject = function(object) {
+
+    if (!object) {
+        return;
+    }
+
+    if (object.parent) {
+        object.parent.removeChild(object);
+        return;
+    }
+
+    if (object.stage) {
+        object.stage.removeChild(object);
+    }
+};

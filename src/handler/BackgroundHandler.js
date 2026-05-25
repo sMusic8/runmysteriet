@@ -90,3 +90,42 @@ runmysteriet.handler.BackgroundHandler.prototype.update = function() {
         }
     }
 };
+
+//------------------------------------------------------------------------------
+// CLEAR
+//------------------------------------------------------------------------------
+
+/**
+ * Tar bort alla bakgrunder från stage.
+ *
+ * @return {void}
+ */
+runmysteriet.handler.BackgroundHandler.prototype.clear = function() {
+
+    var i = 0;
+    var background = null;
+
+    if (!this.backgrounds) {
+        this.backgrounds = [];
+        return;
+    }
+
+    for (i = 0; i < this.backgrounds.length; i++) {
+        background = this.backgrounds[i];
+
+        if (!background) {
+            continue;
+        }
+
+        if (background.parent) {
+            background.parent.removeChild(background);
+        } else if (background.stage) {
+            background.stage.removeChild(background);
+        }
+    }
+
+    this.backgrounds = [];
+    this.stage = null;
+    this.camera = null;
+    this.backgroundTextures = [];
+};
