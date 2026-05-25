@@ -3,7 +3,7 @@
 //------------------------------------------------------------------------------
 
 /**
- * Hanterar ett spelarnamn med fast antal bokstäver.
+ * Hanterar ett nickname med fast antal bokstäver.
  *
  * @constructor
  * @param {number=} maxLength
