@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-// Constructor scope
+// Attacks
 //------------------------------------------------------------------------------
 
 /**
@@ -63,16 +63,8 @@ runmysteriet.attack.Attack = function(player) {
     this.hasHit = false;
 };
 
-//------------------------------------------------------------------------------
-// Inheritance
-//------------------------------------------------------------------------------
-
 runmysteriet.attack.Attack.prototype = Object.create(rune.display.Graphic.prototype);
 runmysteriet.attack.Attack.prototype.constructor = runmysteriet.attack.Attack;
-
-//------------------------------------------------------------------------------
-// Public prototype methods
-//------------------------------------------------------------------------------
 
 /**
  * Uppdaterar attacken.

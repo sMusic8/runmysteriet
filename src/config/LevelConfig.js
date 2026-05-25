@@ -1,8 +1,8 @@
 /**
- * Level configuration.
+ * Level konfiguering.
  *
  * @constructor
- * @param {number=} levelNumber
+ * @param {number=} levelNummer
  */
 runmysteriet.config.LevelConfig = function(levelNumber) {
 
@@ -10,12 +10,8 @@ runmysteriet.config.LevelConfig = function(levelNumber) {
     this.levelNumber = levelNumber || 1;
 };
 
-//------------------------------------------------------------------------------
-// LEVEL LIMIT
-//------------------------------------------------------------------------------
-
 /**
- * Returns maximum level in game.
+ * Retunera max antal levlar
  *
  * @return {number}
  */
@@ -23,12 +19,8 @@ runmysteriet.config.LevelConfig.prototype.getMaxLevel = function() {
     return 20;
 };
 
-//------------------------------------------------------------------------------
-// ENEMY BALANCE
-//------------------------------------------------------------------------------
-
 /**
- * Returns number of Kristen enemies for this level.
+ * Retunera max antal kristna fiender för en bana
  *
  * @return {number}
  */
