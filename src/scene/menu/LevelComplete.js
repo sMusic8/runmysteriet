@@ -21,6 +21,11 @@ runmysteriet.scene.LevelComplete = function(levelNumber, totalScore, earnedScore
     this.backgroundMusic = null;
 
     this.m_highscoreHud = null;
+
+    this.m_titleText = null;
+    this.m_earnedText = null;
+    this.m_totalText = null;
+    this.m_gameInput = null;
 };
 
 //------------------------------------------------------------------------------
@@ -53,23 +58,27 @@ runmysteriet.scene.LevelComplete.prototype.init = function() {
         ? "YOU WON THE WHOLE GAME"
         : "LEVEL " + this.levelNumber + " COMPLETE";
 
-    var title = new rune.text.BitmapField(titleText);
-    title.autoSize = true;
-    title.center = this.application.screen.center;
-    title.y -= 75;
-    this.stage.addChild(title);
+    this.m_titleText = new rune.text.BitmapField(titleText);
+    this.m_titleText.autoSize = true;
+    this.m_titleText.center = this.application.screen.center;
+    this.m_titleText.y -= 75;
+    this.stage.addChild(this.m_titleText);
 
-    var earned = new rune.text.BitmapField("EARNED SCORE +" + this.earnedScore);
-    earned.autoSize = true;
-    earned.center = this.application.screen.center;
-    earned.y -= 45;
-    this.stage.addChild(earned);
+    this.m_earnedText = new rune.text.BitmapField(
+        "EARNED SCORE +" + this.earnedScore
+    );
+    this.m_earnedText.autoSize = true;
+    this.m_earnedText.center = this.application.screen.center;
+    this.m_earnedText.y -= 45;
+    this.stage.addChild(this.m_earnedText);
 
-    var total = new rune.text.BitmapField("TOTAL SCORE " + this.totalScore);
-    total.autoSize = true;
-    total.center = this.application.screen.center;
-    total.y -= 25;
-    this.stage.addChild(total);
+    this.m_totalText = new rune.text.BitmapField(
+        "TOTAL SCORE " + this.totalScore
+    );
+    this.m_totalText.autoSize = true;
+    this.m_totalText.center = this.application.screen.center;
+    this.m_totalText.y -= 25;
+    this.stage.addChild(this.m_totalText);
 
     this.createMenu();
     this.updateMenu();
@@ -190,12 +199,72 @@ runmysteriet.scene.LevelComplete.prototype.chooseSelected = function() {
         new runmysteriet.scene.Menu()
     ]);
 };
+//------------------------------------------------------------------------------
+// REMOVE DISPLAY OBJECT
+//------------------------------------------------------------------------------
+
+/**
+ * Tar bort objekt från stage.
+ *
+ * @param {?Object} object
+ * @return {void}
+ */
+runmysteriet.scene.LevelComplete.prototype.removeDisplayObject = function(object) {
+
+    if (!object) {
+        return;
+    }
+
+    if (object.parent) {
+        object.parent.removeChild(object);
+        return;
+    }
+
+    if (object.stage) {
+        object.stage.removeChild(object);
+    }
+};
 
 //------------------------------------------------------------------------------
 // DISPOSE
 //------------------------------------------------------------------------------
 
 runmysteriet.scene.LevelComplete.prototype.dispose = function() {
+
+    var i = 0;
+
+    if (this.backgroundMusic) {
+        if (
+            this.backgroundMusic.m_source &&
+            this.backgroundMusic.m_source.mediaElement
+        ) {
+            this.backgroundMusic.m_source.mediaElement.pause();
+        }
+    }
+
+    this.removeDisplayObject(this.m_titleText);
+    this.removeDisplayObject(this.m_earnedText);
+    this.removeDisplayObject(this.m_totalText);
+
+    if (this.menuItems) {
+        for (i = 0; i < this.menuItems.length; i++) {
+            this.removeDisplayObject(this.menuItems[i]);
+        }
+    }
+
+    this.m_titleText = null;
+    this.m_earnedText = null;
+    this.m_totalText = null;
+
+    this.menuItems = [];
+    this.selectedIndex = 0;
+
+    this.menuSound = null;
+    this.backgroundMusic = null;
+    this.levelConfig = null;
+    this.m_avatarData = null;
+    this.m_highscoreHud = null;
+    this.m_gameInput = null;
 
     rune.scene.Scene.prototype.dispose.call(this);
 };

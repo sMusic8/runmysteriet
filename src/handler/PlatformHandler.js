@@ -474,3 +474,71 @@ runmysteriet.handler.PlatformHandler.prototype.getArmorCount = function() {
 
     return 2;
 };
+
+//------------------------------------------------------------------------------
+// CLEAR
+//------------------------------------------------------------------------------
+
+/**
+ * Tar bort alla plattformsobjekt från stage och rensar listor.
+ *
+ * @return {void}
+ */
+runmysteriet.handler.PlatformHandler.prototype.clear = function() {
+
+    var i = 0;
+
+    this.clearDisplayList(this.platforms);
+    this.clearDisplayList(this.holes);
+    this.clearDisplayList(this.waterAreas);
+    this.clearDisplayList(this.boats);
+    this.clearDisplayList(this.endZones);
+
+    this.platforms = [];
+    this.holes = [];
+    this.enemySpawns = [];
+    this.waterAreas = [];
+    this.boats = [];
+    this.endZones = [];
+    this.diseaseSpawns = [];
+    this.runeSpawns = [];
+    this.armorSpawns = [];
+
+    this.levelWidth = 0;
+    this.levelNumber = 0;
+    this.stage = null;
+};
+
+/**
+ * Tar bort objekt i en lista från stage.
+ *
+ * @param {?Array} list
+ * @return {void}
+ */
+runmysteriet.handler.PlatformHandler.prototype.clearDisplayList = function(list) {
+
+    var i = 0;
+    var object = null;
+
+    if (!list) {
+        return;
+    }
+
+    for (i = 0; i < list.length; i++) {
+        object = list[i];
+
+        if (!object) {
+            continue;
+        }
+
+        if (typeof object.dispose === "function") {
+            object.dispose();
+        }
+
+        if (object.parent) {
+            object.parent.removeChild(object);
+        } else if (object.stage) {
+            object.stage.removeChild(object);
+        }
+    }
+};

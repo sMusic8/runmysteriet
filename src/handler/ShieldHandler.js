@@ -379,3 +379,66 @@ runmysteriet.handler.ShieldHandler.prototype.getGuessData = function() {
         hiddenIndex: this.m_hiddenIndex
     };
 };
+
+//------------------------------------------------------------------------------
+// CLEAR
+//------------------------------------------------------------------------------
+
+/**
+ * Tar bort alla sköldar/runor från stage och rensar referenser.
+ *
+ * @return {void}
+ */
+runmysteriet.handler.ShieldHandler.prototype.clear = function() {
+
+    var i = 0;
+    var shield = null;
+
+    if (this.m_shields) {
+        for (i = 0; i < this.m_shields.length; i++) {
+            shield = this.m_shields[i];
+
+            if (!shield) {
+                continue;
+            }
+
+            if (shield.parent) {
+                shield.parent.removeChild(shield);
+            } else if (shield.stage) {
+                shield.stage.removeChild(shield);
+            }
+        }
+    }
+
+    if (this.m_collected) {
+        for (i = 0; i < this.m_collected.length; i++) {
+            shield = this.m_collected[i];
+
+            if (!shield) {
+                continue;
+            }
+
+            if (shield.parent) {
+                shield.parent.removeChild(shield);
+            } else if (shield.stage) {
+                shield.stage.removeChild(shield);
+            }
+        }
+    }
+
+    this.m_shields = [];
+    this.m_collected = [];
+    this.m_collectedMap = [];
+    this.m_runeSpawns = [];
+
+    this.m_word = "";
+    this.m_wordData = null;
+    this.m_hints = [];
+    this.m_hiddenIndex = -1;
+
+    this.onCollectedChanged = null;
+    this.catchSound = null;
+    this.box = null;
+    this.application = null;
+    this.m_stage = null;
+};
