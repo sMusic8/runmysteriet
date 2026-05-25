@@ -3,7 +3,7 @@
 //------------------------------------------------------------------------------
 
 /**
- * Representerar en skadlig "disease" (t.ex. gift/moln) som skadar spelaren.
+ * Representerar en skadlig "disease" som skadar spelaren.
  *
  * @constructor
  * @extends {rune.display.Sprite}
