@@ -5,9 +5,6 @@
 /**
  * Hanterar highscore via Rune SDK.
  *
- * Rune SDK sparar highscores i localStorage. Spelet ska inte skriva
- * tillbaka till JSON-filen i asset-mappen.
- *
  * @constructor
  * @param {!Object} application
  */
@@ -18,8 +15,6 @@ runmysteriet.logic.HighscoreManager = function(application) {
 
 /**
  * Sparar score till Rune highscore.
- *
- * Rune SDK ansvarar för själva highscore-listan.
  *
  * @param {!runmysteriet.logic.HighscoreEntry} entry
  * @return {number}
@@ -52,7 +47,7 @@ runmysteriet.logic.HighscoreManager.prototype.save = function(entry) {
 };
 
 /**
- * Hämtar alla highscores från Rune, max 5.
+ * Hämtar alla highscores, max 5 st.
  *
  * @return {!Array<!Object>}
  */
@@ -111,15 +106,6 @@ runmysteriet.logic.HighscoreManager.prototype.isNewRecord = function(score) {
     if (highscores.length < 5) {
         return true;
     }
-
-    /*
-     * Rune-listan ligger på:
-     * 0 = plats 1
-     * 1 = plats 2
-     * 2 = plats 3
-     * 3 = plats 4
-     * 4 = plats 5
-     */
     lowestTopScore = parseInt(highscores[4].score, 10) || 0;
 
     return score > lowestTopScore;
