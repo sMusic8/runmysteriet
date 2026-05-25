@@ -41,10 +41,6 @@ runmysteriet.segments.Segment_End = function() {
 
 };
 
-//------------------------------------------------------------------------------
-// PUBLIC METHODS
-//------------------------------------------------------------------------------
-
 /**
  * Skapar slutsegmentets bana.
  *
@@ -84,9 +80,8 @@ runmysteriet.segments.Segment_End.prototype.ground = function(stage, startX, lev
 
     this.addBackground(stage, segmentStart);
 
-    /*
-     * Marken byggs i delar så små lavahål kan finnas mellan markbitarna.
-     */
+    //Marken byggs i delar så små lavahål kan finnas mellan markbitarna.
+     
     this.addGroundWithSmallLavaHoles(stage, platforms, holes, segmentStart);
     this.addJumpPlatforms(stage, platforms, segmentStart);
     this.addGoalMarkers(stage, gateX, gateY);
@@ -109,10 +104,6 @@ runmysteriet.segments.Segment_End.prototype.ground = function(stage, startX, lev
     };
 };
 
-//------------------------------------------------------------------------------
-// BACKGROUND
-//------------------------------------------------------------------------------
-
 /**
  * Lägger till bakgrunden för slutsegmentet.
  *
@@ -132,10 +123,6 @@ runmysteriet.segments.Segment_End.prototype.addBackground = function(stage, segm
     stage.addChild(background);
 };
 
-//------------------------------------------------------------------------------
-// GROUND
-//------------------------------------------------------------------------------
-
 /**
  * Lägger mark med små lavahål i slutsegmentet.
  *
@@ -149,9 +136,8 @@ runmysteriet.segments.Segment_End.prototype.addGroundWithSmallLavaHoles = functi
     var x = segmentStart;
     var holeWidth = 64;
 
-    /*
-     * Mark före första hålet.
-     */
+    //Mark före första hålet.
+     
     this.addTiles(
         stage,
         platforms,
@@ -163,16 +149,14 @@ runmysteriet.segments.Segment_End.prototype.addGroundWithSmallLavaHoles = functi
 
     x += 8 * this.tileW;
 
-    /*
-     * Första lilla lavahålet.
-     */
+    //Första lilla lavahålet.
+     
     this.addLavaHole(stage, holes, x, holeWidth);
 
     x += holeWidth;
 
-    /*
-     * Mark mellan hålen.
-     */
+    //Mark mellan hålen.
+     
     this.addTiles(
         stage,
         platforms,
@@ -184,16 +168,14 @@ runmysteriet.segments.Segment_End.prototype.addGroundWithSmallLavaHoles = functi
 
     x += 7 * this.tileW;
 
-    /*
-     * Andra lilla lavahålet.
-     */
+    //Andra lilla lavahålet.
+     
     this.addLavaHole(stage, holes, x, holeWidth);
 
     x += holeWidth;
 
-    /*
-     * Resten av marken fram till slutet.
-     */
+    //Resten av marken fram till slutet.
+     
     this.addTiles(
         stage,
         platforms,
@@ -221,14 +203,12 @@ runmysteriet.segments.Segment_End.prototype.addLavaHole = function(stage, holes,
         200
     );
 
-    /*
-     * Hole lägger själv ut sin lava.
-     */
+    //Hole lägger själv ut sin lava.
+     
     hole.addToStage(stage);
 
-    /*
-     * Hole sparas för dödslogik.
-     */
+    //Hole sparas för dödslogik.
+     
     holes.push(hole);
 };
 
@@ -281,10 +261,6 @@ runmysteriet.segments.Segment_End.prototype.addTiles = function(stage, platforms
     }
 };
 
-//------------------------------------------------------------------------------
-// GOAL VISUALS
-//------------------------------------------------------------------------------
-
 /**
  * Lägger till visuella markörer vid målområdet.
  *
@@ -309,16 +285,8 @@ runmysteriet.segments.Segment_End.prototype.addGoalMarkers = function(stage, gat
     }
 };
 
-//------------------------------------------------------------------------------
-// DISEASES
-//------------------------------------------------------------------------------
-
 /**
  * Returnerar antal sjukdomar baserat på level.
- *
- * Level 1-5: 2 sjukdomar
- * Level 6-10: 3 sjukdomar
- * Level 11+: 4 sjukdomar
  *
  * @param {number=} levelNumber
  * @return {number}
@@ -386,10 +354,6 @@ runmysteriet.segments.Segment_End.prototype.getDiseasePositions = function(segme
     ];
 };
 
-//------------------------------------------------------------------------------
-// END ZONE
-//------------------------------------------------------------------------------
-
 /**
  * Lägger till osynlig målzon längst mot slutet av segmentet.
  *
@@ -415,11 +379,14 @@ runmysteriet.segments.Segment_End.prototype.addEndZone = function(stage, endZone
     stage.addChild(endZone);
     endZones.push(endZone);
 };
-
-//------------------------------------------------------------------------------
-// RUNES
-//------------------------------------------------------------------------------
-
+/**
+ * Lägger till rune-positioner i en lista av spawn-punkter.
+ *
+ * @this {runmysteriet.segments.Segment_End}
+ * @param {!Array<!{x: number, y: number}>} runeSpawns Lista som fylls med rune-positioner.
+ * @param {number} segmentStart Startposition för segmentet på x-axeln.
+ * @return {void}
+ */
 runmysteriet.segments.Segment_End.prototype.addRuneSpawns = function(runeSpawns, segmentStart) {
     var positions = this.getRunePositions(segmentStart);
     var i = 0;
@@ -429,6 +396,13 @@ runmysteriet.segments.Segment_End.prototype.addRuneSpawns = function(runeSpawns,
     }
 };
 
+/**
+ * Returnerar positioner där runor ska spawnas i Segment_End.
+ *
+ * @this {runmysteriet.segments.Segment_End}
+ * @param {number} segmentStart Startposition för segmentet på x-axeln.
+ * @return {!Array<!{x: number, y: number}>} Lista med rune-koordinater.
+ */
 runmysteriet.segments.Segment_End.prototype.getRunePositions = function(segmentStart) {
     return [
         {
@@ -442,10 +416,14 @@ runmysteriet.segments.Segment_End.prototype.getRunePositions = function(segmentS
     ];
 };
 
-//------------------------------------------------------------------------------
-// ARMOR
-//------------------------------------------------------------------------------
-
+/**
+ * Lägger till armor-positioner i en lista av spawn-punkter.
+ *
+ * @this {runmysteriet.segments.Segment_End}
+ * @param {!Array<!{x: number, y: number}>} armorSpawns Lista som fylls med armor-positioner.
+ * @param {number} segmentStart Startposition för segmentet på x-axeln.
+ * @return {void}
+ */
 runmysteriet.segments.Segment_End.prototype.addArmorSpawns = function(armorSpawns, segmentStart) {
     var positions = this.getArmorPositions(segmentStart);
     var i = 0;
@@ -455,6 +433,13 @@ runmysteriet.segments.Segment_End.prototype.addArmorSpawns = function(armorSpawn
     }
 };
 
+/**
+ * Returnerar positioner där armor ska spawnas i Segment_End.
+ *
+ * @this {runmysteriet.segments.Segment_End}
+ * @param {number} segmentStart Startposition för segmentet på x-axeln.
+ * @return {!Array<!{x: number, y: number}>} Lista med armor-koordinater.
+ */
 runmysteriet.segments.Segment_End.prototype.getArmorPositions = function(segmentStart) {
     return [
         {
@@ -463,10 +448,6 @@ runmysteriet.segments.Segment_End.prototype.getArmorPositions = function(segment
         }
     ];
 };
-
-//------------------------------------------------------------------------------
-// JUMP PLATFORMS
-//------------------------------------------------------------------------------
 
 /**
  * Lägger till extra plattformar i slutsegmentet.
