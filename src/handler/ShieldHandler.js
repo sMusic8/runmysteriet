@@ -1,9 +1,6 @@
 //------------------------------------------------------------------------------
 // SHIELD HANDLER
 //------------------------------------------------------------------------------
-
-runmysteriet.handler = runmysteriet.handler || {};
-
 /**
  * Hanterar runor/shields som bygger upp ett ord i spelet.
  *
