@@ -1,58 +1,89 @@
 /**
- * "More"-scenen (information/mer info-skärm).
- * 
- * Visar extra information om spelet samt hanterar UI-element,
- * bakgrund, ljud och input för att kunna navigera tillbaka till menyn.
- * 
+ * Scen som visar "More"-informationen i spelet.
+ *
  * @constructor
  * @extends {rune.scene.Scene}
- * 
- * @property {?Object} m_backButton - Knapp för att gå tillbaka till menyn.
- * @property {?Object} m_text - Textinnehåll som visas i scenen.
- * @property {?Object} m_background - Bakgrundsbild för scenen.
- * @property {?Object} m_box - Visuell ruta/container för innehåll.
- * @property {?Object} backgroundMusic - Bakgrundsmusik för scenen.
- * @property {?Object} menuSound - Ljud vid interaktion i menyn.
- * @property {?Object} m_gameInput - Hanterar input från spelaren.
- * @property {?Object} m_volumeHud - UI för volymkontroll.
  */
 runmysteriet.scene.More = function() {
 
     rune.scene.Scene.call(this);
 
+    /**
+     * Knapp för att gå tillbaka från scenen.
+     * @type {?Object}
+     */
     this.m_backButton = null;
+
+    /**
+     * Textobjekt som visar information i scenen.
+     * @type {?Object}
+     */
     this.m_text = null;
+
+    /**
+     * Bakgrundsobjekt för scenen.
+     * @type {?Object}
+     */
     this.m_background = null;
+
+    /**
+     * Box/container som innehåller UI-element.
+     * @type {?Object}
+     */
     this.m_box = null;
 
+    /**
+     * Bakgrundsmusik för scenen.
+     * @type {?Object}
+     */
     this.backgroundMusic = null;
+
+    /**
+     * Ljud som spelas vid menyinteraktion.
+     * @type {?Object}
+     */
     this.menuSound = null;
 
+    /**
+     * Inputhantering för spelet i denna scen.
+     * @type {?Object}
+     */
     this.m_gameInput = null;
+
+    /**
+     * HUD för volymkontroll.
+     * @type {?Object}
+     */
     this.m_volumeHud = null;
 };
 
 runmysteriet.scene.More.prototype = Object.create(rune.scene.Scene.prototype);
 runmysteriet.scene.More.prototype.constructor = runmysteriet.scene.More;
-
 /**
- * Initierar "More"-scenen.
- * 
- * Sätter upp input, ljud, UI och alla visuella element i scenen.
- * Skapar bakgrund, informationsruta, text, tillbaka-knapp samt volym-HUD.
- * 
- * @method
- * @memberof runmysteriet.scene.More
- * 
- * @returns {void}
+ * Initierar scenen och skapar alla visuella och ljudmässiga komponenter.
+ *
+ * @return {void}
  */
 runmysteriet.scene.More.prototype.init = function() {
 
     rune.scene.Scene.prototype.init.call(this);
 
+    /**
+     * Inputhantering för spelet.
+     * @type {runmysteriet.input.GameInput}
+     */
     this.m_gameInput = new runmysteriet.input.GameInput(this.application);
 
+    /**
+     * Bakgrundsmusik för menyn.
+     * @type {Object}
+     */
     this.backgroundMusic = this.application.sounds.sound.get("sound_musicMenu");
+
+    /**
+     * Ljud som används vid menyinteraktion.
+     * @type {Object}
+     */
     this.menuSound = this.application.sounds.sound.get("sound_menu");
 
     if (this.backgroundMusic) {
@@ -65,18 +96,20 @@ runmysteriet.scene.More.prototype.init = function() {
     this.createBox();
     this.createText();
     this.createBackButton();
-
-    /*
-     * VolumeHud ska skapas sist så den hamnar över bakgrund/box/text.
-     */
     this.createVolumeHud();
 };
-//------------------------------------------------------------------------------
-// CREATE
-//------------------------------------------------------------------------------
 
+/**
+ * Skapar och lägger till bakgrundsbilden för scenen.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.More.prototype.createBackground = function() {
 
+    /**
+     * Bakgrundsbild för menyn.
+     * @type {rune.display.Graphic}
+     */
     this.m_background = new rune.display.Graphic(
         0,
         0,
@@ -88,21 +121,28 @@ runmysteriet.scene.More.prototype.createBackground = function() {
     this.stage.addChild(this.m_background);
 };
 /**
- * Skapar en informationsruta i "More"-scenen.
- * 
- * Ritar en vit rektangel centrerad på skärmen som används
- * som bakgrund för text och innehåll.
- * 
- * @method
- * @memberof runmysteriet.scene.More
- * 
- * @returns {void}
+ * Skapar en vit informationsruta och placerar den centralt på skärmen.
+ *
+ * @return {void}
  */
 runmysteriet.scene.More.prototype.createBox = function() {
 
+    /**
+     * Bredd på informationsrutan.
+     * @type {number}
+     */
     var boxWidth = 520;
+
+    /**
+     * Höjd på informationsrutan.
+     * @type {number}
+     */
     var boxHeight = 300;
 
+    /**
+     * Grafiskt box-objekt som fungerar som container för innehåll.
+     * @type {rune.display.Graphic}
+     */
     this.m_box = new rune.display.Graphic(
         0,
         0,
@@ -119,17 +159,16 @@ runmysteriet.scene.More.prototype.createBox = function() {
     this.stage.addChild(this.m_box);
 };
 /**
- * Skapar och placerar informationstext i "More"-scenen.
- * 
- * Texten beskriver spelets mål och kontroller..
- * 
- * @method
- * @memberof runmysteriet.scene.More
- * 
- * @returns {void}
+ * Skapar och placerar informations-texten i scenen.
+ *
+ * @return {void}
  */
 runmysteriet.scene.More.prototype.createText = function() {
 
+    /**
+     * Textfält som visar instruktioner och information till spelaren.
+     * @type {rune.text.BitmapField}
+     */
     this.m_text = new rune.text.BitmapField(
         "This is the game where you help the Vikings\n" +
         "reach their home ship while avoiding obstacles.\n\n" +
@@ -151,15 +190,16 @@ runmysteriet.scene.More.prototype.createText = function() {
     this.m_text.y = this.m_box.y + (this.m_box.height - this.m_text.height) / 2;
 };
 /**
- * Skapar och placerar tillbaka-knappen i "More"-scenen..
- * 
- * @method
- * @memberof runmysteriet.scene.More
- * 
- * @returns {void}
+ * Skapar en tillbaka-knapp (BACK) och placerar den under informationsrutan.
+ *
+ * @return {void}
  */
 runmysteriet.scene.More.prototype.createBackButton = function() {
 
+    /**
+     * Textfält som fungerar som tillbaka-knapp i scenen.
+     * @type {rune.text.BitmapField}
+     */
     this.m_backButton = new rune.text.BitmapField("BACK");
     this.m_backButton.autoSize = true;
 
@@ -172,8 +212,17 @@ runmysteriet.scene.More.prototype.createBackButton = function() {
         this.m_box.y + this.m_box.height + 15;
 };
 
+/**
+ * Skapar och lägger till volym-HUD som visar och hanterar ljudnivå.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.More.prototype.createVolumeHud = function() {
 
+    /**
+     * HUD-komponent för volymkontroll kopplad till bakgrundsmusik.
+     * @type {runmysteriet.ui.graphic.VolumeHud}
+     */
     this.m_volumeHud = new runmysteriet.ui.graphic.VolumeHud(
         this.application,
         this.backgroundMusic
@@ -183,13 +232,11 @@ runmysteriet.scene.More.prototype.createVolumeHud = function() {
 };
 
 /**
- * Uppdaterar "More"-scenen varje frame.
- * 
- * @method
- * @memberof runmysteriet.scene.More
- * 
- * @param {number} step - Tidssteg sedan senaste uppdatering.
- * @returns {void}
+ * Uppdaterar scenen varje frame.
+ * Anropar basklassens update och hanterar inmatning.
+ *
+ * @param {number} step Tidssteg (delta time) för uppdateringen.
+ * @return {void}
  */
 runmysteriet.scene.More.prototype.update = function(step) {
 
@@ -199,17 +246,17 @@ runmysteriet.scene.More.prototype.update = function(step) {
 };
 
 /**
- * Hanterar all input i "More"-scenen.
- * 
- * Läser spelarens input och skickar vidare till funktioner som hanterar volymkontroll.
- * 
- * @method
- * @memberof runmysteriet.scene.More
- * 
- * @returns {void}
+ * Hanterar all input i scenen.
+ * Läser tangentbordsinput och skickar vidare till specifika hanterare.
+ *
+ * @return {void}
  */
 runmysteriet.scene.More.prototype.handleInput = function() {
 
+    /**
+     * Inläst input från spelaren.
+     * @type {?Object}
+     */
     var input = null;
 
     if (!this.m_gameInput) {
@@ -221,14 +268,12 @@ runmysteriet.scene.More.prototype.handleInput = function() {
     this.handleVolumeInput(input);
     this.handleBackInput(input);
 };
+
 /**
- * Hanterar input för att gå tillbaka till menyn.
- * 
- * @method
- * @memberof runmysteriet.scene.More
- * 
- * @param {Object} input - Objekt som innehåller spelarinmatning.
- * @returns {void}
+ * Hanterar input för att gå tillbaka till meny.
+ *
+ * @param {?Object} input Inläst spelarinput.
+ * @return {void}
  */
 runmysteriet.scene.More.prototype.handleBackInput = function(input) {
 
@@ -240,23 +285,19 @@ runmysteriet.scene.More.prototype.handleBackInput = function(input) {
         this.playMenuSound();
         this.goToMenu();
     }
-};
-
-
-/**
- * Hanterar volymstyrning via input.
- * 
- * Ökar eller minskar bakgrundsmusikens volym beroende på input.
- * Volymen loopar mellan 0 och 1.
- * 
- * @method
- * @memberof runmysteriet.scene.More
- * 
- * @param {Object} input - Objekt som innehåller spelarinmatning.
- * @returns {void}
+};/**
+ * Hanterar input för att justera volymen på bakgrundsmusiken.
+ * Ökar eller minskar volymen och uppdaterar HUD:en.
+ *
+ * @param {?Object} input Inläst spelarinput.
+ * @return {void}
  */
 runmysteriet.scene.More.prototype.handleVolumeInput = function(input) {
 
+    /**
+     * Stegstorlek för volymändring.
+     * @type {number}
+     */
     var stepVol = 0.1;
 
     if (!this.backgroundMusic || !input) {
@@ -284,7 +325,12 @@ runmysteriet.scene.More.prototype.handleVolumeInput = function(input) {
         this.updateVolumeHud();
     }
 };
-
+/**
+ * Uppdaterar volym-HUD om den finns tillgänglig.
+ * Anropar HUD:ens textuppdatering.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.More.prototype.updateVolumeHud = function() {
 
     if (this.m_volumeHud &&
@@ -293,17 +339,22 @@ runmysteriet.scene.More.prototype.updateVolumeHud = function() {
         this.m_volumeHud.updateText();
     }
 };
-//------------------------------------------------------------------------------
-// SOUND
-//------------------------------------------------------------------------------
 
+/**
+ * Spelar upp meny-ljudet om det finns tillgängligt.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.More.prototype.playMenuSound = function() {
 
     if (this.menuSound && typeof this.menuSound.play === "function") {
         this.menuSound.play();
     }
-};
-
+};/**
+ * Stoppar bakgrundsmusiken genom att pausa dess ljudkälla.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.More.prototype.stopBackgroundMusic = function() {
 
     if (
@@ -314,17 +365,10 @@ runmysteriet.scene.More.prototype.stopBackgroundMusic = function() {
         this.backgroundMusic.m_source.mediaElement.pause();
     }
 };
-
-
 /**
- * Byter scen tillbaka till huvudmenyn.
- * 
- * Laddar om Menu-scenen och avslutar därmed "More"-scenen.
- * 
- * @method
- * @memberof runmysteriet.scene.More
- * 
- * @returns {void}
+ * Byter scen till huvudmenyn och stoppar bakgrundsmusiken.
+ *
+ * @return {void}
  */
 runmysteriet.scene.More.prototype.goToMenu = function() {
 
@@ -334,24 +378,13 @@ runmysteriet.scene.More.prototype.goToMenu = function() {
         new runmysteriet.scene.Menu()
     ]);
 };
-//------------------------------------------------------------------------------
-// VOLUME HUD
-//------------------------------------------------------------------------------
 
-runmysteriet.scene.More.prototype.createVolumeHud = function() {
-
-    this.m_volumeHud = new runmysteriet.ui.graphic.VolumeHud(
-        this.application,
-        this.backgroundMusic
-    );
-
-    this.stage.addChild(this.m_volumeHud);
-};
-
-//------------------------------------------------------------------------------
-// REMOVE DISPLAY OBJECT
-//------------------------------------------------------------------------------
-
+/**
+ * Tar bort ett objekt frÃ¥n stage.
+ *
+ * @param {?Object} object
+ * @return {void}
+ */
 runmysteriet.scene.More.prototype.removeDisplayObject = function(object) {
 
     if (!object) {
@@ -369,15 +402,10 @@ runmysteriet.scene.More.prototype.removeDisplayObject = function(object) {
 };
 
 /**
- * Rensar och frigör resurser för "More"-scenen.
- * 
- * Stoppar ljuduppspelning och tar bort alla grafiska objekt från scenen.
- * Nollställer referenser för att undvika minnesläckor.
- * 
- * @method
- * @memberof runmysteriet.scene.More
- * 
- * @returns {void}
+ * Rensar upp scenen och frigör alla resurser innan den förstörs.
+ * Stoppar ljud, tar bort displayobjekt och nollställer referenser.
+ *
+ * @return {void}
  */
 runmysteriet.scene.More.prototype.dispose = function() {
 
