@@ -86,22 +86,27 @@ runmysteriet.scene.GuessWord = function(
     this.menuSound = null;
 };
 
-//------------------------------------------------------------------------------
-// INHERITANCE
-//------------------------------------------------------------------------------
-
 runmysteriet.scene.GuessWord.prototype = Object.create(rune.scene.Scene.prototype);
 runmysteriet.scene.GuessWord.prototype.constructor = runmysteriet.scene.GuessWord;
-
-//------------------------------------------------------------------------------
-// INIT
-//------------------------------------------------------------------------------
-
+/**
+ * Initierar GuessWord-scenen och sätter upp ljud, logik och UI-komponenter.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.GuessWord.prototype.init = function() {
 
     rune.scene.Scene.prototype.init.call(this);
 
+    /**
+     * Bakgrundsmusik för scenen.
+     * @type {Object}
+     */
     this.backgroundMusic = this.application.sounds.sound.get("sound_musicMenu");
+
+    /**
+     * Meny-ljud som används vid interaktion.
+     * @type {Object}
+     */
     this.menuSound = this.application.sounds.sound.get("sound_menu");
 
     if (this.backgroundMusic) {
@@ -110,16 +115,36 @@ runmysteriet.scene.GuessWord.prototype.init = function() {
         this.backgroundMusic.play();
     }
 
+    /**
+     * Hanterar highscore-logik.
+     * @type {runmysteriet.logic.HighscoreManager}
+     */
     this.m_highscoreManager =
         new runmysteriet.logic.HighscoreManager(this.application);
 
+    /**
+     * Ljud som spelas vid highscore-händelser.
+     * @type {Object}
+     */
     this.m_highscoreSound =
         this.application.sounds.sound.get("sound_highscore");
 
+    /**
+     * Inputhantering för spelaren.
+     * @type {runmysteriet.input.GameInput}
+     */
     this.m_gameInput = new runmysteriet.input.GameInput(this.application);
 
+    /**
+     * Pussellogik för gissningsspelet.
+     * @type {runmysteriet.logic.GuessWordPuzzle}
+     */
     this.m_puzzle = new runmysteriet.logic.GuessWordPuzzle(this.m_wordData);
 
+    /**
+     * Hanterar val av bokstäver i alfabetet.
+     * @type {runmysteriet.logic.GuessAlphabetSelector}
+     */
     this.m_alphabetSelector = new runmysteriet.logic.GuessAlphabetSelector();
 
     this.createText();
@@ -129,28 +154,37 @@ runmysteriet.scene.GuessWord.prototype.init = function() {
     this.createHighscoreNotice();
     this.checkHighscoreNotice(this.m_totalScore);
 };
-
-//------------------------------------------------------------------------------
-// CREATE TEXT
-//------------------------------------------------------------------------------
-
 /**
- * Skapar all text-UI för GuessWord-scenen.
+ * Skapar all textbaserad UI för GuessWord-scenen.
+ *
+ * @return {void}
  */
 runmysteriet.scene.GuessWord.prototype.createText = function() {
 
+    /**
+     * Titeltext för scenen.
+     * @type {rune.text.BitmapField}
+     */
     this.m_titleText = new rune.text.BitmapField("GUESS MISSING LETTERS");
     this.m_titleText.autoSize = true;
     this.m_titleText.center = this.application.screen.center;
     this.m_titleText.y -= 85;
     this.stage.addChild(this.m_titleText);
 
+    /**
+     * Visar aktuell vald bokstav.
+     * @type {rune.text.BitmapField}
+     */
     this.m_letterText = new rune.text.BitmapField("LETTER: A");
     this.m_letterText.autoSize = true;
     this.m_letterText.center = this.application.screen.center;
     this.m_letterText.y += 10;
     this.stage.addChild(this.m_letterText);
 
+    /**
+     * Hint-text som informerar om hjälp-funktion.
+     * @type {rune.text.BitmapField}
+     */
     this.m_hintText = new rune.text.BitmapField(
         "HINT: PRESS T / TRIANGLE, COSTS 20 POINTS"
     );
@@ -161,6 +195,10 @@ runmysteriet.scene.GuessWord.prototype.createText = function() {
     this.m_hintText.scale = 0.8;
     this.stage.addChild(this.m_hintText);
 
+    /**
+     * Visar spelarens nuvarande poäng.
+     * @type {rune.text.BitmapField}
+     */
     this.m_scoreText = new rune.text.BitmapField(
         "SCORE: " + this.m_totalScore
     );
@@ -171,6 +209,10 @@ runmysteriet.scene.GuessWord.prototype.createText = function() {
     this.m_scoreText.scale = 0.8;
     this.stage.addChild(this.m_scoreText);
 
+    /**
+     * Instruktionstext för kontroller och antal försök.
+     * @type {rune.text.BitmapField}
+     */
     this.m_messageText = new rune.text.BitmapField(
         "TRIES LEFT 3   UP/DOWN = LETTER, ENTER/CROSS = GUESS"
     );
@@ -181,31 +223,64 @@ runmysteriet.scene.GuessWord.prototype.createText = function() {
     this.m_messageText.scale = 0.7;
     this.stage.addChild(this.m_messageText);
 };
-
-//------------------------------------------------------------------------------
-// LETTER BOXES
-//------------------------------------------------------------------------------
-
 /**
  * Skapar visuella bokstavsrutor för det hemliga ordet.
  *
  * Räknar ut centrering baserat på ordets längd och placerar
  * varje bokstavsbox horisontellt med jämnt mellanrum.
+ *
+ * @return {void}
  */
 runmysteriet.scene.GuessWord.prototype.createLetterBoxes = function() {
 
+    /**
+     * Det hemliga ordet som ska gissas.
+     * @type {string}
+     */
     var word = this.m_puzzle.getWord();
 
+    /**
+     * Bredd på varje bokstavsruta.
+     * @type {number}
+     */
     var boxWidth = 28;
+
+    /**
+     * Mellanrum mellan bokstavsrutor.
+     * @type {number}
+     */
     var spacing = 10;
 
+    /**
+     * Total bredd för hela ordet inklusive mellanrum.
+     * @type {number}
+     */
     var totalWidth = word.length * boxWidth + (word.length - 1) * spacing;
+
+    /**
+     * Startposition X för centrering av bokstavsrutor.
+     * @type {number}
+     */
     var startX = this.application.screen.center.x - Math.floor(totalWidth / 2);
 
+    /**
+     * Y-position för alla bokstavsrutor.
+     * @type {number}
+     */
     var y = this.application.screen.center.y - 35;
+
     var i = 0;
+
+    /**
+     * Temporärt bokstavsbox-objekt som skapas i loopen.
+     * @type {?runmysteriet.logic.GuessLetterBox}
+     */
     var box = null;
 
+    /**
+     * Array som innehåller alla skapade bokstavsrutor.
+     * @type {Array.<runmysteriet.logic.GuessLetterBox>}
+     */
     this.m_letterBoxes = [];
 
     for (i = 0; i < word.length; i++) {
@@ -220,17 +295,38 @@ runmysteriet.scene.GuessWord.prototype.createLetterBoxes = function() {
         this.m_letterBoxes.push(box);
     }
 };
-
 /**
  * Uppdaterar alla bokstavsboxar baserat på spelstatus.
+ * Visar rätt bokstav, vald bokstav eller tom ruta beroende på läge.
+ *
+ * @return {void}
  */
 runmysteriet.scene.GuessWord.prototype.updateLetterBoxes = function() {
 
+    /**
+     * Det hemliga ordet som spelas.
+     * @type {string}
+     */
     var word = this.m_puzzle.getWord();
+
+    /**
+     * Karta över redan avslöjade bokstäver.
+     * @type {Array.<boolean>}
+     */
     var revealedMap = this.m_puzzle.getRevealedMap();
+
+    /**
+     * Index för aktuell bokstav som ska gissas.
+     * @type {number}
+     */
     var currentIndex = this.m_puzzle.getCurrentMissingIndex();
 
+    /**
+     * Bokstav som spelaren just nu har valt.
+     * @type {string}
+     */
     var selectedLetter = this.m_alphabetSelector.getLetter();
+
     var i = 0;
 
     for (i = 0; i < word.length; i++) {
@@ -253,12 +349,19 @@ runmysteriet.scene.GuessWord.prototype.updateLetterBoxes = function() {
     }
 };
 
-//------------------------------------------------------------------------------
-// UPDATE
-//------------------------------------------------------------------------------
-
+/**
+ * Uppdaterar GuessWord-scenen varje frame.
+ * Hanterar input, spelstatus, navigation och spel-logik.
+ *
+ * @param {number} step Tidssteg (delta time) för uppdatering.
+ * @return {void}
+ */
 runmysteriet.scene.GuessWord.prototype.update = function(step) {
 
+    /**
+     * Inläst input från spelaren.
+     * @type {?Object}
+     */
     var input = null;
 
     rune.scene.Scene.prototype.update.call(this, step);
@@ -313,13 +416,18 @@ runmysteriet.scene.GuessWord.prototype.update = function(step) {
         this.checkAnswer(this.m_alphabetSelector.getLetter());
     }
 };
-
-//------------------------------------------------------------------------------
-// VOLUME
-//------------------------------------------------------------------------------
-
+/**
+ * Hanterar volyminmatning för bakgrundsmusiken i scenen.
+ *
+ * @param {?Object} input Inläst spelarinput.
+ * @return {void}
+ */
 runmysteriet.scene.GuessWord.prototype.updateVolumeInput = function(input) {
 
+    /**
+     * Stegstorlek för volymändring.
+     * @type {number}
+     */
     var stepVol = 0.1;
 
     if (!input || !this.backgroundMusic) {
@@ -344,13 +452,18 @@ runmysteriet.scene.GuessWord.prototype.updateVolumeInput = function(input) {
         }
     }
 };
-
-//------------------------------------------------------------------------------
-// BUY HINT
-//------------------------------------------------------------------------------
-
+/**
+ * Köper och visar en ledtråd (hint) i GuessWord-scenen.
+ * Drar poäng från spelaren och uppdaterar UI samt highscore-status.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.GuessWord.prototype.buyHint = function() {
 
+    /**
+     * Aktuell ledtråd som hämtas från listan.
+     * @type {?string}
+     */
     var hint = null;
 
     if (this.m_currentHintIndex >= this.m_hints.length) {
@@ -386,13 +499,19 @@ runmysteriet.scene.GuessWord.prototype.buyHint = function() {
     this.updateMessageText("HINT COST 20 POINTS");
     this.checkHighscoreNotice(this.m_totalScore);
 };
-
-//------------------------------------------------------------------------------
-// CHECK ANSWER
-//------------------------------------------------------------------------------
-
+/**
+ * Kontrollerar om vald bokstav är korrekt.
+ * Uppdaterar spelstatus beroende på om svaret är rätt eller fel.
+ *
+ * @param {string} letter Bokstaven som spelaren gissar.
+ * @return {void}
+ */
 runmysteriet.scene.GuessWord.prototype.checkAnswer = function(letter) {
 
+    /**
+     * Resultat av kontrollen mot pusslet.
+     * @type {boolean}
+     */
     var correct = this.m_puzzle.checkLetter(String(letter).toLowerCase());
 
     if (correct) {
@@ -412,10 +531,12 @@ runmysteriet.scene.GuessWord.prototype.checkAnswer = function(letter) {
     this.applyWrongGuessPenalty();
 };
 
-//------------------------------------------------------------------------------
-// CONFIRM
-//------------------------------------------------------------------------------
-
+/**
+ * Kontrollerar om bekräftelseknappen är nedtryckt.
+ *
+ * @param {?Object} input Inläst spelarinput.
+ * @return {boolean} True om choose/confirm är aktiv.
+ */
 runmysteriet.scene.GuessWord.prototype.isConfirmPressed = function(input) {
 
     if (!input) {
@@ -425,10 +546,11 @@ runmysteriet.scene.GuessWord.prototype.isConfirmPressed = function(input) {
     return input.choose === true;
 };
 
-//------------------------------------------------------------------------------
-// LEVEL COMPLETE
-//------------------------------------------------------------------------------
-
+/**
+ * Byter till scenen för nivåslut (Level Complete) och skickar med spelarens data.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.GuessWord.prototype.goToLevelComplete = function() {
 
     this.stopBackgroundMusic();
@@ -443,12 +565,18 @@ runmysteriet.scene.GuessWord.prototype.goToLevelComplete = function() {
     ]);
 };
 
-//------------------------------------------------------------------------------
-// WRONG GUESS
-//------------------------------------------------------------------------------
-
+/**
+ * Applicerar straff för felaktig gissning.
+ * Uppdaterar poäng, antal fel och kontrollerar om spelet är över.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.GuessWord.prototype.applyWrongGuessPenalty = function() {
 
+    /**
+     * Antal försök kvar (beräknas efter felgissning).
+     * @type {number}
+     */
     var triesLeft = 0;
 
     this.m_wrongGuesses++;
@@ -481,15 +609,19 @@ runmysteriet.scene.GuessWord.prototype.applyWrongGuessPenalty = function() {
         triesLeft
     );
 };
-
-//------------------------------------------------------------------------------
-// CORRECT WORD TEXT
-//------------------------------------------------------------------------------
-
+/**
+ * Visar Game Over-text och det korrekta ordet när spelaren förlorar.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.GuessWord.prototype.showCorrectWordText = function() {
 
     this.m_failedGuess = true;
 
+    /**
+     * Textfält som visar korrekt ord vid game over.
+     * @type {rune.text.BitmapField}
+     */
     if (!this.m_correctWordText) {
         this.m_correctWordText = new rune.text.BitmapField("");
         this.m_correctWordText.autoSize = true;
@@ -506,11 +638,11 @@ runmysteriet.scene.GuessWord.prototype.showCorrectWordText = function() {
 
     this.updateMessageText("CONTINUE: PRESS X / ENTER");
 };
-
-//------------------------------------------------------------------------------
-// GAME OVER
-//------------------------------------------------------------------------------
-
+/**
+ * Byter till Game Over-scenen och stoppar bakgrundsmusiken.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.GuessWord.prototype.goToGameOver = function() {
 
     this.stopBackgroundMusic();
@@ -522,10 +654,6 @@ runmysteriet.scene.GuessWord.prototype.goToGameOver = function() {
         )
     ]);
 };
-
-//------------------------------------------------------------------------------
-// MESSAGE TEXT
-//------------------------------------------------------------------------------
 
 /**
  * Uppdaterar meddelandetext.
@@ -542,10 +670,6 @@ runmysteriet.scene.GuessWord.prototype.updateMessageText = function(text) {
     this.m_messageText.text = text;
 };
 
-//------------------------------------------------------------------------------
-// SCORE TEXT
-//------------------------------------------------------------------------------
-
 /**
  * Uppdaterar scoretext.
  *
@@ -560,19 +684,30 @@ runmysteriet.scene.GuessWord.prototype.updateScoreText = function() {
     this.m_scoreText.text = "SCORE: " + this.m_totalScore;
 };
 
-//------------------------------------------------------------------------------
-// HIGHSCORE NOTICE
-//------------------------------------------------------------------------------
-
+/**
+ * Skapar text för highscore-notis i scenen.
+ * Texten är dold tills ett nytt highscore uppnås.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.GuessWord.prototype.createHighscoreNotice = function() {
 
+    /**
+     * Textfält som visar highscore-notis.
+     * @type {rune.text.BitmapField}
+     */
     this.m_highscoreText = new rune.text.BitmapField("NEW HIGHSCORE!");
     this.m_highscoreText.autoSize = true;
     this.m_highscoreText.visible = false;
 
     this.stage.addChild(this.m_highscoreText);
 };
-
+/**
+ * Visar highscore-notis och spelar ljud första gången den triggas.
+ * Startar även en timer för visningstiden.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.GuessWord.prototype.showHighscoreNotice = function() {
 
     if (this.m_highscoreNotified === true) {
@@ -582,6 +717,10 @@ runmysteriet.scene.GuessWord.prototype.showHighscoreNotice = function() {
     this.m_highscoreNotified = true;
     this.m_highscoreTimer = 180;
 
+    /**
+     * Visuell highscore-notis.
+     * @type {?rune.text.BitmapField}
+     */
     if (this.m_highscoreText) {
         this.m_highscoreText.visible = true;
         this.m_highscoreText.alpha = 1;
@@ -589,13 +728,26 @@ runmysteriet.scene.GuessWord.prototype.showHighscoreNotice = function() {
         this.m_highscoreText.scaleY = 1;
     }
 
+    /**
+     * Ljud som spelas vid highscore.
+     * @type {?Object}
+     */
     if (this.m_highscoreSound) {
         this.m_highscoreSound.play();
     }
 };
-
+/**
+ * Uppdaterar highscore-notisen (animation, position och fade-out).
+ * Hanterar puls-effekt och timer för visning.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.GuessWord.prototype.updateHighscoreNotice = function() {
 
+    /**
+     * Skalfaktor för pulserande animation.
+     * @type {number}
+     */
     var pulse = 0;
 
     if (!this.m_highscoreText || this.m_highscoreText.visible !== true) {
@@ -623,7 +775,13 @@ runmysteriet.scene.GuessWord.prototype.updateHighscoreNotice = function() {
         this.m_highscoreText.scaleY = 1;
     }
 };
-
+/**
+ * Kontrollerar om spelaren har uppnått nytt highscore.
+ * Visar highscore-notis om ett nytt rekord har satts.
+ *
+ * @param {number} score Aktuell poäng som ska kontrolleras.
+ * @return {void}
+ */
 runmysteriet.scene.GuessWord.prototype.checkHighscoreNotice = function(score) {
 
     if (this.m_highscoreNotified === true) {
@@ -638,11 +796,13 @@ runmysteriet.scene.GuessWord.prototype.checkHighscoreNotice = function(score) {
         this.showHighscoreNotice();
     }
 };
-
-//------------------------------------------------------------------------------
-// REMOVE DISPLAY OBJECT
-//------------------------------------------------------------------------------
-
+/**
+ * Tar bort ett displayobjekt från scenen eller dess parent.
+ * Säkerställer att objektet inte längre visas i scenens display-lista.
+ *
+ * @param {?Object} object Displayobjekt som ska tas bort.
+ * @return {void}
+ */
 runmysteriet.scene.GuessWord.prototype.removeDisplayObject = function(object) {
 
     if (!object) {
@@ -658,13 +818,17 @@ runmysteriet.scene.GuessWord.prototype.removeDisplayObject = function(object) {
         object.stage.removeChild(object);
     }
 };
-
-//------------------------------------------------------------------------------
-// SOUND
-//------------------------------------------------------------------------------
-
+/**
+ * Stoppar bakgrundsmusiken och återställer uppspelningen till början.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.GuessWord.prototype.stopBackgroundMusic = function() {
 
+    /**
+     * Media-element kopplat till ljudkällan.
+     * @type {?HTMLMediaElement}
+     */
     var mediaElement = null;
 
     if (!this.backgroundMusic) {
@@ -687,14 +851,23 @@ runmysteriet.scene.GuessWord.prototype.stopBackgroundMusic = function() {
         }
     }
 };
-
-//------------------------------------------------------------------------------
-// DISPOSE
-//------------------------------------------------------------------------------
-
+/**
+ * Rensar upp GuessWord-scenen och frigör resurser.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.GuessWord.prototype.dispose = function() {
 
+    /**
+     * Räknare för loopning genom bokstavsboxar.
+     * @type {number}
+     */
     var i = 0;
+
+    /**
+     * Temporär referens till en bokstavsbox vid cleanup.
+     * @type {?Object}
+     */
     var box = null;
 
     this.stopBackgroundMusic();
