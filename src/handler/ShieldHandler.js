@@ -5,6 +5,15 @@
 /**
  * Hanterar runor/shields som bygger upp ett ord i spelet.
  *
+ * Denna klass äger bara logiken:
+ * - väljer ord
+ * - skapar shields
+ * - placerar shields
+ * - kollar pickup
+ * - skickar data till GuessWord
+ *
+ * Den ska inte skapa rune-sprites själv.
+ *
  * @constructor
  * @param {!rune.display.Stage} stage
  * @param {!Object} application
@@ -40,20 +49,6 @@ runmysteriet.handler.ShieldHandler = function(
 
     /** @type {!Array<!Object>} */
     this.m_collected = [];
-
-    /**
-     * Alla visuella rune-sprites som ligger på shields.
-     *
-     * @type {!Array<!Object>}
-     */
-    this.m_runeGraphics = [];
-
-    /**
-     * Skapar rune-sprites från Rune.js.
-     *
-     * @type {?runmysteriet.ui.Rune}
-     */
-    this.m_runeFactory = null;
 
     /** @type {string} */
     this.m_word = "";
@@ -123,19 +118,12 @@ runmysteriet.handler.ShieldHandler.prototype.init = function() {
     var i = 0;
     var shield = null;
     var spawn = null;
-    var runeGraphic = null;
 
     /*
-     * Rensa skapade shields och rune-grafik.
-     * Viktigt: m_runeSpawns ska inte tömmas.
+     * Rensa bara skapade shields.
+     * Viktigt: m_runeSpawns ska inte tömmas här.
      */
     this.clear();
-
-    /*
-     * Skapa ny rune-factory för denna omgång.
-     */
-    this.m_runeFactory = new runmysteriet.ui.Rune();
-    this.m_runeFactory.makeAllRunes();
 
     wordData = this.getRandomWordData();
 
@@ -178,26 +166,23 @@ runmysteriet.handler.ShieldHandler.prototype.init = function() {
         shield.wordIndex = i;
 
         /*
-         * Denna bokstav används av logiken.
+         * Bokstaven sparas för logiken.
          */
         shield.setRune(word.charAt(i));
-
-        /*
-         * Denna sprite är det som syns visuellt på shielden.
-         */
-        runeGraphic = this.createRuneGraphicForShield(shield);
 
         this.m_shields.push(shield);
 
         /*
-         * Viktigt:
-         * Lägg shield först och rune efter.
-         * Annars kan shielden ritas ovanpå runan.
+         * Lägg först shield på stage.
          */
         this.m_stage.addChild(shield);
 
-        if (runeGraphic) {
-            this.m_stage.addChild(runeGraphic);
+        /*
+         * Sedan ber vi shielden själv skapa sin rune-grafik.
+         * ShieldHandler skapar alltså INTE rune-sprites.
+         */
+        if (typeof shield.createRuneGraphic === "function") {
+            shield.createRuneGraphic(this.m_stage);
         }
     }
 };
@@ -235,119 +220,11 @@ runmysteriet.handler.ShieldHandler.prototype.setFallbackWord = function() {
 };
 
 //------------------------------------------------------------------------------
-// RUNE GRAPHIC
-//------------------------------------------------------------------------------
-
-/**
- * Skapar en visuell rune-sprite och kopplar den till en shield.
- *
- * @param {?Object} shield
- * @return {?Object}
- */
-runmysteriet.handler.ShieldHandler.prototype.createRuneGraphicForShield = function(
-    shield
-) {
-
-    var runeGraphic = null;
-
-    if (!shield) {
-        return null;
-    }
-
-    if (!this.m_runeFactory) {
-        return null;
-    }
-
-    runeGraphic = this.m_runeFactory.getOneRune();
-
-    /*
-     * Om listan av någon anledning är tom skapar vi nya runor.
-     * Det skyddar mot ord som kräver fler synliga runor.
-     */
-    if (!runeGraphic) {
-        this.m_runeFactory.makeAllRunes();
-        runeGraphic = this.m_runeFactory.getOneRune();
-    }
-
-    if (!runeGraphic) {
-        return null;
-    }
-
-    shield.m_runeGraphic = runeGraphic;
-
-    this.positionRuneGraphic(shield);
-
-    this.m_runeGraphics.push(runeGraphic);
-
-    return runeGraphic;
-};
-
-/**
- * Placerar rune-spriten ovanpå sin shield.
- *
- * @param {?Object} shield
- * @return {void}
- */
-runmysteriet.handler.ShieldHandler.prototype.positionRuneGraphic = function(
-    shield
-) {
-
-    var runeGraphic = null;
-
-    if (!shield) {
-        return;
-    }
-
-    runeGraphic = shield.m_runeGraphic;
-
-    if (!runeGraphic) {
-        return;
-    }
-
-    runeGraphic.x = shield.x + Math.floor((shield.width - runeGraphic.width) / 2);
-    runeGraphic.y = shield.y + Math.floor((shield.height - runeGraphic.height) / 2);
-};
-
-/**
- * Tar bort rune-grafiken som tillhör en shield.
- *
- * @param {?Object} shield
- * @return {void}
- */
-runmysteriet.handler.ShieldHandler.prototype.removeRuneGraphicFromShield = function(
-    shield
-) {
-
-    var runeGraphic = null;
-    var index = -1;
-
-    if (!shield) {
-        return;
-    }
-
-    runeGraphic = shield.m_runeGraphic;
-
-    if (!runeGraphic) {
-        return;
-    }
-
-    this.removeDisplayOnly(runeGraphic);
-
-    index = this.m_runeGraphics.indexOf(runeGraphic);
-
-    if (index !== -1) {
-        this.m_runeGraphics.splice(index, 1);
-    }
-
-    shield.m_runeGraphic = null;
-};
-
-//------------------------------------------------------------------------------
 // RUNE SPAWN
 //------------------------------------------------------------------------------
 
 /**
- * Returnerar spawnpunkt för en rune.
+ * Returnerar spawnpunkt för en rune/shield.
  *
  * @param {number} index
  * @return {{x:number,y:number}}
@@ -483,7 +360,14 @@ runmysteriet.handler.ShieldHandler.prototype.update = function(players) {
             continue;
         }
 
-        this.positionRuneGraphic(shield);
+        /*
+         * Säkerhet:
+         * Om shieldens update inte körs av stage av någon anledning,
+         * håll rune-grafiken rätt positionerad ändå.
+         */
+        if (typeof shield.updateRuneGraphicPosition === "function") {
+            shield.updateRuneGraphicPosition();
+        }
 
         for (j = 0; j < players.length; j++) {
             player = players[j];
@@ -552,14 +436,9 @@ runmysteriet.handler.ShieldHandler.prototype.collectShield = function(shield) {
     this.playCatchSound();
 
     /*
-     * Ta bort visuell rune-grafik från stage.
-     * Shielden sparas fortfarande i m_collected för getRuneString().
-     */
-    this.removeRuneGraphicFromShield(shield);
-
-    /*
-     * Ta bara bort shield från stage.
-     * Kör inte dispose här eftersom shield behövs i m_collected.
+     * Ta bort visuellt från stage.
+     * Kör inte dispose här eftersom shield behövs i m_collected
+     * för getRuneString().
      */
     if (typeof shield.remove === "function") {
         shield.remove();
@@ -752,7 +631,6 @@ runmysteriet.handler.ShieldHandler.prototype.clear = function() {
 
     var i = 0;
     var shield = null;
-    var runeGraphic = null;
 
     if (this.m_shields) {
         for (i = 0; i < this.m_shields.length; i++) {
@@ -762,7 +640,6 @@ runmysteriet.handler.ShieldHandler.prototype.clear = function() {
                 continue;
             }
 
-            this.removeRuneGraphicFromShield(shield);
             this.removeDisplayObject(shield);
         }
     }
@@ -775,30 +652,12 @@ runmysteriet.handler.ShieldHandler.prototype.clear = function() {
                 continue;
             }
 
-            this.removeRuneGraphicFromShield(shield);
             this.removeDisplayObject(shield);
         }
     }
 
-    /*
-     * Säkerhetsrensning om någon runeSprite inte var kopplad till en shield.
-     */
-    if (this.m_runeGraphics) {
-        for (i = 0; i < this.m_runeGraphics.length; i++) {
-            runeGraphic = this.m_runeGraphics[i];
-
-            this.removeDisplayOnly(runeGraphic);
-        }
-    }
-
-    if (this.m_runeFactory) {
-        this.m_runeFactory.dispose();
-        this.m_runeFactory = null;
-    }
-
     this.m_shields = [];
     this.m_collected = [];
-    this.m_runeGraphics = [];
     this.m_collectedMap = [];
 
     this.m_word = "";

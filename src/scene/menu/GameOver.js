@@ -9,27 +9,55 @@
  * @extends {rune.scene.Scene}
  * @param {number=} score
  * @param {string=} reason
+ * @param {string=} playerName
  */
-runmysteriet.scene.GameOver = function(score, reason) {
+runmysteriet.scene.GameOver = function(score, reason, playerName) {
 
     rune.scene.Scene.call(this);
 
+    /** @type {number} */
     this.m_score = score || 0;
+
+    /** @type {string} */
     this.m_reason = reason || "GAME OVER";
 
+    /** @type {string} */
+    this.m_playerName = playerName || "PLAYER";
+
+    /** @type {?rune.text.BitmapField} */
     this.m_title = null;
+
+    /** @type {?rune.text.BitmapField} */
     this.m_reasonText = null;
+
+    /** @type {?rune.text.BitmapField} */
     this.m_scoreText = null;
 
+    /** @type {?Object} */
     this.m_highscoreHud = null;
+
+    /** @type {?Object} */
     this.m_volumeHud = null;
+
+    /** @type {?Object} */
     this.m_menu = null;
 
+    /** @type {?Object} */
     this.m_menuSound = null;
+
+    /** @type {?Object} */
     this.backgroundMusic = null;
 
+    /** @type {?runmysteriet.input.GameInput} */
     this.m_gameInput = null;
+
+    /** @type {boolean} */
+    this.m_highscoreSaved = false;
 };
+
+//------------------------------------------------------------------------------
+// INHERITANCE
+//------------------------------------------------------------------------------
 
 runmysteriet.scene.GameOver.prototype =
     Object.create(rune.scene.Scene.prototype);
@@ -61,14 +89,69 @@ runmysteriet.scene.GameOver.prototype.init = function() {
         this.backgroundMusic.play();
     }
 
+    /*
+     * Viktigt:
+     * Spara score innan highscore-HUD skapas.
+     * Annars kan listan laddas innan nya resultatet finns.
+     */
+    this.saveHighscore();
+
     this.createTitle();
     this.createReasonText();
     this.createScoreText();
-    this.createMenu();
     this.createHighscoreHud();
+    this.createMenu();
     this.createVolumeHud();
 
     this.positionMenu();
+};
+
+//------------------------------------------------------------------------------
+// HIGHSCORE SAVE
+//------------------------------------------------------------------------------
+
+/**
+ * Sparar score till highscore-listan.
+ *
+ * @return {void}
+ */
+runmysteriet.scene.GameOver.prototype.saveHighscore = function() {
+
+    var entry = null;
+    var manager = null;
+
+    if (this.m_highscoreSaved === true) {
+        return;
+    }
+
+    this.m_highscoreSaved = true;
+
+    if (this.m_score <= 0) {
+        return;
+    }
+
+    if (!runmysteriet.logic) {
+        return;
+    }
+
+    if (typeof runmysteriet.logic.HighscoreEntry !== "function") {
+        return;
+    }
+
+    if (typeof runmysteriet.logic.HighscoreManager !== "function") {
+        return;
+    }
+
+    entry = new runmysteriet.logic.HighscoreEntry(
+        this.m_playerName,
+        this.m_score
+    );
+
+    manager = new runmysteriet.logic.HighscoreManager(this.application);
+
+    if (manager && typeof manager.save === "function") {
+        manager.save(entry);
+    }
 };
 
 //------------------------------------------------------------------------------
@@ -84,26 +167,36 @@ runmysteriet.scene.GameOver.prototype.createTitle = function() {
 
     this.m_title = new rune.text.BitmapField("GAME OVER");
     this.m_title.autoSize = true;
-    this.m_title.scaleX = 4;
-    this.m_title.scaleY = 4;
+    this.m_title.scaleX = 2;
+    this.m_title.scaleY = 2;
     this.m_title.center = this.application.screen.center;
-    this.m_title.y = 30;
+    this.m_title.y = 18;
 
     this.stage.addChild(this.m_title);
 };
 
+/**
+ * Skapar text som visar varför det blev Game Over.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.GameOver.prototype.createReasonText = function() {
 
     this.m_reasonText = new rune.text.BitmapField(this.m_reason);
     this.m_reasonText.autoSize = true;
+    this.m_reasonText.scaleX = 0.8;
+    this.m_reasonText.scaleY = 0.8;
     this.m_reasonText.center = this.application.screen.center;
-    this.m_reasonText.y = 85;
-    this.m_reasonText.scaleX = 1;
-    this.m_reasonText.scaleY = 1;
+    this.m_reasonText.y = 58;
 
     this.stage.addChild(this.m_reasonText);
 };
 
+/**
+ * Skapar scoretext.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.GameOver.prototype.createScoreText = function() {
 
     this.m_scoreText = new rune.text.BitmapField(
@@ -111,12 +204,56 @@ runmysteriet.scene.GameOver.prototype.createScoreText = function() {
     );
 
     this.m_scoreText.autoSize = true;
+    this.m_scoreText.scaleX = 1;
+    this.m_scoreText.scaleY = 1;
     this.m_scoreText.center = this.application.screen.center;
-    this.m_scoreText.y = 75;
+    this.m_scoreText.y = 80;
 
     this.stage.addChild(this.m_scoreText);
 };
 
+/**
+ * Skapar highscore-listan.
+ *
+ * @return {void}
+ */
+runmysteriet.scene.GameOver.prototype.createHighscoreHud = function() {
+
+    if (
+        !runmysteriet.ui ||
+        !runmysteriet.ui.graphic ||
+        typeof runmysteriet.ui.graphic.HighscoreHud !== "function"
+    ) {
+        return;
+    }
+
+    this.m_highscoreHud = new runmysteriet.ui.graphic.HighscoreHud(
+        this.application,
+        5
+    );
+
+    /*
+     * Synlig placering.
+     * Läggs till vänster så den inte krockar med menyn.
+     */
+    this.m_highscoreHud.x = 15;
+    this.m_highscoreHud.y = 112;
+
+    this.stage.addChild(this.m_highscoreHud);
+
+    /*
+     * Om HighscoreHud har reload-metod, använd den.
+     */
+    if (typeof this.m_highscoreHud.reload === "function") {
+        this.m_highscoreHud.reload();
+    }
+};
+
+/**
+ * Skapar meny.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.GameOver.prototype.createMenu = function() {
 
     this.m_menu = new runmysteriet.ui.graphic.MenuList(
@@ -129,20 +266,20 @@ runmysteriet.scene.GameOver.prototype.createMenu = function() {
     );
 };
 
-runmysteriet.scene.GameOver.prototype.createHighscoreHud = function() {
-
-    this.m_highscoreHud = new runmysteriet.ui.graphic.HighscoreHud(
-        this.application,
-        5
-    );
-
-    this.m_highscoreHud.x = 15;
-    this.m_highscoreHud.y = 140;
-
-    this.stage.addChild(this.m_highscoreHud);
-};
-
+/**
+ * Skapar volym-HUD.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.GameOver.prototype.createVolumeHud = function() {
+
+    if (
+        !runmysteriet.ui ||
+        !runmysteriet.ui.graphic ||
+        typeof runmysteriet.ui.graphic.VolumeHud !== "function"
+    ) {
+        return;
+    }
 
     this.m_volumeHud = new runmysteriet.ui.graphic.VolumeHud(
         this.application,
@@ -152,6 +289,11 @@ runmysteriet.scene.GameOver.prototype.createVolumeHud = function() {
     this.stage.addChild(this.m_volumeHud);
 };
 
+/**
+ * Positionerar meny.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.GameOver.prototype.positionMenu = function() {
 
     var camera = this.cameras.getCameraAt(0);
@@ -161,8 +303,12 @@ runmysteriet.scene.GameOver.prototype.positionMenu = function() {
     }
 
     if (this.m_menu.setCameraPosition && camera) {
-        this.m_menu.setCameraPosition(camera, 155, 100);
+        this.m_menu.setCameraPosition(camera, 155, 135);
+        return;
     }
+
+    this.m_menu.x = 155;
+    this.m_menu.y = 135;
 };
 
 //------------------------------------------------------------------------------
@@ -229,6 +375,12 @@ runmysteriet.scene.GameOver.prototype.handleMenuInput = function(input) {
     }
 };
 
+/**
+ * Hanterar volyminput.
+ *
+ * @param {!Object} input
+ * @return {void}
+ */
 runmysteriet.scene.GameOver.prototype.handleVolumeInput = function(input) {
 
     var stepVol = 0.1;
@@ -259,6 +411,11 @@ runmysteriet.scene.GameOver.prototype.handleVolumeInput = function(input) {
     }
 };
 
+/**
+ * Uppdaterar volym-HUD.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.GameOver.prototype.updateVolumeHud = function() {
 
     if (
@@ -302,6 +459,11 @@ runmysteriet.scene.GameOver.prototype.chooseMenuItem = function() {
 // NAVIGATION
 //------------------------------------------------------------------------------
 
+/**
+ * Startar nytt spel.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.GameOver.prototype.startNewGame = function() {
 
     this.stopBackgroundMusic();
@@ -311,6 +473,11 @@ runmysteriet.scene.GameOver.prototype.startNewGame = function() {
     ]);
 };
 
+/**
+ * Går tillbaka till huvudmenyn.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.GameOver.prototype.goToMenu = function() {
 
     this.stopBackgroundMusic();
@@ -324,6 +491,11 @@ runmysteriet.scene.GameOver.prototype.goToMenu = function() {
 // SOUND
 //------------------------------------------------------------------------------
 
+/**
+ * Spelar menyljud.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.GameOver.prototype.playMenuSound = function() {
 
     if (this.m_menuSound && typeof this.m_menuSound.play === "function") {
@@ -331,16 +503,39 @@ runmysteriet.scene.GameOver.prototype.playMenuSound = function() {
     }
 };
 
+/**
+ * Stoppar bakgrundsmusik.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.GameOver.prototype.stopBackgroundMusic = function() {
 
+    var mediaElement = null;
+
+    if (!this.backgroundMusic) {
+        return;
+    }
+
     if (
-        this.backgroundMusic &&
         this.backgroundMusic.m_source &&
         this.backgroundMusic.m_source.mediaElement
     ) {
-        this.backgroundMusic.m_source.mediaElement.pause();
+        mediaElement = this.backgroundMusic.m_source.mediaElement;
+
+        if (typeof mediaElement.pause === "function") {
+            mediaElement.pause();
+        }
+
+        try {
+            mediaElement.currentTime = 0;
+        } catch (error) {
+        }
     }
 };
+
+//------------------------------------------------------------------------------
+// REMOVE DISPLAY OBJECT
+//------------------------------------------------------------------------------
 
 /**
  * Tar bort display object från stage.
@@ -363,6 +558,10 @@ runmysteriet.scene.GameOver.prototype.removeDisplayObject = function(object) {
         object.stage.removeChild(object);
     }
 };
+
+//------------------------------------------------------------------------------
+// DISPOSE
+//------------------------------------------------------------------------------
 
 /**
  * Rensar GameOver.
@@ -400,6 +599,8 @@ runmysteriet.scene.GameOver.prototype.dispose = function() {
 
     this.m_score = 0;
     this.m_reason = "";
+    this.m_playerName = "PLAYER";
+    this.m_highscoreSaved = false;
 
     rune.scene.Scene.prototype.dispose.call(this);
 };

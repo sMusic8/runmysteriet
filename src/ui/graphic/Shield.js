@@ -5,6 +5,11 @@
 /**
  * Shield / rune collectible.
  *
+ * Denna klass äger det visuella:
+ * - shield-bilden
+ * - rune-grafiken ovanpå shielden
+ * - pulserande effekt
+ *
  * @constructor
  * @extends {rune.display.Graphic}
  * @param {number=} x
@@ -21,23 +26,82 @@ runmysteriet.ui.Shield = function(x, y) {
         "shield"
     );
 
-    /** @type {string} */
+    /**
+     * Bokstaven som shielden representerar.
+     *
+     * @type {string}
+     */
     this.rune = "";
 
-    /** @type {number} */
+    /**
+     * Index i ordet.
+     *
+     * @type {number}
+     */
     this.wordIndex = -1;
 
-    /** @type {boolean} */
+    /**
+     * Om shielden redan är insamlad.
+     *
+     * @type {boolean}
+     */
     this.isCollected = false;
 
-    /** @type {boolean} */
+    /**
+     * Om shielden är aktiv.
+     *
+     * @type {boolean}
+     */
     this.active = true;
 
-    /** @type {boolean} */
+    /**
+     * Identifiering.
+     *
+     * @type {boolean}
+     */
     this.isShield = true;
 
-    /** @type {?rune.text.BitmapField} */
-    this.m_runeText = null;
+    /**
+     * Stage som shielden ligger på.
+     *
+     * @type {?Object}
+     */
+    this.m_stage = null;
+
+    /**
+     * Visuell rune-sprite ovanpå shielden.
+     *
+     * @type {?rune.display.Graphic}
+     */
+    this.m_runeGraphic = null;
+
+    /**
+     * Skapar rune-sprites från Rune.js.
+     *
+     * @type {?runmysteriet.ui.Rune}
+     */
+    this.m_runeFactory = null;
+
+    /**
+     * Grundskala för pulseffekt.
+     *
+     * @type {number}
+     */
+    this.m_baseScale = 1;
+
+    /**
+     * Hastighet för pulseffekt.
+     *
+     * @type {number}
+     */
+    this.m_pulseSpeed = 0.08;
+
+    /**
+     * Räknare för pulseffekt.
+     *
+     * @type {number}
+     */
+    this.m_pulseValue = Math.random() * 10;
 };
 
 //------------------------------------------------------------------------------
@@ -55,7 +119,7 @@ runmysteriet.ui.Shield.prototype.constructor =
 //------------------------------------------------------------------------------
 
 /**
- * Sätter vilken rune/bokstav shielden representerar.
+ * Sätter vilken bokstav shielden innehåller.
  *
  * @param {string} rune
  * @return {void}
@@ -63,61 +127,156 @@ runmysteriet.ui.Shield.prototype.constructor =
 runmysteriet.ui.Shield.prototype.setRune = function(rune) {
 
     this.rune = String(rune || "").toUpperCase();
-
-    if (this.m_runeText) {
-        this.m_runeText.text = this.rune || "A";
-        this.updateRuneTextPosition();
-    }
 };
 
 /**
- * Hämtar runan/bokstaven.
+ * Hämtar bokstaven shielden innehåller.
  *
  * @return {string}
  */
 runmysteriet.ui.Shield.prototype.getRune = function() {
 
-    return this.rune;
+    return this.rune || "";
 };
 
+//------------------------------------------------------------------------------
+// RUNE GRAPHIC
+//------------------------------------------------------------------------------
+
 /**
- * Skapar texten som visar runan ovanpå shielden.
- * Texten ligger separat på stage eftersom Graphic inte ska användas
- * som container här.
+ * Skapar visuell rune-grafik ovanpå shielden.
+ *
+ * Viktigt:
+ * ShieldHandler ska bara anropa denna metod.
+ * ShieldHandler ska inte själv skapa rune-sprites.
  *
  * @param {!Object} stage
  * @return {void}
  */
-runmysteriet.ui.Shield.prototype.createRuneText = function(stage) {
+runmysteriet.ui.Shield.prototype.createRuneGraphic = function(stage) {
 
     if (!stage) {
         return;
     }
 
-    if (!this.m_runeText) {
-        this.m_runeText = new rune.text.BitmapField(this.rune || "A");
-        this.m_runeText.autoSize = true;
-        this.m_runeText.scale = 0.75;
-        stage.addChild(this.m_runeText);
-    }
+    this.m_stage = stage;
 
-    this.updateRuneTextPosition();
-};
-
-/**
- * Håller runtexten centrerad på shielden.
- *
- * @return {void}
- */
-runmysteriet.ui.Shield.prototype.updateRuneTextPosition = function() {
-
-    if (!this.m_runeText) {
+    if (this.m_runeGraphic) {
+        this.updateRuneGraphicPosition();
         return;
     }
 
-    this.m_runeText.visible = this.visible !== false;
-    this.m_runeText.x = this.x + 8;
-    this.m_runeText.y = this.y + 7;
+    if (
+        !runmysteriet.ui ||
+        typeof runmysteriet.ui.Rune !== "function"
+    ) {
+        return;
+    }
+
+    this.m_runeFactory = new runmysteriet.ui.Rune();
+    this.m_runeFactory.makeAllRunes();
+
+    this.m_runeGraphic = this.m_runeFactory.getOneRune();
+
+    if (!this.m_runeGraphic) {
+        return;
+    }
+
+    this.updateRuneGraphicPosition();
+
+    /*
+     * Runan läggs på stage efter shielden.
+     * Då hamnar den visuellt ovanpå shielden.
+     */
+    stage.addChild(this.m_runeGraphic);
+};
+
+/**
+ * Uppdaterar rune-grafikens position så den ligger centrerad på shielden.
+ *
+ * @return {void}
+ */
+runmysteriet.ui.Shield.prototype.updateRuneGraphicPosition = function() {
+
+    var centerX = 0;
+    var centerY = 0;
+    var runeWidth = 0;
+    var runeHeight = 0;
+
+    /*
+     * Justera dessa om runan ska flyttas lite visuellt.
+     * offsetX: + höger / - vänster
+     * offsetY: + ned / - upp
+     */
+    var offsetX = -2;
+    var offsetY = -3;
+
+    if (!this.m_runeGraphic) {
+        return;
+    }
+
+    centerX = this.x + this.width / 2;
+    centerY = this.y + this.height / 2;
+
+    runeWidth = this.m_runeGraphic.width * this.m_runeGraphic.scaleX;
+    runeHeight = this.m_runeGraphic.height * this.m_runeGraphic.scaleY;
+
+    this.m_runeGraphic.x =
+        Math.round(centerX - runeWidth / 2 + offsetX);
+
+    this.m_runeGraphic.y =
+        Math.round(centerY - runeHeight / 2 + offsetY);
+};
+
+/**
+ * Hämtar rune-grafiken.
+ *
+ * @return {?rune.display.Graphic}
+ */
+runmysteriet.ui.Shield.prototype.getRuneGraphic = function() {
+
+    return this.m_runeGraphic;
+};
+
+//------------------------------------------------------------------------------
+// UPDATE
+//------------------------------------------------------------------------------
+
+/**
+ * Uppdaterar shield-effekt och rune-position.
+ *
+ * @param {number=} step
+ * @return {void}
+ */
+runmysteriet.ui.Shield.prototype.update = function(step) {
+
+    var scale = 1;
+
+    if (rune.display.Graphic.prototype.update) {
+        rune.display.Graphic.prototype.update.call(this, step);
+    }
+
+    if (this.isCollected === true) {
+        return;
+    }
+
+    if (this.visible === false) {
+        return;
+    }
+
+    this.m_pulseValue += this.m_pulseSpeed;
+
+    scale = this.m_baseScale + Math.sin(this.m_pulseValue) * 0.08;
+
+    this.scaleX = scale;
+    this.scaleY = scale;
+
+    if (this.m_runeGraphic) {
+        this.m_runeGraphic.scaleX = scale;
+        this.m_runeGraphic.scaleY = scale;
+    }
+
+    this.updateRuneGraphicPosition();
 };
 
 //------------------------------------------------------------------------------
@@ -126,6 +285,9 @@ runmysteriet.ui.Shield.prototype.updateRuneTextPosition = function() {
 
 /**
  * Markerar shielden som insamlad.
+ *
+ * Kör inte dispose här, eftersom ShieldHandler sparar shielden i m_collected
+ * för att kunna läsa ut bokstaven senare.
  *
  * @return {void}
  */
@@ -169,16 +331,13 @@ runmysteriet.ui.Shield.prototype.removeDisplayObject = function(object) {
 //------------------------------------------------------------------------------
 
 /**
- * Tar bort shieldens visuella delar från stage.
- * Behåller rune-data så ShieldHandler fortfarande kan läsa getRune
+ * Tar bort shield och dess visuella rune från stage.
  *
  * @return {void}
  */
 runmysteriet.ui.Shield.prototype.remove = function() {
 
-    this.removeDisplayObject(this.m_runeText);
-    this.m_runeText = null;
-
+    this.removeDisplayObject(this.m_runeGraphic);
     this.removeDisplayObject(this);
 };
 
@@ -187,7 +346,7 @@ runmysteriet.ui.Shield.prototype.remove = function() {
 //------------------------------------------------------------------------------
 
 /**
- * Rensar Shield.
+ * Rensar Shield helt.
  *
  * @return {void}
  */
@@ -195,10 +354,22 @@ runmysteriet.ui.Shield.prototype.dispose = function() {
 
     this.remove();
 
+    if (this.m_runeFactory) {
+        this.m_runeFactory.dispose();
+    }
+
+    this.m_stage = null;
+    this.m_runeGraphic = null;
+    this.m_runeFactory = null;
+
     this.rune = "";
     this.wordIndex = -1;
 
     this.isCollected = true;
     this.active = false;
     this.isShield = false;
+
+    this.m_baseScale = 1;
+    this.m_pulseSpeed = 0;
+    this.m_pulseValue = 0;
 };
