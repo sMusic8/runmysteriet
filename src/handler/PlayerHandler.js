@@ -54,6 +54,7 @@ runmysteriet.handler.PlayerHandler = function(stage, platformHandler, applicatio
 
     
     this.deathEffects = [];
+    this.attackEmitters = [];
 
     this.cameraHandler = null;
     this.deathSound = this.application.sounds.sound.get("lose_");
@@ -342,7 +343,7 @@ runmysteriet.handler.PlayerHandler.prototype.updateCollisions = function() {
             this.checkPlayerPlatform(player, other);
         }
 
-        this.checkCaveBlockers(player);
+        this.checkEnemyBlockers(player);
         this.checkWaterDeath(player, i);
         this.checkBoatDeath(player, i);
         this.checkFallDeath(player, i);
@@ -1032,23 +1033,60 @@ runmysteriet.handler.PlayerHandler.prototype.createDeathEffect = function(player
     this.stage.addChild(effect);
 };
 
+//------------------------------------------------------------------------------
+// SOUND
+//------------------------------------------------------------------------------
+
+/**
+ * Spelar ljud vid attack
+ *
+ * @param {?Object} sound
+ * @return {void}
+ */
+runmysteriet.handler.PlayerHandler.prototype.playSound = function(sound) {
+
+    var mediaElement = null;
+
+    if (!sound) {
+        return;
+    }
+
+    if (
+        sound.m_source &&
+        sound.m_source.mediaElement
+    ) {
+        mediaElement = sound.m_source.mediaElement;
+
+        try {
+            mediaElement.currentTime = 0;
+        } catch (error) {
+        }
+    }
+
+    if (typeof sound.play === "function") {
+        sound.play();
+    }
+};
+
 runmysteriet.handler.PlayerHandler.prototype.createAttack = function(player) {
+
+    var attack = null;
+
+    if (!player) {
+        return;
+    }
 
     if (!this.attackSound && this.application) {
         this.attackSound = this.application.sounds.sound.get("sword_slash");
     }
 
-    if (this.attackSound) {
-        this.attackSound.stop();
-        this.attackSound.play();
-    }
-    
-    var attack = new runmysteriet.attack.Attack(player);
+    this.playSound(this.attackSound);
+
+    attack = new runmysteriet.attack.Attack(player);
 
     this.stage.addChild(attack);
     this.attacks.push(attack);
 };
-
 /**
  * Uppdaterar attacker och kollar om de träffar fiender.
  *
@@ -1092,8 +1130,6 @@ runmysteriet.handler.PlayerHandler.prototype.updateAttacks = function() {
 
             if (attack.hitTestObject(enemy)) {
                 this.createAttackEmitter(enemy.x, enemy.y);
-
-                console.log("Attack träffade Kristen");
 
                 if (typeof enemy.takeDamage === "function") {
                     enemy.takeDamage(attack.damage);
@@ -1315,100 +1351,124 @@ runmysteriet.handler.PlayerHandler.prototype.createAttackEmitter = function(x, y
     );
 
     this.stage.addChild(emitter);
+    this.attackEmitters.push(emitter);
 
     emitter.emit(10);
 };
 
 //------------------------------------------------------------------------------
-// CAVE BLOCKERS
+// ENEMY BLOCKERS
 //------------------------------------------------------------------------------
 
 /**
- * Hindrar spelaren från att hoppa över grottan.
- * Spelaren får bara passera genom den lägre öppningen där Kristen står.
+ * Stoppar spelaren från att gå vidare tills kopplad Kristen är död.
  *
  * @param {!runmysteriet.entity.Player} player
  * @return {void}
  */
-runmysteriet.handler.PlayerHandler.prototype.checkCaveBlockers = function(player) {
+runmysteriet.handler.PlayerHandler.prototype.checkEnemyBlockers = function(player) {
 
     var blockers = null;
     var blocker = null;
+    var enemy = null;
     var i = 0;
 
     var playerLeft = 0;
     var playerRight = 0;
-    var playerFootY = 0;
+    var playerTop = 0;
+    var playerBottom = 0;
+
+    var previousLeft = 0;
+    var previousRight = 0;
 
     var blockerLeft = 0;
     var blockerRight = 0;
+    var blockerTop = 0;
+    var blockerBottom = 0;
 
     var overlapsX = false;
-    var isTooHigh = false;
+    var overlapsY = false;
+    var crossedFromLeft = false;
+    var crossedFromRight = false;
 
     if (!player || player.isDead === true) {
         return;
     }
 
-    if (!this.enemyHandler || !this.enemyHandler.caveBlockers) {
+    if (!this.enemyHandler || !this.enemyHandler.enemyBlockers) {
         return;
     }
 
-    blockers = this.enemyHandler.caveBlockers;
+    blockers = this.enemyHandler.enemyBlockers;
 
     playerLeft = player.x;
     playerRight = player.x + player.width;
-    playerFootY = this.getPlayerFootY(player);
+    playerTop = player.y;
+    playerBottom = player.y + player.height;
+
+    previousLeft = typeof player.previousX === "number"
+        ? player.previousX
+        : player.x;
+
+    previousRight = previousLeft + player.width;
 
     for (i = 0; i < blockers.length; i++) {
-
         blocker = blockers[i];
-        
 
         if (!blocker) {
             continue;
         }
-        if (blocker.enemy && blocker.enemy.isDead === true) {
+
+        enemy = blocker.enemy;
+
+        /*
+         * Om Kristen är död ska spärren inte stoppa spelaren.
+         */
+        if (enemy && enemy.isDead === true) {
             continue;
         }
 
         blockerLeft = blocker.x;
         blockerRight = blocker.x + blocker.width;
+        blockerTop = blocker.y;
+        blockerBottom = blocker.y + blocker.height;
 
         overlapsX =
             playerRight > blockerLeft &&
             playerLeft < blockerRight;
 
+        overlapsY =
+            playerBottom > blockerTop &&
+            playerTop < blockerBottom;
+
         /*
-         * Om spelarens fötter är ovanför öppningen,
-         * försöker spelaren passera för högt.
+         * Fångar fall där spelaren rör sig snabbt och passerar
+         * från ena sidan till andra sidan mellan två frames.
          */
-        isTooHigh = playerFootY < blocker.openingY;
+        crossedFromLeft =
+            previousRight <= blockerLeft &&
+            playerRight >= blockerLeft;
 
-        if (overlapsX && isTooHigh) {
+        crossedFromRight =
+            previousLeft >= blockerRight &&
+            playerLeft <= blockerRight;
 
-            /*
-             * Flytta tillbaka spelaren till positionen innan sidledsrörelsen.
-             * Detta stoppar hopp över grottan men tillåter gång genom öppningen.
-             */
-            if (typeof player.previousX === "number") {
-                player.x = player.previousX;
+        if ((overlapsX && overlapsY) || crossedFromLeft || crossedFromRight) {
+
+            if (crossedFromRight) {
+                player.x = blockerRight;
             } else {
                 player.x = blockerLeft - player.width;
             }
 
-            /*
-             * Om spelaren är på väg uppåt, stoppa upphoppet lite.
-             */
-            if (player.velocityY < 0) {
-                player.velocityY = 0;
+            if (typeof player.velocityX === "number") {
+                player.velocityX = 0;
             }
 
             return;
         }
     }
 };
-
 
 runmysteriet.handler.PlayerHandler.prototype.updateDeathEffects = function() {
 
@@ -1463,11 +1523,47 @@ runmysteriet.handler.PlayerHandler.prototype.setCameraHandler = function(cameraH
 };
 
 //------------------------------------------------------------------------------
+// REMOVE DISPLAY OBJECT
+//------------------------------------------------------------------------------
+
+/**
+ * Tar bort display object från stage.
+ *
+ * @param {?Object} object
+ * @return {void}
+ */
+runmysteriet.handler.PlayerHandler.prototype.removeDisplayObject = function(object) {
+
+    if (!object) {
+        return;
+    }
+
+    if (typeof object.dispose === "function") {
+        object.dispose();
+        return;
+    }
+
+    if (typeof object.remove === "function") {
+        object.remove();
+        return;
+    }
+
+    if (object.parent) {
+        object.parent.removeChild(object);
+        return;
+    }
+
+    if (object.stage) {
+        object.stage.removeChild(object);
+    }
+};
+
+//------------------------------------------------------------------------------
 // CLEAR
 //------------------------------------------------------------------------------
 
 /**
- * Tar bort spelare, hp-bars, attacker och dödseffekter från stage.
+ * Tar bort spelare, hp-bars, attacker, dödseffekter och emitters från stage.
  *
  * @return {void}
  */
@@ -1477,7 +1573,11 @@ runmysteriet.handler.PlayerHandler.prototype.clear = function() {
     var player = null;
     var attack = null;
     var effect = null;
+    var emitter = null;
 
+    /*
+     * Spelare och hp-bars.
+     */
     if (this.players) {
         for (i = 0; i < this.players.length; i++) {
             player = this.players[i];
@@ -1495,71 +1595,79 @@ runmysteriet.handler.PlayerHandler.prototype.clear = function() {
         }
     }
 
+    /*
+     * Attacker.
+     */
     if (this.attacks) {
         for (i = 0; i < this.attacks.length; i++) {
             attack = this.attacks[i];
 
-            if (!attack) {
-                continue;
-            }
-
-            if (typeof attack.remove === "function") {
-                attack.remove();
-            } else {
-                this.removeDisplayObject(attack);
-            }
+            this.removeDisplayObject(attack);
         }
     }
 
+    /*
+     * Döds-effekter.
+     */
     if (this.deathEffects) {
         for (i = 0; i < this.deathEffects.length; i++) {
             effect = this.deathEffects[i];
 
-            if (!effect) {
-                continue;
-            }
-
             this.removeDisplayObject(effect);
+        }
+    }
+
+    /*
+     * Attack particle emitters.
+     */
+    if (this.attackEmitters) {
+        for (i = 0; i < this.attackEmitters.length; i++) {
+            emitter = this.attackEmitters[i];
+
+            this.removeDisplayObject(emitter);
         }
     }
 
     this.players = [];
     this.attacks = [];
     this.deathEffects = [];
+    this.attackEmitters = [];
+};
 
-    this.platforms = null;
+//------------------------------------------------------------------------------
+// DISPOSE
+//------------------------------------------------------------------------------
+
+/**
+ * Rensar PlayerHandler helt.
+ *
+ * @return {void}
+ */
+runmysteriet.handler.PlayerHandler.prototype.dispose = function() {
+
+    this.clear();
+
+    this.stage = null;
+
     this.platformHandler = null;
+    this.platforms = null;
+
     this.application = null;
+
     this.input = null;
     this.keyboard = null;
+
     this.enemyHandler = null;
+
     this.camera = null;
     this.cameraHandler = null;
 
     this.jumpSound = null;
     this.deathSound = null;
     this.attackSound = null;
+
     this.avatarData = null;
-};
 
-/**
- * Tar bort display-objekt från stage.
- *
- * @param {?Object} object
- * @return {void}
- */
-runmysteriet.handler.PlayerHandler.prototype.removeDisplayObject = function(object) {
-
-    if (!object) {
-        return;
-    }
-
-    if (object.parent) {
-        object.parent.removeChild(object);
-        return;
-    }
-
-    if (object.stage) {
-        object.stage.removeChild(object);
-    }
+    this.m_avatarPlatformOffsetY = 0;
+    this.m_raftPlatformOffsetY = 0;
 };

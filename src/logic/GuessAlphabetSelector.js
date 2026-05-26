@@ -1,6 +1,7 @@
 //------------------------------------------------------------------------------
 // GUESS ALPHABET SELECTOR
 //------------------------------------------------------------------------------
+
 /**
  * Håller koll på vilken bokstav spelaren valt.
  *
@@ -18,7 +19,13 @@ runmysteriet.logic.GuessAlphabetSelector = function() {
     this.m_index = 0;
 };
 
+//------------------------------------------------------------------------------
+// PUBLIC METHODS
+//------------------------------------------------------------------------------
+
 /**
+ * Går till nästa bokstav.
+ *
  * @return {void}
  */
 runmysteriet.logic.GuessAlphabetSelector.prototype.next = function() {
@@ -31,6 +38,8 @@ runmysteriet.logic.GuessAlphabetSelector.prototype.next = function() {
 };
 
 /**
+ * Går till föregående bokstav.
+ *
  * @return {void}
  */
 runmysteriet.logic.GuessAlphabetSelector.prototype.previous = function() {
@@ -43,15 +52,40 @@ runmysteriet.logic.GuessAlphabetSelector.prototype.previous = function() {
 };
 
 /**
+ * Hämtar aktuell bokstav.
+ *
  * @return {string}
  */
 runmysteriet.logic.GuessAlphabetSelector.prototype.getLetter = function() {
+
+    if (!this.m_letters || this.m_letters.length === 0) {
+        return "";
+    }
+
     return this.m_letters[this.m_index];
 };
 
 /**
+ * Återställer valet till första bokstaven.
+ *
  * @return {void}
  */
 runmysteriet.logic.GuessAlphabetSelector.prototype.reset = function() {
+
+    this.m_index = 0;
+};
+
+//------------------------------------------------------------------------------
+// DISPOSE
+//------------------------------------------------------------------------------
+
+/**
+ * Rensar GuessAlphabetSelector.
+ *
+ * @return {void}
+ */
+runmysteriet.logic.GuessAlphabetSelector.prototype.dispose = function() {
+
+    this.m_letters = [];
     this.m_index = 0;
 };

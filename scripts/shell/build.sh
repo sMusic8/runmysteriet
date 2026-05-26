@@ -29,7 +29,6 @@ npx google-closure-compiler \
 --js "./../../src/handler/AutoScrollCameraHandler.js" \
 --js "./../../src/handler/BackgroundHandler.js" \
 --js "./../../src/handler/ShieldHandler.js" \
---js "./../../src/handler/CameraHandler.js" \
 --js "./../../src/handler/CloudHandler.js" \
 --js "./../../src/handler/PlatformHandler.js" \
 --js "./../../src/handler/EnemyHandler.js" \
@@ -58,7 +57,6 @@ npx google-closure-compiler \
 --js "./../../src/segments/Segment_Start.js" \
 --js "./../../src/segments/Segment_End.js" \
 --js "./../../src/segments/Segment_Water.js" \
---js "./../../src/scene/menu/TextInputView.js" \
 --js "./../../src/scene/menu/AvatarSelect.js" \
 --js "./../../src/scene/menu/Menu.js" \
 --js "./../../src/scene/menu/GameOver.js" \

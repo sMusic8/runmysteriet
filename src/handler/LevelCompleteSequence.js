@@ -2,6 +2,8 @@
 // LEVEL COMPLETE SEQUENCE
 //------------------------------------------------------------------------------
 
+runmysteriet.handler = runmysteriet.handler || {};
+
 /**
  * Hanterar segersekvensen när en level är klar.
  *
@@ -36,6 +38,7 @@ runmysteriet.handler.LevelCompleteSequence = function(
     this.m_completeData = null;
 
     this.m_hasPlayedSound = false;
+    this.m_cheerSound = null;
 
     this.m_flowers = [];
     this.m_flowerData = [];
@@ -47,6 +50,15 @@ runmysteriet.handler.LevelCompleteSequence = function(
         "b4",
         "b5"
     ];
+
+    if (
+        this.m_application &&
+        this.m_application.sounds &&
+        this.m_application.sounds.sound
+    ) {
+        this.m_cheerSound =
+            this.m_application.sounds.sound.get("lvl_up");
+    }
 };
 
 //------------------------------------------------------------------------------
@@ -76,8 +88,10 @@ runmysteriet.handler.LevelCompleteSequence.prototype.start = function(
 
     this.m_active = true;
     this.m_timer = 0;
+
     this.m_completeData = completeData || null;
     this.m_onComplete = onComplete || null;
+
     this.m_hasPlayedSound = false;
 
     this.savePlayersStartData();
@@ -143,6 +157,10 @@ runmysteriet.handler.LevelCompleteSequence.prototype.isActive = function() {
  */
 runmysteriet.handler.LevelCompleteSequence.prototype.createOverlay = function() {
 
+    if (!this.m_stage || !this.m_application || !this.m_application.screen) {
+        return;
+    }
+
     this.m_overlay = new rune.display.Graphic(
         this.getCameraX(),
         this.getCameraY(),
@@ -162,6 +180,10 @@ runmysteriet.handler.LevelCompleteSequence.prototype.createOverlay = function() 
  * @return {void}
  */
 runmysteriet.handler.LevelCompleteSequence.prototype.createText = function() {
+
+    if (!this.m_stage) {
+        return;
+    }
 
     this.m_text = new rune.text.BitmapField("LEVEL COMPLETE");
     this.m_text.autoSize = true;
@@ -223,6 +245,10 @@ runmysteriet.handler.LevelCompleteSequence.prototype.updatePlayers = function() 
     var player = null;
     var jumpOffset = 0;
 
+    if (!this.m_playersData) {
+        return;
+    }
+
     for (i = 0; i < this.m_playersData.length; i++) {
         data = this.m_playersData[i];
         player = data.player;
@@ -267,6 +293,10 @@ runmysteriet.handler.LevelCompleteSequence.prototype.restorePlayers = function()
 
     var i = 0;
     var data = null;
+
+    if (!this.m_playersData) {
+        return;
+    }
 
     for (i = 0; i < this.m_playersData.length; i++) {
         data = this.m_playersData[i];
@@ -314,7 +344,7 @@ runmysteriet.handler.LevelCompleteSequence.prototype.updateTextPosition = functi
  */
 runmysteriet.handler.LevelCompleteSequence.prototype.positionTextCenterScreen = function() {
 
-    if (!this.m_text) {
+    if (!this.m_text || !this.m_application || !this.m_application.screen) {
         return;
     }
 
@@ -372,6 +402,10 @@ runmysteriet.handler.LevelCompleteSequence.prototype.createFlowers = function() 
     var texture = "";
     var offsetX = 0;
 
+    if (!this.m_stage || !this.m_application || !this.m_application.screen) {
+        return;
+    }
+
     centerX = this.getPlayersCenterX();
     baseY = this.getPlayersTopY();
 
@@ -420,6 +454,10 @@ runmysteriet.handler.LevelCompleteSequence.prototype.updateFlowers = function() 
     var data = null;
     var flower = null;
 
+    if (!this.m_flowerData) {
+        return;
+    }
+
     /*
      * Blommorna börjar när avatarerna hoppar.
      */
@@ -429,6 +467,11 @@ runmysteriet.handler.LevelCompleteSequence.prototype.updateFlowers = function() 
 
     for (i = 0; i < this.m_flowerData.length; i++) {
         data = this.m_flowerData[i];
+
+        if (!data) {
+            continue;
+        }
+
         flower = data.flower;
 
         if (!flower) {
@@ -456,12 +499,14 @@ runmysteriet.handler.LevelCompleteSequence.prototype.clearFlowers = function() {
     var i = 0;
     var flower = null;
 
+    if (!this.m_flowers) {
+        this.m_flowers = [];
+        this.m_flowerData = [];
+        return;
+    }
+
     for (i = 0; i < this.m_flowers.length; i++) {
         flower = this.m_flowers[i];
-
-        if (!flower) {
-            continue;
-        }
 
         this.removeDisplayObject(flower);
     }
@@ -481,18 +526,16 @@ runmysteriet.handler.LevelCompleteSequence.prototype.clearFlowers = function() {
  */
 runmysteriet.handler.LevelCompleteSequence.prototype.playCheerSound = function() {
 
-    var sound = null;
-
     if (this.m_hasPlayedSound === true) {
         return;
     }
 
     this.m_hasPlayedSound = true;
 
-    sound = this.m_application.sounds.sound.get("lvl_up");
+    if (this.m_cheerSound &&
+        typeof this.m_cheerSound.play === "function") {
 
-    if (sound && typeof sound.play === "function") {
-        sound.play();
+        this.m_cheerSound.play();
     }
 };
 
@@ -513,6 +556,10 @@ runmysteriet.handler.LevelCompleteSequence.prototype.getPlayersCenterX = functio
     var totalX = 0;
     var count = 0;
 
+    if (!this.m_playersData) {
+        return this.getCameraX();
+    }
+
     for (i = 0; i < this.m_playersData.length; i++) {
         data = this.m_playersData[i];
         player = data.player;
@@ -526,7 +573,11 @@ runmysteriet.handler.LevelCompleteSequence.prototype.getPlayersCenterX = functio
     }
 
     if (count <= 0) {
-        return this.getCameraX() + this.m_application.screen.width / 2;
+        if (this.m_application && this.m_application.screen) {
+            return this.getCameraX() + this.m_application.screen.width / 2;
+        }
+
+        return this.getCameraX();
     }
 
     return totalX / count;
@@ -543,6 +594,10 @@ runmysteriet.handler.LevelCompleteSequence.prototype.getPlayersTopY = function()
     var data = null;
     var player = null;
     var topY = 999999;
+
+    if (!this.m_playersData) {
+        return 0;
+    }
 
     for (i = 0; i < this.m_playersData.length; i++) {
         data = this.m_playersData[i];
@@ -614,7 +669,7 @@ runmysteriet.handler.LevelCompleteSequence.prototype.finish = function() {
 };
 
 //------------------------------------------------------------------------------
-// HELPERS
+// REMOVE DISPLAY OBJECT
 //------------------------------------------------------------------------------
 
 /**
@@ -639,6 +694,10 @@ runmysteriet.handler.LevelCompleteSequence.prototype.removeDisplayObject = funct
     }
 };
 
+//------------------------------------------------------------------------------
+// CLEAR
+//------------------------------------------------------------------------------
+
 /**
  * Rensar sekvensen.
  *
@@ -650,6 +709,7 @@ runmysteriet.handler.LevelCompleteSequence.prototype.clear = function() {
 
     this.removeDisplayObject(this.m_text);
     this.removeDisplayObject(this.m_overlay);
+
     this.clearFlowers();
 
     this.m_text = null;
@@ -662,8 +722,13 @@ runmysteriet.handler.LevelCompleteSequence.prototype.clear = function() {
 
     this.m_onComplete = null;
     this.m_completeData = null;
+
     this.m_hasPlayedSound = false;
 };
+
+//------------------------------------------------------------------------------
+// DISPOSE
+//------------------------------------------------------------------------------
 
 /**
  * Rensar alla referenser.
@@ -678,4 +743,9 @@ runmysteriet.handler.LevelCompleteSequence.prototype.dispose = function() {
     this.m_application = null;
     this.m_camera = null;
     this.m_playerHandler = null;
+
+    this.m_cheerSound = null;
+
+    this.m_duration = 0;
+    this.m_flowerTextures = [];
 };

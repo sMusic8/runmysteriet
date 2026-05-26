@@ -3,36 +3,40 @@
 //------------------------------------------------------------------------------
 
 /**
- * Handler som ansvarar för att skapa, uppdatera och hantera armor-objekt i spelet.
+ * ansvarar för att skapa, uppdatera och hantera armor objekt
  *
  * @constructor
- * @param {rune.scene.Scene} stage - Stage där armors renderas.
- * @param {Object} application - Spelapplikationen (för ljud m.m.).
- * @param {number=} levelNumber - Nivånummer som påverkar antal armors.
- * @param {Array=} armorSpawns - Lista över möjliga spawnpunkter.
+ * @param {!rune.display.Stage} stage
+ * @param {!Object} application
+ * @param {number=} levelNumber
+ * @param {Array=} armorSpawns
  */
 runmysteriet.handler.ArmorHandler = function(stage, application, levelNumber, armorSpawns) {
 
-    /** @type {rune.scene.Scene} */
+    /** @type {!rune.display.Stage} */
     this.m_stage = stage;
 
-    /** @type {Object} */
+    /** @type {!Object} */
     this.application = application;
 
     /** @type {number} */
     this.m_levelNumber = levelNumber || 1;
 
-    /** @type {Array} */
+    /** @type {!Array} */
     this.m_armorSpawns = armorSpawns || [];
 
-    /** @type {Array.<rune.display.Graphic>} */
+    /** @type {!Array.<rune.display.Graphic>} */
     this.m_armors = [];
 
     /**
-     * Callback när armor samlas upp.
-     * @type {Function|null}
+     * Callback när armor samlas upp
+     *
+     * @type {?Function}
      */
     this.onArmorCollected = null;
+
+    /** @type {?Object} */
+    this.catchSound = null;
 };
 
 //------------------------------------------------------------------------------
@@ -40,11 +44,16 @@ runmysteriet.handler.ArmorHandler = function(stage, application, levelNumber, ar
 //------------------------------------------------------------------------------
 
 /**
- * Skapar armor baserat på valda spawnpunkter.
+ * Skapar armor baserat på valda spawnpunkter
+ *
+ * @return {void}
  */
 runmysteriet.handler.ArmorHandler.prototype.init = function() {
-    var selectedSpawns = this.getSelectedArmorSpawns();
+
+    var selectedSpawns = null;
     var i = 0;
+
+    selectedSpawns = this.getSelectedArmorSpawns();
 
     for (i = 0; i < selectedSpawns.length; i++) {
         this.addArmor(
@@ -59,11 +68,12 @@ runmysteriet.handler.ArmorHandler.prototype.init = function() {
 //------------------------------------------------------------------------------
 
 /**
- * Returnerar antal armor som ska spawnas beroende på nivå.
+ * Returnerar antal armor som ska spawnas beroende på nivå
  *
  * @return {number}
  */
 runmysteriet.handler.ArmorHandler.prototype.getArmorCount = function() {
+
     if (this.m_levelNumber >= 11) {
         return 4;
     }
@@ -80,15 +90,23 @@ runmysteriet.handler.ArmorHandler.prototype.getArmorCount = function() {
 //------------------------------------------------------------------------------
 
 /**
- * Väljer slumpmässiga spawnpunkter för armor.
+ * Väljer slumpmässiga spawnpunkter för armor
  *
- * @return {Array}
+ * @return {!Array}
  */
 runmysteriet.handler.ArmorHandler.prototype.getSelectedArmorSpawns = function() {
-    var copy = this.m_armorSpawns.slice();
+
+    var copy = [];
     var result = [];
-    var maxCount = this.getArmorCount();
+    var maxCount = 0;
     var index = 0;
+
+    if (!this.m_armorSpawns) {
+        return result;
+    }
+
+    copy = this.m_armorSpawns.slice();
+    maxCount = this.getArmorCount();
 
     while (result.length < maxCount && copy.length > 0) {
         index = Math.floor(Math.random() * copy.length);
@@ -105,12 +123,14 @@ runmysteriet.handler.ArmorHandler.prototype.getSelectedArmorSpawns = function() 
 //------------------------------------------------------------------------------
 
 /**
- * Skapar ett armor-objekt och dess visuella box.
+ * Skapar ett armor-objekt och dess visuella box
  *
- * @param {number} x - X-position.
- * @param {number} y - Y-position.
+ * @param {number} x
+ * @param {number} y
+ * @return {void}
  */
 runmysteriet.handler.ArmorHandler.prototype.addArmor = function(x, y) {
+
     var box = null;
     var armor = null;
 
@@ -150,21 +170,23 @@ runmysteriet.handler.ArmorHandler.prototype.addArmor = function(x, y) {
 //------------------------------------------------------------------------------
 
 /**
- * Uppdaterar armor och hanterar kollision med spelare.
+ * Uppdaterar armor och hanterar kollision med spelare
  *
- * @param {Array.<Object>} players - Lista med spelare.
+ * @param {?Array.<Object>} players
+ * @return {void}
  */
 runmysteriet.handler.ArmorHandler.prototype.update = function(players) {
+
     var i = 0;
     var j = 0;
     var armor = null;
     var player = null;
 
-    if (!players) {
+    if (!players || !this.m_armors) {
         return;
     }
 
-    for (i = 0; i < this.m_armors.length; i++) {
+    for (i = this.m_armors.length - 1; i >= 0; i--) {
         armor = this.m_armors[i];
 
         if (!armor || armor.__collected === true) {
@@ -180,19 +202,7 @@ runmysteriet.handler.ArmorHandler.prototype.update = function(players) {
         for (j = 0; j < players.length; j++) {
             player = players[j];
 
-            if (!player) {
-                continue;
-            }
-
-            if (player.isDead === true) {
-                continue;
-            }
-
-            if (player.visible === false) {
-                continue;
-            }
-
-            if (player.active === false) {
+            if (!this.isValidPlayer(player)) {
                 continue;
             }
 
@@ -204,16 +214,45 @@ runmysteriet.handler.ArmorHandler.prototype.update = function(players) {
     }
 };
 
+/**
+ * Kontrollerar om spelaren kan samla armor
+ *
+ * @param {?Object} player
+ * @return {boolean}
+ */
+runmysteriet.handler.ArmorHandler.prototype.isValidPlayer = function(player) {
+
+    if (!player) {
+        return false;
+    }
+
+    if (player.isDead === true) {
+        return false;
+    }
+
+    if (player.visible === false) {
+        return false;
+    }
+
+    if (player.active === false) {
+        return false;
+    }
+
+    return true;
+};
+
 //------------------------------------------------------------------------------
 // BLINK
 //------------------------------------------------------------------------------
 
 /**
- * Hanterar blink-effekt för armor.
+ * Hanterar blink-effekt för armor
  *
- * @param {rune.display.Graphic} armor
+ * @param {?rune.display.Graphic} armor
+ * @return {void}
  */
 runmysteriet.handler.ArmorHandler.prototype.updateBlink = function(armor) {
+
     if (!armor) {
         return;
     }
@@ -241,42 +280,27 @@ runmysteriet.handler.ArmorHandler.prototype.updateBlink = function(armor) {
 //------------------------------------------------------------------------------
 
 /**
- * Hanterar insamling av armor.
+ * Hanterar insamling av armor
  *
- * @param {rune.display.Graphic} armor
- * @param {Object} player
+ * @param {?rune.display.Graphic} armor
+ * @param {?Object} player
+ * @return {void}
  */
 runmysteriet.handler.ArmorHandler.prototype.collectArmor = function(armor, player) {
+
     var index = 0;
 
     if (!armor || armor.__collected === true) {
         return;
     }
 
-    // Spela ljud vid insamling
-    if (this.application &&
-        this.application.sounds &&
-        this.application.sounds.sound) {
-
-        this.catchsound =
-            this.application.sounds.sound.get("sound_catch");
-
-        if (this.catchsound) {
-            this.catchsound.play();
-        }
-    }
+    this.playCatchSound();
 
     armor.__collected = true;
     armor.active = false;
     armor.visible = false;
 
-    if (armor.__box && armor.__box.parent) {
-        armor.__box.parent.removeChild(armor.__box);
-    }
-
-    if (armor.parent) {
-        armor.parent.removeChild(armor);
-    }
+    this.removeArmor(armor);
 
     index = this.m_armors.indexOf(armor);
 
@@ -289,28 +313,122 @@ runmysteriet.handler.ArmorHandler.prototype.collectArmor = function(armor, playe
     }
 };
 
+/**
+ * Spelar ljud när armor samlas upp
+ *
+ * @return {void}
+ */
+runmysteriet.handler.ArmorHandler.prototype.playCatchSound = function() {
+
+    if (!this.application ||
+        !this.application.sounds ||
+        !this.application.sounds.sound) {
+
+        return;
+    }
+
+    this.catchSound = this.application.sounds.sound.get("sound_catch");
+
+    if (this.catchSound && typeof this.catchSound.play === "function") {
+        this.catchSound.play();
+    }
+};
+
+//------------------------------------------------------------------------------
+// REMOVE ARMOR
+//------------------------------------------------------------------------------
+
+/**
+ * Tar bort armor och dess box från stage
+ *
+ * @param {?rune.display.Graphic} armor
+ * @return {void}
+ */
+runmysteriet.handler.ArmorHandler.prototype.removeArmor = function(armor) {
+
+    if (!armor) {
+        return;
+    }
+
+    this.removeDisplayObject(armor.__box);
+    this.removeDisplayObject(armor);
+
+    armor.__box = null;
+};
+
+//------------------------------------------------------------------------------
+// REMOVE DISPLAY OBJECT
+//------------------------------------------------------------------------------
+
+/**
+ * Tar bort display object från stage
+ *
+ * @param {?Object} object
+ * @return {void}
+ */
+runmysteriet.handler.ArmorHandler.prototype.removeDisplayObject = function(object) {
+
+    if (!object) {
+        return;
+    }
+
+    if (object.parent) {
+        object.parent.removeChild(object);
+        return;
+    }
+
+    if (object.stage) {
+        object.stage.removeChild(object);
+    }
+};
+
 //------------------------------------------------------------------------------
 // CLEAR
 //------------------------------------------------------------------------------
 
 /**
- * Tar bort alla armor från scenen och rensar listan.
+ * Tar bort alla armor från scenen och rensar listan
+ *
+ * @return {void}
  */
 runmysteriet.handler.ArmorHandler.prototype.clear = function() {
+
     var i = 0;
     var armor = null;
+
+    if (!this.m_armors) {
+        this.m_armors = [];
+        return;
+    }
 
     for (i = 0; i < this.m_armors.length; i++) {
         armor = this.m_armors[i];
 
-        if (armor && armor.__box && armor.__box.parent) {
-            armor.__box.parent.removeChild(armor.__box);
-        }
-
-        if (armor && armor.parent) {
-            armor.parent.removeChild(armor);
-        }
+        this.removeArmor(armor);
     }
 
     this.m_armors = [];
+};
+
+//------------------------------------------------------------------------------
+// DISPOSE
+//------------------------------------------------------------------------------
+
+/**
+ * Städar ArmorHandler helt
+ *
+ * @return {void}
+ */
+runmysteriet.handler.ArmorHandler.prototype.dispose = function() {
+
+    this.clear();
+
+    this.m_stage = null;
+    this.application = null;
+
+    this.m_levelNumber = 0;
+    this.m_armorSpawns = [];
+
+    this.onArmorCollected = null;
+    this.catchSound = null;
 };

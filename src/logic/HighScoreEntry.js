@@ -6,11 +6,18 @@
  * En highscore-post.
  *
  * @constructor
- * @param {string} name
- * @param {number} score
+ * @param {string=} name
+ * @param {number=} score
  */
 runmysteriet.logic.HighscoreEntry = function(name, score) {
 
-    this.name = name || "PLAYER";
-    this.score = score || 0;
+    /** @type {string} */
+    this.name = String(name || "PLAYER").toUpperCase();
+
+    /** @type {number} */
+    this.score = parseInt(score, 10) || 0;
+
+    if (this.score < 0) {
+        this.score = 0;
+    }
 };

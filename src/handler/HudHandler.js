@@ -12,17 +12,31 @@
  */
 runmysteriet.handler.HudHandler = function(stage, application, cameras) {
 
+    /** @type {!rune.display.DisplayObjectContainer} */
     this.stage = stage;
+
+    /** @type {!Object} */
     this.application = application;
+
+    /** @type {!Object} */
     this.cameras = cameras;
 
+    /** @type {?rune.text.BitmapField} */
     this.m_timerText = null;
+
+    /** @type {?rune.text.BitmapField} */
     this.m_scoreText = null;
+
+    /** @type {?runmysteriet.ui.graphic.HighscoreHud} */
     this.m_highscoreHud = null;
 
+    /** @type {?rune.display.Graphic} */
     this.m_runeTextBg = null;
+
+    /** @type {?rune.text.BitmapField} */
     this.m_runeText = null;
 
+    /** @type {?runmysteriet.handler.ShieldHandler} */
     this.m_shieldHandler = null;
 };
 
@@ -30,7 +44,17 @@ runmysteriet.handler.HudHandler = function(stage, application, cameras) {
 // INIT
 //------------------------------------------------------------------------------
 
+/**
+ * Skapar HUD-objekt.
+ *
+ * @return {void}
+ */
 runmysteriet.handler.HudHandler.prototype.init = function() {
+
+    /*
+     * Säkerhet om HUD råkar initieras om.
+     */
+    this.clear();
 
     this.m_timerText = new rune.text.BitmapField("COLLECT ALL RUNES");
     this.m_timerText.x = 15;
@@ -72,6 +96,12 @@ runmysteriet.handler.HudHandler.prototype.init = function() {
 // PUBLIC METHODS
 //------------------------------------------------------------------------------
 
+/**
+ * Kopplar HUD till ShieldHandler.
+ *
+ * @param {?runmysteriet.handler.ShieldHandler} shieldHandler
+ * @return {void}
+ */
 runmysteriet.handler.HudHandler.prototype.connectShieldHandler = function(shieldHandler) {
 
     var self = this;
@@ -87,6 +117,11 @@ runmysteriet.handler.HudHandler.prototype.connectShieldHandler = function(shield
     };
 };
 
+/**
+ * Uppdaterar HUD-positioner efter kameran.
+ *
+ * @return {void}
+ */
 runmysteriet.handler.HudHandler.prototype.update = function() {
 
     var camera = null;
@@ -133,7 +168,6 @@ runmysteriet.handler.HudHandler.prototype.update = function() {
     }
 
     if (this.m_runeText && this.m_runeTextBg) {
-
         runeBoxWidth = this.m_runeText.width + 10;
 
         if (runeBoxWidth < 190) {
@@ -155,6 +189,12 @@ runmysteriet.handler.HudHandler.prototype.update = function() {
     }
 };
 
+/**
+ * Sätter timer-text.
+ *
+ * @param {string} text
+ * @return {void}
+ */
 runmysteriet.handler.HudHandler.prototype.setTimerText = function(text) {
 
     if (this.m_timerText && this.m_timerText.text !== text) {
@@ -162,6 +202,12 @@ runmysteriet.handler.HudHandler.prototype.setTimerText = function(text) {
     }
 };
 
+/**
+ * Sätter score-text.
+ *
+ * @param {string} text
+ * @return {void}
+ */
 runmysteriet.handler.HudHandler.prototype.setScoreText = function(text) {
 
     if (this.m_scoreText && this.m_scoreText.text !== text) {
@@ -169,13 +215,24 @@ runmysteriet.handler.HudHandler.prototype.setScoreText = function(text) {
     }
 };
 
+/**
+ * Sätter run-text.
+ *
+ * @param {string} text
+ * @return {void}
+ */
 runmysteriet.handler.HudHandler.prototype.setRuneText = function(text) {
 
     if (this.m_runeText) {
-        this.m_runeText.text = "RUNES: " + text;
+        this.m_runeText.text = "RUNES: " + String(text || "");
     }
 };
 
+/**
+ * Laddar om highscore-HUD.
+ *
+ * @return {void}
+ */
 runmysteriet.handler.HudHandler.prototype.reloadHighscore = function() {
 
     if (
@@ -190,9 +247,25 @@ runmysteriet.handler.HudHandler.prototype.reloadHighscore = function() {
 // REMOVE DISPLAY OBJECT
 //------------------------------------------------------------------------------
 
+/**
+ * Tar bort display object från stage.
+ *
+ * @param {?Object} object
+ * @return {void}
+ */
 runmysteriet.handler.HudHandler.prototype.removeDisplayObject = function(object) {
 
     if (!object) {
+        return;
+    }
+
+    if (typeof object.dispose === "function") {
+        object.dispose();
+        return;
+    }
+
+    if (typeof object.remove === "function") {
+        object.remove();
         return;
     }
 
@@ -210,18 +283,15 @@ runmysteriet.handler.HudHandler.prototype.removeDisplayObject = function(object)
 // CLEAR
 //------------------------------------------------------------------------------
 
+/**
+ * Tar bort HUD-objekt från stage.
+ *
+ * @return {void}
+ */
 runmysteriet.handler.HudHandler.prototype.clear = function() {
 
     if (this.m_shieldHandler) {
         this.m_shieldHandler.onCollectedChanged = null;
-    }
-
-    if (this.m_highscoreHud) {
-        if (typeof this.m_highscoreHud.clear === "function") {
-            this.m_highscoreHud.clear();
-        } else if (typeof this.m_highscoreHud.dispose === "function") {
-            this.m_highscoreHud.dispose();
-        }
     }
 
     this.removeDisplayObject(this.m_runeText);
@@ -238,6 +308,21 @@ runmysteriet.handler.HudHandler.prototype.clear = function() {
     this.m_runeText = null;
 
     this.m_shieldHandler = null;
+};
+
+//------------------------------------------------------------------------------
+// DISPOSE
+//------------------------------------------------------------------------------
+
+/**
+ * Rensar HudHandler helt.
+ *
+ * @return {void}
+ */
+runmysteriet.handler.HudHandler.prototype.dispose = function() {
+
+    this.clear();
+
     this.stage = null;
     this.application = null;
     this.cameras = null;

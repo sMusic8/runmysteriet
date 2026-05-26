@@ -1,18 +1,17 @@
 //------------------------------------------------------------------------------
-// Attacks
+// ATTACK
 //------------------------------------------------------------------------------
 
 /**
  * Attack hitbox.
  *
  * @constructor
- * @extends rune.display.Graphic
- *
+ * @extends {rune.display.Graphic}
  * @param {!runmysteriet.entity.Player} player
  */
 runmysteriet.attack.Attack = function(player) {
 
-    var width = 32; 
+    var width = 32;
     var height = 32;
     var x = 0;
     var y = 0;
@@ -63,14 +62,25 @@ runmysteriet.attack.Attack = function(player) {
     this.hasHit = false;
 };
 
-runmysteriet.attack.Attack.prototype = Object.create(rune.display.Graphic.prototype);
-runmysteriet.attack.Attack.prototype.constructor = runmysteriet.attack.Attack;
+//------------------------------------------------------------------------------
+// INHERITANCE
+//------------------------------------------------------------------------------
+
+runmysteriet.attack.Attack.prototype =
+    Object.create(rune.display.Graphic.prototype);
+
+runmysteriet.attack.Attack.prototype.constructor =
+    runmysteriet.attack.Attack;
+
+//------------------------------------------------------------------------------
+// UPDATE
+//------------------------------------------------------------------------------
 
 /**
  * Uppdaterar attacken.
  *
  * @param {number} step
- * @return {undefined}
+ * @return {void}
  */
 runmysteriet.attack.Attack.prototype.update = function(step) {
 
@@ -83,14 +93,62 @@ runmysteriet.attack.Attack.prototype.update = function(step) {
     }
 };
 
+//------------------------------------------------------------------------------
+// REMOVE DISPLAY OBJECT
+//------------------------------------------------------------------------------
+
+/**
+ * Tar bort display object från stage.
+ *
+ * @param {?Object} object
+ * @return {void}
+ */
+runmysteriet.attack.Attack.prototype.removeDisplayObject = function(object) {
+
+    if (!object) {
+        return;
+    }
+
+    if (object.parent) {
+        object.parent.removeChild(object);
+        return;
+    }
+
+    if (object.stage) {
+        object.stage.removeChild(object);
+    }
+};
+
+//------------------------------------------------------------------------------
+// REMOVE
+//------------------------------------------------------------------------------
+
 /**
  * Tar bort attacken från scenen.
  *
- * @return {undefined}
+ * @return {void}
  */
 runmysteriet.attack.Attack.prototype.remove = function() {
 
-    if (this.parent) {
-        this.parent.removeChild(this);
-    }
+    this.removeDisplayObject(this);
+};
+
+//------------------------------------------------------------------------------
+// DISPOSE
+//------------------------------------------------------------------------------
+
+/**
+ * Rensar Attack.
+ *
+ * @return {void}
+ */
+runmysteriet.attack.Attack.prototype.dispose = function() {
+
+    this.remove();
+
+    this.owner = null;
+
+    this.damage = 0;
+    this.life = 0;
+    this.hasHit = false;
 };

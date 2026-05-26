@@ -25,25 +25,30 @@ runmysteriet.ui.graphic.Hole = function(x, y, width, height, fallLimitY) {
      * Lava som fyller hela hålet.
      * En bild per hål, inte massa tiles.
      */
-  var lavaBleedX = 2;
-var lavaBleedY = 2;
-var lavaOffsetY = -25;
+    var lavaBleedX = 2;
+    var lavaBleedY = 2;
+    var lavaOffsetY = -25;
 
-this.lava = new rune.display.Graphic(
-    x - lavaBleedX,
-    y - lavaBleedY + lavaOffsetY,
-    width + lavaBleedX * 2,
-    height + lavaBleedY,
-    "lava"
-);
+    this.lava = new rune.display.Graphic(
+        x - lavaBleedX,
+        y - lavaBleedY + lavaOffsetY,
+        width + lavaBleedX * 2,
+        height + lavaBleedY,
+        "lava"
+    );
 
-this.lava.baseY = y - lavaBleedY + lavaOffsetY;
+    this.lava.baseY = y - lavaBleedY + lavaOffsetY;
+
     /*
      * Enkel lava-effekt.
      */
     this.lava.time = Math.random() * 100;
     this.lava.alpha = 0.9;
-    };
+};
+
+//------------------------------------------------------------------------------
+// INHERITANCE
+//------------------------------------------------------------------------------
 
 runmysteriet.ui.graphic.Hole.prototype =
     Object.create(rune.display.DisplayObject.prototype);
@@ -57,7 +62,6 @@ runmysteriet.ui.graphic.Hole.prototype.constructor =
 
 /**
  * Lägger till hålets lava på stage.
- * Själva Hole behöver inte synas, men kan ligga kvar för logik.
  *
  * @param {!rune.display.Stage} stage
  * @return {void}
@@ -114,11 +118,13 @@ runmysteriet.ui.graphic.Hole.prototype.update = function(step) {
  */
 runmysteriet.ui.graphic.Hole.prototype.isPlayerInside = function(player) {
 
+    var cx = 0;
+
     if (!player) {
         return false;
     }
 
-    var cx = player.x + player.width / 2;
+    cx = player.x + player.width / 2;
 
     return cx >= this.x && cx <= this.x + this.width;
 };
@@ -131,12 +137,15 @@ runmysteriet.ui.graphic.Hole.prototype.isPlayerInside = function(player) {
  */
 runmysteriet.ui.graphic.Hole.prototype.hasPlayerFallen = function(player) {
 
+    var cx = 0;
+    var bottom = 0;
+
     if (!player || player.isDead) {
         return false;
     }
 
-    var cx = player.x + player.width / 2;
-    var bottom = player.y + player.height;
+    cx = player.x + player.width / 2;
+    bottom = player.y + player.height;
 
     return (
         cx >= this.x &&
@@ -146,19 +155,67 @@ runmysteriet.ui.graphic.Hole.prototype.hasPlayerFallen = function(player) {
 };
 
 //------------------------------------------------------------------------------
+// REMOVE DISPLAY OBJECT
+//------------------------------------------------------------------------------
+
+/**
+ * Tar bort display object från stage.
+ *
+ * @param {?Object} object
+ * @return {void}
+ */
+runmysteriet.ui.graphic.Hole.prototype.removeDisplayObject = function(object) {
+
+    if (!object) {
+        return;
+    }
+
+    if (object.parent) {
+        object.parent.removeChild(object);
+        return;
+    }
+
+    if (object.stage) {
+        object.stage.removeChild(object);
+    }
+};
+
+//------------------------------------------------------------------------------
 // REMOVE
 //------------------------------------------------------------------------------
 
 /**
- * Tar bort lavan från stage.
+ * Tar bort hålets lava från stage.
  *
  * @return {void}
  */
 runmysteriet.ui.graphic.Hole.prototype.remove = function() {
 
-    if (this.lava && this.lava.stage) {
-        this.lava.stage.removeChild(this.lava);
-    }
+    this.removeDisplayObject(this.lava);
+
+    /*
+     * tas det bort säkert från stage också
+     */
+    this.removeDisplayObject(this);
 
     this.lava = null;
+};
+
+//------------------------------------------------------------------------------
+// DISPOSE
+//------------------------------------------------------------------------------
+
+/**
+ * Rensar Hole helt.
+ *
+ * @return {void}
+ */
+runmysteriet.ui.graphic.Hole.prototype.dispose = function() {
+
+    this.remove();
+
+    this.fallLimitY = 0;
+
+    this.backgroundColor = null;
+    this.alpha = 0;
 };

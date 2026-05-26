@@ -18,20 +18,63 @@ runmysteriet.logic.NameInput = function(maxLength) {
 
     /** @type {number} */
     this.m_maxLength = maxLength || 4;
+
+    if (this.m_maxLength < 1) {
+        this.m_maxLength = 1;
+    }
 };
 
+//------------------------------------------------------------------------------
+// LETTER SELECTOR
+//------------------------------------------------------------------------------
+
+/**
+ * Går till nästa bokstav.
+ *
+ * @return {void}
+ */
 runmysteriet.logic.NameInput.prototype.nextLetter = function() {
-    this.m_selector.next();
+
+    if (this.m_selector) {
+        this.m_selector.next();
+    }
 };
 
+/**
+ * Går till föregående bokstav.
+ *
+ * @return {void}
+ */
 runmysteriet.logic.NameInput.prototype.previousLetter = function() {
-    this.m_selector.previous();
+
+    if (this.m_selector) {
+        this.m_selector.previous();
+    }
 };
 
+/**
+ * Hämtar vald bokstav.
+ *
+ * @return {string}
+ */
 runmysteriet.logic.NameInput.prototype.getSelectedLetter = function() {
+
+    if (!this.m_selector) {
+        return "";
+    }
+
     return this.m_selector.getLetter();
 };
 
+//------------------------------------------------------------------------------
+// NAME EDIT
+//------------------------------------------------------------------------------
+
+/**
+ * Lägger till vald bokstav i namnet.
+ *
+ * @return {void}
+ */
 runmysteriet.logic.NameInput.prototype.addSelectedLetter = function() {
 
     if (this.m_name.length >= this.m_maxLength) {
@@ -41,6 +84,11 @@ runmysteriet.logic.NameInput.prototype.addSelectedLetter = function() {
     this.m_name += this.getSelectedLetter();
 };
 
+/**
+ * Tar bort senaste bokstaven.
+ *
+ * @return {void}
+ */
 runmysteriet.logic.NameInput.prototype.removeLastLetter = function() {
 
     if (this.m_name.length <= 0) {
@@ -51,11 +99,30 @@ runmysteriet.logic.NameInput.prototype.removeLastLetter = function() {
 };
 
 /**
+ * Återställer namninput.
+ *
+ * @return {void}
+ */
+runmysteriet.logic.NameInput.prototype.reset = function() {
+
+    this.m_name = "";
+
+    if (this.m_selector) {
+        this.m_selector.reset();
+    }
+};
+
+//------------------------------------------------------------------------------
+// GETTERS
+//------------------------------------------------------------------------------
+
+/**
  * Namnet exakt som spelaren har skrivit det, utan PLAYER-standard.
  *
  * @return {string}
  */
 runmysteriet.logic.NameInput.prototype.getRawName = function() {
+
     return this.m_name.toUpperCase();
 };
 
@@ -65,7 +132,18 @@ runmysteriet.logic.NameInput.prototype.getRawName = function() {
  * @return {number}
  */
 runmysteriet.logic.NameInput.prototype.getLength = function() {
+
     return this.m_name.length;
+};
+
+/**
+ * Max antal bokstäver.
+ *
+ * @return {number}
+ */
+runmysteriet.logic.NameInput.prototype.getMaxLength = function() {
+
+    return this.m_maxLength;
 };
 
 /**
@@ -74,6 +152,7 @@ runmysteriet.logic.NameInput.prototype.getLength = function() {
  * @return {boolean}
  */
 runmysteriet.logic.NameInput.prototype.isComplete = function() {
+
     return this.m_name.length >= this.m_maxLength;
 };
 
@@ -89,4 +168,26 @@ runmysteriet.logic.NameInput.prototype.getName = function() {
     }
 
     return this.m_name.toUpperCase();
+};
+
+//------------------------------------------------------------------------------
+// DISPOSE
+//------------------------------------------------------------------------------
+
+/**
+ * Rensar NameInput.
+ *
+ * @return {void}
+ */
+runmysteriet.logic.NameInput.prototype.dispose = function() {
+
+    if (this.m_selector &&
+        typeof this.m_selector.dispose === "function") {
+
+        this.m_selector.dispose();
+    }
+
+    this.m_selector = null;
+    this.m_name = "";
+    this.m_maxLength = 0;
 };

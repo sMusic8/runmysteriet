@@ -12,23 +12,24 @@ runmysteriet.ui.graphic.Water = function(x, y, width, height) {
         this,
         x || 0,
         y || 0,
-        402,
-        32,
+        width || 402,
+        height || 32,
         "havet"
     );
 
-    /** @type {number} */
-    this.width = 402;
-
-    /** @type {number} */
-    this.height = 32;
+    /** @type {boolean} */
+    this.isWater = true;
 };
 
-runmysteriet.ui.graphic.Water.prototype = Object.create(rune.display.Graphic.prototype);
-runmysteriet.ui.graphic.Water.prototype.constructor = runmysteriet.ui.graphic.Water;
+runmysteriet.ui.graphic.Water.prototype =
+    Object.create(rune.display.Graphic.prototype);
+
+runmysteriet.ui.graphic.Water.prototype.constructor =
+    runmysteriet.ui.graphic.Water;
 
 /**
  * Checks if player is touching water.
+ *
  * @param {?Object} player
  * @return {boolean}
  */
@@ -44,4 +45,60 @@ runmysteriet.ui.graphic.Water.prototype.isTouchingPlayer = function(player) {
         player.y + player.height > this.y &&
         player.y < this.y + this.height
     );
+};
+
+//------------------------------------------------------------------------------
+// REMOVE DISPLAY OBJECT
+//------------------------------------------------------------------------------
+
+/**
+ * Tar bort display object från stage.
+ *
+ * @param {?Object} object
+ * @return {void}
+ */
+runmysteriet.ui.graphic.Water.prototype.removeDisplayObject = function(object) {
+
+    if (!object) {
+        return;
+    }
+
+    if (object.parent) {
+        object.parent.removeChild(object);
+        return;
+    }
+
+    if (object.stage) {
+        object.stage.removeChild(object);
+    }
+};
+
+//------------------------------------------------------------------------------
+// REMOVE
+//------------------------------------------------------------------------------
+
+/**
+ * Tar bort Water från stage.
+ *
+ * @return {void}
+ */
+runmysteriet.ui.graphic.Water.prototype.remove = function() {
+
+    this.removeDisplayObject(this);
+};
+
+//------------------------------------------------------------------------------
+// DISPOSE
+//------------------------------------------------------------------------------
+
+/**
+ * Rensar Water.
+ *
+ * @return {void}
+ */
+runmysteriet.ui.graphic.Water.prototype.dispose = function() {
+
+    this.remove();
+
+    this.isWater = false;
 };

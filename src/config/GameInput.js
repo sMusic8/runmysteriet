@@ -110,8 +110,8 @@ runmysteriet.input.GameInput.prototype.readKeyboard = function(keyboard, input) 
         keyboard.justPressed("ESCAPE");
 
     input.volumeUp = input.volumeUp ||
-        keyboard.justPressed("R") ||
-        keyboard.justPressed("r");
+        keyboard.justPressed("E") ||
+        keyboard.justPressed("e");
 
     input.volumeDown = input.volumeDown ||
         keyboard.justPressed("Q") ||
@@ -287,32 +287,14 @@ runmysteriet.input.GameInput.prototype.readPlayer = function(keyboard, playerInd
         up: false,
         down: false,
         jump: false,
-        attack: false
+        attack: false,
+        choose: false,
+        back: false,
+        pause: false,
+        hint: false,
+        volumeUp: false,
+        volumeDown: false
     };
-
-    var axisX = 0;
-    var axisY = 0;
-    var deadZone = 0.35;
-
-    axisX = this.getGamepadAxis(gamepad, 0);
-    axisY = this.getGamepadAxis(gamepad, 1);
-
-   //Vänster spak
-    if (axisX < -deadZone) {
-        input.left = true;
-    }
-
-    if (axisX > deadZone) {
-        input.right = true;
-    }
-
-    if (axisY < -deadZone) {
-        input.up = true;
-    }
-
-    if (axisY > deadZone) {
-        input.down = true;
-    }
 
     this.readPlayerKeyboard(keyboard, playerIndex, input);
     this.readPlayerGamepad(gamepad, input);
@@ -320,7 +302,6 @@ runmysteriet.input.GameInput.prototype.readPlayer = function(keyboard, playerInd
 
     return input;
 };
-
 /**
  * Läser tangentbord för spelare.
  *
@@ -343,6 +324,7 @@ runmysteriet.input.GameInput.prototype.readPlayerKeyboard = function(keyboard, p
         }
 
         if (typeof keyboard.justPressed === "function") {
+            input.up = input.up || keyboard.justPressed("UP");
             input.jump = input.jump || keyboard.justPressed("UP");
             input.attack = input.attack || keyboard.justPressed("SPACE");
         }
@@ -356,9 +338,36 @@ runmysteriet.input.GameInput.prototype.readPlayerKeyboard = function(keyboard, p
         }
 
         if (typeof keyboard.justPressed === "function") {
+            input.up = input.up || keyboard.justPressed("W");
             input.jump = input.jump || keyboard.justPressed("W");
             input.attack = input.attack || keyboard.justPressed("E");
         }
+    }
+
+    if (typeof keyboard.justPressed === "function") {
+        input.choose = input.choose ||
+            keyboard.justPressed("ENTER") ||
+            keyboard.justPressed("SPACE");
+
+        input.back = input.back ||
+            keyboard.justPressed("ESCAPE") ||
+            keyboard.justPressed("BACKSPACE");
+
+        input.pause = input.pause ||
+            keyboard.justPressed("P") ||
+            keyboard.justPressed("ESCAPE");
+
+        input.hint = input.hint ||
+            keyboard.justPressed("T");
+
+    
+        input.volumeUp = input.volumeUp ||
+            keyboard.justPressed("E") ||
+            keyboard.justPressed("e");
+
+        input.volumeDown = input.volumeDown ||
+            keyboard.justPressed("Q") ||
+            keyboard.justPressed("q");
     }
 };
 
@@ -385,12 +394,11 @@ runmysteriet.input.GameInput.prototype.readPlayerGamepad = function(gamepad, inp
             gamepad.pressed("RIGHT") ||
             gamepad.pressed("DPAD_RIGHT") ||
             gamepad.pressed(15);
-            
+
         input.up = input.up ||
             gamepad.pressed("UP") ||
             gamepad.pressed("DPAD_UP") ||
             gamepad.pressed(12);
-
 
         input.down = input.down ||
             gamepad.pressed("DOWN") ||
@@ -404,10 +412,40 @@ runmysteriet.input.GameInput.prototype.readPlayerGamepad = function(gamepad, inp
             gamepad.justPressed("CROSS") ||
             gamepad.justPressed(0);
 
+        input.choose = input.choose ||
+            gamepad.justPressed("A") ||
+            gamepad.justPressed("CROSS") ||
+            gamepad.justPressed(0);
+
         input.attack = input.attack ||
             gamepad.justPressed("X") ||
             gamepad.justPressed("SQUARE") ||
             gamepad.justPressed(2);
+
+        input.back = input.back ||
+            gamepad.justPressed("B") ||
+            gamepad.justPressed("CIRCLE") ||
+            gamepad.justPressed(1);
+
+        input.hint = input.hint ||
+            gamepad.justPressed("Y") ||
+            gamepad.justPressed("TRIANGLE") ||
+            gamepad.justPressed(3);
+
+        input.pause = input.pause ||
+            gamepad.justPressed("START") ||
+            gamepad.justPressed("OPTIONS") ||
+            gamepad.justPressed(9);
+
+        input.volumeDown = input.volumeDown ||
+            gamepad.justPressed("LB") ||
+            gamepad.justPressed("L1") ||
+            gamepad.justPressed(4);
+
+        input.volumeUp = input.volumeUp ||
+            gamepad.justPressed("RB") ||
+            gamepad.justPressed("R1") ||
+            gamepad.justPressed(5);
     }
 };
 

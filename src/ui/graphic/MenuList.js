@@ -1,6 +1,6 @@
-
 /**
  * Menu list UI component.
+ *
  * @constructor
  * @param {!Object} stage
  * @param {!Object} application
@@ -9,7 +9,14 @@
  * @param {number=} spacing
  * @param {number=} scale
  */
-runmysteriet.ui.graphic.MenuList = function(stage, application, labels, yOffset, spacing, scale) {
+runmysteriet.ui.graphic.MenuList = function(
+    stage,
+    application,
+    labels,
+    yOffset,
+    spacing,
+    scale
+) {
 
     /** @type {!Object} */
     this.stage = stage;
@@ -47,32 +54,33 @@ runmysteriet.ui.graphic.MenuList = function(stage, application, labels, yOffset,
 //------------------------------------------------------------------------------
 
 /**
- * Creates menu items.
+ *
  * @return {void}
  */
 runmysteriet.ui.graphic.MenuList.prototype.create = function() {
-    /** @type {?rune.text.BitmapField} */
-    var item = null;
 
+    var item = null;
     var i = 0;
 
     this.clear();
 
     for (i = 0; i < this.labels.length; i++) {
+        item = new rune.text.BitmapField(
+            String(this.labels[i] || "")
+        );
 
-        item = new rune.text.BitmapField(String(this.labels[i] || ""));        item.autoSize = true;
-/*
-         * Rune använder scaleX och scaleY.
-         * item.scale fungerar inte som riktig Rune-skalning.
-         */
+        item.autoSize = true;
+
         item.scaleX = this.scale;
         item.scaleY = this.scale;
 
         /*
-         * Centrera efter skalning, annars kan placeringen bli fel.
+         * Centreras efter scalningen.
          */
         item.center = this.application.screen.center;
         item.y += this.yOffset + i * this.spacing;
+
+        item.visible = this.visible;
 
         this.stage.addChild(item);
         this.items.push(item);
@@ -84,11 +92,15 @@ runmysteriet.ui.graphic.MenuList.prototype.create = function() {
 //------------------------------------------------------------------------------
 
 /**
- * Move selection down.
+ * Flyttar markeringen nedåt.
+ *
  * @return {void}
  */
 runmysteriet.ui.graphic.MenuList.prototype.moveNext = function() {
-    if (this.items.length <= 0) return;
+
+    if (!this.items || this.items.length <= 0) {
+        return;
+    }
 
     this.selectedIndex++;
 
@@ -100,11 +112,15 @@ runmysteriet.ui.graphic.MenuList.prototype.moveNext = function() {
 };
 
 /**
- * flytta markören uppåt
+ * Flyttar markeringen uppåt.
+ *
  * @return {void}
  */
 runmysteriet.ui.graphic.MenuList.prototype.movePrevious = function() {
-    if (this.items.length <= 0) return;
+
+    if (!this.items || this.items.length <= 0) {
+        return;
+    }
 
     this.selectedIndex--;
 
@@ -116,7 +132,7 @@ runmysteriet.ui.graphic.MenuList.prototype.movePrevious = function() {
 };
 
 /**
- * Updates visual selection.
+ *
  * @return {void}
  */
 runmysteriet.ui.graphic.MenuList.prototype.updateSelection = function() {
@@ -125,8 +141,11 @@ runmysteriet.ui.graphic.MenuList.prototype.updateSelection = function() {
     var label = "";
     var i = 0;
 
-    for (i = 0; i < this.items.length; i++) {
+    if (!this.items) {
+        return;
+    }
 
+    for (i = 0; i < this.items.length; i++) {
         item = this.items[i];
 
         if (!item) {
@@ -142,10 +161,14 @@ runmysteriet.ui.graphic.MenuList.prototype.updateSelection = function() {
         }
     }
 };
+
 /**
+ * Hämtar markerat index.
+ *
  * @return {number}
  */
 runmysteriet.ui.graphic.MenuList.prototype.getSelectedIndex = function() {
+
     return this.selectedIndex;
 };
 
@@ -154,21 +177,30 @@ runmysteriet.ui.graphic.MenuList.prototype.getSelectedIndex = function() {
 //------------------------------------------------------------------------------
 
 /**
+ * Visar eller döljer menylistan.
+ *
  * @param {boolean} value
  * @return {void}
  */
 runmysteriet.ui.graphic.MenuList.prototype.setVisible = function(value) {
 
     var i = 0;
+    var item = null;
 
     this.visible = value;
 
+    if (!this.items) {
+        return;
+    }
+
     for (i = 0; i < this.items.length; i++) {
-        this.items[i].visible = value;
+        item = this.items[i];
+
+        if (item) {
+            item.visible = value;
+        }
     }
 };
-
-
 
 /**
  * Skalar alla menyval.
@@ -183,8 +215,11 @@ runmysteriet.ui.graphic.MenuList.prototype.setScale = function(value) {
 
     this.scale = value || 1;
 
-    for (i = 0; i < this.items.length; i++) {
+    if (!this.items) {
+        return;
+    }
 
+    for (i = 0; i < this.items.length; i++) {
         item = this.items[i];
 
         if (!item) {
@@ -197,24 +232,63 @@ runmysteriet.ui.graphic.MenuList.prototype.setScale = function(value) {
 };
 
 /**
+ * Placerar menylistan relativt kameran.
+ *
  * @param {?Object} camera
  * @param {number} x
  * @param {number} y
  * @return {void}
  */
-runmysteriet.ui.graphic.MenuList.prototype.setCameraPosition = function(camera, x, y) {
+runmysteriet.ui.graphic.MenuList.prototype.setCameraPosition = function(
+    camera,
+    x,
+    y
+) {
 
-    /** @type {?rune.text.BitmapField} */
     var item = null;
-
     var i = 0;
 
-    if (!camera) return;
+    if (!camera || !camera.viewport || !this.items) {
+        return;
+    }
 
     for (i = 0; i < this.items.length; i++) {
         item = this.items[i];
+
+        if (!item) {
+            continue;
+        }
+
         item.x = camera.viewport.x + x;
         item.y = camera.viewport.y + y + i * this.spacing;
+    }
+};
+
+//------------------------------------------------------------------------------
+// REMOVE DISPLAY OBJECT
+//------------------------------------------------------------------------------
+
+/**
+ * Tar bort display object från stage.
+ *
+ * @param {?Object} object
+ * @return {void}
+ */
+runmysteriet.ui.graphic.MenuList.prototype.removeDisplayObject = function(
+    object
+) {
+
+    if (!object) {
+        return;
+    }
+
+    if (object.parent) {
+        object.parent.removeChild(object);
+        return;
+    }
+
+    if (object.stage) {
+        object.stage.removeChild(object);
     }
 };
 
@@ -223,7 +297,8 @@ runmysteriet.ui.graphic.MenuList.prototype.setCameraPosition = function(camera, 
 //------------------------------------------------------------------------------
 
 /**
- * tar bort alla menyval från scenen och tömmer items-arrayen
+ * Tar bort alla menyval från scenen och tömmer items-arrayen.
+ *
  * @return {void}
  */
 runmysteriet.ui.graphic.MenuList.prototype.clear = function() {
@@ -231,16 +306,20 @@ runmysteriet.ui.graphic.MenuList.prototype.clear = function() {
     var item = null;
     var i = 0;
 
+    if (!this.items) {
+        this.items = [];
+        return;
+    }
+
     for (i = 0; i < this.items.length; i++) {
         item = this.items[i];
 
-        if (item && item.stage) {
-            item.stage.removeChild(item);
-        }
+        this.removeDisplayObject(item);
     }
 
     this.items = [];
 };
+
 //------------------------------------------------------------------------------
 // DISPOSE
 //------------------------------------------------------------------------------
@@ -256,6 +335,14 @@ runmysteriet.ui.graphic.MenuList.prototype.dispose = function() {
 
     this.stage = null;
     this.application = null;
+
     this.labels = [];
     this.items = [];
+
+    this.yOffset = 0;
+    this.spacing = 0;
+    this.scale = 0;
+
+    this.selectedIndex = 0;
+    this.visible = false;
 };

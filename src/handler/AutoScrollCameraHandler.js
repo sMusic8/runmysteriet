@@ -14,16 +14,27 @@
  * @param {!runmysteriet.handler.PlatformHandler} platformHandler
  * @param {number} levelWidth
  */
-runmysteriet.handler.AutoScrollCameraHandler = function(camera, playerHandler, platformHandler, levelWidth) {
+runmysteriet.handler.AutoScrollCameraHandler = function(
+    camera,
+    playerHandler,
+    platformHandler,
+    levelWidth
+) {
 
+    /** @type {!rune.camera.Camera} */
     this.camera = camera;
+
+    /** @type {!runmysteriet.handler.PlayerHandler} */
     this.playerHandler = playerHandler;
+
+    /** @type {!runmysteriet.handler.PlatformHandler} */
     this.platformHandler = platformHandler;
 
+    /** @type {number} */
     this.levelWidth = levelWidth || 0;
 
     /*
-     * Flytta med hela pixlar för att undvika HUD/text-skakar
+     * Flytta med hela pixlar för att undvika HUD/text-skak.
      */
     this.speed = 2;
 
@@ -35,8 +46,11 @@ runmysteriet.handler.AutoScrollCameraHandler = function(camera, playerHandler, p
     this.scrollDelay = 1;
     this.scrollCounter = 0;
 
+    /*
+     * Death slow motion.
+     */
     this.deathSlowTimer = 0;
-    this.deathSlowDuration = 90; // 30 fps * 3 sekunder
+    this.deathSlowDuration = 90;
     this.deathSlowScrollDelay = 6;
 
     /*
@@ -67,6 +81,7 @@ runmysteriet.handler.AutoScrollCameraHandler.prototype.update = function(step) {
     if (!this.camera || !this.camera.viewport) {
         return;
     }
+
     this.updateDeathSlowMotion();
 
     /*
@@ -74,9 +89,7 @@ runmysteriet.handler.AutoScrollCameraHandler.prototype.update = function(step) {
      * vänta tills alla levande spelare står på flotten.
      */
     if (this.isPausedForRaft === true) {
-
         if (this.areAllActivePlayersOnRaft() === true) {
-
             if (this.currentRaft) {
                 this.currentRaft.autoScrollDone = true;
             }
@@ -93,7 +106,6 @@ runmysteriet.handler.AutoScrollCameraHandler.prototype.update = function(step) {
      * Sedan kollar vi om flotten nu ligger i mitten.
      */
     this.moveCamera();
-
     this.checkRaftPause();
 };
 
@@ -110,6 +122,10 @@ runmysteriet.handler.AutoScrollCameraHandler.prototype.moveCamera = function() {
 
     var maxX = 0;
 
+    if (!this.camera || !this.camera.viewport) {
+        return;
+    }
+
     maxX = this.levelWidth - this.camera.viewport.width;
 
     if (maxX < 0) {
@@ -119,8 +135,8 @@ runmysteriet.handler.AutoScrollCameraHandler.prototype.moveCamera = function() {
     this.scrollCounter++;
 
     if (this.scrollCounter < this.getCurrentScrollDelay()) {
-    return;
-}
+        return;
+    }
 
     this.scrollCounter = 0;
 
@@ -148,6 +164,10 @@ runmysteriet.handler.AutoScrollCameraHandler.prototype.moveCamera = function() {
 runmysteriet.handler.AutoScrollCameraHandler.prototype.checkRaftPause = function() {
 
     var raft = null;
+
+    if (this.isPausedForRaft === true) {
+        return;
+    }
 
     raft = this.findNextRaftToPauseAt();
 
@@ -177,6 +197,10 @@ runmysteriet.handler.AutoScrollCameraHandler.prototype.findNextRaftToPauseAt = f
     var cameraCenterX = 0;
     var raftCenterX = 0;
 
+    if (!this.camera || !this.camera.viewport) {
+        return null;
+    }
+
     if (!this.platformHandler || !this.platformHandler.platforms) {
         return null;
     }
@@ -186,7 +210,6 @@ runmysteriet.handler.AutoScrollCameraHandler.prototype.findNextRaftToPauseAt = f
         this.camera.viewport.width / 2;
 
     for (i = 0; i < this.platformHandler.platforms.length; i++) {
-
         platform = this.platformHandler.platforms[i];
 
         if (!platform || platform.isRaft !== true) {
@@ -212,6 +235,7 @@ runmysteriet.handler.AutoScrollCameraHandler.prototype.findNextRaftToPauseAt = f
 
     return null;
 };
+
 /**
  * Returnerar true bara när alla levande spelare står på flotten.
  *
@@ -228,7 +252,6 @@ runmysteriet.handler.AutoScrollCameraHandler.prototype.areAllActivePlayersOnRaft
     }
 
     for (i = 0; i < this.playerHandler.players.length; i++) {
-
         player = this.playerHandler.players[i];
 
         if (!player || player.isDead === true) {
@@ -253,6 +276,11 @@ runmysteriet.handler.AutoScrollCameraHandler.prototype.areAllActivePlayersOnRaft
 // DEATH SLOW MOTION
 //------------------------------------------------------------------------------
 
+/**
+ * Startar långsammare autoscroll efter död.
+ *
+ * @return {void}
+ */
 runmysteriet.handler.AutoScrollCameraHandler.prototype.startDeathSlowMotion = function() {
 
     if (this.deathSlowTimer > 0) {
@@ -263,12 +291,23 @@ runmysteriet.handler.AutoScrollCameraHandler.prototype.startDeathSlowMotion = fu
     this.scrollCounter = 0;
 };
 
+/**
+ * Uppdaterar death slow motion-timer.
+ *
+ * @return {void}
+ */
 runmysteriet.handler.AutoScrollCameraHandler.prototype.updateDeathSlowMotion = function() {
 
     if (this.deathSlowTimer > 0) {
         this.deathSlowTimer--;
     }
 };
+
+/**
+ * Hämtar aktuell scroll-delay.
+ *
+ * @return {number}
+ */
 runmysteriet.handler.AutoScrollCameraHandler.prototype.getCurrentScrollDelay = function() {
 
     if (this.deathSlowTimer > 0) {
@@ -276,4 +315,38 @@ runmysteriet.handler.AutoScrollCameraHandler.prototype.getCurrentScrollDelay = f
     }
 
     return this.scrollDelay;
+};
+
+//------------------------------------------------------------------------------
+// DISPOSE
+//------------------------------------------------------------------------------
+
+/**
+ * Rensar AutoScrollCameraHandler.
+ *
+ * Äger inga stage-objekt, släpper bara referenser.
+ *
+ * @return {void}
+ */
+runmysteriet.handler.AutoScrollCameraHandler.prototype.dispose = function() {
+
+    this.camera = null;
+    this.playerHandler = null;
+    this.platformHandler = null;
+
+    this.levelWidth = 0;
+
+    this.speed = 0;
+
+    this.scrollDelay = 0;
+    this.scrollCounter = 0;
+
+    this.deathSlowTimer = 0;
+    this.deathSlowDuration = 0;
+    this.deathSlowScrollDelay = 0;
+
+    this.isPausedForRaft = false;
+    this.currentRaft = null;
+
+    this.raftStopOffsetX = 0;
 };

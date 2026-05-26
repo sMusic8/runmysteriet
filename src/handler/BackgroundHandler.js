@@ -100,6 +100,32 @@ runmysteriet.handler.BackgroundHandler.prototype.update = function() {
 };
 
 //------------------------------------------------------------------------------
+// REMOVE DISPLAY OBJECT
+//------------------------------------------------------------------------------
+
+/**
+ * Tar bort ett display object från stage.
+ *
+ * @param {?Object} object
+ * @return {void}
+ */
+runmysteriet.handler.BackgroundHandler.prototype.removeDisplayObject = function(object) {
+
+    if (!object) {
+        return;
+    }
+
+    if (object.parent) {
+        object.parent.removeChild(object);
+        return;
+    }
+
+    if (object.stage) {
+        object.stage.removeChild(object);
+    }
+};
+
+//------------------------------------------------------------------------------
 // CLEAR
 //------------------------------------------------------------------------------
 
@@ -120,20 +146,30 @@ runmysteriet.handler.BackgroundHandler.prototype.clear = function() {
 
     for (i = 0; i < this.backgrounds.length; i++) {
         background = this.backgrounds[i];
-
-        if (!background) {
-            continue;
-        }
-
-        if (background.parent) {
-            background.parent.removeChild(background);
-        } else if (background.stage) {
-            background.stage.removeChild(background);
-        }
+        this.removeDisplayObject(background);
     }
 
     this.backgrounds = [];
+};
+
+//------------------------------------------------------------------------------
+// DISPOSE
+//------------------------------------------------------------------------------
+
+/**
+ * Rensar BackgroundHandler helt.
+ *
+ * @return {void}
+ */
+runmysteriet.handler.BackgroundHandler.prototype.dispose = function() {
+
+    this.clear();
+
     this.stage = null;
     this.camera = null;
+    this.screenWidth = 0;
+    this.screenHeight = 0;
     this.backgroundTextures = [];
+    this.backgroundCount = 0;
+    this.levelWidth = 0;
 };

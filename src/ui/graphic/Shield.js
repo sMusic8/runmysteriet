@@ -1,102 +1,162 @@
+//------------------------------------------------------------------------------
+// SHIELD
+//------------------------------------------------------------------------------
+
 /**
- * Shield UI element.
+ * Shield / rune collectible.
+ *
  * @constructor
  * @extends {rune.display.Graphic}
+ * @param {number=} x
+ * @param {number=} y
  */
-runmysteriet.ui.Shield = function() {
+runmysteriet.ui.Shield = function(x, y) {
 
-    rune.display.Graphic.call(this,
-        0,
-        0,
-        40,
-        40,
+    rune.display.Graphic.call(
+        this,
+        x || 0,
+        y || 0,
+        24,
+        24,
         "shield"
     );
 
-    // Rune manager
-    this.runes = new runmysteriet.ui.Rune();
-
-    this.runes.makeAllRunes();
-
-    var randomRune = this.runes.getOneRune();
-    console.log("Slumpad rune:", randomRune);
-
-    // Spara runan
-    this.runeGraphic = randomRune;
-
-    // Lägg till som child om den finns
-    if (this.runeGraphic) {
-        this.addChild(this.runeGraphic);
-
-        // centrera i 40x40 sköld
-        this.runeGraphic.x = (22 - this.runeGraphic.width) / 2;
-        this.runeGraphic.y = (20 - this.runeGraphic.height) / 2;
-    }
-
-    /** @type {string} */
+    /*
+     * Vilken bokstav/runa denna shield representerar.
+     */
     this.rune = "";
 
-    /** @private @type {boolean} */
-    this.__collected = false;
+    /*
+     * Index i ordet.
+     */
+    this.wordIndex = -1;
 
-    /** @type {boolean} */
+    /*
+     * Om den redan är insamlad.
+     */
+    this.isCollected = false;
+
+    /*
+     * Används av handlern för att veta om objektet är aktivt.
+     */
     this.active = true;
 
-    // TEXT
-
-    /** @type {rune.text.BitmapField} */
-    this.m_text = new rune.text.BitmapField(" ");
-
-    this.m_text.autoSize = true;
-
-    this.addChild(this.m_text);
-
-    // PULSE
-    this.m_baseScale = 1.7;
-    this.m_pulseSpeed = 0.08;
-    this.m_pulseValue = 0;
+    /*
+     * Identifiering.
+     */
+    this.isShield = true;
 };
 
-// inheritance
-runmysteriet.ui.Shield.prototype = Object.create(rune.display.Graphic.prototype);
-runmysteriet.ui.Shield.prototype.constructor = runmysteriet.ui.Shield;
+//------------------------------------------------------------------------------
+// INHERITANCE
+//------------------------------------------------------------------------------
+
+runmysteriet.ui.Shield.prototype =
+    Object.create(rune.display.Graphic.prototype);
+
+runmysteriet.ui.Shield.prototype.constructor =
+    runmysteriet.ui.Shield;
+
+//------------------------------------------------------------------------------
+// RUNE
+//------------------------------------------------------------------------------
 
 /**
- * Update loop.
+ * Sätter vilken rune/bokstav shielden representerar.
+ *
+ * @param {string} rune
+ * @return {void}
  */
-runmysteriet.ui.Shield.prototype.update = function() {
+runmysteriet.ui.Shield.prototype.setRune = function(rune) {
 
-    if (this.__collected) return;
-
-    this.m_pulseValue += this.m_pulseSpeed;
-
-    var scale = this.m_baseScale + Math.sin(this.m_pulseValue) * 0.08;
-
-    this.scaleX = scale;
-    this.scaleY = scale;
+    this.rune = String(rune || "").toUpperCase();
 };
 
 /**
- * Centers the text inside the shield.
+ * Hämtar runan/bokstaven.
+ *
+ * @return {string}
  */
-runmysteriet.ui.Shield.prototype.centerText = function() {
+runmysteriet.ui.Shield.prototype.getRune = function() {
 
-    this.m_text.x = (this.width - this.m_text.width) / 2;
-    this.m_text.y = (this.height - this.m_text.height) / 2;
-};
-
-/**
- * Sets the rune letter.
- */
-runmysteriet.ui.Shield.prototype.setRune = function(letter) {
-
-    this.rune = letter;
-
-    this.m_text.text = letter;
-
-    this.centerText();
-};
-
-runmysteriet.ui.Shield.prototype.getRune = function () {
     return this.rune;
+};
+
+//------------------------------------------------------------------------------
+// COLLECT
+//------------------------------------------------------------------------------
+
+/**
+ * Markerar shielden som insamlad.
+ *
+ * @return {void}
+ */
+runmysteriet.ui.Shield.prototype.collect = function() {
+
+    this.isCollected = true;
+    this.active = false;
+    this.visible = false;
+
+    this.remove();
+};
+
+//------------------------------------------------------------------------------
+// REMOVE DISPLAY OBJECT
+//------------------------------------------------------------------------------
+
+/**
+ * Tar bort display object från stage.
+ *
+ * @param {?Object} object
+ * @return {void}
+ */
+runmysteriet.ui.Shield.prototype.removeDisplayObject = function(object) {
+
+    if (!object) {
+        return;
+    }
+
+    if (object.parent) {
+        object.parent.removeChild(object);
+        return;
+    }
+
+    if (object.stage) {
+        object.stage.removeChild(object);
+    }
+};
+
+//------------------------------------------------------------------------------
+// REMOVE
+//------------------------------------------------------------------------------
+
+/**
+ * Tar bort shield från stage.
+ *
+ * @return {void}
+ */
+runmysteriet.ui.Shield.prototype.remove = function() {
+
+    this.removeDisplayObject(this);
+};
+
+//------------------------------------------------------------------------------
+// DISPOSE
+//------------------------------------------------------------------------------
+
+/**
+ * Rensar Shield.
+ *
+ * @return {void}
+ */
+runmysteriet.ui.Shield.prototype.dispose = function() {
+
+    this.remove();
+
+    this.rune = "";
+    this.wordIndex = -1;
+
+    this.isCollected = true;
+    this.active = false;
+    this.isShield = false;
 };

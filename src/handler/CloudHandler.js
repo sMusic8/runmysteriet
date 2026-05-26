@@ -123,3 +123,21 @@ runmysteriet.handler.CloudHandler.prototype.clear = function() {
 
     this.clouds = [];
 };
+//------------------------------------------------------------------------------
+// DISPOSE
+//------------------------------------------------------------------------------
+
+/**
+ * Rensar CloudHandler helt.
+ *
+ * @return {void}
+ */
+runmysteriet.handler.CloudHandler.prototype.dispose = function() {
+
+    this.clear();
+
+    this.stage = null;
+    this.screenWidth = 0;
+    this.levelWidth = 0;
+    this.cloudResources = [];
+};
