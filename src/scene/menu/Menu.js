@@ -5,17 +5,20 @@
  * @extends rune.scene.Scene
  * 
  * @constructor
- * Initierar menyscenen och dess grundläggande egenskaper såsom UI-element,
- * ljud och inmatningshantering.
  * 
- * @property {?Object} menuList - Lista eller container som innehåller menyalternativ (t.ex. knappar).
- * @property {?Object} menuSound - Ljudeffekt som används vid menyinteraktioner.
- * @property {?Object} m_background - Bakgrundselement eller sprite för menyn.
- * @property {?Object} m_highscoreHud - HUD-element som visar highscore.
+ * @property {?Object} menuList - Hanterar menyalternativ och navigation i menyn.
+ * @property {?Object} menuSound - Ljudeffekt som spelas vid menyinteraktioner.
  * @property {?Object} backgroundMusic - Bakgrundsmusik som spelas i menyn.
- * @property {?Object} m_gameInput - Hanterar inmatning för menynavigering.
+ * @property {?Object} m_background - Bakgrundsgrafik för menyn.
+ * @property {?Object} m_controller - Grafisk indikator för kontroller/instruktioner.
+ * @property {?Object} m_titleText - Huvudtitel i menyn.
+ * @property {?Object} m_subtitleText - Undertitel eller beskrivningstext i menyn.
+ * @property {?Object} m_highscoreHud - HUD som visar highscore.
+ * @property {?Object} m_volumeHud - HUD för volymkontroll.
+ * @property {?Object} m_gameInput - Hanterar input för meny-navigering.
  */
-gcc.verbose.runmysteriet.scene.Menu = function() {
+runmysteriet.scene.Menu = function() {
+
     rune.scene.Scene.call(this);
 
     this.menuList = null;
@@ -35,6 +38,7 @@ gcc.verbose.runmysteriet.scene.Menu = function() {
 
 runmysteriet.scene.Menu.prototype = Object.create(rune.scene.Scene.prototype);
 runmysteriet.scene.Menu.prototype.constructor = runmysteriet.scene.Menu;
+
 /**
  * Initierar menyscenen.
  * Anropas när scenen startas.
@@ -47,31 +51,16 @@ runmysteriet.scene.Menu.prototype.init = function() {
 
     rune.scene.Scene.prototype.init.call(this);
 
-
-    /**
-     * Hanterar spelarens inmatning i menyn.
-     * @type {runmysteriet.input.GameInput}
-     */
     this.m_gameInput = new runmysteriet.input.GameInput(this.application);
 
-    /**
-     * Ljudeffekt för menyinteraktioner.
-     * @type {?Object}
-     */
     this.menuSound = this.application.sounds.sound.get("sound_menu");
-
-    /**
-     * Bakgrundsmusik för menyn.
-     * @type {?Object}
-     */
     this.backgroundMusic = this.application.sounds.sound.get("sound_musicMenu");
 
-    
     if (this.backgroundMusic) {
-            this.backgroundMusic.loop = true;
-            this.backgroundMusic.volume = 0.5;
-            this.backgroundMusic.play();
-        }
+        this.backgroundMusic.loop = true;
+        this.backgroundMusic.volume = 0.5;
+        this.backgroundMusic.play();
+    }
 
     this.createBackground();
     this.createControllerImage();
@@ -81,23 +70,20 @@ runmysteriet.scene.Menu.prototype.init = function() {
     this.createVolumeHud();
 };
 
-//------------------------------------------------------------------------------
-// CREATE
-//------------------------------------------------------------------------------
 
+/**
+ * Skapar och lägger till bakgrunden för huvudmenyn.
+ * 
+ * Genererar en grafisk bakgrund som täcker hela skärmen och
+ * lägger till den i scenens stage.
+ * 
+ * @method
+ * @memberof runmysteriet.scene.Menu
+ * 
+ * @returns {void}
+ */
 runmysteriet.scene.Menu.prototype.createBackground = function() {
 
-    /**
-     * Hanterar volym för bakgrundsmusiken.
-     * @type {runmysteriet.handler.VolumeHandler}
-     */
-    this.m_volumeHandler = new runmysteriet.handler.VolumeHandler(null);
-    this.m_volumeHandler.setAudio(this.backgroundMusic);
-
-    /**
-     * Bakgrundsgrafik för menyn.
-     * @type {rune.display.Graphic}
-     */
     this.m_background = new rune.display.Graphic(
         0,
         0,
@@ -109,12 +95,16 @@ runmysteriet.scene.Menu.prototype.createBackground = function() {
     this.stage.addChild(this.m_background);
 };
 
+/**
+ * Skapar och lägger till en grafisk bild för kontroller i menyn.
+ * 
+ * @method
+ * @memberof runmysteriet.scene.Menu
+ * 
+ * @returns {void}
+ */
 runmysteriet.scene.Menu.prototype.createControllerImage = function() {
 
-    /**
-     * Bild som visar en kontroll (t.ex. handkontroll).
-     * @type {rune.display.Graphic}
-     */
     this.m_controller = new rune.display.Graphic(
         250,
         110,
@@ -124,22 +114,15 @@ runmysteriet.scene.Menu.prototype.createControllerImage = function() {
     );
 
     this.stage.addChild(this.m_controller);
-
-    /**
-     * Huvudtitel i menyn.
-     * @type {rune.text.BitmapField}
-     */
-    var text = new rune.text.BitmapField("Welcome to the Rune Mystery");
-    text.autoSize = true;
-    text.center = this.application.screen.center;
-    text.y -= 70;
-    text.x -= 80;
-    text.scaleX = 2;
-    text.scaleY = 2;
-    text.flicker.start(750, 0.5);
-    this.stage.addChild(text);
 };
-
+/**
+ * Skapar titel och undertitel i huvudmenyn.
+ * 
+ * @method
+ * @memberof runmysteriet.scene.Menu
+ * 
+ * @returns {void}
+ */
 runmysteriet.scene.Menu.prototype.createTitle = function() {
 
     this.m_titleText = new rune.text.BitmapField(
@@ -156,10 +139,6 @@ runmysteriet.scene.Menu.prototype.createTitle = function() {
 
     this.stage.addChild(this.m_titleText);
 
-    /**
-     * Undertitel/beskrivning i menyn.
-     * @type {rune.text.BitmapField}
-     */
     this.m_subtitleText = new rune.text.BitmapField(
         "From battle to brain, earn the final word!"
     );
@@ -173,6 +152,10 @@ runmysteriet.scene.Menu.prototype.createTitle = function() {
     this.stage.addChild(this.m_subtitleText);
 };
 
+  /**
+     * HUD som visar highscores.
+     * @type {runmysteriet.ui.graphic.HighscoreHud}
+     */
 runmysteriet.scene.Menu.prototype.createHighscoreHud = function() {
 
     this.m_highscoreHud = new runmysteriet.ui.graphic.HighscoreHud(
@@ -185,13 +168,12 @@ runmysteriet.scene.Menu.prototype.createHighscoreHud = function() {
 
     this.stage.addChild(this.m_highscoreHud);
 };
-
-runmysteriet.scene.Menu.prototype.createMenuList = function() {
-
-    /**
+ /**
      * Menylista med valbara alternativ.
      * @type {runmysteriet.ui.graphic.MenuList}
      */
+runmysteriet.scene.Menu.prototype.createMenuList = function() {
+
     this.menuList = new runmysteriet.ui.graphic.MenuList(
         this.stage,
         this.application,
@@ -202,16 +184,14 @@ runmysteriet.scene.Menu.prototype.createMenuList = function() {
     );
 };
 
-runmysteriet.scene.Menu.prototype.createVolumeHud = function() {
-
-    this.m_volumeHud = new runmysteriet.ui.graphic.VolumeHud(
-        this.application,
-        this.backgroundMusic
-    );
-
-    this.stage.addChild(this.m_volumeHud);
-};
-
+/**
+ * Skapar och lägger till volym-HUD i huvudmenyn.
+ * 
+ * @method
+ * @memberof runmysteriet.scene.Menu
+ * 
+ * @returns {void}
+ */
 runmysteriet.scene.Menu.prototype.createVolumeHud = function() {
 
     this.m_volumeHud = new runmysteriet.ui.graphic.VolumeHud(
@@ -233,88 +213,60 @@ runmysteriet.scene.Menu.prototype.createVolumeHud = function() {
  */
 runmysteriet.scene.Menu.prototype.update = function(step) {
 
-    // Direktstart av spel med F4
-    if (this.keyboard && this.keyboard.justPressed("F4")) {
+    var input = null;
 
-        //Stoppar bakgrundsmusiken om möjligt.
-         
-        if (this.backgroundMusic && typeof this.backgroundMusic.stop === "function") {
-            this.backgroundMusic.stop();
-        }
-
-        //Laddar spel-scenen.
-         
-        this.application.scenes.load([
-            new runmysteriet.scene.Game(2)
-        ]);
-
-        return;
-    }
-
-    // Uppdatera basklass
     rune.scene.Scene.prototype.update.call(this, step);
 
-    /**
-     * Referens till tangentbord.
-     * @type {?Object}
-     */
-    var keyboard = this.keyboard;
-
-    /**
-     * Första anslutna gamepad.
-     * @type {?Object}
-     */
-    var gamepad = this.gamepads.get(0);
-
-    //Uppdaterar volym baserat på spelarens input.
-    if (this.m_volumeHandler) {
-        this.m_volumeHandler.update(
-            this.m_gameInput.read(this.keyboard),
-            this.gamepads.get(0),
-            this.keyboard
-        );
-    }
-
-    //Säkerställer att meny och input finns innan hantering.
-     
-    if (!this.menuList || !this.m_gameInput) {
+    if (!this.m_gameInput || !this.menuList) {
         return;
     }
 
-    /**
-     * Läser spelarens input (t.ex. upp/ner/välj).
-     * @type {{up: boolean, down: boolean, choose: boolean}}
-     */
-    var input = this.m_gameInput.read(this.keyboard);
+    input = this.m_gameInput.read(this.keyboard);
 
-    // Navigera nedåt i menyn
+    this.handleVolumeInput(input);
+    this.handleMenuInput(input);
+};
+
+/**
+ * Hanterar inmatning för menynavigering.
+ * 
+ * @method
+ * @memberof runmysteriet.scene.Menu
+ * 
+ * @param {Object} input - Objekt som innehåller spelarens inmatning (upp, ner, välj).
+ * @returns {void}
+ */
+runmysteriet.scene.Menu.prototype.handleMenuInput = function(input) {
+
+    if (!input) {
+        return;
+    }
+
     if (input.down) {
         this.playMenuSound();
         this.menuList.moveNext();
         return;
     }
 
-    // Navigera uppåt i menyn
     if (input.up) {
         this.playMenuSound();
         this.menuList.movePrevious();
         return;
     }
 
-    // Välj aktuellt alternativ
     if (input.choose) {
         this.chooseSelected();
     }
 };
 /**
- * Hanterar val av markerat menyobjekt.
+ * Hanterar volymkontroll via inmatning.
  * 
  * @method
  * @memberof runmysteriet.scene.Menu
  * 
+ * @param {Object} input - Objekt som innehåller spelarens inmatning (volym upp/ner).
  * @returns {void}
  */
-
 runmysteriet.scene.Menu.prototype.handleVolumeInput = function(input) {
 
     var stepVol = 0.1;
@@ -345,6 +297,17 @@ runmysteriet.scene.Menu.prototype.handleVolumeInput = function(input) {
     }
 };
 
+/**
+ * Uppdaterar volym-HUD:ens text/visning.
+ * 
+ * Anropar HUD:ens `updateText`-funktion om den finns, för att
+ * spegla aktuell volymnivå i UI:t.
+ * 
+ * @method
+ * @memberof runmysteriet.scene.Menu
+ * 
+ * @returns {void}
+ */
 runmysteriet.scene.Menu.prototype.updateVolumeHud = function() {
 
     if (
@@ -355,10 +318,14 @@ runmysteriet.scene.Menu.prototype.updateVolumeHud = function() {
     }
 };
 
-//------------------------------------------------------------------------------
-// CHOOSE
-//------------------------------------------------------------------------------
-
+/**
+ * Hanterar val av markerat menyval.
+ * 
+ * @method
+ * @memberof runmysteriet.scene.Menu
+ * 
+ * @returns {void}
+ */
 runmysteriet.scene.Menu.prototype.chooseSelected = function() {
 
     var selectedIndex = 0;
@@ -393,7 +360,7 @@ runmysteriet.scene.Menu.prototype.chooseSelected = function() {
 };
 
 /**
- * Spelar upp meny-ljudet vid klick om det finns tillgänligt.
+ * Spelar upp meny-ljudet.
  * 
  * @method
  * @memberof runmysteriet.scene.Menu
@@ -407,6 +374,14 @@ runmysteriet.scene.Menu.prototype.playMenuSound = function() {
     }
 };
 
+/**
+ * Stoppar bakgrundsmusiken i huvudmenyn.
+ * 
+ * @method
+ * @memberof runmysteriet.scene.Menu
+ * 
+ * @returns {void}
+ */
 runmysteriet.scene.Menu.prototype.stopBackgroundMusic = function() {
 
     if (
@@ -417,10 +392,6 @@ runmysteriet.scene.Menu.prototype.stopBackgroundMusic = function() {
         this.backgroundMusic.m_source.mediaElement.pause();
     }
 };
-
-//------------------------------------------------------------------------------
-// REMOVE DISPLAY OBJECT
-//------------------------------------------------------------------------------
 
 /**
  * Tar bort display object från stage.
@@ -443,11 +414,12 @@ runmysteriet.scene.Menu.prototype.removeDisplayObject = function(object) {
         object.stage.removeChild(object);
     }
 };
-
 /**
- * Rensar och frigör resurser för menyscenen.
+ * Rensar och frigör resurser för huvudmenyn.
  * 
- * Tar bort och nollställer objekt som används i menyn för att undvika minnesläckor.
+ * Stoppar bakgrundsmusik, städar upp menykomponenter och tar bort alla
+ * display-objekt från scenen. Nollställer referenser för att undvika
+ * minnesläckor och anropar sedan basklassens dispose-metod.
  * 
  * @method
  * @memberof runmysteriet.scene.Menu
