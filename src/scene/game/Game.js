@@ -1,80 +1,267 @@
 //------------------------------------------------------------------------------
 // GAME SCENE
 //------------------------------------------------------------------------------
+/**
+ * Skapar en ny spel-scene (Game) med nivådata, poäng och avatarinformation.
+ *
+ * @constructor
+ * @extends {rune.scene.Scene}
+ * @param {number} levelNumber Aktuellt nivånummer som ska spelas.
+ * @param {number} score Spelarens totala poäng innan denna nivå.
+ * @param {Object=} avatarData Data kopplad till spelarens avatar (valfri).
+ */
 runmysteriet.scene.Game = function (levelNumber, score, avatarData) {
   rune.scene.Scene.call(this);
 
+  /**
+   * Hanterare för spelaren.
+   * @type {?Object}
+   */
   this.m_playerHandler = null;
+
+  /**
+   * Hanterare för plattformar.
+   * @type {?Object}
+   */
   this.m_platformHandler = null;
+
+  /**
+   * Hanterare för moln.
+   * @type {?Object}
+   */
   this.m_cloudHandler = null;
+
+  /**
+   * Hanterare för sköldar.
+   * @type {?Object}
+   */
   this.m_shieldHandler = null;
+
+  /**
+   * Kamerahanterare.
+   * @type {?Object}
+   */
   this.m_cameraHandler = null;
+
+  /**
+   * Hanterare för bakgrund.
+   * @type {?Object}
+   */
   this.m_backgroundHandler = null;
+
+  /**
+   * Hanterare för fiender.
+   * @type {?Object}
+   */
   this.m_enemyHandler = null;
+
+  /**
+   * Hanterare för sjukdomar/effects.
+   * @type {?Object}
+   */
   this.m_diseaseHandler = null;
+
+  /**
+   * Hanterare för rustning/armor.
+   * @type {?Object}
+   */
   this.m_armorHandler = null;
 
+  /**
+   * Konfiguration för aktuell nivå.
+   * @type {?Object}
+   */
   this.m_levelConfig = null;
+
+  /**
+   * Nuvarande nivånummer.
+   * @type {number}
+   */
   this.m_levelNumber = levelNumber || 1;
+
+  /**
+   * Total poäng innan nivån startar.
+   * @type {number}
+   */
   this.m_score = score || 0;
+
+  /**
+   * Poäng som samlas under aktuell nivå.
+   * @type {number}
+   */
   this.m_levelScore = 0;
+
+  /**
+   * Poängkrav för att klara nivån.
+   * @type {number}
+   */
   this.m_scoreLevelComplete = 100;
+
+  /**
+   * Multiplikator/andel för hälsa i poängberäkning.
+   * @type {number}
+   */
   this.m_scoreHealthPercent = 1;
 
-if (avatarData && typeof avatarData === "object") {
+  if (avatarData && typeof avatarData === "object") {
     this.m_avatarData = avatarData;
-} else {
+  } else {
     this.m_avatarData = null;
-}  
+  }
 
+  /**
+   * Highscore-hanterare.
+   * @type {?Object}
+   */
   this.m_highscoreManager = null;
+
+  /**
+   * Ljud som spelas vid highscore.
+   * @type {?Object}
+   */
   this.m_highscoreSound = null;
+
+  /**
+   * Highscore-UI text.
+   * @type {?Object}
+   */
   this.m_highscoreText = null;
+
+  /**
+   * Timer för highscore-notis.
+   * @type {number}
+   */
   this.m_highscoreTimer = 0;
+
+  /**
+   * Flagga för om highscore redan visats.
+   * @type {boolean}
+   */
   this.m_highscoreNotified = false;
 
+  /**
+   * Pausläge för spelet.
+   * @type {boolean}
+   */
   this.m_isPaused = false;
+
+  /**
+   * Titeltext i pausmenyn.
+   * @type {?Object}
+   */
   this.m_pauseTitle = null;
+
+  /**
+   * Pausmeny.
+   * @type {?Object}
+   */
   this.m_pauseMenu = null;
+
+  /**
+   * Overlay för pausläge.
+   * @type {?Object}
+   */
   this.m_pauseOverlay = null;
 
+  /**
+   * Flagga för om spelet är avslutat.
+   * @type {boolean}
+   */
   this.m_gameEnd = false;
+
+  /**
+   * X-position för mållinje/finish.
+   * @type {number}
+   */
   this.m_finishX = 0;
 
+  /**
+   * Bakgrundsmusik.
+   * @type {?Object}
+   */
   this.backgroundMusic = null;
+
+  /**
+   * Meny-/UI-ljud.
+   * @type {?Object}
+   */
   this.menuSound = null;
 
+  /**
+   * Inputhantering för spelet.
+   * @type {?Object}
+   */
   this.m_gameInput = null;
+
+  /**
+   * Kameraobjekt.
+   * @type {?Object}
+   */
   this.camera = null;
+
+  /**
+   * HUD-hanterare.
+   * @type {?Object}
+   */
   this.m_hudHandler = null;
 
+  /**
+   * Flagga för aktiv nedräkning innan start.
+   * @type {boolean}
+   */
   this.m_startCountdownActive = false;
+
+  /**
+   * Timer för nedräkning innan start.
+   * @type {number}
+   */
   this.m_startCountdownTimer = 0;
+
+  /**
+   * Overlay för nedräkning.
+   * @type {?Object}
+   */
   this.m_startCountdownOverlay = null;
+
+  /**
+   * Text för nedräkning.
+   * @type {?Object}
+   */
   this.m_startCountdownText = null;
 
+  /**
+   * Sekvens för level complete-animation/logik.
+   * @type {?Object}
+   */
   this.m_levelCompleteSequence = null;
 };
 
-//------------------------------------------------------------------------------
-// INHERITANCE
-//------------------------------------------------------------------------------
-
 runmysteriet.scene.Game.prototype = Object.create(rune.scene.Scene.prototype);
 runmysteriet.scene.Game.prototype.constructor = runmysteriet.scene.Game;
-//------------------------------------------------------------------------------
-// HIGHSCORE NOTICE
-//------------------------------------------------------------------------------
-
+/**
+ * Skapar textobjektet som används för highscore-notis.
+ * Texten är initialt dold och visas endast vid nytt rekord.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.Game.prototype.createHighscoreNotice = function() {
 
+    /**
+     * Textfält som visar "NEW HIGHSCORE!".
+     * @type {rune.text.BitmapField}
+     */
     this.m_highscoreText = new rune.text.BitmapField("NEW HIGHSCORE!");
     this.m_highscoreText.autoSize = true;
     this.m_highscoreText.visible = false;
 
     this.stage.addChild(this.m_highscoreText);
 };
-
+/**
+ * Visar highscore-notis och spelar tillhörande ljud.
+ * Säkerställer att notisen endast visas en gång per nivå.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.Game.prototype.showHighscoreNotice = function() {
 
     if (this.m_highscoreNotified === true) {
@@ -84,6 +271,10 @@ runmysteriet.scene.Game.prototype.showHighscoreNotice = function() {
     this.m_highscoreNotified = true;
     this.m_highscoreTimer = 180;
 
+    /**
+     * Visuellt highscore-textfält.
+     * @type {?rune.text.BitmapField}
+     */
     if (this.m_highscoreText) {
         this.m_highscoreText.visible = true;
         this.m_highscoreText.alpha = 1;
@@ -91,15 +282,38 @@ runmysteriet.scene.Game.prototype.showHighscoreNotice = function() {
         this.m_highscoreText.scaleY = 1;
     }
 
+    /**
+     * Ljud som spelas vid nytt highscore.
+     * @type {?Object}
+     */
     if (this.m_highscoreSound) {
         this.m_highscoreSound.play();
     }
 };
-
+/**
+ * Uppdaterar highscore-notisen (animation, position och fade-out).
+ * Tar hänsyn till kamerans position för korrekt placering i världen.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.Game.prototype.updateHighscoreNotice = function() {
 
+    /**
+     * Kamerans X-position (viewport).
+     * @type {number}
+     */
     var cameraX = 0;
+
+    /**
+     * Kamerans Y-position (viewport).
+     * @type {number}
+     */
     var cameraY = 0;
+
+    /**
+     * Pulsfaktor för animation av texten.
+     * @type {number}
+     */
     var pulse = 0;
 
     if (!this.m_highscoreText || this.m_highscoreText.visible !== true) {
@@ -136,7 +350,12 @@ runmysteriet.scene.Game.prototype.updateHighscoreNotice = function() {
         this.m_highscoreText.scaleY = 1;
     }
 };
-
+/**
+ * Kontrollerar om spelaren har satt ett nytt highscore.
+ *
+ * @param {number} score Aktuell poäng att kontrollera.
+ * @return {void}
+ */
 runmysteriet.scene.Game.prototype.checkHighscoreNotice = function(score) {
 
     if (this.m_highscoreNotified === true) {
@@ -151,12 +370,19 @@ runmysteriet.scene.Game.prototype.checkHighscoreNotice = function(score) {
         this.showHighscoreNotice();
     }
 };
-//------------------------------------------------------------------------------
-// HUD
-//------------------------------------------------------------------------------
 
+/**
+ * Skapar och initialiserar HUD för spelet.
+ * Kopplar samman relevanta spelhandlers och uppdaterar UI.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.Game.prototype.createHUD = function() {
 
+    /**
+     * Handler för HUD (spelinterface).
+     * @type {runmysteriet.handler.HudHandler}
+     */
     this.m_hudHandler = new runmysteriet.handler.HudHandler(
         this.stage,
         this.application,
@@ -172,6 +398,11 @@ runmysteriet.scene.Game.prototype.createHUD = function() {
     this.updateHUD();
 };
 
+/**
+ * Uppdaterar HUD om den finns tillgänglig.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.Game.prototype.updateHUD = function() {
 
     if (this.m_hudHandler) {
@@ -179,20 +410,40 @@ runmysteriet.scene.Game.prototype.updateHUD = function() {
     }
 };
 
-//------------------------------------------------------------------------------
-// INIT
-//------------------------------------------------------------------------------
-
+/**
+ * Initierar Game-scenen och sätter upp hela spelvärlden.
+ * Skapar input, ljud, handlers, spelobjekt, HUD och nivålogik.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.Game.prototype.init = function () {
-  rune.scene.Scene.prototype.init.call(this);
+      rune.scene.Scene.prototype.init.call(this);
 
+
+  /**
+   * Inputhantering för spelaren.
+   * @type {runmysteriet.input.GameInput}
+   */
   this.m_gameInput = new runmysteriet.input.GameInput(this.application);
+
+  /**
+   * Huvudkamera som används i scenen.
+   * @type {?Object}
+   */
   this.camera = this.cameras.getCameraAt(0);
 
-  /*
-   * Musik
+  // Musik
+
+  /**
+   * Bakgrundsmusik för spelet.
+   * @type {?Object}
    */
   this.backgroundMusic = this.application.sounds.sound.get("sound_music");
+
+  /**
+   * Meny-/UI-ljud.
+   * @type {?Object}
+   */
   this.menuSound = this.application.sounds.sound.get("sound_menu");
 
   if (this.backgroundMusic) {
@@ -201,14 +452,25 @@ runmysteriet.scene.Game.prototype.init = function () {
     this.backgroundMusic.play();
   }
 
+  /**
+   * Highscore-hanterare.
+   * @type {runmysteriet.logic.HighscoreManager}
+   */
   this.m_highscoreManager =
       new runmysteriet.logic.HighscoreManager(this.application);
 
+  /**
+   * Ljud som spelas vid highscore.
+   * @type {?Object}
+   */
   this.m_highscoreSound =
       this.application.sounds.sound.get("sound_highscore");
 
-  /*
-   * Bakgrund
+  // Bakgrund
+
+  /**
+   * Handler för bakgrund.
+   * @type {runmysteriet.handler.BackgroundHandler}
    */
   this.m_backgroundHandler = new runmysteriet.handler.BackgroundHandler(
     this.stage,
@@ -219,8 +481,11 @@ runmysteriet.scene.Game.prototype.init = function () {
 
   this.m_backgroundHandler.init();
 
-  /*
-   * Plattformar
+  // Plattformar
+
+  /**
+   * Handler för plattformar.
+   * @type {runmysteriet.handler.PlatformHandler}
    */
   this.m_platformHandler = new runmysteriet.handler.PlatformHandler(
     this.stage,
@@ -232,8 +497,11 @@ runmysteriet.scene.Game.prototype.init = function () {
 
   this.m_finishX = this.m_platformHandler.levelWidth - 50;
 
-  /*
-   * Moln
+  // Moln
+
+  /**
+   * Handler för moln.
+   * @type {runmysteriet.handler.CloudHandler}
    */
   this.m_cloudHandler = new runmysteriet.handler.CloudHandler(
     this.stage,
@@ -243,8 +511,11 @@ runmysteriet.scene.Game.prototype.init = function () {
 
   this.m_cloudHandler.init();
 
-  /*
-   * Spelare
+  // Spelare
+
+  /**
+   * Handler för spelaren.
+   * @type {runmysteriet.handler.PlayerHandler}
    */
   this.m_playerHandler = new runmysteriet.handler.PlayerHandler(
     this.stage,
@@ -257,13 +528,19 @@ runmysteriet.scene.Game.prototype.init = function () {
 
   this.m_playerHandler.init();
 
-  /*
-   * Level config
+  // Level config
+
+  /**
+   * Konfiguration för aktuell nivå.
+   * @type {runmysteriet.config.LevelConfig}
    */
   this.m_levelConfig = new runmysteriet.config.LevelConfig(this.m_levelNumber);
 
-  /*
-   * Fiender
+  // Fiender
+
+  /**
+   * Handler för fiender.
+   * @type {runmysteriet.handler.EnemyHandler}
    */
   this.m_enemyHandler = new runmysteriet.handler.EnemyHandler(this.stage);
 
@@ -274,8 +551,11 @@ runmysteriet.scene.Game.prototype.init = function () {
 
   this.m_playerHandler.setEnemyHandler(this.m_enemyHandler);
 
-  /*
-   * Kamera
+  // Kamera
+
+  /**
+   * Automatisk kamerahantering.
+   * @type {runmysteriet.handler.AutoScrollCameraHandler}
    */
   this.m_cameraHandler = new runmysteriet.handler.AutoScrollCameraHandler(
     this.camera,
@@ -283,47 +563,55 @@ runmysteriet.scene.Game.prototype.init = function () {
     this.m_platformHandler,
     this.m_platformHandler.levelWidth,
     this.m_levelNumber
-);
-  
+  );
 
   this.m_playerHandler.setCamera(this.camera);
   this.m_playerHandler.setCameraHandler(this.m_cameraHandler);
 
-  /*
-   * Sjukdomar / hazards
+  // Sjukdomar
+
+  /**
+   * Handler för sjukdomar/effects.
+   * @type {runmysteriet.handler.DiseaseHandler}
    */
-  this.m_diseaseHandler = new runmysteriet.handler.DiseaseHandler(this.stage, this.application);
+  this.m_diseaseHandler =
+    new runmysteriet.handler.DiseaseHandler(this.stage, this.application);
 
   this.m_diseaseHandler.init(
     this.m_levelNumber,
     this.m_platformHandler.getDiseaseSpawns()
   );
 
-/*
- * Rustning
- */
+  // Rustning
 
-this.m_armorHandler = new runmysteriet.handler.ArmorHandler(
+  /**
+   * Handler för armor.
+   * @type {runmysteriet.handler.ArmorHandler}
+   */
+  this.m_armorHandler = new runmysteriet.handler.ArmorHandler(
     this.stage,
     this.application,
     this.m_levelNumber,
     this.m_platformHandler.getArmorSpawns()
-);
+  );
 
-this.m_armorHandler.init();
+  this.m_armorHandler.init();
 
-this.m_armorHandler.onArmorCollected = function(player, armor) {
+  this.m_armorHandler.onArmorCollected = function(player, armor) {
     if (!player) {
-        return;
+      return;
     }
 
     if (player.maxHp !== undefined) {
-        player.hp = player.maxHp;
+      player.hp = player.maxHp;
     }
-};
+  };
 
-  /*
-   * Sköldar / runor
+  // Sköldar / runor
+
+  /**
+   * Handler för sköldar/runor.
+   * @type {runmysteriet.handler.ShieldHandler}
    */
   this.m_shieldHandler = new runmysteriet.handler.ShieldHandler(
     this.stage,
@@ -335,9 +623,12 @@ this.m_armorHandler.onArmorCollected = function(player, armor) {
 
   this.m_shieldHandler.init();
 
-  /*
-  * Level complete sequence
-  */
+  // Level complete sequence
+
+  /**
+   * Sekvens som hanterar level complete-övergång.
+   * @type {runmysteriet.handler.LevelCompleteSequence}
+   */
   this.m_levelCompleteSequence =
     new runmysteriet.handler.LevelCompleteSequence(
         this.stage,
@@ -346,32 +637,36 @@ this.m_armorHandler.onArmorCollected = function(player, armor) {
         this.m_playerHandler
     );
 
-  /*
-  * HUD
-  */
+  // HUD
+
   this.createHUD();
   this.updateGameInfo();
 
-  /*
- * Highscore notifikation
- */
+  // Highscore notifikation
+
   this.createHighscoreNotice();
 
-  /*
-  * Start countdown.
-  */
+  // Start countdown
+
   this.createStartCountdown();
 };
 
-//------------------------------------------------------------------------------
-// UPDATE
-//------------------------------------------------------------------------------
-
+/**
+ * Uppdaterar Game-scenen varje frame.
+ *
+ * @param {number} step Tidssteg för uppdatering.
+ * @return {void}
+ */
 runmysteriet.scene.Game.prototype.update = function(step) {
-        var input = this.m_gameInput.read(this.keyboard);
-    /*
-     * Debug-snabbval.
+
+    /**
+     * Inläst spelarinput från GameInput.
+     * @type {?Object}
      */
+    var input = this.m_gameInput.read(this.keyboard);
+
+    //Debug-snabbval.
+     
     if (this.keyboard.justPressed("F1")) {
         this.application.scenes.load([
             new runmysteriet.scene.Game(6, this.m_score, this.m_avatarData)
@@ -401,12 +696,13 @@ runmysteriet.scene.Game.prototype.update = function(step) {
         this.updateHUD();
         return;
     }
+
     if (this.m_levelCompleteSequence && this.m_levelCompleteSequence.isActive()) {
         this.m_levelCompleteSequence.update();
 
-    if (this.m_backgroundHandler) {
-        this.m_backgroundHandler.update();
-    }
+        if (this.m_backgroundHandler) {
+            this.m_backgroundHandler.update();
+        }
 
         this.updateHUD();
         return;
@@ -429,57 +725,42 @@ runmysteriet.scene.Game.prototype.update = function(step) {
         this.updateHighscoreNotice();
         this.updateHUD();
         return;
-}
-
-
+    }
 
     rune.scene.Scene.prototype.update.call(this, step);
-
-    /*
-     * Visuella system som inte styr spelaren.
-     */
+     
     if (this.m_cloudHandler) {
         this.m_cloudHandler.update();
     }
 
-    /*
-     * Plattformar / holes.
-     * Detta uppdaterar bland annat lavaeffekten i Hole.
-     */
+    //Plattformar / holes
     if (this.m_platformHandler &&
         typeof this.m_platformHandler.update === "function"
     ) {
         this.m_platformHandler.update(step);
     }
 
-    /*
-     * Spelaren uppdateras före kameran.
-     * Då rör sig avatarerna först.
-     */
+    //Spelaren uppdateras före kameran.
+     
     if (this.m_playerHandler) {
         this.m_playerHandler.update();
     }
 
-    /*
-     * Kollisioner / game logic.
-     */
+    //Kollisioner
     this.updateHoles();
     this.updateEnemies();
     this.updateDiseases(step);
     this.updateArmor();
     this.updateShields();
 
-    /*
-     * Autoscroll-kameran flyttas efter spelaren.
-     */
+    //Autoscroll-kameran flyttas efter spelaren.
+     
     if (this.m_cameraHandler) {
         this.m_cameraHandler.update(step);
     }
 
-    /*
-     * Efter att kameran flyttats:
-     * håll spelare inom kamerans vänster/högerkant.
-     */
+    //Håll spelare inom kamerans vänster/högerkant.
+     
     if (
         this.m_playerHandler &&
         typeof this.m_playerHandler.handleAutoScrollCameraBounds === "function"
@@ -487,34 +768,38 @@ runmysteriet.scene.Game.prototype.update = function(step) {
         this.m_playerHandler.handleAutoScrollCameraBounds();
     }
 
-    /*
-     * Uppdatera Rune-kameran.
-     */
+    //Uppdatera Rune-kameran.
+    
     if (this.camera && typeof this.camera.update === "function") {
         this.camera.update(0);
     }
 
-    /*
-     * Bakgrund efter kamera så den följer rätt.
-     */
+    //Bakgrund efter kamera så den följer rätt.
+     
     if (this.m_backgroundHandler) {
         this.m_backgroundHandler.update();
     }
 
-    /*
-     * Kolla level completion efter att kamera/bounds är rättade.
-     */
+    //Kolla level completion efter att kamera/bounds är rättade.
+     
     this.checkLevelCompletion();
     this.updateGameInfo();
     this.updateHighscoreNotice();
     this.updateHUD();
 };
 
-//------------------------------------------------------------------------------
-// UPDATE HELPERS
-//------------------------------------------------------------------------------
-
+/**
+ * Uppdaterar hål i plattformarna och hanterar död vid kontakt.
+ * Använder callback för att eliminera spelare som faller i hål.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.Game.prototype.updateHoles = function () {
+
+  /**
+   * Referens till aktuell scene (för callback-scope).
+   * @type {runmysteriet.scene.Game}
+   */
   var self = this;
 
   if (this.m_platformHandler && this.m_playerHandler) {
@@ -527,33 +812,50 @@ runmysteriet.scene.Game.prototype.updateHoles = function () {
   }
 };
 
+/**
+ * Uppdaterar fiender och skickar in spelarobjekt för kollision/logik.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.Game.prototype.updateEnemies = function () {
   if (this.m_enemyHandler && this.m_playerHandler) {
     this.m_enemyHandler.update(this.m_playerHandler.players);
   }
 };
 
+/**
+ * Uppdaterar sköld-/runehanteraren och skickar in spelare för kollisioner.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.Game.prototype.updateShields = function () {
   if (this.m_shieldHandler && this.m_playerHandler) {
     this.m_shieldHandler.update(this.m_playerHandler.players);
   }
 };
 
+/**
+ * Uppdaterar sjukdoms-/effekthanteraren och skickar in spelare samt tidssteg.
+ *
+ * @param {number} step Tidssteg (delta time) för uppdatering.
+ * @return {void}
+ */
 runmysteriet.scene.Game.prototype.updateDiseases = function (step) {
   if (this.m_diseaseHandler && this.m_playerHandler) {
     this.m_diseaseHandler.update(this.m_playerHandler.players, step);
   }
 };
 
+/**
+ * Uppdaterar armor-hanteraren och skickar in spelare för kollision/logik.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.Game.prototype.updateArmor = function () {
   if (this.m_armorHandler && this.m_playerHandler) {
     this.m_armorHandler.update(this.m_playerHandler.players);
   }
 };
-
-//------------------------------------------------------------------------------
-// START COUNTDOWN
-//------------------------------------------------------------------------------
 
 /**
  * Skapar start-countdown innan spelet börjar.
@@ -573,9 +875,8 @@ runmysteriet.scene.Game.prototype.createStartCountdown = function() {
         cameraY = this.camera.viewport.y;
     }
 
-    /*
-     * Mörk overlay som ger blur-/pauskänsla.
-     */
+    //Mörk overlay som ger blur-/pauskänsla.
+     
     this.m_startCountdownOverlay = new rune.display.Graphic(
         cameraX,
         cameraY,
@@ -588,9 +889,8 @@ runmysteriet.scene.Game.prototype.createStartCountdown = function() {
 
     this.stage.addChild(this.m_startCountdownOverlay);
 
-    /*
-     * Countdown-text.
-     */
+    //Countdown-text.
+     
     this.m_startCountdownText = new rune.text.BitmapField("3");
     this.m_startCountdownText.autoSize = true;
 
@@ -598,9 +898,8 @@ runmysteriet.scene.Game.prototype.createStartCountdown = function() {
 
     this.updateStartCountdownPosition();
 
-    /*
-     * Pausa tweens under countdown så båt/flotte inte börjar röra sig direkt.
-     */
+    //Pausa tweens under countdown så båt/flotte inte börjar röra sig direkt.
+     
     if (this.tweens) {
         this.tweens.paused = true;
     }
@@ -692,13 +991,19 @@ runmysteriet.scene.Game.prototype.closeStartCountdown = function() {
         this.tweens.paused = false;
     }
 };
-
-//------------------------------------------------------------------------------
-// VOLUME
-//------------------------------------------------------------------------------
-
+/**
+ * Hanterar volyminmatning under spelets gång.
+ * Justerar bakgrundsmusikens volym upp eller ner i steg.
+ *
+ * @param {?Object} input Inläst spelarinput.
+ * @return {void}
+ */
 runmysteriet.scene.Game.prototype.updateVolumeInput = function(input) {
 
+    /**
+     * Stegstorlek för volymändring.
+     * @type {number}
+     */
     var stepVol = 0.1;
 
     if (!input || !this.backgroundMusic) {
@@ -712,6 +1017,7 @@ runmysteriet.scene.Game.prototype.updateVolumeInput = function(input) {
         if (this.backgroundMusic.volume > 1) {
             this.backgroundMusic.volume = 0;
         }
+
         return;
     }
 
@@ -726,13 +1032,19 @@ runmysteriet.scene.Game.prototype.updateVolumeInput = function(input) {
         console.log("Volym:", this.backgroundMusic.volume.toFixed(2));
     }
 };
-
-//------------------------------------------------------------------------------
-// PAUSE
-//------------------------------------------------------------------------------
-
+/**
+ * Hanterar input för pausmenyn.
+ * Öppnar/stänger paus, samt hanterar menyval när spelet är pausat.
+ *
+ * @param {?Object} input Inläst spelarinput.
+ * @return {void}
+ */
 runmysteriet.scene.Game.prototype.updatePauseInput = function(input) {
 
+    /**
+     * Säkerställer att spelet inte är pauslogik om spelet redan är avslutat.
+     * @type {boolean}
+     */
     if (this.m_gameEnd === true) {
         return;
     }
@@ -758,7 +1070,7 @@ runmysteriet.scene.Game.prototype.updatePauseInput = function(input) {
 
     this.updatePauseMenuPosition();
 
-    this.handleMenuListInput(this.m_pauseMenu, 
+    this.handleMenuListInput(this.m_pauseMenu,
       input,
       function(selectedIndex) {
         if (selectedIndex === 0) {
@@ -768,12 +1080,22 @@ runmysteriet.scene.Game.prototype.updatePauseInput = function(input) {
         }
     });
 };
-
+/**
+ * Skapar pausmeny med overlay, titel och menyval.
+ * Används för att stoppa spelet och visa paus-UI.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.Game.prototype.createPauseMenu = function () {
+
   if (this.m_pauseMenu) {
     return;
   }
 
+  /**
+   * Mörk bakgrunds-overlay som visas vid paus.
+   * @type {rune.display.Graphic}
+   */
   this.m_pauseOverlay = new rune.display.Graphic(
     0,
     0,
@@ -787,12 +1109,20 @@ runmysteriet.scene.Game.prototype.createPauseMenu = function () {
 
   this.stage.addChild(this.m_pauseOverlay);
 
+  /**
+   * Titeltext för pausmenyn.
+   * @type {rune.text.BitmapField}
+   */
   this.m_pauseTitle = new rune.text.BitmapField("GAME PAUSED");
   this.m_pauseTitle.autoSize = true;
   this.m_pauseTitle.visible = false;
 
   this.stage.addChild(this.m_pauseTitle);
 
+  /**
+   * Menylista för pausalternativ.
+   * @type {runmysteriet.ui.graphic.MenuList}
+   */
   this.m_pauseMenu = new runmysteriet.ui.graphic.MenuList(
     this.stage,
     this.application,
@@ -805,6 +1135,12 @@ runmysteriet.scene.Game.prototype.createPauseMenu = function () {
   this.m_pauseMenu.setVisible(false);
 };
 
+/**
+ * Öppnar pausmenyn och stoppar spelets aktivitet.
+ * Visar overlay, titel och meny samt pausar animationer och musik.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.Game.prototype.openPauseMenu = function () {
   this.m_isPaused = true;
 
@@ -834,7 +1170,12 @@ runmysteriet.scene.Game.prototype.openPauseMenu = function () {
     this.backgroundMusic.pause();
   }
 };
-
+/**
+ * Stänger pausmenyn och återupptar spelet.
+ * Döljer UI-element och återstartar animationer och musik.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.Game.prototype.closePauseMenu = function () {
   this.m_isPaused = false;
 
@@ -858,8 +1199,18 @@ runmysteriet.scene.Game.prototype.closePauseMenu = function () {
     this.backgroundMusic.play();
   }
 };
-
+/**
+ * Uppdaterar positionen för pausmenyn så den följer kamerans viewport.
+ * Säkerställer att overlay, titel och meny ligger korrekt vid scroll.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.Game.prototype.updatePauseMenuPosition = function () {
+
+  /**
+   * Aktiv kamera som används för positionering.
+   * @type {?Object}
+   */
   var camera = this.cameras.getCameraAt(0);
 
   if (!camera) {
@@ -880,7 +1231,12 @@ runmysteriet.scene.Game.prototype.updatePauseMenuPosition = function () {
     this.m_pauseMenu.setCameraPosition(camera, 170, 115);
   }
 };
-
+/**
+ * Avslutar spelet och återgår till huvudmenyn.
+ * Stoppar musik och markerar spelet som avslutat innan scenbyte.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.Game.prototype.quitToMenu = function () {
   this.m_gameEnd = true;
 
@@ -894,7 +1250,12 @@ runmysteriet.scene.Game.prototype.quitToMenu = function () {
 
   this.application.scenes.load([new runmysteriet.scene.Menu()]);
 };
-
+/**
+ * Spelar upp meny-ljudet vid UI-interaktion.
+ * Hämtar ljudet från sound-systemet och spelar det om det finns.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.Game.prototype.playMenuSound = function () {
   var menuSound = this.application.sounds.sound.get("sound_menu");
 
@@ -902,7 +1263,15 @@ runmysteriet.scene.Game.prototype.playMenuSound = function () {
     menuSound.play();
   }
 };
-
+/**
+ * Hanterar input för en menylista (upp/ner/val).
+ * Flyttar markering och anropar callback vid val.
+ *
+ * @param {Object} menuList Menyobjekt som hanterar valbara alternativ.
+ * @param {?Object} input Inläst spelarinput.
+ * @param {Function} onChoose Callback som körs vid val av menyitem.
+ * @return {void}
+ */
 runmysteriet.scene.Game.prototype.handleMenuListInput = function(menuList, input, onChoose) {
 
     if (!menuList || !input) {
@@ -924,10 +1293,12 @@ runmysteriet.scene.Game.prototype.handleMenuListInput = function(menuList, input
     }
 };
 
-//------------------------------------------------------------------------------
-// GAME INFO
-//------------------------------------------------------------------------------
-
+/**
+ * Uppdaterar spelinformation i HUD (score och målstatus).
+ * Visar nivå, totalpoäng samt status för runor.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.Game.prototype.updateGameInfo = function() {
 
     if (!this.m_hudHandler) {
@@ -945,10 +1316,12 @@ runmysteriet.scene.Game.prototype.updateGameInfo = function() {
         " SCORE " + this.getTotalScore()
     );
 };
-//------------------------------------------------------------------------------
-// LEVEL COMPLETION
-//------------------------------------------------------------------------------
-
+/**
+ * Kontrollerar om spelet ska avslutas genom vinst eller förlust.
+ * Kollar om någon spelare nått slutzon eller om alla spelare är döda.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.Game.prototype.checkLevelCompletion = function () {
   var players = null;
   var player = null;
@@ -983,6 +1356,12 @@ runmysteriet.scene.Game.prototype.checkLevelCompletion = function () {
   }
 };
 
+/**
+ * Kontrollerar om en specifik spelare har nått slutzonen.
+ *
+ * @param {Object} player Spelare som ska kontrolleras.
+ * @return {boolean} True om spelaren är i slutzonen, annars false.
+ */
 runmysteriet.scene.Game.prototype.hasPlayerReachedEndZone = function (player) {
   var endZones = null;
   var endZone = null;
@@ -1012,11 +1391,12 @@ runmysteriet.scene.Game.prototype.hasPlayerReachedEndZone = function (player) {
 
   return false;
 };
-
-//------------------------------------------------------------------------------
-// PLAYER DEATH
-//------------------------------------------------------------------------------
-
+/**
+ * Kontrollerar om alla spelare är döda.
+ * Används för att avgöra om spelet ska avslutas som förlust.
+ *
+ * @return {boolean} True om alla spelare är döda, annars false.
+ */
 runmysteriet.scene.Game.prototype.areAllPlayersDead = function () {
   var players = null;
   var i = 0;
@@ -1040,10 +1420,13 @@ runmysteriet.scene.Game.prototype.areAllPlayersDead = function () {
   return true;
 };
 
-//------------------------------------------------------------------------------
-// SCORE
-//------------------------------------------------------------------------------
-
+/**
+ * Lägger till poäng till aktuell nivå.
+ * Uppdaterar även highscore-kontroll efter poängtillägg.
+ *
+ * @param {number} amount Antal poäng som ska läggas till.
+ * @return {void}
+ */
 runmysteriet.scene.Game.prototype.addScore = function(amount) {
 
     amount = parseInt(amount, 10) || 0;
@@ -1055,12 +1438,22 @@ runmysteriet.scene.Game.prototype.addScore = function(amount) {
     this.m_levelScore += amount;
     this.checkHighscoreNotice(this.getTotalScore());
 };
-
+/**
+ * Hämtar spelarens totala poäng.
+ * Summerar tidigare poäng och poäng från aktuell nivå.
+ *
+ * @return {number} Totalpoäng.
+ */
 runmysteriet.scene.Game.prototype.getTotalScore = function() {
 
     return this.m_score + this.m_levelScore;
 };
-
+/**
+ * Beräknar poäng baserat på spelarnas hälsa.
+ * Omvandlar HP till procent och viktar det till en score-del.
+ *
+ * @return {number} Hälsobaserad poängsumma.
+ */
 runmysteriet.scene.Game.prototype.getHealthScore = function() {
 
     var players = null;
@@ -1116,15 +1509,36 @@ runmysteriet.scene.Game.prototype.getHealthScore = function() {
     return score;
 };
 
-//------------------------------------------------------------------------------
-// WIN / LOSE
-//------------------------------------------------------------------------------
-
+/**
+ * Hanterar vinst i spelet och startar level complete-sekvensen.
+ *
+ * @param {Object} winningPlayer Spelaren som nådde målet.
+ * @return {void}
+ */
 runmysteriet.scene.Game.prototype.winGame = function(winningPlayer) {
 
+    /**
+     * Referens till scenen för callbacks.
+     * @type {runmysteriet.scene.Game}
+     */
     var self = this;
+
+    /**
+     * Poäng som tjänats under denna nivå.
+     * @type {number}
+     */
     var earnedScore = 0;
+
+    /**
+     * Totalpoäng efter nivåslut.
+     * @type {number}
+     */
     var totalScore = 0;
+
+    /**
+     * Data från gissningssystemet (runor/sköldar).
+     * @type {?Object}
+     */
     var guessData = null;
 
     if (this.m_gameEnd === true) {
@@ -1133,9 +1547,7 @@ runmysteriet.scene.Game.prototype.winGame = function(winningPlayer) {
 
     this.m_gameEnd = true;
 
-    /*
-     * Lägg till level complete-score och health bonus.
-     */
+    // Lägg till level complete-score och health bonus.
     this.addScore(
         this.m_scoreLevelComplete + this.getHealthScore()
     );
@@ -1150,19 +1562,14 @@ runmysteriet.scene.Game.prototype.winGame = function(winningPlayer) {
         guessData = this.m_shieldHandler.getGuessData();
     }
 
-    /*
-     * Pausa rörelser som båtar/flottar under segersekvensen.
-     */
+    // Pausa rörelser som båtar/flottar under segersekvensen.
     if (this.tweens) {
         this.tweens.paused = true;
     }
 
     this.stopSound(this.backgroundMusic);
 
-    /*
-     * Starta segersekvensen.
-     * GuessWord laddas först när sekvensen är klar.
-     */
+    // Starta segersekvensen
     if (
         this.m_levelCompleteSequence &&
         typeof this.m_levelCompleteSequence.start === "function"
@@ -1191,9 +1598,7 @@ runmysteriet.scene.Game.prototype.winGame = function(winningPlayer) {
         return;
     }
 
-    /*
-     * Fallback om sekvensen saknas.
-     */
+    // Fallback om sekvensen saknas.
     this.application.scenes.load([
         new runmysteriet.scene.GuessWord(
             this.m_levelNumber,
@@ -1204,6 +1609,13 @@ runmysteriet.scene.Game.prototype.winGame = function(winningPlayer) {
         )
     ]);
 };
+/**
+ * Hanterar förlust i spelet och byter till Game Over-scenen.
+ * Stoppar musik och skickar med slutpoäng samt orsak.
+ *
+ * @param {string=} reason Orsak till game over (valfri).
+ * @return {void}
+ */
 runmysteriet.scene.Game.prototype.loseGame = function(reason) {
 
     if (this.m_gameEnd === true) {
@@ -1221,10 +1633,12 @@ runmysteriet.scene.Game.prototype.loseGame = function(reason) {
         )
     ]);
 };
-//------------------------------------------------------------------------------
-// RUNES
-//------------------------------------------------------------------------------
-
+/**
+ * Kontrollerar om alla runor/sköldar har samlats in.
+ * Använder ShieldHandler för att avgöra om spelet är klart.
+ *
+ * @return {boolean} True om alla runor är insamlade, annars false.
+ */
 runmysteriet.scene.Game.prototype.allRunesColected = function () {
   if (!this.m_shieldHandler) {
     return false;
@@ -1232,14 +1646,30 @@ runmysteriet.scene.Game.prototype.allRunesColected = function () {
 
   return this.m_shieldHandler.allRunesColected();
 };
-
-//------------------------------------------------------------------------------
-// REVIVE
-//------------------------------------------------------------------------------
-
+/**
+ * Återupplivar döda spelare efter vinst
+ *
+ * @param {Object=} winningPlayer Spelaren som vann (används för positionering).
+ * @return {void}
+ */
 runmysteriet.scene.Game.prototype.reviveDeadPlayers = function (winningPlayer) {
+
+  /**
+   * Lista med spelare från PlayerHandler.
+   * @type {?Array}
+   */
   var players = null;
+
+  /**
+   * Aktuell spelare i loopen.
+   * @type {?Object}
+   */
   var player = null;
+
+  /**
+   * Loopindex.
+   * @type {number}
+   */
   var i = 0;
 
   if (!this.m_playerHandler) {
@@ -1281,11 +1711,14 @@ runmysteriet.scene.Game.prototype.reviveDeadPlayers = function (winningPlayer) {
   }
 };
 
-//------------------------------------------------------------------------------
-// RESTART LEVEL
-//------------------------------------------------------------------------------
-
+/**
+ * Startar om nuvarande nivå genom att rensa och återskapa fiender.
+ * Återinitialiserar LevelConfig och kopplar om EnemyHandler till spelaren.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.Game.prototype.restartLevel = function () {
+
   if (this.m_enemyHandler) {
     this.m_enemyHandler.clear();
   }
@@ -1304,9 +1737,6 @@ runmysteriet.scene.Game.prototype.restartLevel = function () {
   }
 };
 
-//------------------------------------------------------------------------------
-// REMOVE DISPLAY OBJECT
-//------------------------------------------------------------------------------
 
 /**
  * Tar bort ett objekt från scenen om det finns där.
@@ -1329,10 +1759,6 @@ runmysteriet.scene.Game.prototype.removeDisplayObject = function(object) {
         object.stage.removeChild(object);
     }
 };
-
-//------------------------------------------------------------------------------
-// SOUND
-//------------------------------------------------------------------------------
 
 /**
  * Stoppar ett Rune-ljud säkert.
@@ -1367,10 +1793,6 @@ runmysteriet.scene.Game.prototype.stopSound = function(sound) {
     }
 };
 
-//------------------------------------------------------------------------------
-// DISPOSE
-//------------------------------------------------------------------------------
-
 /**
  * Rensar Game-scenen.
  *
@@ -1381,9 +1803,7 @@ runmysteriet.scene.Game.prototype.stopSound = function(sound) {
  */
 runmysteriet.scene.Game.prototype.dispose = function() {
 
-    /*
-     * Start countdown skapades sist i init.
-     */
+    //Start countdown skapades sist i init.
     this.m_startCountdownActive = false;
     this.m_startCountdownTimer = 0;
 
@@ -1393,9 +1813,8 @@ runmysteriet.scene.Game.prototype.dispose = function() {
     this.m_startCountdownText = null;
     this.m_startCountdownOverlay = null;
 
-    /*
-     * Highscore notification.
-     */
+    //Highscore notification.
+     
     this.removeDisplayObject(this.m_highscoreText);
 
     this.m_highscoreText = null;
@@ -1404,9 +1823,8 @@ runmysteriet.scene.Game.prototype.dispose = function() {
     this.m_highscoreTimer = 0;
     this.m_highscoreNotified = false;
 
-    /*
-     * Pause UI kan ha skapats senare under spelet.
-     */
+    //Pause UI kan ha skapats senare under spelet.
+     
     if (this.m_pauseMenu) {
         if (typeof this.m_pauseMenu.dispose === "function") {
             this.m_pauseMenu.dispose();
@@ -1423,9 +1841,8 @@ runmysteriet.scene.Game.prototype.dispose = function() {
     this.m_pauseOverlay = null;
     this.m_isPaused = false;
 
-    /*
-     * Level complete sequence.
-     */
+    //Level complete sequence.
+     
     if (this.m_levelCompleteSequence) {
         if (typeof this.m_levelCompleteSequence.dispose === "function") {
             this.m_levelCompleteSequence.dispose();
@@ -1436,9 +1853,8 @@ runmysteriet.scene.Game.prototype.dispose = function() {
 
     this.m_levelCompleteSequence = null;
 
-    /*
-     * HUD skapades efter shields.
-     */
+    //HUD skapades efter shields.
+     
     if (this.m_hudHandler) {
         if (typeof this.m_hudHandler.dispose === "function") {
             this.m_hudHandler.dispose();
@@ -1449,9 +1865,8 @@ runmysteriet.scene.Game.prototype.dispose = function() {
 
     this.m_hudHandler = null;
 
-    /*
-     * Shields / runor.
-     */
+    //Shields / runor.
+     
     if (this.m_shieldHandler) {
         if (typeof this.m_shieldHandler.dispose === "function") {
             this.m_shieldHandler.dispose();
@@ -1462,9 +1877,8 @@ runmysteriet.scene.Game.prototype.dispose = function() {
 
     this.m_shieldHandler = null;
 
-    /*
-     * Armor.
-     */
+    //Armor.
+     
     if (this.m_armorHandler) {
         if (typeof this.m_armorHandler.dispose === "function") {
             this.m_armorHandler.dispose();
@@ -1475,9 +1889,8 @@ runmysteriet.scene.Game.prototype.dispose = function() {
 
     this.m_armorHandler = null;
 
-    /*
-     * Sjukdomar.
-     */
+    //Sjukdomar.
+     
     if (this.m_diseaseHandler) {
         if (typeof this.m_diseaseHandler.dispose === "function") {
             this.m_diseaseHandler.dispose();
@@ -1488,14 +1901,10 @@ runmysteriet.scene.Game.prototype.dispose = function() {
 
     this.m_diseaseHandler = null;
 
-    /*
-     * Kamera-handler äger inga stage-objekt, men referensen ska släppas.
-     */
     this.m_cameraHandler = null;
 
-    /*
-     * Fiender
-     */
+    //Fiender
+     
     if (this.m_enemyHandler) {
         if (typeof this.m_enemyHandler.dispose === "function") {
             this.m_enemyHandler.dispose();
@@ -1506,14 +1915,12 @@ runmysteriet.scene.Game.prototype.dispose = function() {
 
     this.m_enemyHandler = null;
 
-    /*
-     * Level config
-     */
+    //Level config
+     
     this.m_levelConfig = null;
 
-    /*
-     * Spelare
-     */
+    // Spelare
+     
     if (this.m_playerHandler) {
         if (typeof this.m_playerHandler.dispose === "function") {
             this.m_playerHandler.dispose();
@@ -1524,9 +1931,8 @@ runmysteriet.scene.Game.prototype.dispose = function() {
 
     this.m_playerHandler = null;
 
-    /*
-     * Moln
-     */
+    //Moln
+     
     if (this.m_cloudHandler) {
         if (typeof this.m_cloudHandler.dispose === "function") {
             this.m_cloudHandler.dispose();
@@ -1537,9 +1943,8 @@ runmysteriet.scene.Game.prototype.dispose = function() {
 
     this.m_cloudHandler = null;
 
-    /*
-     * Plattformar, lava, vatten, båtar.
-     */
+    //Plattformar, lava, vatten, båtar.
+     
     if (this.m_platformHandler) {
         if (typeof this.m_platformHandler.dispose === "function") {
             this.m_platformHandler.dispose();
@@ -1550,9 +1955,8 @@ runmysteriet.scene.Game.prototype.dispose = function() {
 
     this.m_platformHandler = null;
 
-    /*
-     * Bakgrund skapas tidigt i init, därför rensas den sent.
-     */
+    //Bakgrund skapas tidigt i init, därför rensas den sent.
+     
     if (this.m_backgroundHandler) {
         if (typeof this.m_backgroundHandler.dispose === "function") {
             this.m_backgroundHandler.dispose();
@@ -1563,21 +1967,16 @@ runmysteriet.scene.Game.prototype.dispose = function() {
 
     this.m_backgroundHandler = null;
 
-    /*
-     * Ljud.
-     */
+    //Ljud.
+     
     this.stopSound(this.backgroundMusic);
 
     this.backgroundMusic = null;
     this.menuSound = null;
 
-    /*
-     * 
-     */
     this.m_gameInput = null;
     this.camera = null;
     this.m_avatarData = null;
 
     rune.scene.Scene.prototype.dispose.call(this);
 };
-

@@ -27,11 +27,6 @@ runmysteriet.scene.LevelComplete = function(
     this.totalScore = totalScore || 0;
     this.earnedScore = earnedScore || 0;
 
-    /*
-     * Säkerhet:
-     * Om gammal kod fortfarande skickar playerName som fjärde parameter
-     * och avatarData som femte, fångar vi upp det här.
-     */
     if (avatarData && typeof avatarData === "object") {
         this.m_avatarData = avatarData;
     } else if (oldAvatarData && typeof oldAvatarData === "object") {
@@ -55,27 +50,37 @@ runmysteriet.scene.LevelComplete = function(
     this.m_totalText = null;
 };
 
-//------------------------------------------------------------------------------
-// INHERITANCE
-//------------------------------------------------------------------------------
-
 runmysteriet.scene.LevelComplete.prototype =
     Object.create(rune.scene.Scene.prototype);
 
 runmysteriet.scene.LevelComplete.prototype.constructor =
     runmysteriet.scene.LevelComplete;
 
-//------------------------------------------------------------------------------
-// INIT
-//------------------------------------------------------------------------------
-
+/**
+ * Initierar LevelComplete-scenen och sätter upp input, ljud och UI.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.LevelComplete.prototype.init = function() {
 
     rune.scene.Scene.prototype.init.call(this);
 
+    /**
+     * Inputhantering för scenen.
+     * @type {runmysteriet.input.GameInput}
+     */
     this.m_gameInput = new runmysteriet.input.GameInput(this.application);
 
+    /**
+     * Ljud för menyinteraktion.
+     * @type {?Object}
+     */
     this.menuSound = this.application.sounds.sound.get("sound_menu");
+
+    /**
+     * Bakgrundsmusik för scenen.
+     * @type {?Object}
+     */
     this.backgroundMusic = this.application.sounds.sound.get("sound_musicMenu");
 
     if (this.backgroundMusic) {
@@ -88,19 +93,28 @@ runmysteriet.scene.LevelComplete.prototype.init = function() {
     this.createMenu();
     this.updateMenu();
 };
-
-//------------------------------------------------------------------------------
-// CREATE
-//------------------------------------------------------------------------------
-
+/**
+ * Skapar textobjekt för LevelComplete-scenen.
+ * Visar nivåstatus samt poänginformation.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.LevelComplete.prototype.createTexts = function() {
 
+    /**
+     * Titeltext som varierar beroende på nivåstatus.
+     * @type {string}
+     */
     var titleText = "";
 
     titleText = (this.levelNumber >= this.maxLevel)
         ? "YOU WON THE WHOLE GAME"
         : "LEVEL " + this.levelNumber + " COMPLETE";
 
+    /**
+     * Titeltext för scenen.
+     * @type {rune.text.BitmapField}
+     */
     this.m_titleText = new rune.text.BitmapField(titleText);
     this.m_titleText.autoSize = true;
     this.m_titleText.center = this.application.screen.center;
@@ -108,6 +122,10 @@ runmysteriet.scene.LevelComplete.prototype.createTexts = function() {
 
     this.stage.addChild(this.m_titleText);
 
+    /**
+     * Text som visar poäng som tjänats i nivån.
+     * @type {rune.text.BitmapField}
+     */
     this.m_earnedText = new rune.text.BitmapField(
         "EARNED SCORE +" + this.earnedScore
     );
@@ -118,6 +136,10 @@ runmysteriet.scene.LevelComplete.prototype.createTexts = function() {
 
     this.stage.addChild(this.m_earnedText);
 
+    /**
+     * Text som visar totalpoäng.
+     * @type {rune.text.BitmapField}
+     */
     this.m_totalText = new rune.text.BitmapField(
         "TOTAL SCORE " + this.totalScore
     );
@@ -129,12 +151,19 @@ runmysteriet.scene.LevelComplete.prototype.createTexts = function() {
     this.stage.addChild(this.m_totalText);
 };
 
-//------------------------------------------------------------------------------
-// UPDATE
-//------------------------------------------------------------------------------
-
+/**
+ * Uppdaterar LevelComplete-scenen varje frame.
+ * Hanterar input, volym och meny-navigering.
+ *
+ * @param {number} step Tidssteg (delta time) för uppdatering.
+ * @return {void}
+ */
 runmysteriet.scene.LevelComplete.prototype.update = function(step) {
 
+    /**
+     * Inläst spelarinput.
+     * @type {?Object}
+     */
     var input = null;
 
     rune.scene.Scene.prototype.update.call(this, step);
@@ -180,13 +209,19 @@ runmysteriet.scene.LevelComplete.prototype.update = function(step) {
         this.goToMenu();
     }
 };
-
-//------------------------------------------------------------------------------
-// VOLUME
-//------------------------------------------------------------------------------
-
+/**
+ * Hanterar volyminmatning i LevelComplete-scenen.
+ * Justerar bakgrundsmusikens volym baserat på input.
+ *
+ * @param {?Object} input Inläst spelarinput.
+ * @return {void}
+ */
 runmysteriet.scene.LevelComplete.prototype.updateVolumeInput = function(input) {
 
+    /**
+     * Stegstorlek för volymjustering.
+     * @type {number}
+     */
     var stepVol = 0.1;
 
     if (!input || !this.backgroundMusic) {
@@ -211,15 +246,30 @@ runmysteriet.scene.LevelComplete.prototype.updateVolumeInput = function(input) {
         }
     }
 };
-
-//------------------------------------------------------------------------------
-// MENU
-//------------------------------------------------------------------------------
-
+/**
+ * Skapar menyalternativ för LevelComplete-scenen.
+ * Anpassar valen beroende på om sista nivån är klar.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.LevelComplete.prototype.createMenu = function() {
 
+    /**
+     * Lista med textetiketter för menyn.
+     * @type {Array.<string>}
+     */
     var labels = null;
+
+    /**
+     * Loopräknare.
+     * @type {number}
+     */
     var i = 0;
+
+    /**
+     * Tillfälligt menyobjekt (textfält).
+     * @type {?rune.text.BitmapField}
+     */
     var item = null;
 
     labels = (this.levelNumber < this.maxLevel)
@@ -236,12 +286,30 @@ runmysteriet.scene.LevelComplete.prototype.createMenu = function() {
         this.stage.addChild(item);
         this.menuItems.push(item);
     }
-};
-
+};/**
+ * Uppdaterar menyn i LevelComplete-scenen.
+ * Markerar valt alternativ med en indikator.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.LevelComplete.prototype.updateMenu = function() {
 
+    /**
+     * Loopräknare.
+     * @type {number}
+     */
     var i = 0;
+
+    /**
+     * Referens till aktuellt menyobjekt.
+     * @type {?rune.text.BitmapField}
+     */
     var item = null;
+
+    /**
+     * Rensad text utan markör.
+     * @type {string}
+     */
     var text = "";
 
     for (i = 0; i < this.menuItems.length; i++) {
@@ -259,10 +327,12 @@ runmysteriet.scene.LevelComplete.prototype.updateMenu = function() {
     }
 };
 
-//------------------------------------------------------------------------------
-// CHOOSE
-//------------------------------------------------------------------------------
-
+/**
+ * Utför vald menyhandling i LevelComplete-scenen.
+ * Startar nästa nivå eller går tillbaka till huvudmenyn.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.LevelComplete.prototype.chooseSelected = function() {
 
     if (this.levelNumber < this.maxLevel && this.selectedIndex === 0) {
@@ -281,11 +351,11 @@ runmysteriet.scene.LevelComplete.prototype.chooseSelected = function() {
 
     this.goToMenu();
 };
-
-//------------------------------------------------------------------------------
-// NAVIGATION
-//------------------------------------------------------------------------------
-
+/**
+ * Byter till huvudmenyn och stoppar bakgrundsmusiken.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.LevelComplete.prototype.goToMenu = function() {
 
     this.stopBackgroundMusic();
@@ -294,18 +364,22 @@ runmysteriet.scene.LevelComplete.prototype.goToMenu = function() {
         new runmysteriet.scene.Menu()
     ]);
 };
-
-//------------------------------------------------------------------------------
-// SOUND
-//------------------------------------------------------------------------------
-
+/**
+ * Spelar upp meny-ljud om det finns tillgängligt.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.LevelComplete.prototype.playMenuSound = function() {
 
     if (this.menuSound && typeof this.menuSound.play === "function") {
         this.menuSound.play();
     }
 };
-
+/**
+ * Stoppar bakgrundsmusiken i scenen genom att pausa dess mediaelement.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.LevelComplete.prototype.stopBackgroundMusic = function() {
 
     if (
@@ -316,10 +390,6 @@ runmysteriet.scene.LevelComplete.prototype.stopBackgroundMusic = function() {
         this.backgroundMusic.m_source.mediaElement.pause();
     }
 };
-
-//------------------------------------------------------------------------------
-// REMOVE DISPLAY OBJECT
-//------------------------------------------------------------------------------
 
 /**
  * Tar bort objekt från stage.
@@ -343,12 +413,18 @@ runmysteriet.scene.LevelComplete.prototype.removeDisplayObject = function(object
     }
 };
 
-//------------------------------------------------------------------------------
-// DISPOSE
-//------------------------------------------------------------------------------
-
+/**
+ * Rensar upp LevelComplete-scenen och frigör alla resurser.
+ * Stoppar ljud, tar bort UI-element och nollställer intern data.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.LevelComplete.prototype.dispose = function() {
 
+    /**
+     * Loopräknare för menyobjekt.
+     * @type {number}
+     */
     var i = 0;
 
     this.stopBackgroundMusic();
