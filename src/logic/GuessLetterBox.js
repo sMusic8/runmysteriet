@@ -14,18 +14,37 @@ runmysteriet.logic = runmysteriet.logic || {};
  */
 runmysteriet.logic.GuessLetterBox = function(x, y, index) {
 
+    /** @type {number} */
     this.x = x || 0;
+
+    /** @type {number} */
     this.y = y || 0;
+
+    /** @type {number} */
     this.index = index || 0;
 
+    /** @type {number} */
     this.width = 28;
+
+    /** @type {number} */
     this.height = 28;
 
+    /** @type {?rune.display.Graphic} */
     this.box = null;
+
+    /** @type {?rune.text.BitmapField} */
     this.letterText = null;
+
+    /** @type {?rune.text.BitmapField} */
     this.upArrowText = null;
+
+    /** @type {?rune.text.BitmapField} */
     this.downArrowText = null;
 };
+
+//------------------------------------------------------------------------------
+// CREATE
+//------------------------------------------------------------------------------
 
 /**
  * Skapar boxen och texterna.
@@ -56,10 +75,6 @@ runmysteriet.logic.GuessLetterBox.prototype.create = function(stage) {
     this.letterText.visible = false;
     stage.addChild(this.letterText);
 
-    /*
-     * Använder UP/DN istället för ^ och v,
-     * eftersom vissa bitmap-fonter saknar specialtecken.
-     */
     this.upArrowText = new rune.text.BitmapField("UP");
     this.upArrowText.autoSize = true;
     this.upArrowText.x = this.x + 3;
@@ -75,8 +90,12 @@ runmysteriet.logic.GuessLetterBox.prototype.create = function(stage) {
     stage.addChild(this.downArrowText);
 };
 
+//------------------------------------------------------------------------------
+// LETTER STATE
+//------------------------------------------------------------------------------
+
 /**
- * Visar en bokstav.
+ * Visar en låst/insamlad bokstav.
  *
  * @param {string} letter
  * @return {void}
@@ -104,7 +123,8 @@ runmysteriet.logic.GuessLetterBox.prototype.setPreviewLetter = function(letter) 
 };
 
 /**
- * Tömmer boxen utan att sätta texten till tom sträng.
+ * Tömmer bara den visuella bokstaven i boxen.
+ * Tar inte bort displayobjekten från stage.
  *
  * @return {void}
  */
@@ -167,46 +187,29 @@ runmysteriet.logic.GuessLetterBox.prototype.removeDisplayObject = function(objec
 };
 
 //------------------------------------------------------------------------------
-// CLEAR
-//------------------------------------------------------------------------------
-
-/**
- * Tar bort alla display objects som hör till bokstavsrutan.
- *
- * @return {void}
- */
-runmysteriet.logic.GuessLetterBox.prototype.clear = function() {
-
-    this.removeDisplayObject(this.m_box);
-    this.removeDisplayObject(this.m_text);
-    this.removeDisplayObject(this.m_background);
-    this.removeDisplayObject(this.m_letterText);
-
-    this.m_box = null;
-    this.m_text = null;
-    this.m_background = null;
-    this.m_letterText = null;
-};
-
-//------------------------------------------------------------------------------
 // DISPOSE
 //------------------------------------------------------------------------------
 
 /**
- * Rensar GuessLetterBox helt.
+ * Rensar ut GuessLetterBox helt
  *
  * @return {void}
  */
 runmysteriet.logic.GuessLetterBox.prototype.dispose = function() {
 
-    this.clear();
+    this.removeDisplayObject(this.downArrowText);
+    this.removeDisplayObject(this.upArrowText);
+    this.removeDisplayObject(this.letterText);
+    this.removeDisplayObject(this.box);
 
-    this.m_index = 0;
-    this.m_x = 0;
-    this.m_y = 0;
-    this.m_width = 0;
-    this.m_height = 0;
+    this.box = null;
+    this.letterText = null;
+    this.upArrowText = null;
+    this.downArrowText = null;
 
-    this.m_letter = "";
-    this.m_isActive = false;
+    this.index = 0;
+    this.x = 0;
+    this.y = 0;
+    this.width = 0;
+    this.height = 0;
 };

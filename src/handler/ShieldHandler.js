@@ -151,6 +151,10 @@ runmysteriet.handler.ShieldHandler.prototype.init = function() {
 
         this.m_shields.push(shield);
         this.m_stage.addChild(shield);
+
+        if (typeof shield.createRuneText === "function") {
+            shield.createRuneText(this.m_stage);
+        }
     }
 };
 
@@ -320,6 +324,10 @@ runmysteriet.handler.ShieldHandler.prototype.update = function(players) {
             continue;
         }
 
+        if (typeof shield.updateRuneTextPosition === "function") {
+            shield.updateRuneTextPosition();
+        }
+
         for (j = 0; j < players.length; j++) {
             player = players[j];
 
@@ -392,7 +400,11 @@ runmysteriet.handler.ShieldHandler.prototype.collectShield = function(shield) {
      * Kör inte dispose här, eftersom shield behövs i m_collected
      * för getRuneString().
      */
-    this.removeDisplayOnly(shield);
+    if (typeof shield.remove === "function") {
+        shield.remove();
+    } else {
+        this.removeDisplayOnly(shield);
+    }
 
     index = this.m_shields.indexOf(shield);
 

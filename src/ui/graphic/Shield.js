@@ -21,30 +21,23 @@ runmysteriet.ui.Shield = function(x, y) {
         "shield"
     );
 
-    /*
-     * Vilken bokstav/runa denna shield representerar.
-     */
+    /** @type {string} */
     this.rune = "";
 
-    /*
-     * Index i ordet.
-     */
+    /** @type {number} */
     this.wordIndex = -1;
 
-    /*
-     * Om den redan är insamlad.
-     */
+    /** @type {boolean} */
     this.isCollected = false;
 
-    /*
-     * Används av handlern för att veta om objektet är aktivt.
-     */
+    /** @type {boolean} */
     this.active = true;
 
-    /*
-     * Identifiering.
-     */
+    /** @type {boolean} */
     this.isShield = true;
+
+    /** @type {?rune.text.BitmapField} */
+    this.m_runeText = null;
 };
 
 //------------------------------------------------------------------------------
@@ -70,6 +63,11 @@ runmysteriet.ui.Shield.prototype.constructor =
 runmysteriet.ui.Shield.prototype.setRune = function(rune) {
 
     this.rune = String(rune || "").toUpperCase();
+
+    if (this.m_runeText) {
+        this.m_runeText.text = this.rune || "A";
+        this.updateRuneTextPosition();
+    }
 };
 
 /**
@@ -80,6 +78,46 @@ runmysteriet.ui.Shield.prototype.setRune = function(rune) {
 runmysteriet.ui.Shield.prototype.getRune = function() {
 
     return this.rune;
+};
+
+/**
+ * Skapar texten som visar runan ovanpå shielden.
+ * Texten ligger separat på stage eftersom Graphic inte ska användas
+ * som container här.
+ *
+ * @param {!Object} stage
+ * @return {void}
+ */
+runmysteriet.ui.Shield.prototype.createRuneText = function(stage) {
+
+    if (!stage) {
+        return;
+    }
+
+    if (!this.m_runeText) {
+        this.m_runeText = new rune.text.BitmapField(this.rune || "A");
+        this.m_runeText.autoSize = true;
+        this.m_runeText.scale = 0.75;
+        stage.addChild(this.m_runeText);
+    }
+
+    this.updateRuneTextPosition();
+};
+
+/**
+ * Håller runtexten centrerad på shielden.
+ *
+ * @return {void}
+ */
+runmysteriet.ui.Shield.prototype.updateRuneTextPosition = function() {
+
+    if (!this.m_runeText) {
+        return;
+    }
+
+    this.m_runeText.visible = this.visible !== false;
+    this.m_runeText.x = this.x + 8;
+    this.m_runeText.y = this.y + 7;
 };
 
 //------------------------------------------------------------------------------
@@ -131,11 +169,15 @@ runmysteriet.ui.Shield.prototype.removeDisplayObject = function(object) {
 //------------------------------------------------------------------------------
 
 /**
- * Tar bort shield från stage.
+ * Tar bort shieldens visuella delar från stage.
+ * Behåller rune-data så ShieldHandler fortfarande kan läsa getRune
  *
  * @return {void}
  */
 runmysteriet.ui.Shield.prototype.remove = function() {
+
+    this.removeDisplayObject(this.m_runeText);
+    this.m_runeText = null;
 
     this.removeDisplayObject(this);
 };
