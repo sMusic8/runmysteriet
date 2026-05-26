@@ -31,10 +31,6 @@ runmysteriet.scene.GameOver = function(score, reason) {
     this.m_gameInput = null;
 };
 
-//------------------------------------------------------------------------------
-// INHERITANCE
-//------------------------------------------------------------------------------
-
 runmysteriet.scene.GameOver.prototype =
     Object.create(rune.scene.Scene.prototype);
 
@@ -45,6 +41,11 @@ runmysteriet.scene.GameOver.prototype.constructor =
 // INIT
 //------------------------------------------------------------------------------
 
+/**
+ * Initierar GameOver.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.GameOver.prototype.init = function() {
 
     rune.scene.Scene.prototype.init.call(this);
@@ -74,6 +75,11 @@ runmysteriet.scene.GameOver.prototype.init = function() {
 // CREATE
 //------------------------------------------------------------------------------
 
+/**
+ * Skapar titeltext.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.GameOver.prototype.createTitle = function() {
 
     this.m_title = new rune.text.BitmapField("GAME OVER");
@@ -163,6 +169,12 @@ runmysteriet.scene.GameOver.prototype.positionMenu = function() {
 // UPDATE
 //------------------------------------------------------------------------------
 
+/**
+ * Uppdaterar GameOver.
+ *
+ * @param {number} step
+ * @return {void}
+ */
 runmysteriet.scene.GameOver.prototype.update = function(step) {
 
     var input = null;
@@ -183,6 +195,12 @@ runmysteriet.scene.GameOver.prototype.update = function(step) {
 // INPUT
 //------------------------------------------------------------------------------
 
+/**
+ * Hanterar menyinput.
+ *
+ * @param {!Object} input
+ * @return {void}
+ */
 runmysteriet.scene.GameOver.prototype.handleMenuInput = function(input) {
 
     if (!this.m_menu || !input) {
@@ -255,6 +273,11 @@ runmysteriet.scene.GameOver.prototype.updateVolumeHud = function() {
 // CHOOSE
 //------------------------------------------------------------------------------
 
+/**
+ * Utför valt menyval.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.GameOver.prototype.chooseMenuItem = function() {
 
     var selectedIndex = 0;
@@ -319,10 +342,6 @@ runmysteriet.scene.GameOver.prototype.stopBackgroundMusic = function() {
     }
 };
 
-//------------------------------------------------------------------------------
-// REMOVE DISPLAY OBJECT
-//------------------------------------------------------------------------------
-
 /**
  * Tar bort display object från stage.
  *
@@ -345,10 +364,11 @@ runmysteriet.scene.GameOver.prototype.removeDisplayObject = function(object) {
     }
 };
 
-//------------------------------------------------------------------------------
-// DISPOSE
-//------------------------------------------------------------------------------
-
+/**
+ * Rensar GameOver.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.GameOver.prototype.dispose = function() {
 
     this.stopBackgroundMusic();

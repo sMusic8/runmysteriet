@@ -27,10 +27,10 @@ runmysteriet.logic.NameInput = function(maxLength) {
 //------------------------------------------------------------------------------
 // LETTER SELECTOR
 //------------------------------------------------------------------------------
-
 /**
- * Går till nästa bokstav.
+ * Går till nästa bokstav i alfabetväljaren.
  *
+ * @this {runmysteriet.logic.NameInput}
  * @return {void}
  */
 runmysteriet.logic.NameInput.prototype.nextLetter = function() {
@@ -41,8 +41,9 @@ runmysteriet.logic.NameInput.prototype.nextLetter = function() {
 };
 
 /**
- * Går till föregående bokstav.
+ * Går till föregående bokstav i alfabetväljaren.
  *
+ * @this {runmysteriet.logic.NameInput}
  * @return {void}
  */
 runmysteriet.logic.NameInput.prototype.previousLetter = function() {
@@ -53,9 +54,10 @@ runmysteriet.logic.NameInput.prototype.previousLetter = function() {
 };
 
 /**
- * Hämtar vald bokstav.
+ * Returnerar den aktuellt valda bokstaven från alfabetväljaren.
  *
- * @return {string}
+ * @this {runmysteriet.logic.NameInput}
+ * @return {string} Den valda bokstaven.
  */
 runmysteriet.logic.NameInput.prototype.getSelectedLetter = function() {
 
@@ -77,6 +79,7 @@ runmysteriet.logic.NameInput.prototype.getSelectedLetter = function() {
  */
 runmysteriet.logic.NameInput.prototype.addSelectedLetter = function() {
 
+    // Kontrollera att vi inte överskrider maxlängden
     if (this.m_name.length >= this.m_maxLength) {
         return;
     }
@@ -85,12 +88,14 @@ runmysteriet.logic.NameInput.prototype.addSelectedLetter = function() {
 };
 
 /**
- * Tar bort senaste bokstaven.
+ * Tar bort den sista bokstaven i namnet.
  *
+ * @this {runmysteriet.logic.NameInput}
  * @return {void}
  */
 runmysteriet.logic.NameInput.prototype.removeLastLetter = function() {
 
+    // Kontrollera att det finns något att ta bort
     if (this.m_name.length <= 0) {
         return;
     }

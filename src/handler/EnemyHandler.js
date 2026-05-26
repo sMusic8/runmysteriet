@@ -3,7 +3,7 @@
 //------------------------------------------------------------------------------
 
 /**
- * Handles all enemies in the game world.
+ * Hanterar alla kristna i världen.
  *
  * @constructor
  * @param {!rune.display.Stage} stage
@@ -23,12 +23,8 @@ runmysteriet.handler.EnemyHandler = function(stage) {
     this.enemyBlockers = [];
 };
 
-//------------------------------------------------------------------------------
-// INIT
-//------------------------------------------------------------------------------
-
 /**
- * Initializes enemies for the level.
+ * Initsierar kristna för levlen.
  *
  * @param {!runmysteriet.config.LevelConfig} levelConfig
  * @param {!Array<!Object>} enemySpawns
@@ -63,12 +59,8 @@ runmysteriet.handler.EnemyHandler.prototype.init = function(
     }
 };
 
-//------------------------------------------------------------------------------
-// CREATE ENEMY
-//------------------------------------------------------------------------------
-
 /**
- * Creates a Kristen enemy and a blocker connected to her.
+ * Skapar en kristen.
  *
  * @param {{x: number, y: number, type: string}} spawn
  * @return {!runmysteriet.entity.Kristen}
@@ -142,12 +134,8 @@ runmysteriet.handler.EnemyHandler.prototype.createKristenBlocker = function(
     return blocker;
 };
 
-//------------------------------------------------------------------------------
-// UPDATE
-//------------------------------------------------------------------------------
-
 /**
- * Updates all enemies.
+ * Uppdaterar alla kristna.
  *
  * @param {!Array<!runmysteriet.entity.Player>} players
  * @return {void}

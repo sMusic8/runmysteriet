@@ -1,6 +1,5 @@
 /**
- * Menu list UI component.
- *
+ * Menylistans ui.
  * @constructor
  * @param {!Object} stage
  * @param {!Object} application
@@ -49,10 +48,6 @@ runmysteriet.ui.graphic.MenuList = function(
     this.updateSelection();
 };
 
-//------------------------------------------------------------------------------
-// CREATE
-//------------------------------------------------------------------------------
-
 /**
  *
  * @return {void}
@@ -86,10 +81,6 @@ runmysteriet.ui.graphic.MenuList.prototype.create = function() {
         this.items.push(item);
     }
 };
-
-//------------------------------------------------------------------------------
-// SELECTION
-//------------------------------------------------------------------------------
 
 /**
  * Flyttar markeringen nedåt.
@@ -163,19 +154,15 @@ runmysteriet.ui.graphic.MenuList.prototype.updateSelection = function() {
 };
 
 /**
- * Hämtar markerat index.
+ * Returnerar index för det nuvarande valda menyobjektet.
  *
- * @return {number}
+ * @this {runmysteriet.ui.graphic.MenuList}
+ * @return {number} Det valda indexet i listan.
  */
 runmysteriet.ui.graphic.MenuList.prototype.getSelectedIndex = function() {
 
     return this.selectedIndex;
 };
-
-//------------------------------------------------------------------------------
-// VISIBILITY / POSITION
-//------------------------------------------------------------------------------
-
 /**
  * Visar eller döljer menylistan.
  *

@@ -13,9 +13,8 @@ runmysteriet.ui.graphic.Hole = function(x, y, width, height, fallLimitY) {
 
     rune.display.DisplayObject.call(this, x, y, width, height);
 
-    /*
-     * Hole är logik. Själva lavan ritas av this.lava.
-     */
+    //Hole är logik. Själva lavan ritas av this.lava.
+     
     this.backgroundColor = "#000000";
     this.alpha = 0;
 
@@ -56,10 +55,6 @@ runmysteriet.ui.graphic.Hole.prototype =
 runmysteriet.ui.graphic.Hole.prototype.constructor =
     runmysteriet.ui.graphic.Hole;
 
-//------------------------------------------------------------------------------
-// STAGE
-//------------------------------------------------------------------------------
-
 /**
  * Lägger till hålets lava på stage.
  *
@@ -77,10 +72,6 @@ runmysteriet.ui.graphic.Hole.prototype.addToStage = function(stage) {
     }
 };
 
-//------------------------------------------------------------------------------
-// UPDATE
-//------------------------------------------------------------------------------
-
 /**
  * Uppdaterar lavans visuella effekt.
  *
@@ -95,23 +86,17 @@ runmysteriet.ui.graphic.Hole.prototype.update = function(step) {
 
     this.lava.time += 0.08;
 
-    /*
-     * Väldigt liten rörelse så lavan känns levande.
-     */
+    //Väldigt liten rörelse så lavan känns levande.
+     
     this.lava.y = this.lava.baseY + Math.sin(this.lava.time) * 2;
 
-    /*
-     * Pulsering.
-     */
+    //Pulsering.
+     
     this.lava.alpha = 0.9 + Math.sin(this.lava.time) * 0.15;
 };
 
-//------------------------------------------------------------------------------
-// COLLISION
-//------------------------------------------------------------------------------
-
 /**
- * Check if player is inside hole.
+ * Kollar om en spelare är i hålet
  *
  * @param {!Object} player
  * @return {boolean}
@@ -130,7 +115,7 @@ runmysteriet.ui.graphic.Hole.prototype.isPlayerInside = function(player) {
 };
 
 /**
- * Check if player fell into hole.
+ * Kolla om spelarew föll i hålet
  *
  * @param {!Object} player
  * @return {boolean}

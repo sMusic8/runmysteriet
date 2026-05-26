@@ -20,13 +20,9 @@ runmysteriet.ui.graphic.Raft = function(x, y) {
         20,
         "flotte"
     );
-
-    this.isRaft = true;
-
-    /*
-     * Gör att spelaren kan följa med flotten
-     * när spelaren står ovanpå den.
-     */
+    this.isRaft = true; 
+    //Gör att spelaren kan följa med flotten när spelaren står ovanpå den.
+    
     this.sticky = true;
     this.immovable = true;
 
@@ -70,7 +66,7 @@ runmysteriet.ui.graphic.Raft.prototype.start = function() {
 
     /*
      * VIKTIGT - ta inte bort denna check
-     * annars kan rörelsen startas om varje frame och då hackar flotten.
+     * annars kan rörelsen startas om varje frame och då hackar flotten
      */
     if (this.hasStarted === true || this.hasArrived === true) {
         return;
@@ -91,36 +87,30 @@ runmysteriet.ui.graphic.Raft.prototype.start = function() {
  */
 runmysteriet.ui.graphic.Raft.prototype.update = function(step) {
 
-    /*
-     * Spara position före rörelse.
-     */
+    //Spara position före rörelse.
+     
     this.previousX = this.x;
 
-    /*
-     * Om flotten inte har startat ska den stå still.
-     */
+    //Om flotten inte har startat ska den stå still.
+     
     if (this.hasStarted !== true || this.hasArrived === true) {
         this.deltaX = 0;
         return;
     }
 
-    /*
-     * Flytta flotten mjukt åt höger.
-     */
+    //Flytta flotten mjukt åt höger.
+     
     this.x += this.speed;
 
-    /*
-     * Stoppa vid maxX.
-     */
+    //Stoppa vid maxX.
+     
     if (this.x >= this.maxX) {
         this.x = this.maxX;
         this.hasArrived = true;
     }
 
-    /*
-     * Hur mycket flotten flyttade denna frame.
-     * Spelaren använder detta för att följa med.
-     */
+    //Hur mycket flotten flyttade denna frame. Spelaren använder detta för att följa med.
+     
     this.deltaX = this.x - this.previousX;
 };
 

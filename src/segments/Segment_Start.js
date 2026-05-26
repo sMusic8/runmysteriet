@@ -32,10 +32,6 @@ runmysteriet.segments.Segment_Start = function() {
 
 };
 
-//------------------------------------------------------------------------------
-// PUBLIC METHODS
-//------------------------------------------------------------------------------
-
 /**
  * Skapar startsegmentets mark, lava, sjukdomar, runor och armor.
  *
@@ -68,10 +64,8 @@ runmysteriet.segments.Segment_Start.prototype.ground = function(stage, startX, l
     var runeSpawns = [];
     var armorSpawns = [];
 
-    /*
-     * Bygger startmarken i delar så vi kan ha ett litet lavahål
-     * och en plattform/tile ovanför lavan.
-     */
+    //Bygger startmarken i delar så vi kan ha ett litet lavahål och en plattform/tile ovanför lavan.
+     
     this.addGroundWithLavaAndJumpTile(stage, platforms, holes, segmentStart);
 
     this.addDiseases(diseaseSpawns, segmentStart, levelNumber);
@@ -91,10 +85,6 @@ runmysteriet.segments.Segment_Start.prototype.ground = function(stage, startX, l
     };
 };
 
-//------------------------------------------------------------------------------
-// GROUND
-//------------------------------------------------------------------------------
-
 /**
  * Lägger till startmark, ett litet lavahål och en tile/plattform att hoppa på.
  *
@@ -108,9 +98,8 @@ runmysteriet.segments.Segment_Start.prototype.addGroundWithLavaAndJumpTile = fun
     var x = segmentStart;
     var holeWidth = 96;
 
-    /*
-     * Trygg startmark före lavan.
-     */
+    //Trygg startmark före lavan.
+    
     this.addTiles(
         stage,
         platforms,
@@ -122,17 +111,11 @@ runmysteriet.segments.Segment_Start.prototype.addGroundWithLavaAndJumpTile = fun
 
     x += 6 * this.tileW;
 
-    /*
-     * Litet lavahål.
-     * Hole lägger själv ut sin lava via addToStage().
-     */
+    //Litet lavahål.
+     
     this.addLavaHole(stage, holes, x, holeWidth);
 
-    /*
-     * En tile/plattform ovanför lavan.
-     * Den läggs i platforms-arrayen via addTiles(),
-     * så avataren kan stå och hoppa på den.
-     */
+    //En tile/plattform ovanför lavan.
     this.addTiles(
         stage,
         platforms,
@@ -144,9 +127,8 @@ runmysteriet.segments.Segment_Start.prototype.addGroundWithLavaAndJumpTile = fun
 
     x += holeWidth;
 
-    /*
-     * Mark efter lavan.
-     */
+    //Mark efter lavan.
+     
     this.addTiles(
         stage,
         platforms,
@@ -195,14 +177,12 @@ runmysteriet.segments.Segment_Start.prototype.addLavaHole = function(stage, hole
         200
     );
 
-    /*
-     * Hole lägger själv ut sin lava.
-     */
+    //Hole lägger själv ut sin lava.
+     
     hole.addToStage(stage);
 
-    /*
-     * Hole sparas för dödslogik.
-     */
+    //Hole sparas för dödslogik.
+     
     holes.push(hole);
 };
 
@@ -233,10 +213,6 @@ runmysteriet.segments.Segment_Start.prototype.addTiles = function(stage, platfor
         platforms.push(tile);
     }
 };
-
-//------------------------------------------------------------------------------
-// DISEASES
-//------------------------------------------------------------------------------
 
 /**
  * Returnerar antal sjukdomar baserat på level.
@@ -310,11 +286,14 @@ runmysteriet.segments.Segment_Start.prototype.getDiseasePositions = function(seg
         }
     ];
 };
-
-//------------------------------------------------------------------------------
-// RUNES
-//------------------------------------------------------------------------------
-
+/**
+ * Lägger till rune-positioner i en lista av spawn-punkter.
+ *
+ * @this {runmysteriet.segments.Segment_Start}
+ * @param {!Array<!{x: number, y: number}>} runeSpawns Lista som fylls med rune-positioner.
+ * @param {number} segmentStart Startposition för segmentet på x-axeln.
+ * @return {void}
+ */
 runmysteriet.segments.Segment_Start.prototype.addRuneSpawns = function(runeSpawns, segmentStart) {
     var positions = this.getRunePositions(segmentStart);
     var i = 0;
@@ -324,6 +303,13 @@ runmysteriet.segments.Segment_Start.prototype.addRuneSpawns = function(runeSpawn
     }
 };
 
+/**
+ * Returnerar positioner där runor ska spawnas i Segment_Start.
+ *
+ * @this {runmysteriet.segments.Segment_Start}
+ * @param {number} segmentStart Startposition för segmentet på x-axeln.
+ * @return {!Array<!{x: number, y: number}>} Lista med rune-koordinater.
+ */
 runmysteriet.segments.Segment_Start.prototype.getRunePositions = function(segmentStart) {
     return [
         {
@@ -333,10 +319,14 @@ runmysteriet.segments.Segment_Start.prototype.getRunePositions = function(segmen
     ];
 };
 
-//------------------------------------------------------------------------------
-// ARMOR
-//------------------------------------------------------------------------------
-
+/**
+ * Lägger till armor-positioner i en lista av spawn-punkter.
+ *
+ * @this {runmysteriet.segments.Segment_Start}
+ * @param {!Array<!{x: number, y: number}>} armorSpawns Lista som fylls med armor-positioner.
+ * @param {number} segmentStart Startposition för segmentet på x-axeln.
+ * @return {void}
+ */
 runmysteriet.segments.Segment_Start.prototype.addArmorSpawns = function(armorSpawns, segmentStart) {
     var positions = this.getArmorPositions(segmentStart);
     var i = 0;
@@ -346,6 +336,13 @@ runmysteriet.segments.Segment_Start.prototype.addArmorSpawns = function(armorSpa
     }
 };
 
+/**
+ * Returnerar positioner där armor ska spawnas i Segment_Start.
+ *
+ * @this {runmysteriet.segments.Segment_Start}
+ * @param {number} segmentStart Startposition för segmentet på x-axeln.
+ * @return {!Array<!{x: number, y: number}>} Lista med armor-koordinater.
+ */
 runmysteriet.segments.Segment_Start.prototype.getArmorPositions = function(segmentStart) {
     return [
         {

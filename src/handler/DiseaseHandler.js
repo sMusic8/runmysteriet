@@ -32,20 +32,17 @@ runmysteriet.handler.DiseaseHandler = function(stage, application) {
     }
 };
 
-//------------------------------------------------------------------------------
-// INIT
-//------------------------------------------------------------------------------
-
 /**
- * Initierar sjukdomar från spawnpunkter.
+ * Initierar DiseaseHandler genom att rensa tidigare diseases och skapa nya från spawn-data.
  *
- * @param {number=} levelNumber
- * @param {?Array} diseaseSpawns
+ * @param {number} levelNumber - Aktuellt levelnummer (används för framtida scaling/logic).
+ * @param {!Array<!Object>} diseaseSpawns - Lista med spawnpunkter för diseases.
+ *        
  * @return {void}
  */
-runmysteriet.handler.DiseaseHandler.prototype.init = function(
-    levelNumber,
-    diseaseSpawns
+runmysteriet.handler.DiseaseHandler.prototype.init = function (
+  levelNumber,
+  diseaseSpawns
 ) {
 
     var i = 0;

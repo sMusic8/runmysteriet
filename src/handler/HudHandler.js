@@ -40,12 +40,8 @@ runmysteriet.handler.HudHandler = function(stage, application, cameras) {
     this.m_shieldHandler = null;
 };
 
-//------------------------------------------------------------------------------
-// INIT
-//------------------------------------------------------------------------------
-
 /**
- * Skapar HUD-objekt.
+ * Initierar HUD: skapar textfält, highscore-display och rune UI.
  *
  * @return {void}
  */
@@ -91,27 +87,33 @@ runmysteriet.handler.HudHandler.prototype.init = function() {
 
     this.update();
 };
-
-//------------------------------------------------------------------------------
-// PUBLIC METHODS
-//------------------------------------------------------------------------------
-
 /**
- * Kopplar HUD till ShieldHandler.
+ * Kopplar HUD:en till en ShieldHandler för att uppdatera run-text när något samlas in.
  *
- * @param {?runmysteriet.handler.ShieldHandler} shieldHandler
+ * @param {runmysteriet.handler.ShieldHandler} shieldHandler
  * @return {void}
  */
 runmysteriet.handler.HudHandler.prototype.connectShieldHandler = function(shieldHandler) {
 
+    /** @type {runmysteriet.handler.HudHandler} */
     var self = this;
 
     if (!shieldHandler) {
         return;
     }
 
+    /**
+     * Intern referens till ShieldHandler.
+     * @type {runmysteriet.handler.ShieldHandler}
+     */
     this.m_shieldHandler = shieldHandler;
 
+    /**
+     * Callback: triggas när en rune samlas upp.
+     *
+     * @param {string} text Den aktuella run-strängen
+     * @return {void}
+     */
     shieldHandler.onCollectedChanged = function(text) {
         self.setRuneText(text);
     };
@@ -124,11 +126,22 @@ runmysteriet.handler.HudHandler.prototype.connectShieldHandler = function(shield
  */
 runmysteriet.handler.HudHandler.prototype.update = function() {
 
+    /** @type {rune.camera.Camera} */
     var camera = null;
+
+    /** @type {number} */
     var cameraX = 0;
+
+    /** @type {number} */
     var cameraY = 0;
+
+    /** @type {number} */
     var screenWidth = 0;
+
+    /** @type {number} */
     var screenHeight = 0;
+
+    /** @type {number} */
     var runeBoxWidth = 0;
 
     if (!this.cameras) {
@@ -190,7 +203,7 @@ runmysteriet.handler.HudHandler.prototype.update = function() {
 };
 
 /**
- * Sätter timer-text.
+ * Sätter timertext i HUD om värdet har ändrats.
  *
  * @param {string} text
  * @return {void}
@@ -203,7 +216,7 @@ runmysteriet.handler.HudHandler.prototype.setTimerText = function(text) {
 };
 
 /**
- * Sätter score-text.
+ * Sätter scoretext i HUD om värdet har ändrats.
  *
  * @param {string} text
  * @return {void}
@@ -216,7 +229,8 @@ runmysteriet.handler.HudHandler.prototype.setScoreText = function(text) {
 };
 
 /**
- * Sätter run-text.
+ * Uppdaterar run-text i HUD.
+ *Visar insamlade runor i formatet "RUNES: <text>".
  *
  * @param {string} text
  * @return {void}
@@ -229,7 +243,8 @@ runmysteriet.handler.HudHandler.prototype.setRuneText = function(text) {
 };
 
 /**
- * Laddar om highscore-HUD.
+ * Laddar om highscore-HUD om den finns tillgänglig.
+ * Anropar `reload()` på HighscoreHud-komponenten om metoden existerar.
  *
  * @return {void}
  */
@@ -278,7 +293,17 @@ runmysteriet.handler.HudHandler.prototype.removeDisplayObject = function(object)
         object.stage.removeChild(object);
     }
 };
+    /**
+     * Rensar HUD och kopplade referenser.
+     *
+     * @return {void}
+     */
+runmysteriet.handler.HudHandler.prototype.clear = function() {
 
+        if (this.m_shieldHandler) {
+            this.m_shieldHandler.onCollectedChanged = null;
+        }
+}
 //------------------------------------------------------------------------------
 // CLEAR
 //------------------------------------------------------------------------------
@@ -300,12 +325,12 @@ runmysteriet.handler.HudHandler.prototype.clear = function() {
     this.removeDisplayObject(this.m_scoreText);
     this.removeDisplayObject(this.m_timerText);
 
-    this.m_timerText = null;
-    this.m_scoreText = null;
-    this.m_highscoreHud = null;
+        this.m_timerText = null;
+        this.m_scoreText = null;
+        this.m_highscoreHud = null;
 
-    this.m_runeTextBg = null;
-    this.m_runeText = null;
+        this.m_runeTextBg = null;
+        this.m_runeText = null;
 
     this.m_shieldHandler = null;
 };

@@ -34,10 +34,6 @@ runmysteriet.segments.Segment_4 = function() {
 
 };
 
-//------------------------------------------------------------------------------
-// PUBLIC METHODS
-//------------------------------------------------------------------------------
-
 /**
  * Skapar Segment 4.
  *
@@ -99,10 +95,6 @@ runmysteriet.segments.Segment_4.prototype.ground = function(stage, startX, level
         endX: segmentEnd
     };
 };
-
-//------------------------------------------------------------------------------
-// GROUND
-//------------------------------------------------------------------------------
 
 /**
  * Lägger till startmark.
@@ -176,10 +168,6 @@ runmysteriet.segments.Segment_4.prototype.addTiles = function(stage, platforms, 
     }
 };
 
-//------------------------------------------------------------------------------
-// LAVA
-//------------------------------------------------------------------------------
-
 /**
  * Lägger till lavahål.
  *
@@ -197,14 +185,11 @@ runmysteriet.segments.Segment_4.prototype.addLavaHole = function(stage, holes, x
         200
     );
 
-    /*
-     * Hole lägger själv ut sin lava.
-     */
+    //Hole lägger själv ut sin lava.
     hole.addToStage(stage);
 
-    /*
-     * Hole sparas för dödslogik.
-     */
+    //Hole sparas för dödslogik.
+     
     holes.push(hole);
 };
 
@@ -227,10 +212,6 @@ runmysteriet.segments.Segment_4.prototype.addZigZagPlatforms = function(stage, p
         this.addTiles(stage, platforms, px, py, 2, this.platformTexture);
     }
 };
-
-//------------------------------------------------------------------------------
-// DISEASES
-//------------------------------------------------------------------------------
 
 /**
  * Returnerar antal sjukdomar baserat på level.
@@ -257,7 +238,7 @@ runmysteriet.segments.Segment_4.prototype.getDiseaseCount = function(levelNumber
 };
 
 /**
- * Lägger till sjukdomar på säkra markytor.
+ * Lägger till sjukdomar på olika markytor.
  *
  * @param {!Array<!Object>} diseaseSpawns
  * @param {number} segmentStart
@@ -305,10 +286,14 @@ runmysteriet.segments.Segment_4.prototype.getDiseasePositions = function(segment
     ];
 };
 
-//------------------------------------------------------------------------------
-// RUNES
-//------------------------------------------------------------------------------
-
+/**
+ * Lägger till rune-positioner i en lista av spawn-punkter.
+ *
+ * @this {runmysteriet.segments.Segment_4}
+ * @param {!Array<!{x: number, y: number}>} runeSpawns Lista som fylls med rune-positioner.
+ * @param {number} segmentStart Startposition för segmentet på x-axeln.
+ * @return {void}
+ */
 runmysteriet.segments.Segment_4.prototype.addRuneSpawns = function(runeSpawns, segmentStart) {
     var positions = this.getRunePositions(segmentStart);
     var i = 0;
@@ -318,6 +303,13 @@ runmysteriet.segments.Segment_4.prototype.addRuneSpawns = function(runeSpawns, s
     }
 };
 
+/**
+ * Returnerar positioner där runor ska spawnas i Segment_4.
+ *
+ * @this {runmysteriet.segments.Segment_4}
+ * @param {number} segmentStart Startposition för segmentet på x-axeln.
+ * @return {!Array<!{x: number, y: number}>} Lista med rune-koordinater.
+ */
 runmysteriet.segments.Segment_4.prototype.getRunePositions = function(segmentStart) {
     return [
         {
@@ -335,11 +327,14 @@ runmysteriet.segments.Segment_4.prototype.getRunePositions = function(segmentSta
     ];
 };
 
-
-//------------------------------------------------------------------------------
-// ARMOR
-//------------------------------------------------------------------------------
-
+/**
+ * Lägger till armor-positioner i en lista av spawn-punkter.
+ *
+ * @this {runmysteriet.segments.Segment_4}
+ * @param {!Array<!{x: number, y: number}>} armorSpawns Lista som fylls med armor-positioner.
+ * @param {number} segmentStart Startposition för segmentet på x-axeln.
+ * @return {void}
+ */
 runmysteriet.segments.Segment_4.prototype.addArmorSpawns = function(armorSpawns, segmentStart) {
     var positions = this.getArmorPositions(segmentStart);
     var i = 0;
@@ -349,7 +344,13 @@ runmysteriet.segments.Segment_4.prototype.addArmorSpawns = function(armorSpawns,
     }
 };
 
-
+/**
+ * Returnerar positioner där armor ska spawnas i Segment_4.
+ *
+ * @this {runmysteriet.segments.Segment_4}
+ * @param {number} segmentStart Startposition för segmentet på x-axeln.
+ * @return {!Array<!{x: number, y: number}>} Lista med armor-koordinater.
+ */
 runmysteriet.segments.Segment_4.prototype.getArmorPositions = function(segmentStart) {
     return [
         {

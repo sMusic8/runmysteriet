@@ -3,7 +3,7 @@
 //------------------------------------------------------------------------------
 
 /**
- * Handles parallax / looping background layers.
+ * Loopa igenom bakgrunder.
  *
  * @constructor
  * @param {!rune.display.Stage} stage
@@ -42,12 +42,8 @@ runmysteriet.handler.BackgroundHandler = function(stage, camera, screenWidth, sc
     this.levelWidth = this.screenWidth * this.backgroundCount;
 };
 
-//------------------------------------------------------------------------------
-// INIT
-//------------------------------------------------------------------------------
-
 /**
- * Creates background layers.
+ * Skapar bakgrunden.
  *
  * @return {void}
  */
@@ -68,12 +64,8 @@ runmysteriet.handler.BackgroundHandler.prototype.init = function() {
     }
 };
 
-//------------------------------------------------------------------------------
-// UPDATE
-//------------------------------------------------------------------------------
-
 /**
- * Updates infinite scrolling background.
+ * Uppdaterar skrollnigen av bakgrunden
  *
  * @return {void}
  */

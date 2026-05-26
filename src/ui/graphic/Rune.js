@@ -10,7 +10,17 @@
 runmysteriet.ui.Rune = function() {
 
     this.allRunes = [];
+
+    /**
+     * Senast utdelade rune.
+     * @type {?rune.display.Graphic}
+     */
     this.oneRune = null;
+
+    /**
+     * Index för nuvarande position (används ej aktivt i denna implementation).
+     * @type {number}
+     */
     this.currentIndex = 0;
 
     this.filePrefix = "rune_";

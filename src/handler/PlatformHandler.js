@@ -51,10 +51,6 @@ runmysteriet.handler.PlatformHandler = function(stage, screenWidth) {
     this.levelNumber = 1;
 };
 
-//------------------------------------------------------------------------------
-// INIT
-//------------------------------------------------------------------------------
-
 /**
  * Initierar levelgenerering och bygger hela banan.
  *
@@ -380,7 +376,6 @@ runmysteriet.handler.PlatformHandler.prototype.getEndZones = function() {
 
     return this.endZones;
 };
-
 /**
  * @return {!Array}
  */
@@ -460,14 +455,19 @@ runmysteriet.handler.PlatformHandler.prototype.updateHoles = function(
 //------------------------------------------------------------------------------
 
 /**
- * Startar tween-animationer för båtar.
+ * Startar tween-animationer för alla registrerade båtar.
  *
- * @param {?Object} tweens
+ * Använder varje båts `startTween`-metod om den finns.
+ *
+ * @param {Object} tweens Tween-manager som hanterar animationer.
  * @return {void}
  */
 runmysteriet.handler.PlatformHandler.prototype.startBoatTweens = function(tweens) {
 
+    /** @type {number} */
     var i = 0;
+
+    /** @type {?Object} */
     var boat = null;
 
     if (!tweens || !this.boats) {
@@ -503,8 +503,13 @@ runmysteriet.handler.PlatformHandler.prototype.startBoatTweens = function(tweens
  */
 runmysteriet.handler.PlatformHandler.prototype.update = function(step) {
 
+    /** @type {number} */
     var i = 0;
+
+    /** @type {?Object} */
     var hole = null;
+
+    /** @type {?Object} */
     var platform = null;
 
     if (this.holes) {
@@ -537,6 +542,9 @@ runmysteriet.handler.PlatformHandler.prototype.update = function(step) {
 //------------------------------------------------------------------------------
 
 /**
+ * Returnerar antal plattformssegment som ska placeras före vattenområdet.
+ * Används för att variera level-design beroende på svårighetsgrad.
+ *
  * @return {number}
  */
 runmysteriet.handler.PlatformHandler.prototype.getSegmentsBeforeWaterCount = function() {
@@ -549,6 +557,9 @@ runmysteriet.handler.PlatformHandler.prototype.getSegmentsBeforeWaterCount = fun
 };
 
 /**
+ * Returnerar antal plattformssegment som ska placeras efter vattenområdet.
+ * Används för att balansera level-layout beroende på levelnummer.
+ *
  * @return {number}
  */
 runmysteriet.handler.PlatformHandler.prototype.getSegmentsAfterWaterCount = function() {
@@ -559,7 +570,6 @@ runmysteriet.handler.PlatformHandler.prototype.getSegmentsAfterWaterCount = func
 
     return 1;
 };
-
 /**
  * @return {!Array}
  */
@@ -593,7 +603,6 @@ runmysteriet.handler.PlatformHandler.prototype.getSegmentPool = function() {
         runmysteriet.segments.Segment_6
     ];
 };
-
 /**
  * Hämtar slumpade segmentklasser.
  *

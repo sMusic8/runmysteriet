@@ -33,9 +33,7 @@ runmysteriet.handler.AutoScrollCameraHandler = function(
     /** @type {number} */
     this.levelWidth = levelWidth || 0;
 
-    /*
-     * Flytta med hela pixlar för att undvika HUD/text-skak.
-     */
+    //Flytta med hela pixlar för att undvika HUD/text-skakar
     this.speed = 2;
 
     /*
@@ -53,22 +51,15 @@ runmysteriet.handler.AutoScrollCameraHandler = function(
     this.deathSlowDuration = 90;
     this.deathSlowScrollDelay = 6;
 
-    /*
-     * Raft-paus.
-     */
+    //Raft-paus.
     this.isPausedForRaft = false;
     this.currentRaft = null;
 
     /*
-     * Justering om flotten ska hamna lite mer vänster/höger
-     * när kameran pausar.
+     * Justering om flotten ska hamna lite mer vänster/höger när kameran pausar.
      */
     this.raftStopOffsetX = 0;
 };
-
-//------------------------------------------------------------------------------
-// UPDATE
-//------------------------------------------------------------------------------
 
 /**
  * Uppdaterar autoscroll-kameran.
@@ -84,10 +75,8 @@ runmysteriet.handler.AutoScrollCameraHandler.prototype.update = function(step) {
 
     this.updateDeathSlowMotion();
 
-    /*
-     * Om kameran är pausad vid flotten:
-     * vänta tills alla levande spelare står på flotten.
-     */
+    //Om kameran är pausad vid flotten vänta tills alla levande spelare står på flotten.
+
     if (this.isPausedForRaft === true) {
         if (this.areAllActivePlayersOnRaft() === true) {
             if (this.currentRaft) {
@@ -102,16 +91,11 @@ runmysteriet.handler.AutoScrollCameraHandler.prototype.update = function(step) {
     }
 
     /*
-     * Kameran rör sig först.
-     * Sedan kollar vi om flotten nu ligger i mitten.
+     * Kameran rör sig först efter det kollar vi om flotten nu ligger i mitten.
      */
     this.moveCamera();
     this.checkRaftPause();
 };
-
-//------------------------------------------------------------------------------
-// CAMERA MOVEMENT
-//------------------------------------------------------------------------------
 
 /**
  * Flyttar kameran automatiskt åt höger.
@@ -146,15 +130,9 @@ runmysteriet.handler.AutoScrollCameraHandler.prototype.moveCamera = function() {
         this.camera.viewport.x = maxX;
     }
 
-    /*
-     * Viktigt för att minska HUD/text-skak.
-     */
+    //För att minska HUD/text-skak.
     this.camera.viewport.x = Math.round(this.camera.viewport.x);
 };
-
-//------------------------------------------------------------------------------
-// RAFT PAUSE
-//------------------------------------------------------------------------------
 
 /**
  * Pausar kameran när flotten hamnar ungefär i mitten av skärmen.
@@ -175,10 +153,6 @@ runmysteriet.handler.AutoScrollCameraHandler.prototype.checkRaftPause = function
         return;
     }
 
-    /*
-     * Ingen snap/flytt av kameran här.
-     * Vi pausar bara kameran där den redan är.
-     */
     this.currentRaft = raft;
     this.isPausedForRaft = true;
 };
@@ -224,10 +198,8 @@ runmysteriet.handler.AutoScrollCameraHandler.prototype.findNextRaftToPauseAt = f
 
         raftCenterX = raft.x + raft.width / 2;
 
-        /*
-         * Pausa först när kamerans mitt har nått flotten.
-         * Ingen kamera-snappning.
-         */
+        //Pausa först när kamerans mitt har nått flotten.
+         
         if (cameraCenterX >= raftCenterX) {
             return raft;
         }
@@ -260,10 +232,8 @@ runmysteriet.handler.AutoScrollCameraHandler.prototype.areAllActivePlayersOnRaft
 
         hasActivePlayer = true;
 
-        /*
-         * Vanlig plattform räcker inte.
-         * Spelaren måste stå på flotten.
-         */
+        //Spelaren måste stå på flotten.
+        
         if (!player.currentPlatform || player.currentPlatform.isRaft !== true) {
             return false;
         }
@@ -271,13 +241,9 @@ runmysteriet.handler.AutoScrollCameraHandler.prototype.areAllActivePlayersOnRaft
 
     return hasActivePlayer;
 };
-
-//------------------------------------------------------------------------------
-// DEATH SLOW MOTION
-//------------------------------------------------------------------------------
-
 /**
- * Startar långsammare autoscroll efter död.
+ * Startar "death slow motion"-läget för kameraskrollning.
+ * Funktionen aktiverar en temporär slowdown-effekt som används när en spelare dör.
  *
  * @return {void}
  */
@@ -292,7 +258,8 @@ runmysteriet.handler.AutoScrollCameraHandler.prototype.startDeathSlowMotion = fu
 };
 
 /**
- * Uppdaterar death slow motion-timer.
+ * Uppdaterar death slow motion-timern.
+ * Funktionen minskar timern varje frame tills den når 0,
  *
  * @return {void}
  */
@@ -304,9 +271,9 @@ runmysteriet.handler.AutoScrollCameraHandler.prototype.updateDeathSlowMotion = f
 };
 
 /**
- * Hämtar aktuell scroll-delay.
+ * Returnerar aktuell scroll-delay beroende på om death slow motion är aktivt.
  *
- * @return {number}
+ * @return {number} Delay i frames mellan kameraskrollningar.
  */
 runmysteriet.handler.AutoScrollCameraHandler.prototype.getCurrentScrollDelay = function() {
 

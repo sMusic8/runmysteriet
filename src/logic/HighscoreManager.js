@@ -24,8 +24,6 @@ runmysteriet.logic.HighscoreManager = function(application) {
 /**
  * Sparar score till Rune highscore.
  *
- * Rune SDK ansvarar för själva highscore-listan.
- *
  * @param {!runmysteriet.logic.HighscoreEntry} entry
  * @return {number}
  */
@@ -65,7 +63,7 @@ runmysteriet.logic.HighscoreManager.prototype.save = function(entry) {
 //------------------------------------------------------------------------------
 
 /**
- * Hämtar alla highscores från Rune, max 5.
+ * Hämtar alla highscores, max 5 st.
  *
  * @return {!Array<!Object>}
  */
@@ -185,7 +183,6 @@ runmysteriet.logic.HighscoreManager.prototype.getLowestTopScore = function() {
      * 4 = plats 5
      */
     item = highscores[4];
-
     if (!item) {
         return 0;
     }

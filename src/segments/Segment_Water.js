@@ -32,13 +32,7 @@ this.backgroundHeight = 225;
 
 this.backgroundTexture = "backgroundWater";
 
-    console.log("segmentWater");
-
 };
-
-//------------------------------------------------------------------------------
-// PUBLIC METHODS
-//------------------------------------------------------------------------------
 
 /**
  * Skapar vattensegmentet.
@@ -108,10 +102,6 @@ this.addBackground(stage, x);
     };
 };
 
-//------------------------------------------------------------------------------
-// LAND
-//------------------------------------------------------------------------------
-
 /**
  * Lägger till vänster mark.
  *
@@ -128,9 +118,6 @@ runmysteriet.segments.Segment_Water.prototype.addLeftLand = function(stage, plat
     stage.addChild(platform);
     platforms.push(platform);
 };
-//------------------------------------------------------------------------------
-// BACKGROUND
-//------------------------------------------------------------------------------
 
 /**
  * Lägger till bakgrunden för vattensegmentet.
@@ -150,6 +137,7 @@ runmysteriet.segments.Segment_Water.prototype.addBackground = function(stage, se
 
     stage.addChild(background);
 };
+
 /**
  * Lägger till höger mark.
  *
@@ -166,10 +154,6 @@ runmysteriet.segments.Segment_Water.prototype.addRightLand = function(stage, pla
     stage.addChild(platform);
     platforms.push(platform);
 };
-
-//------------------------------------------------------------------------------
-// WATER
-//------------------------------------------------------------------------------
 
 /**
  * Lägger till vattenområdet.
@@ -191,10 +175,6 @@ runmysteriet.segments.Segment_Water.prototype.addWater = function(stage, waterAr
     return water;
 };
 
-//------------------------------------------------------------------------------
-// RAFT
-//------------------------------------------------------------------------------
-
 /**
  * Lägger till flotten.
  *
@@ -213,14 +193,10 @@ runmysteriet.segments.Segment_Water.prototype.addRaft = function(stage, platform
 
     stage.addChild(raft);
 
-    /*
-     * Flotten räknas som plattform så spelaren kan stå på den.
-     */
+    //Flotten räknas som plattform så spelaren kan stå på den.
+     
     platforms.push(raft);
 };
-//------------------------------------------------------------------------------
-// BOAT
-//------------------------------------------------------------------------------
 
 /**
  * Lägger till den engelska båten.
@@ -248,9 +224,6 @@ runmysteriet.segments.Segment_Water.prototype.addBoat = function(stage, boats, w
     stage.addChild(boat);
     boats.push(boat);
 };
-//------------------------------------------------------------------------------
-// DISEASES
-//------------------------------------------------------------------------------
 
 /**
  * Returnerar antal sjukdomar baserat på level.
@@ -327,11 +300,15 @@ runmysteriet.segments.Segment_Water.prototype.getDiseasePositions = function(lef
         }
     ];
 };
-
-//------------------------------------------------------------------------------
-// RUNES
-//------------------------------------------------------------------------------
-
+/**
+ * Lägger till rune-positioner i en lista av spawn-punkter.
+ *
+ * @this {runmysteriet.segments.Segment_Water}
+ * @param {!Array<!{x: number, y: number}>} runeSpawns Lista som fylls med rune-positioner.
+ * @param {number} leftLandX X-position för vänster landmassa.
+ * @param {number} rightLandX X-position för höger landmassa.
+ * @return {void}
+ */
 runmysteriet.segments.Segment_Water.prototype.addRuneSpawns = function(runeSpawns, leftLandX, rightLandX) {
     var positions = this.getRunePositions(leftLandX, rightLandX);
     var i = 0;
@@ -341,6 +318,14 @@ runmysteriet.segments.Segment_Water.prototype.addRuneSpawns = function(runeSpawn
     }
 };
 
+/**
+ * Returnerar positioner där runor ska spawnas i vatten-segmentet.
+ *
+ * @this {runmysteriet.segments.Segment_Water}
+ * @param {number} leftLandX X-position för vänster landmassa.
+ * @param {number} rightLandX X-position för höger landmassa.
+ * @return {!Array<!{x: number, y: number}>} Lista med rune-koordinater.
+ */
 runmysteriet.segments.Segment_Water.prototype.getRunePositions = function(leftLandX, rightLandX) {
     return [
         {
@@ -354,10 +339,15 @@ runmysteriet.segments.Segment_Water.prototype.getRunePositions = function(leftLa
     ];
 };
 
-//------------------------------------------------------------------------------
-// ARMOR
-//------------------------------------------------------------------------------
-
+/**
+ * Lägger till armor-positioner i en lista av spawn-punkter.
+ *
+ * @this {runmysteriet.segments.Segment_Water}
+ * @param {!Array<!{x: number, y: number}>} armorSpawns Lista som fylls med armor-positioner.
+ * @param {number} leftLandX X-position för vänster landmassa.
+ * @param {number} rightLandX X-position för höger landmassa.
+ * @return {void}
+ */
 runmysteriet.segments.Segment_Water.prototype.addArmorSpawns = function(armorSpawns, leftLandX, rightLandX) {
     var positions = this.getArmorPositions(leftLandX, rightLandX);
     var i = 0;
@@ -367,6 +357,14 @@ runmysteriet.segments.Segment_Water.prototype.addArmorSpawns = function(armorSpa
     }
 };
 
+/**
+ * Returnerar positioner där armor ska spawnas i vatten-segmentet.
+ *
+ * @this {runmysteriet.segments.Segment_Water}
+ * @param {number} leftLandX X-position för vänster landmassa.
+ * @param {number} rightLandX X-position för höger landmassa.
+ * @return {!Array<!{x: number, y: number}>} Lista med armor-koordinater.
+ */
 runmysteriet.segments.Segment_Water.prototype.getArmorPositions = function(leftLandX, rightLandX) {
     return [
         {
@@ -379,4 +377,3 @@ runmysteriet.segments.Segment_Water.prototype.getArmorPositions = function(leftL
         }
     ];
 };
-
