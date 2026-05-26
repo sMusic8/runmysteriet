@@ -21,8 +21,8 @@ runmysteriet.ui.graphic.Raft = function(x, y) {
         "flotte"
     );
     this.isRaft = true; 
+
     //Gör att spelaren kan följa med flotten när spelaren står ovanpå den.
-    
     this.sticky = true;
     this.immovable = true;
 
@@ -109,7 +109,7 @@ runmysteriet.ui.graphic.Raft.prototype.update = function(step) {
         this.hasArrived = true;
     }
 
-    //Hur mycket flotten flyttade denna frame. Spelaren använder detta för att följa med.
+    //Hur mycket flotten flyttade denna frame och spelaren använder detta för att följa med flotten
      
     this.deltaX = this.x - this.previousX;
 };
@@ -145,7 +145,7 @@ runmysteriet.ui.graphic.Raft.prototype.removeDisplayObject = function(object) {
 //------------------------------------------------------------------------------
 
 /**
- * Tar bort flotten från stage.
+ * Tar bort flotten från stage
  *
  * @return {void}
  */
@@ -159,7 +159,7 @@ runmysteriet.ui.graphic.Raft.prototype.remove = function() {
 //------------------------------------------------------------------------------
 
 /**
- * Rensar Raft.
+ * Rensar Raft
  *
  * @return {void}
  */

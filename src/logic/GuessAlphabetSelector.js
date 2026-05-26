@@ -2,21 +2,25 @@
 // GUESS ALPHABET SELECTOR
 //------------------------------------------------------------------------------
 
+runmysteriet.logic = runmysteriet.logic || {};
+
 /**
- * Håller koll på vilken bokstav spelaren valt.
+ * Håller koll på vilken bokstav spelaren valt i GuessWord
  *
  * @constructor
  */
 runmysteriet.logic.GuessAlphabetSelector = function() {
 
+    /** @type {number} */
+    this.m_index = 0;
+
+    /** @type {!Array<string>} */
     this.m_letters = [
         "a", "b", "c", "d", "e", "f", "g",
         "h", "i", "j", "k", "l", "m", "n",
         "o", "p", "q", "r", "s", "t",
         "u", "v", "w", "x", "y", "z"
     ];
-
-    this.m_index = 0;
 };
 
 //------------------------------------------------------------------------------
@@ -24,60 +28,41 @@ runmysteriet.logic.GuessAlphabetSelector = function() {
 //------------------------------------------------------------------------------
 
 /**
+ * Går till nästa bokstav.
  *
- * Alphabet selector som kan bläddra fram och tillbaka i en lista av bokstäver.
- * @constructor
- * @struct
- */
-runmysteriet.logic.GuessAlphabetSelector = function() {
-
-    /**
-     * Nuvarande index i bokstavslistan.
-     * @type {number}
-     */
-    this.m_index = 0;
-
-    /**
-     * Lista med bokstäver som kan väljas.
-     * @type {!Array<string>}
-     */
-    this.m_letters = [];
-};
-
-/**
- * Går till nästa bokstav i listan.
- * Om slutet nås, börjar den om från början.
- *
- * @this {runmysteriet.logic.GuessAlphabetSelector}
  * @return {void}
  */
 runmysteriet.logic.GuessAlphabetSelector.prototype.next = function() {
 
+    if (!this.m_letters || this.m_letters.length <= 0) {
+        return;
+    }
+
     this.m_index++;
 
-    // Om vi passerat sista index, börja om från början
     if (this.m_index >= this.m_letters.length) {
         this.m_index = 0;
     }
 };
 
 /**
+ * Går till föregående bokstav.
  *
- * Går till föregående bokstav i listan.
- * Om det går under 0, hoppar vi till sista index.
- *
- * @this {runmysteriet.logic.GuessAlphabetSelector}
  * @return {void}
  */
 runmysteriet.logic.GuessAlphabetSelector.prototype.previous = function() {
 
+    if (!this.m_letters || this.m_letters.length <= 0) {
+        return;
+    }
+
     this.m_index--;
 
-    // Om index blir negativt, hoppa till sista elementet
     if (this.m_index < 0) {
         this.m_index = this.m_letters.length - 1;
     }
 };
+
 /**
  * Hämtar aktuell bokstav.
  *
@@ -85,8 +70,8 @@ runmysteriet.logic.GuessAlphabetSelector.prototype.previous = function() {
  */
 runmysteriet.logic.GuessAlphabetSelector.prototype.getLetter = function() {
 
-    if (!this.m_letters || this.m_letters.length === 0) {
-        return "";
+    if (!this.m_letters || this.m_letters.length <= 0) {
+        return "a";
     }
 
     return this.m_letters[this.m_index];

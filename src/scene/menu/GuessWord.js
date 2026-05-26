@@ -91,17 +91,19 @@ runmysteriet.scene.GuessWord = function(
 //------------------------------------------------------------------------------
 
 runmysteriet.scene.GuessWord.prototype = Object.create(rune.scene.Scene.prototype);
-
 runmysteriet.scene.GuessWord.prototype.constructor = runmysteriet.scene.GuessWord;
 
-    // Kör parent-scenens init för korrekt uppstart
-    rune.scene.Scene.prototype.init.call(this);{
+//------------------------------------------------------------------------------
+// INIT
+//------------------------------------------------------------------------------
 
-    // Hämta ljud från ljudsystemet
+runmysteriet.scene.GuessWord.prototype.init = function() {
+
+    rune.scene.Scene.prototype.init.call(this);
+
     this.backgroundMusic = this.application.sounds.sound.get("sound_musicMenu");
     this.menuSound = this.application.sounds.sound.get("sound_menu");
 
-    // Spela bakgrundsmusik om den finns
     if (this.backgroundMusic) {
         this.backgroundMusic.loop = true;
         this.backgroundMusic.volume = 0.3;
@@ -111,41 +113,38 @@ runmysteriet.scene.GuessWord.prototype.constructor = runmysteriet.scene.GuessWor
     this.m_highscoreManager =
         new runmysteriet.logic.HighscoreManager(this.application);
 
-    // Hämta ljud för highscore-event
     this.m_highscoreSound =
         this.application.sounds.sound.get("sound_highscore");
 
-    // Initiera input-system för spelet
     this.m_gameInput = new runmysteriet.input.GameInput(this.application);
 
-    // Skapa pussel-logik för ordgissning
     this.m_puzzle = new runmysteriet.logic.GuessWordPuzzle(this.m_wordData);
 
-    // Skapa bokstavsselector för alfabetet
     this.m_alphabetSelector = new runmysteriet.logic.GuessAlphabetSelector();
 
-    // Skapa UI och spelkomponenter
     this.createText();
     this.createLetterBoxes();
     this.updateLetterBoxes();
 
     this.createHighscoreNotice();
     this.checkHighscoreNotice(this.m_totalScore);
-}
+};
+
+//------------------------------------------------------------------------------
+// CREATE TEXT
+//------------------------------------------------------------------------------
 
 /**
  * Skapar all text-UI för GuessWord-scenen.
  */
-runmysteriet.scene.GuessWord.prototype.createText = function () {
+runmysteriet.scene.GuessWord.prototype.createText = function() {
 
-    // Titeltext
     this.m_titleText = new rune.text.BitmapField("GUESS MISSING LETTERS");
     this.m_titleText.autoSize = true;
     this.m_titleText.center = this.application.screen.center;
     this.m_titleText.y -= 85;
     this.stage.addChild(this.m_titleText);
 
-    // Visar vald bokstav
     this.m_letterText = new rune.text.BitmapField("LETTER: A");
     this.m_letterText.autoSize = true;
     this.m_letterText.center = this.application.screen.center;
@@ -182,31 +181,31 @@ runmysteriet.scene.GuessWord.prototype.createText = function () {
     this.m_messageText.scale = 0.7;
     this.stage.addChild(this.m_messageText);
 };
+
+//------------------------------------------------------------------------------
+// LETTER BOXES
+//------------------------------------------------------------------------------
+
 /**
  * Skapar visuella bokstavsrutor för det hemliga ordet.
  *
  * Räknar ut centrering baserat på ordets längd och placerar
  * varje bokstavsbox horisontellt med jämnt mellanrum.
  */
-runmysteriet.scene.GuessWord.prototype.createLetterBoxes = function () {
+runmysteriet.scene.GuessWord.prototype.createLetterBoxes = function() {
 
-    // Hämta ordet från pusslet
     var word = this.m_puzzle.getWord();
 
-    // Layout-inställningar för boxarna
     var boxWidth = 28;
     var spacing = 10;
 
-    // Beräkna total bredd för att centrera hela raden
     var totalWidth = word.length * boxWidth + (word.length - 1) * spacing;
     var startX = this.application.screen.center.x - Math.floor(totalWidth / 2);
 
-    // Y-position för bokstavsraderna
     var y = this.application.screen.center.y - 35;
     var i = 0;
     var box = null;
 
-    // Initiera array för alla bokstavsboxar
     this.m_letterBoxes = [];
 
     for (i = 0; i < word.length; i++) {
@@ -216,24 +215,21 @@ runmysteriet.scene.GuessWord.prototype.createLetterBoxes = function () {
             i
         );
 
-        // Lägg till boxen i scenen
         box.create(this.stage);
 
-        // Spara referens för uppdatering senare
         this.m_letterBoxes.push(box);
     }
 };
+
 /**
  * Uppdaterar alla bokstavsboxar baserat på spelstatus.
  */
-runmysteriet.scene.GuessWord.prototype.updateLetterBoxes = function () {
+runmysteriet.scene.GuessWord.prototype.updateLetterBoxes = function() {
 
-    // Hämta aktuell speldata från pusslet
     var word = this.m_puzzle.getWord();
     var revealedMap = this.m_puzzle.getRevealedMap();
     var currentIndex = this.m_puzzle.getCurrentMissingIndex();
 
-    // Hämta vald bokstav från alfabet-selektorn
     var selectedLetter = this.m_alphabetSelector.getLetter();
     var i = 0;
 
@@ -242,23 +238,21 @@ runmysteriet.scene.GuessWord.prototype.updateLetterBoxes = function () {
             this.m_letterBoxes[i].setLetter(word.charAt(i));
             this.m_letterBoxes[i].setActive(false);
 
-        // Om detta är den aktiva (aktuella) rutan
         } else if (i === currentIndex) {
             this.m_letterBoxes[i].setPreviewLetter(selectedLetter);
             this.m_letterBoxes[i].setActive(true);
 
-        // Alla andra rutor är tomma
         } else {
             this.m_letterBoxes[i].clear();
             this.m_letterBoxes[i].setActive(false);
         }
     }
 
-    // Uppdatera text som visar vald bokstav i UI
     if (this.m_letterText) {
         this.m_letterText.text = "LETTER: " + selectedLetter.toUpperCase();
     }
 };
+
 //------------------------------------------------------------------------------
 // UPDATE
 //------------------------------------------------------------------------------
@@ -407,7 +401,8 @@ runmysteriet.scene.GuessWord.prototype.checkAnswer = function(letter) {
 
         if (this.m_puzzle.isComplete()) {
             this.m_answeredCorrect = true;
-            this.updateMessageText("RIGHT! CONTINUE: PRESS X / ENTER");            return;
+            this.updateMessageText("RIGHT! CONTINUE: PRESS X / ENTER");
+            return;
         }
 
         this.updateMessageText("RIGHT! NEXT LETTER");
@@ -510,7 +505,8 @@ runmysteriet.scene.GuessWord.prototype.showCorrectWordText = function() {
     this.m_correctWordText.y = this.application.screen.center.y - 65;
 
     this.updateMessageText("CONTINUE: PRESS X / ENTER");
-}
+};
+
 //------------------------------------------------------------------------------
 // GAME OVER
 //------------------------------------------------------------------------------
