@@ -17,6 +17,7 @@
  * @property {?Object} m_volumeHud - UI för volymkontroll.
  */
 runmysteriet.scene.More = function() {
+
     rune.scene.Scene.call(this);
 
     this.m_backButton = null;
@@ -26,8 +27,9 @@ runmysteriet.scene.More = function() {
 
     this.backgroundMusic = null;
     this.menuSound = null;
+
     this.m_gameInput = null;
-    this.m_volumeHud = null;    
+    this.m_volumeHud = null;
 };
 
 runmysteriet.scene.More.prototype = Object.create(rune.scene.Scene.prototype);
@@ -64,17 +66,15 @@ runmysteriet.scene.More.prototype.init = function() {
     this.createText();
     this.createBackButton();
 
-    // VolumeHud ska skapas sist så den hamnar över bakgrund/box/text.
+    /*
+     * VolumeHud ska skapas sist så den hamnar över bakgrund/box/text.
+     */
     this.createVolumeHud();
 };
-/**
- * Skapar och lägger till bakgrunden för "More"-scenen.
- * 
- * @method
- * @memberof runmysteriet.scene.More
- * 
- * @returns {void}
- */
+//------------------------------------------------------------------------------
+// CREATE
+//------------------------------------------------------------------------------
+
 runmysteriet.scene.More.prototype.createBackground = function() {
 
     this.m_background = new rune.display.Graphic(
@@ -144,6 +144,7 @@ runmysteriet.scene.More.prototype.createText = function() {
     );
 
     this.m_text.autoSize = true;
+
     this.stage.addChild(this.m_text);
 
     this.m_text.x = this.m_box.x + (this.m_box.width - this.m_text.width) / 2;
@@ -169,6 +170,16 @@ runmysteriet.scene.More.prototype.createBackButton = function() {
 
     this.m_backButton.y =
         this.m_box.y + this.m_box.height + 15;
+};
+
+runmysteriet.scene.More.prototype.createVolumeHud = function() {
+
+    this.m_volumeHud = new runmysteriet.ui.graphic.VolumeHud(
+        this.application,
+        this.backgroundMusic
+    );
+
+    this.stage.addChild(this.m_volumeHud);
 };
 
 /**
@@ -259,9 +270,8 @@ runmysteriet.scene.More.prototype.handleVolumeInput = function(input) {
             this.backgroundMusic.volume = 0;
         }
 
-        if (this.m_volumeHud) {
-            this.m_volumeHud.updateText();
-        }
+        this.updateVolumeHud();
+        return;
     }
 
     if (input.volumeDown) {
@@ -271,23 +281,37 @@ runmysteriet.scene.More.prototype.handleVolumeInput = function(input) {
             this.backgroundMusic.volume = 1;
         }
 
-        if (this.m_volumeHud) {
-            this.m_volumeHud.updateText();
-        }
+        this.updateVolumeHud();
     }
 };
-/**
- * Spelar upp meny-ljudet om det finns tillgängligt.
- * 
- * @method
- * @memberof runmysteriet.scene.More
- * 
- * @returns {void}
- */
+
+runmysteriet.scene.More.prototype.updateVolumeHud = function() {
+
+    if (this.m_volumeHud &&
+        typeof this.m_volumeHud.updateText === "function") {
+
+        this.m_volumeHud.updateText();
+    }
+};
+//------------------------------------------------------------------------------
+// SOUND
+//------------------------------------------------------------------------------
+
 runmysteriet.scene.More.prototype.playMenuSound = function() {
 
-    if (this.menuSound) {
+    if (this.menuSound && typeof this.menuSound.play === "function") {
         this.menuSound.play();
+    }
+};
+
+runmysteriet.scene.More.prototype.stopBackgroundMusic = function() {
+
+    if (
+        this.backgroundMusic &&
+        this.backgroundMusic.m_source &&
+        this.backgroundMusic.m_source.mediaElement
+    ) {
+        this.backgroundMusic.m_source.mediaElement.pause();
     }
 };
 
@@ -304,19 +328,16 @@ runmysteriet.scene.More.prototype.playMenuSound = function() {
  */
 runmysteriet.scene.More.prototype.goToMenu = function() {
 
+    this.stopBackgroundMusic();
+
     this.application.scenes.load([
         new runmysteriet.scene.Menu()
     ]);
 };
+//------------------------------------------------------------------------------
+// VOLUME HUD
+//------------------------------------------------------------------------------
 
-/**
- * Skapar och lägger till volym-HUD i "More"-scenen.
- * 
- * @method
- * @memberof runmysteriet.scene.More
- * 
- * @returns {void}
- */
 runmysteriet.scene.More.prototype.createVolumeHud = function() {
 
     this.m_volumeHud = new runmysteriet.ui.graphic.VolumeHud(
@@ -327,18 +348,10 @@ runmysteriet.scene.More.prototype.createVolumeHud = function() {
     this.stage.addChild(this.m_volumeHud);
 };
 
-/**
- * Tar bort ett display-objekt från scenen.
- * 
- * Försöker först ta bort objektet från dess parent.
- * Om det inte finns en parent, tas det bort från scenens stage.
- * 
- * @method
- * @memberof runmysteriet.scene.More
- * 
- * @param {Object} object - Display-objekt som ska tas bort.
- * @returns {void}
- */
+//------------------------------------------------------------------------------
+// REMOVE DISPLAY OBJECT
+//------------------------------------------------------------------------------
+
 runmysteriet.scene.More.prototype.removeDisplayObject = function(object) {
 
     if (!object) {
@@ -368,13 +381,7 @@ runmysteriet.scene.More.prototype.removeDisplayObject = function(object) {
  */
 runmysteriet.scene.More.prototype.dispose = function() {
 
-    if (
-        this.backgroundMusic &&
-        this.backgroundMusic.m_source &&
-        this.backgroundMusic.m_source.mediaElement
-    ) {
-        this.backgroundMusic.m_source.mediaElement.pause();
-    }
+    this.stopBackgroundMusic();
 
     this.removeDisplayObject(this.m_volumeHud);
     this.removeDisplayObject(this.m_backButton);
@@ -382,15 +389,15 @@ runmysteriet.scene.More.prototype.dispose = function() {
     this.removeDisplayObject(this.m_box);
     this.removeDisplayObject(this.m_background);
 
+    this.m_volumeHud = null;
     this.m_backButton = null;
     this.m_text = null;
-    this.m_background = null;
     this.m_box = null;
+    this.m_background = null;
 
     this.backgroundMusic = null;
     this.menuSound = null;
     this.m_gameInput = null;
-    this.m_volumeHud = null;
 
     rune.scene.Scene.prototype.dispose.call(this);
 };

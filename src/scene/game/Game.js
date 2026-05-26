@@ -628,7 +628,7 @@ runmysteriet.scene.Game.prototype.updateStartCountdown = function() {
     } else if (this.m_startCountdownTimer > 30) {
         this.m_startCountdownText.text = "1";
     } else if (this.m_startCountdownTimer > 0) {
-        this.m_startCountdownText.text = "GO";
+        this.m_startCountdownText.text = " GO";
     } else {
         this.closeStartCountdown();
     }
@@ -712,8 +712,6 @@ runmysteriet.scene.Game.prototype.updateVolumeInput = function(input) {
         if (this.backgroundMusic.volume > 1) {
             this.backgroundMusic.volume = 0;
         }
-
-        console.log("Volym:", this.backgroundMusic.volume.toFixed(2));
         return;
     }
 
@@ -1153,7 +1151,7 @@ runmysteriet.scene.Game.prototype.winGame = function(winningPlayer) {
     }
 
     /*
-     * Stoppa gameplay-rörelser under segersekvensen.
+     * Pausa rörelser som båtar/flottar under segersekvensen.
      */
     if (this.tweens) {
         this.tweens.paused = true;
@@ -1163,9 +1161,12 @@ runmysteriet.scene.Game.prototype.winGame = function(winningPlayer) {
 
     /*
      * Starta segersekvensen.
-     * Den går vidare till GuessWord först när sekvensen är klar.
+     * GuessWord laddas först när sekvensen är klar.
      */
-    if (this.m_levelCompleteSequence) {
+    if (
+        this.m_levelCompleteSequence &&
+        typeof this.m_levelCompleteSequence.start === "function"
+    ) {
         this.m_levelCompleteSequence.start(
             {
                 levelNumber: this.m_levelNumber,
@@ -1203,7 +1204,6 @@ runmysteriet.scene.Game.prototype.winGame = function(winningPlayer) {
         )
     ]);
 };
-
 runmysteriet.scene.Game.prototype.loseGame = function(reason) {
 
     if (this.m_gameEnd === true) {
@@ -1331,19 +1331,6 @@ runmysteriet.scene.Game.prototype.removeDisplayObject = function(object) {
 };
 
 //------------------------------------------------------------------------------
-// DISPOSE
-//------------------------------------------------------------------------------
-
-/**
- * Rensar Game-scenen.
- *
- * Ordningen är motsatt mot init:
- * det som skapas sist i init rensas först här.
- *
- * @return {void}
- */
-
-//------------------------------------------------------------------------------
 // SOUND
 //------------------------------------------------------------------------------
 
@@ -1379,6 +1366,19 @@ runmysteriet.scene.Game.prototype.stopSound = function(sound) {
     } catch (error) {
     }
 };
+
+//------------------------------------------------------------------------------
+// DISPOSE
+//------------------------------------------------------------------------------
+
+/**
+ * Rensar Game-scenen.
+ *
+ * Ordningen är motsatt mot init:
+ * det som skapas sist i init rensas först här.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.Game.prototype.dispose = function() {
 
     /*
@@ -1393,6 +1393,9 @@ runmysteriet.scene.Game.prototype.dispose = function() {
     this.m_startCountdownText = null;
     this.m_startCountdownOverlay = null;
 
+    /*
+     * Highscore notification.
+     */
     this.removeDisplayObject(this.m_highscoreText);
 
     this.m_highscoreText = null;
@@ -1421,12 +1424,27 @@ runmysteriet.scene.Game.prototype.dispose = function() {
     this.m_isPaused = false;
 
     /*
+     * Level complete sequence.
+     */
+    if (this.m_levelCompleteSequence) {
+        if (typeof this.m_levelCompleteSequence.dispose === "function") {
+            this.m_levelCompleteSequence.dispose();
+        } else if (typeof this.m_levelCompleteSequence.clear === "function") {
+            this.m_levelCompleteSequence.clear();
+        }
+    }
+
+    this.m_levelCompleteSequence = null;
+
+    /*
      * HUD skapades efter shields.
      */
-    if (this.m_hudHandler &&
-        typeof this.m_hudHandler.clear === "function") {
-
-        this.m_hudHandler.clear();
+    if (this.m_hudHandler) {
+        if (typeof this.m_hudHandler.dispose === "function") {
+            this.m_hudHandler.dispose();
+        } else if (typeof this.m_hudHandler.clear === "function") {
+            this.m_hudHandler.clear();
+        }
     }
 
     this.m_hudHandler = null;
@@ -1434,31 +1452,25 @@ runmysteriet.scene.Game.prototype.dispose = function() {
     /*
      * Shields / runor.
      */
-    if (this.m_shieldHandler &&
-        typeof this.m_shieldHandler.clear === "function") {
-
-        this.m_shieldHandler.clear();
+    if (this.m_shieldHandler) {
+        if (typeof this.m_shieldHandler.dispose === "function") {
+            this.m_shieldHandler.dispose();
+        } else if (typeof this.m_shieldHandler.clear === "function") {
+            this.m_shieldHandler.clear();
+        }
     }
 
     this.m_shieldHandler = null;
 
     /*
-     * Level complete sequence.
-     */
-
-    if (this.m_levelCompleteSequence) {
-    this.m_levelCompleteSequence.dispose();
-}
-
-this.m_levelCompleteSequence = null;
-
-    /*
      * Armor.
      */
-    if (this.m_armorHandler &&
-        typeof this.m_armorHandler.clear === "function") {
-
-        this.m_armorHandler.clear();
+    if (this.m_armorHandler) {
+        if (typeof this.m_armorHandler.dispose === "function") {
+            this.m_armorHandler.dispose();
+        } else if (typeof this.m_armorHandler.clear === "function") {
+            this.m_armorHandler.clear();
+        }
     }
 
     this.m_armorHandler = null;
@@ -1466,10 +1478,12 @@ this.m_levelCompleteSequence = null;
     /*
      * Sjukdomar.
      */
-    if (this.m_diseaseHandler &&
-        typeof this.m_diseaseHandler.clear === "function") {
-
-        this.m_diseaseHandler.clear();
+    if (this.m_diseaseHandler) {
+        if (typeof this.m_diseaseHandler.dispose === "function") {
+            this.m_diseaseHandler.dispose();
+        } else if (typeof this.m_diseaseHandler.clear === "function") {
+            this.m_diseaseHandler.clear();
+        }
     }
 
     this.m_diseaseHandler = null;
@@ -1480,39 +1494,45 @@ this.m_levelCompleteSequence = null;
     this.m_cameraHandler = null;
 
     /*
-     * Fiender.
+     * Fiender
      */
-    if (this.m_enemyHandler &&
-        typeof this.m_enemyHandler.clear === "function") {
-
-        this.m_enemyHandler.clear();
+    if (this.m_enemyHandler) {
+        if (typeof this.m_enemyHandler.dispose === "function") {
+            this.m_enemyHandler.dispose();
+        } else if (typeof this.m_enemyHandler.clear === "function") {
+            this.m_enemyHandler.clear();
+        }
     }
 
     this.m_enemyHandler = null;
 
     /*
-     * Level config.
+     * Level config
      */
     this.m_levelConfig = null;
 
     /*
-     * Spelare.
+     * Spelare
      */
-    if (this.m_playerHandler &&
-        typeof this.m_playerHandler.clear === "function") {
-
-        this.m_playerHandler.clear();
+    if (this.m_playerHandler) {
+        if (typeof this.m_playerHandler.dispose === "function") {
+            this.m_playerHandler.dispose();
+        } else if (typeof this.m_playerHandler.clear === "function") {
+            this.m_playerHandler.clear();
+        }
     }
 
     this.m_playerHandler = null;
 
     /*
-     * Moln.
+     * Moln
      */
-    if (this.m_cloudHandler &&
-        typeof this.m_cloudHandler.clear === "function") {
-
-        this.m_cloudHandler.clear();
+    if (this.m_cloudHandler) {
+        if (typeof this.m_cloudHandler.dispose === "function") {
+            this.m_cloudHandler.dispose();
+        } else if (typeof this.m_cloudHandler.clear === "function") {
+            this.m_cloudHandler.clear();
+        }
     }
 
     this.m_cloudHandler = null;
@@ -1520,10 +1540,12 @@ this.m_levelCompleteSequence = null;
     /*
      * Plattformar, lava, vatten, båtar.
      */
-    if (this.m_platformHandler &&
-        typeof this.m_platformHandler.clear === "function") {
-
-        this.m_platformHandler.clear();
+    if (this.m_platformHandler) {
+        if (typeof this.m_platformHandler.dispose === "function") {
+            this.m_platformHandler.dispose();
+        } else if (typeof this.m_platformHandler.clear === "function") {
+            this.m_platformHandler.clear();
+        }
     }
 
     this.m_platformHandler = null;
@@ -1531,20 +1553,31 @@ this.m_levelCompleteSequence = null;
     /*
      * Bakgrund skapas tidigt i init, därför rensas den sent.
      */
-    if (this.m_backgroundHandler &&
-        typeof this.m_backgroundHandler.clear === "function") {
-
-        this.m_backgroundHandler.clear();
+    if (this.m_backgroundHandler) {
+        if (typeof this.m_backgroundHandler.dispose === "function") {
+            this.m_backgroundHandler.dispose();
+        } else if (typeof this.m_backgroundHandler.clear === "function") {
+            this.m_backgroundHandler.clear();
+        }
     }
 
     this.m_backgroundHandler = null;
 
+    /*
+     * Ljud.
+     */
     this.stopSound(this.backgroundMusic);
+
     this.backgroundMusic = null;
     this.menuSound = null;
+
+    /*
+     * 
+     */
     this.m_gameInput = null;
     this.camera = null;
     this.m_avatarData = null;
 
     rune.scene.Scene.prototype.dispose.call(this);
 };
+

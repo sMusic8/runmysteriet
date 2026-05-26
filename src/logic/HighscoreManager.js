@@ -5,13 +5,21 @@
 /**
  * Hanterar highscore via Rune SDK.
  *
+ * Rune SDK sparar highscores i localStorage.
+ * Spelet ska inte skriva tillbaka till JSON-filen i asset-mappen.
+ *
  * @constructor
  * @param {!Object} application
  */
 runmysteriet.logic.HighscoreManager = function(application) {
 
+    /** @type {!Object} */
     this.application = application;
 };
+
+//------------------------------------------------------------------------------
+// SAVE
+//------------------------------------------------------------------------------
 
 /**
  * Sparar score till Rune highscore.
@@ -21,15 +29,19 @@ runmysteriet.logic.HighscoreManager = function(application) {
  */
 runmysteriet.logic.HighscoreManager.prototype.save = function(entry) {
 
-    var name = "PLAYER";
+    var name = "";
     var score = 0;
 
-    if (!this.application || !this.application.highscores || !entry) {
+    if (!this.hasHighscoreSystem()) {
         return -1;
     }
 
-    name = String(entry.name || "PLAYER").toUpperCase();
-    score = parseInt(entry.score, 10) || 0;
+    if (!entry) {
+        return -1;
+    }
+
+    name = this.normalizeName(entry.name);
+    score = this.normalizeScore(entry.score);
 
     if (score <= 0) {
         return -1;
@@ -46,6 +58,10 @@ runmysteriet.logic.HighscoreManager.prototype.save = function(entry) {
     );
 };
 
+//------------------------------------------------------------------------------
+// GET
+//------------------------------------------------------------------------------
+
 /**
  * Hämtar alla highscores, max 5 st.
  *
@@ -58,7 +74,7 @@ runmysteriet.logic.HighscoreManager.prototype.getAll = function() {
     var score = 0;
     var i = 0;
 
-    if (!this.application || !this.application.highscores) {
+    if (!this.hasHighscoreSystem()) {
         return highscores;
     }
 
@@ -69,7 +85,7 @@ runmysteriet.logic.HighscoreManager.prototype.getAll = function() {
             continue;
         }
 
-        score = parseInt(item.score, 10) || 0;
+        score = this.normalizeScore(item.score);
 
         if (score <= 0) {
             continue;
@@ -82,6 +98,39 @@ runmysteriet.logic.HighscoreManager.prototype.getAll = function() {
 };
 
 /**
+ * Hämtar bästa highscore.
+ *
+ * @return {?Object}
+ */
+runmysteriet.logic.HighscoreManager.prototype.getBest = function() {
+
+    var item = null;
+    var score = 0;
+
+    if (!this.hasHighscoreSystem()) {
+        return null;
+    }
+
+    item = this.application.highscores.get(0, 0);
+
+    if (!item) {
+        return null;
+    }
+
+    score = this.normalizeScore(item.score);
+
+    if (score <= 0) {
+        return null;
+    }
+
+    return item;
+};
+
+//------------------------------------------------------------------------------
+// TOP 5 CHECK
+//------------------------------------------------------------------------------
+
+/**
  * Kollar om score hamnar på top 5-listan.
  *
  * @param {number} score
@@ -92,7 +141,7 @@ runmysteriet.logic.HighscoreManager.prototype.isNewRecord = function(score) {
     var highscores = null;
     var lowestTopScore = 0;
 
-    score = parseInt(score, 10) || 0;
+    score = this.normalizeScore(score);
 
     if (score <= 0) {
         return false;
@@ -106,10 +155,44 @@ runmysteriet.logic.HighscoreManager.prototype.isNewRecord = function(score) {
     if (highscores.length < 5) {
         return true;
     }
-    lowestTopScore = parseInt(highscores[4].score, 10) || 0;
+
+    lowestTopScore = this.getLowestTopScore();
 
     return score > lowestTopScore;
 };
+
+/**
+ * Hämtar lägsta score på top 5-listan.
+ *
+ * @return {number}
+ */
+runmysteriet.logic.HighscoreManager.prototype.getLowestTopScore = function() {
+
+    var highscores = null;
+    var item = null;
+
+    highscores = this.getAll();
+
+    if (highscores.length < 5) {
+        return 0;
+    }
+
+    /*
+     * Rune-listan antas vara sorterad:
+     * 0 = plats 1
+     * 4 = plats 5
+     */
+    item = highscores[4];
+    if (!item) {
+        return 0;
+    }
+
+    return this.normalizeScore(item.score);
+};
+
+//------------------------------------------------------------------------------
+// DUPLICATE CHECK
+//------------------------------------------------------------------------------
 
 /**
  * Hindrar att samma namn + samma score läggs in flera gånger.
@@ -122,10 +205,15 @@ runmysteriet.logic.HighscoreManager.prototype.hasSameEntry = function(name, scor
 
     var i = 0;
     var item = null;
+    var itemName = "";
+    var itemScore = 0;
 
-    if (!this.application || !this.application.highscores) {
+    if (!this.hasHighscoreSystem()) {
         return false;
     }
+
+    name = this.normalizeName(name);
+    score = this.normalizeScore(score);
 
     for (i = 0; i < 5; i++) {
         item = this.application.highscores.get(i, 0);
@@ -134,10 +222,10 @@ runmysteriet.logic.HighscoreManager.prototype.hasSameEntry = function(name, scor
             continue;
         }
 
-        if (
-            String(item.name || item.username || "").toUpperCase() === name &&
-            parseInt(item.score, 10) === score
-        ) {
+        itemName = this.normalizeName(item.name || item.username);
+        itemScore = this.normalizeScore(item.score);
+
+        if (itemName === name && itemScore === score) {
             return true;
         }
     }
@@ -145,31 +233,67 @@ runmysteriet.logic.HighscoreManager.prototype.hasSameEntry = function(name, scor
     return false;
 };
 
+//------------------------------------------------------------------------------
+// HELPERS
+//------------------------------------------------------------------------------
+
 /**
- * Hämtar bästa highscore.
+ * Kontrollerar att Rune highscore-system finns.
  *
- * @return {?Object}
+ * @return {boolean}
  */
-runmysteriet.logic.HighscoreManager.prototype.getBest = function() {
+runmysteriet.logic.HighscoreManager.prototype.hasHighscoreSystem = function() {
 
-    var item = null;
-    var score = 0;
+    return (
+        this.application &&
+        this.application.highscores
+    );
+};
 
-    if (!this.application || !this.application.highscores) {
-        return null;
+/**
+ * Normaliserar namn.
+ *
+ * @param {string=} name
+ * @return {string}
+ */
+runmysteriet.logic.HighscoreManager.prototype.normalizeName = function(name) {
+
+    name = String(name || "PLAYER").toUpperCase();
+
+    if (name.length <= 0) {
+        name = "PLAYER";
     }
 
-    item = this.application.highscores.get(0, 0);
+    return name;
+};
 
-    if (!item) {
-        return null;
+/**
+ * Normaliserar score.
+ *
+ * @param {number|string=} score
+ * @return {number}
+ */
+runmysteriet.logic.HighscoreManager.prototype.normalizeScore = function(score) {
+
+    score = parseInt(score, 10) || 0;
+
+    if (score < 0) {
+        score = 0;
     }
 
-    score = parseInt(item.score, 10) || 0;
+    return score;
+};
 
-    if (score <= 0) {
-        return null;
-    }
+//------------------------------------------------------------------------------
+// DISPOSE
+//------------------------------------------------------------------------------
 
-    return item;
+/**
+ * Rensar HighscoreManager.
+ *
+ * @return {void}
+ */
+runmysteriet.logic.HighscoreManager.prototype.dispose = function() {
+
+    this.application = null;
 };

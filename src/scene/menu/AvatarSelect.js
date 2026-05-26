@@ -298,7 +298,8 @@ runmysteriet.scene.AvatarSelect.prototype.createPlayerAvatarChoices = function(p
  */
 runmysteriet.scene.AvatarSelect.prototype.update = function(step) {
 
-    // Kör parent update
+    var input = null;
+
     rune.scene.Scene.prototype.update.call(this, step);
 
     // Avsluta om spelet redan har startat
@@ -306,7 +307,36 @@ runmysteriet.scene.AvatarSelect.prototype.update = function(step) {
         return;
     }
 
-    // Hantera cooldown för player 1
+    if (!this.m_gameInput) {
+        return;
+    }
+
+    /*
+     * Gemensam menyinput.
+     * Detta gör att ESC / BACKSPACE / Circle / B kan gå tillbaka
+     * även innan spelarna har valt avatar.
+     */
+    input = this.m_gameInput.read(this.keyboard);
+
+    if (input && input.back === true) {
+
+        /*
+         * Om någon redan är READY ska back först avvälja READY.
+         * Om ingen är READY går man tillbaka till huvudmenyn.
+         */
+        if (this.m_player1Ready === true || this.m_player2Ready === true) {
+            this.m_player1Ready = false;
+            this.m_player2Ready = false;
+
+            this.playMenuSound();
+            this.updateView();
+            return;
+        }
+
+        this.goBackToMenu();
+        return;
+    }
+
     if (this.m_inputCooldown1 > 0) {
         this.m_inputCooldown1--;
     }
@@ -623,18 +653,93 @@ runmysteriet.scene.AvatarSelect.prototype.playMenuSound = function() {
     }
 };
 
+//------------------------------------------------------------------------------
+// REMOVE DISPLAY OBJECT
+//------------------------------------------------------------------------------
+
 /**
- * Rensar upp scenen och frigör referenser.
+ * Tar bort display object från stage.
  *
- * @this {runmysteriet.scene.AvatarSelect}
+ * @param {?Object} object
+ * @return {void}
+ */
+runmysteriet.scene.AvatarSelect.prototype.removeDisplayObject = function(object) {
+
+    if (!object) {
+        return;
+    }
+
+    if (object.parent) {
+        object.parent.removeChild(object);
+        return;
+    }
+
+    if (object.stage) {
+        object.stage.removeChild(object);
+    }
+};
+
+//------------------------------------------------------------------------------
+// CLEAR DISPLAY LIST
+//------------------------------------------------------------------------------
+
+/**
+ * Tar bort alla objekt i en array från stage.
+ *
+ * @param {?Array} list
+ * @return {void}
+ */
+runmysteriet.scene.AvatarSelect.prototype.clearDisplayList = function(list) {
+
+    var i = 0;
+
+    if (!list) {
+        return;
+    }
+
+    for (i = 0; i < list.length; i++) {
+        this.removeDisplayObject(list[i]);
+    }
+};
+
+//------------------------------------------------------------------------------
+// DISPOSE
+//------------------------------------------------------------------------------
+
+/**
+ * Rensar AvatarSelect-scenen.
+ *
  * @return {void}
  */
 runmysteriet.scene.AvatarSelect.prototype.dispose = function() {
 
-    // Input
-    this.m_gameInput = null;
+    /*
+     * Sprites och namntexter för avatarval.
+     */
+    this.clearDisplayList(this.m_player1Sprites);
+    this.clearDisplayList(this.m_player2Sprites);
+    this.clearDisplayList(this.m_player1Names);
+    this.clearDisplayList(this.m_player2Names);
 
-    // Data
+    /*
+     * Textobjekt.
+     */
+    this.removeDisplayObject(this.m_titleText);
+    this.removeDisplayObject(this.m_helpText);
+    this.removeDisplayObject(this.m_backText);
+
+    this.removeDisplayObject(this.m_player1Label);
+    this.removeDisplayObject(this.m_player2Label);
+
+    this.removeDisplayObject(this.m_player1ReadyText);
+    this.removeDisplayObject(this.m_player2ReadyText);
+
+    this.removeDisplayObject(this.m_player1Marker);
+    this.removeDisplayObject(this.m_player2Marker);
+
+    /*
+     * Töm arrayer.
+     */
     this.m_avatars = [];
 
     // Sprites
@@ -645,7 +750,9 @@ runmysteriet.scene.AvatarSelect.prototype.dispose = function() {
     this.m_player1Names = [];
     this.m_player2Names = [];
 
-    // UI text
+    /*
+     * Nolla display-referenser.
+     */
     this.m_titleText = null;
     this.m_helpText = null;
     this.m_backText = null;
@@ -659,9 +766,30 @@ runmysteriet.scene.AvatarSelect.prototype.dispose = function() {
     this.m_player1Marker = null;
     this.m_player2Marker = null;
 
-    // Ljud
+    /*
+     * Nolla input/state.
+     */
+    this.m_gameInput = null;
+
+    this.m_player1Index = 0;
+    this.m_player2Index = 1;
+
+    this.m_player1Ready = false;
+    this.m_player2Ready = false;
+
+    this.m_hasStarted = false;
+
+    this.m_inputCooldown1 = 0;
+    this.m_inputCooldown2 = 0;
+    this.m_inputDelay = 0;
+
+    /*
+     * Ljudreferens.
+     */
     this.menuSound = null;
 
-    // Parent cleanup
+    /*
+     * Rune Scene dispose sist.
+     */
     rune.scene.Scene.prototype.dispose.call(this);
 };

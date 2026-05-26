@@ -3,21 +3,15 @@
 //------------------------------------------------------------------------------
 
 /**
- * Representerar en fiendebåt som kan bli elektriskt farlig för spelaren.
- *
- * Båten rör sig horisontellt och kan aktivera ett "danger state" där blixtar visas och spelaren kan dö vid kontakt.
+ * Representerar en fiendebåt som kan bli farlig för spelaren.
  *
  * @constructor
  * @extends {rune.display.Graphic}
- *
- * @param {number=} x - Startposition X (default 0)
- * @param {number=} y - Startposition Y (default 0)
+ * @param {number=} x
+ * @param {number=} y
  */
 runmysteriet.entity.EnglishBoat = function(x, y) {
 
-    /**
-     * Bas-Graphic (visual representation av båten)
-     */
     rune.display.Graphic.call(
         this,
         x || 0,
@@ -27,80 +21,42 @@ runmysteriet.entity.EnglishBoat = function(x, y) {
         "english_boat"
     );
 
-    /**
-     * @type {number} Bredd på båten
-     */
-    this.width = 100;
-
-    /**
-     * @type {number} Höjd på båten
-     */
-    this.height = 100;
-
-    /**
-     * @type {number} Skada som appliceras vid träff (instant death)
-     */
+    /** @type {number} */
     this.damage = 999;
 
-    /**
-     * @type {number} Ursprunglig X-position för rörelse/tween
-     */
+    /** @type {number} */
     this.startX = x || 0;
 
-    /**
-     * @type {number} Ursprunglig Y-position för vågrörelse
-     */
+    /** @type {number} */
     this.startY = y || 0;
 
-    /**
-     * @type {number} Intern räknare för sinusvåg
-     */
+    /** @type {number} */
     this.waveCounter = 0;
 
-    /**
-     * @type {number} Hastighet på vågrörelse
-     */
+    /** @type {number} */
     this.waveSpeed = 0.20;
 
-    /**
-     * @type {number} Höjd på vågrörelse
-     */
+    /** @type {number} */
     this.waveHeight = 3;
 
-    /**
-     * @type {boolean} Om båten är farlig och kan döda spelaren
-     */
+    /** @type {boolean} */
     this.isDangerous = false;
 
-    /**
-     * HITBOX som är separerad från grafik
+    /*
+     * Separat hitbox.
      */
-
-    /** @type {number} X-offset för hitbox */
     this.hitboxOffsetX = 30;
-
-    /** @type {number} Y-offset för hitbox */
     this.hitboxOffsetY = 45;
-
-    /** @type {number} Bredd på hitbox */
     this.hitboxWidth = 50;
-
-    /** @type {number} Höjd på hitbox */
     this.hitboxHeight = 35;
 
-    /**
-     * @type {!Array<!rune.display.Graphic>} Lista av aktiva blixtar
-     */
+    /** @type {!Array<!rune.display.Graphic>} */
     this.m_lightnings = [];
 
-    /**
-     * @type {number} Max antal blixtar som kan visas samtidigt
-     */
+    /** @type {number} */
     this.m_maxLightnings = 3;
 
-    /**
-     * @type {!Array<string>} Lista av blixt-texturer
-     */
+    /** @type {!Array<string>} */
     this.m_lightningTypes = [
         "blixt11",
         "blixt12",
@@ -108,7 +64,14 @@ runmysteriet.entity.EnglishBoat = function(x, y) {
         "blixt14",
         "blixt15"
     ];
+
+    /** @type {boolean} */
+    this.m_isDisposed = false;
 };
+
+//------------------------------------------------------------------------------
+// INHERITANCE
+//------------------------------------------------------------------------------
 
 runmysteriet.entity.EnglishBoat.prototype =
     Object.create(rune.display.Graphic.prototype);
@@ -116,10 +79,12 @@ runmysteriet.entity.EnglishBoat.prototype =
 runmysteriet.entity.EnglishBoat.prototype.constructor =
     runmysteriet.entity.EnglishBoat;
 
+//------------------------------------------------------------------------------
+// LIGHTNING
+//------------------------------------------------------------------------------
+
 /**
  * Skapar en ny blixt och placerar den slumpmässigt på båten.
- *
- * Blixten är ett barn till båten.
  *
  * @return {void}
  */
@@ -128,12 +93,18 @@ runmysteriet.entity.EnglishBoat.prototype.spawnLightning = function() {
     var type = null;
     var lightning = null;
 
-    // Välj slumpmässig blixt-textur
+    if (this.m_isDisposed === true) {
+        return;
+    }
+
+    if (!this.m_lightningTypes || this.m_lightningTypes.length <= 0) {
+        return;
+    }
+
     type = this.m_lightningTypes[
         Math.floor(Math.random() * this.m_lightningTypes.length)
     ];
 
-    // Skapa blixt-grafik
     lightning = new rune.display.Graphic(
         0,
         0,
@@ -145,11 +116,9 @@ runmysteriet.entity.EnglishBoat.prototype.spawnLightning = function() {
     lightning.scaleX = 1;
     lightning.scaleY = 1;
 
-    // Slumpmässig position inom båten
     lightning.x = Math.random() * 43;
     lightning.y = Math.random() * 58;
 
-    // Lägg till bakom båten
     this.addChildAt(lightning, 0);
 
     this.m_lightnings.push(lightning);
@@ -164,7 +133,10 @@ runmysteriet.entity.EnglishBoat.prototype.showLightning = function() {
 
     var i = 0;
 
-    // Undvik duplicering ab blixtar
+    if (this.m_isDisposed === true) {
+        return;
+    }
+
     if (this.m_lightnings.length > 0) {
         return;
     }
@@ -184,17 +156,15 @@ runmysteriet.entity.EnglishBoat.prototype.hideLightning = function() {
     var i = 0;
     var lightning = null;
 
-    for (i = 0; i < this.m_lightnings.length; i++) {
+    if (!this.m_lightnings) {
+        this.m_lightnings = [];
+        return;
+    }
 
+    for (i = 0; i < this.m_lightnings.length; i++) {
         lightning = this.m_lightnings[i];
 
-        if (!lightning) {
-            continue;
-        }
-
-        if (lightning.parent) {
-            lightning.parent.removeChild(lightning);
-        }
+        this.removeDisplayObject(lightning);
     }
 
     this.m_lightnings = [];
@@ -207,6 +177,10 @@ runmysteriet.entity.EnglishBoat.prototype.hideLightning = function() {
  * @return {void}
  */
 runmysteriet.entity.EnglishBoat.prototype.setDangerous = function(value) {
+
+    if (this.m_isDisposed === true) {
+        return;
+    }
 
     value = value === true;
 
@@ -223,9 +197,12 @@ runmysteriet.entity.EnglishBoat.prototype.setDangerous = function(value) {
     }
 };
 
+//------------------------------------------------------------------------------
+// COLLISION / STATE
+//------------------------------------------------------------------------------
+
 /**
  * Kollar om båten är ovanför en flotte.
- *Används för att avgöra om båten ska bli farlig.
  *
  * @param {!Object} raft
  * @return {boolean}
@@ -233,7 +210,6 @@ runmysteriet.entity.EnglishBoat.prototype.setDangerous = function(value) {
 runmysteriet.entity.EnglishBoat.prototype.isAboveRaft = function(raft) {
 
     var hitboxLeft = 0;
-    var hitboxRight = 0;
     var hitboxCenterX = 0;
     var hitboxBottom = 0;
 
@@ -241,12 +217,15 @@ runmysteriet.entity.EnglishBoat.prototype.isAboveRaft = function(raft) {
     var raftRight = 0;
     var raftTop = 0;
 
+    if (this.m_isDisposed === true) {
+        return false;
+    }
+
     if (!raft || raft.isRaft !== true) {
         return false;
     }
 
     hitboxLeft = this.x + this.hitboxOffsetX;
-    hitboxRight = hitboxLeft + this.hitboxWidth;
     hitboxCenterX = hitboxLeft + this.hitboxWidth / 2;
     hitboxBottom = this.y + this.hitboxOffsetY + this.hitboxHeight;
 
@@ -254,12 +233,16 @@ runmysteriet.entity.EnglishBoat.prototype.isAboveRaft = function(raft) {
     raftRight = raft.x + raft.width;
     raftTop = raft.y;
 
-    // Kontrollera att mitten av båten är över flotten
+    /*
+     * Kontrollera att mitten av båten är över flotten.
+     */
     if (hitboxCenterX < raftLeft || hitboxCenterX > raftRight) {
         return false;
     }
 
-    // Kontrollera höjd
+    /*
+     * Kontrollera höjd.
+     */
     if (hitboxBottom > raftTop + 20) {
         return false;
     }
@@ -268,61 +251,8 @@ runmysteriet.entity.EnglishBoat.prototype.isAboveRaft = function(raft) {
 };
 
 /**
- * Uppdaterar båtens rörelse och blixt-effekter.
- *
- * @return {void}
- */
-runmysteriet.entity.EnglishBoat.prototype.update = function() {
-
-    var i = 0;
-    var lightning = null;
-    var old = null;
-
-    // Vertikal vågrörelse
-    this.waveCounter += this.waveSpeed;
-    this.y = this.startY + Math.sin(this.waveCounter) * this.waveHeight;
-
-    // Om inte farlig så avbryt
-    if (this.isDangerous !== true) {
-        return;
-    }
-
-    // Uppdatera blixtar
-    for (i = 0; i < this.m_lightnings.length; i++) {
-
-        lightning = this.m_lightnings[i];
-
-        if (!lightning) {
-            continue;
-        }
-
-        lightning.x += (Math.random() - 0.5) * 5;
-        lightning.y += (Math.random() - 0.5) * 5;
-
-        // Clamp inom båten
-        if (lightning.x < 0) lightning.x = 0;
-        if (lightning.x > 93) lightning.x = 93;
-
-        if (lightning.y < 0) lightning.y = 0;
-        if (lightning.y > 88) lightning.y = 88;
-    }
-
-    // Slumpmässigt byt ut blixt
-    if (Math.random() < 0.18) {
-
-        old = this.m_lightnings.shift();
-
-        if (old && old.parent) {
-            old.parent.removeChild(old);
-        }
-
-        this.spawnLightning();
-    }
-};
-
-/**
  * Kollar om båten träffar spelaren.
- *Endast aktiv när båten är farlig.
+ * Endast aktiv när båten är farlig.
  *
  * @param {!Object} player
  * @return {boolean}
@@ -331,6 +261,10 @@ runmysteriet.entity.EnglishBoat.prototype.isTouchingPlayer = function(player) {
 
     var boatX = 0;
     var boatY = 0;
+
+    if (this.m_isDisposed === true) {
+        return false;
+    }
 
     if (!player || player.isDead === true) {
         return false;
@@ -351,6 +285,81 @@ runmysteriet.entity.EnglishBoat.prototype.isTouchingPlayer = function(player) {
     );
 };
 
+//------------------------------------------------------------------------------
+// UPDATE
+//------------------------------------------------------------------------------
+
+/**
+ * Uppdaterar båtens rörelse och blixt-effekter.
+ *
+ * @return {void}
+ */
+runmysteriet.entity.EnglishBoat.prototype.update = function() {
+
+    var i = 0;
+    var lightning = null;
+    var old = null;
+
+    if (this.m_isDisposed === true) {
+        return;
+    }
+
+    /*
+     * Vertikal vågrörelse.
+     */
+    this.waveCounter += this.waveSpeed;
+    this.y = this.startY + Math.sin(this.waveCounter) * this.waveHeight;
+
+    if (this.isDangerous !== true) {
+        return;
+    }
+
+    /*
+     * Uppdatera blixtar.
+     */
+    for (i = 0; i < this.m_lightnings.length; i++) {
+        lightning = this.m_lightnings[i];
+
+        if (!lightning) {
+            continue;
+        }
+
+        lightning.x += (Math.random() - 0.5) * 5;
+        lightning.y += (Math.random() - 0.5) * 5;
+
+        if (lightning.x < 0) {
+            lightning.x = 0;
+        }
+
+        if (lightning.x > 93) {
+            lightning.x = 93;
+        }
+
+        if (lightning.y < 0) {
+            lightning.y = 0;
+        }
+
+        if (lightning.y > 88) {
+            lightning.y = 88;
+        }
+    }
+
+    /*
+     * Slumpmässigt byt ut blixt.
+     */
+    if (Math.random() < 0.18) {
+        old = this.m_lightnings.shift();
+
+        this.removeDisplayObject(old);
+
+        this.spawnLightning();
+    }
+};
+
+//------------------------------------------------------------------------------
+// TWEEN
+//------------------------------------------------------------------------------
+
 /**
  * Startar horisontell rörelse mellan två punkter.
  *
@@ -360,6 +369,10 @@ runmysteriet.entity.EnglishBoat.prototype.isTouchingPlayer = function(player) {
  * @return {void}
  */
 runmysteriet.entity.EnglishBoat.prototype.startTween = function(tweens, minX, maxX) {
+
+    if (this.m_isDisposed === true) {
+        return;
+    }
 
     if (!tweens) {
         return;
@@ -379,14 +392,79 @@ runmysteriet.entity.EnglishBoat.prototype.startTween = function(tweens, minX, ma
     });
 };
 
+//------------------------------------------------------------------------------
+// REMOVE DISPLAY OBJECT
+//------------------------------------------------------------------------------
+
 /**
- * Städar upp blixtar och referenser.
+ * Tar bort display object från stage/parent.
+ *
+ * @param {?Object} object
+ * @return {void}
+ */
+runmysteriet.entity.EnglishBoat.prototype.removeDisplayObject = function(object) {
+
+    if (!object) {
+        return;
+    }
+
+    if (object.parent) {
+        object.parent.removeChild(object);
+        return;
+    }
+
+    if (object.stage) {
+        object.stage.removeChild(object);
+    }
+};
+
+//------------------------------------------------------------------------------
+// REMOVE
+//------------------------------------------------------------------------------
+
+/**
+ * Tar bort båten från stage.
+ *
+ * @return {void}
+ */
+runmysteriet.entity.EnglishBoat.prototype.remove = function() {
+
+    this.hideLightning();
+    this.removeDisplayObject(this);
+};
+
+//------------------------------------------------------------------------------
+// DISPOSE
+//------------------------------------------------------------------------------
+
+/**
+ * Städar upp båten, blixtar och referenser.
  *
  * @return {void}
  */
 runmysteriet.entity.EnglishBoat.prototype.dispose = function() {
 
-    this.hideLightning();
+    this.m_isDisposed = true;
 
-    this.m_lightningTypes = null;
+    this.remove();
+
+    this.damage = 0;
+
+    this.startX = 0;
+    this.startY = 0;
+
+    this.waveCounter = 0;
+    this.waveSpeed = 0;
+    this.waveHeight = 0;
+
+    this.isDangerous = false;
+
+    this.hitboxOffsetX = 0;
+    this.hitboxOffsetY = 0;
+    this.hitboxWidth = 0;
+    this.hitboxHeight = 0;
+
+    this.m_lightnings = [];
+    this.m_maxLightnings = 0;
+    this.m_lightningTypes = [];
 };

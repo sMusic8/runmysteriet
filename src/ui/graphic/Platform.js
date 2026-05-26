@@ -1,4 +1,10 @@
+//------------------------------------------------------------------------------
+// PLATFORM
+//------------------------------------------------------------------------------
+
 /**
+ * Platform.
+ *
  * @constructor
  * @extends {rune.display.Graphic}
  * @param {number=} x
@@ -9,60 +15,136 @@
  */
 runmysteriet.ui.Platform = function(x, y, width, height, texture) {
 
-     rune.display.Graphic.call(
+    rune.display.Graphic.call(
         this,
-        (x !== undefined ? x : 200), 
-        (y !== undefined ? y : 200),
+        x !== undefined ? x : 200,
+        y !== undefined ? y : 200,
         width || 268,
         height || 32,
         texture || "bana-gras1"
     );
 
-        this.collisionPaddingLeft = 4;
-        this.collisionPaddingRight = 4;
-        this.collisionPaddingTop = 0;
+    /*
+     * Kollisionsyta.
+     * Gör hitboxen lite smalare än grafiken så spelaren inte fastnar i kanter.
+     */
+    this.collisionPaddingLeft = 4;
+    this.collisionPaddingRight = 4;
+    this.collisionPaddingTop = 0;
 };
 
-//Inheritance
-runmysteriet.ui.Platform.prototype = Object.create(rune.display.Graphic.prototype);
-runmysteriet.ui.Platform.prototype.constructor = runmysteriet.ui.Platform;
+//------------------------------------------------------------------------------
+// INHERITANCE
+//------------------------------------------------------------------------------
+
+runmysteriet.ui.Platform.prototype =
+    Object.create(rune.display.Graphic.prototype);
+
+runmysteriet.ui.Platform.prototype.constructor =
+    runmysteriet.ui.Platform;
+
+//------------------------------------------------------------------------------
+// INIT
+//------------------------------------------------------------------------------
 
 /**
- * Initierar platformen.
+ * Initializes platform.
  *
- * @this {runmysteriet.ui.Platform}
  * @return {void}
  */
 runmysteriet.ui.Platform.prototype.init = function() {
+
     rune.display.Graphic.prototype.init.call(this);
 };
 
+//------------------------------------------------------------------------------
+// COLLISION
+//------------------------------------------------------------------------------
+
 /**
- * Returnerar vänster kant för kollisionsyta.
+ * Hämtar vänster kollisionskant.
  *
- * @this {runmysteriet.ui.Platform}
- * @return {number} X-position för vänster kollisionsgräns.
+ * @return {number}
  */
 runmysteriet.ui.Platform.prototype.getCollisionLeft = function() {
+
     return this.x + this.collisionPaddingLeft;
 };
 
 /**
- * Returnerar höger kant för kollisionsyta.
+ * Hämtar höger kollisionskant.
  *
- * @this {runmysteriet.ui.Platform}
- * @return {number} X-position för höger kollisionsgräns.
+ * @return {number}
  */
 runmysteriet.ui.Platform.prototype.getCollisionRight = function() {
+
     return this.x + this.width - this.collisionPaddingRight;
 };
 
 /**
- * Returnerar övre kant för kollisionsyta.
+ * Hämtar övre kollisionskant.
  *
- * @this {runmysteriet.ui.Platform}
- * @return {number} Y-position för övre kollisionsgräns.
+ * @return {number}
  */
 runmysteriet.ui.Platform.prototype.getCollisionTop = function() {
+
     return this.y + this.collisionPaddingTop;
+};
+
+//------------------------------------------------------------------------------
+// REMOVE DISPLAY OBJECT
+//------------------------------------------------------------------------------
+
+/**
+ * Tar bort display object från stage.
+ *
+ * @param {?Object} object
+ * @return {void}
+ */
+runmysteriet.ui.Platform.prototype.removeDisplayObject = function(object) {
+
+    if (!object) {
+        return;
+    }
+
+    if (object.parent) {
+        object.parent.removeChild(object);
+        return;
+    }
+
+    if (object.stage) {
+        object.stage.removeChild(object);
+    }
+};
+
+//------------------------------------------------------------------------------
+// REMOVE
+//------------------------------------------------------------------------------
+
+/**
+ * Tar bort plattformen från stage.
+ *
+ * @return {void}
+ */
+runmysteriet.ui.Platform.prototype.remove = function() {
+
+    this.removeDisplayObject(this);
+};
+
+//------------------------------------------------------------------------------
+// DISPOSE
+//------------------------------------------------------------------------------
+
+/**
+ * Rensar Platform.
+ *
+ * @return {void}
+ */
+runmysteriet.ui.Platform.prototype.dispose = function() {
+
+    this.remove();
+
+    this.collisionPaddingLeft = 0;
+    this.collisionPaddingRight = 0;
+    this.collisionPaddingTop = 0;
 };

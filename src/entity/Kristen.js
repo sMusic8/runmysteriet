@@ -355,3 +355,75 @@ runmysteriet.entity.Kristen.prototype.checkPlayerCollisions = function (players)
     this.handleCollision(players[i]);
   }
 };
+
+//------------------------------------------------------------------------------
+// REMOVE DISPLAY OBJECT
+//------------------------------------------------------------------------------
+
+/**
+ * Tar bort display object från stage.
+ *
+ * @param {?Object} object
+ * @return {void}
+ */
+runmysteriet.entity.Kristen.prototype.removeDisplayObject = function(object) {
+
+    if (!object) {
+        return;
+    }
+
+    if (object.parent) {
+        object.parent.removeChild(object);
+        return;
+    }
+
+    if (object.stage) {
+        object.stage.removeChild(object);
+    }
+};
+
+//------------------------------------------------------------------------------
+// DISPOSE
+//------------------------------------------------------------------------------
+
+/**
+ * Rensar Kristen och objekt som Kristen själv äger.
+ *
+ * @return {void}
+ */
+runmysteriet.entity.Kristen.prototype.dispose = function() {
+
+    /*
+     * HpBar hör till Kristen och ska bort när Kristen tas bort.
+     */
+    this.removeDisplayObject(this.hpBar);
+
+    /*
+     * Själva Kristen-objektet.
+     */
+    this.removeDisplayObject(this);
+
+    /*
+     * Nolla display/state.
+     */
+    this.hpBar = null;
+    this.enemyBlocker = null;
+
+    this.isDead = true;
+    this.isActive = false;
+
+    this.hp = 0;
+    this.maxHp = 0;
+
+    this.damage = 0;
+    this.speed = 0;
+    this.direction = 0;
+
+    /*
+     * Nolla ljud/referenser om de finns.
+     */
+    this.hitSound = null;
+    this.deathSound = null;
+    this.attackSound = null;
+    this.application = null;
+};

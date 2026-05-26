@@ -12,17 +12,31 @@
  */
 runmysteriet.handler.HudHandler = function(stage, application, cameras) {
 
+    /** @type {!rune.display.DisplayObjectContainer} */
     this.stage = stage;
+
+    /** @type {!Object} */
     this.application = application;
+
+    /** @type {!Object} */
     this.cameras = cameras;
 
+    /** @type {?rune.text.BitmapField} */
     this.m_timerText = null;
+
+    /** @type {?rune.text.BitmapField} */
     this.m_scoreText = null;
+
+    /** @type {?runmysteriet.ui.graphic.HighscoreHud} */
     this.m_highscoreHud = null;
 
+    /** @type {?rune.display.Graphic} */
     this.m_runeTextBg = null;
+
+    /** @type {?rune.text.BitmapField} */
     this.m_runeText = null;
 
+    /** @type {?runmysteriet.handler.ShieldHandler} */
     this.m_shieldHandler = null;
 };
 
@@ -32,6 +46,11 @@ runmysteriet.handler.HudHandler = function(stage, application, cameras) {
  * @return {void}
  */
 runmysteriet.handler.HudHandler.prototype.init = function() {
+
+    /*
+     * Säkerhet om HUD råkar initieras om.
+     */
+    this.clear();
 
     this.m_timerText = new rune.text.BitmapField("COLLECT ALL RUNES");
     this.m_timerText.x = 15;
@@ -99,9 +118,9 @@ runmysteriet.handler.HudHandler.prototype.connectShieldHandler = function(shield
         self.setRuneText(text);
     };
 };
+
 /**
- * Uppdaterar HUD-positioner baserat på aktuell kamera viewport.
- * Denna metod gör att UI-element följer kameran och alltid ligger fast på skärmen oavsett scroll.
+ * Uppdaterar HUD-positioner efter kameran.
  *
  * @return {void}
  */
@@ -162,7 +181,6 @@ runmysteriet.handler.HudHandler.prototype.update = function() {
     }
 
     if (this.m_runeText && this.m_runeTextBg) {
-
         runeBoxWidth = this.m_runeText.width + 10;
 
         if (runeBoxWidth < 190) {
@@ -220,7 +238,7 @@ runmysteriet.handler.HudHandler.prototype.setScoreText = function(text) {
 runmysteriet.handler.HudHandler.prototype.setRuneText = function(text) {
 
     if (this.m_runeText) {
-        this.m_runeText.text = "RUNES: " + text;
+        this.m_runeText.text = "RUNES: " + String(text || "");
     }
 };
 
@@ -239,15 +257,30 @@ runmysteriet.handler.HudHandler.prototype.reloadHighscore = function() {
         this.m_highscoreHud.reload();
     }
 };
+
+//------------------------------------------------------------------------------
+// REMOVE DISPLAY OBJECT
+//------------------------------------------------------------------------------
+
 /**
- * Tar bort ett displayobjekt från scenen.
+ * Tar bort display object från stage.
  *
- * @param {rune.display.DisplayObject} object
+ * @param {?Object} object
  * @return {void}
  */
 runmysteriet.handler.HudHandler.prototype.removeDisplayObject = function(object) {
 
     if (!object) {
+        return;
+    }
+
+    if (typeof object.dispose === "function") {
+        object.dispose();
+        return;
+    }
+
+    if (typeof object.remove === "function") {
+        object.remove();
         return;
     }
 
@@ -265,25 +298,32 @@ runmysteriet.handler.HudHandler.prototype.removeDisplayObject = function(object)
      *
      * @return {void}
      */
-    runmysteriet.handler.HudHandler.prototype.clear = function() {
+runmysteriet.handler.HudHandler.prototype.clear = function() {
 
         if (this.m_shieldHandler) {
             this.m_shieldHandler.onCollectedChanged = null;
         }
+}
+//------------------------------------------------------------------------------
+// CLEAR
+//------------------------------------------------------------------------------
 
-        if (this.m_highscoreHud) {
-            if (typeof this.m_highscoreHud.clear === "function") {
-                this.m_highscoreHud.clear();
-            } else if (typeof this.m_highscoreHud.dispose === "function") {
-                this.m_highscoreHud.dispose();
-            }
-        }
+/**
+ * Tar bort HUD-objekt från stage.
+ *
+ * @return {void}
+ */
+runmysteriet.handler.HudHandler.prototype.clear = function() {
 
-        this.removeDisplayObject(this.m_runeText);
-        this.removeDisplayObject(this.m_runeTextBg);
-        this.removeDisplayObject(this.m_highscoreHud);
-        this.removeDisplayObject(this.m_scoreText);
-        this.removeDisplayObject(this.m_timerText);
+    if (this.m_shieldHandler) {
+        this.m_shieldHandler.onCollectedChanged = null;
+    }
+
+    this.removeDisplayObject(this.m_runeText);
+    this.removeDisplayObject(this.m_runeTextBg);
+    this.removeDisplayObject(this.m_highscoreHud);
+    this.removeDisplayObject(this.m_scoreText);
+    this.removeDisplayObject(this.m_timerText);
 
         this.m_timerText = null;
         this.m_scoreText = null;
@@ -292,8 +332,23 @@ runmysteriet.handler.HudHandler.prototype.removeDisplayObject = function(object)
         this.m_runeTextBg = null;
         this.m_runeText = null;
 
-        this.m_shieldHandler = null;
-        this.stage = null;
-        this.application = null;
-        this.cameras = null;
-    };
+    this.m_shieldHandler = null;
+};
+
+//------------------------------------------------------------------------------
+// DISPOSE
+//------------------------------------------------------------------------------
+
+/**
+ * Rensar HudHandler helt.
+ *
+ * @return {void}
+ */
+runmysteriet.handler.HudHandler.prototype.dispose = function() {
+
+    this.clear();
+
+    this.stage = null;
+    this.application = null;
+    this.cameras = null;
+};

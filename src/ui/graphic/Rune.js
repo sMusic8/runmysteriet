@@ -1,14 +1,14 @@
+//------------------------------------------------------------------------------
+// RUNE
+//------------------------------------------------------------------------------
+
 /**
- * Hanterar skapande och utdelning av runor i UI.
+ * Skapar och hanterar rune-grafik.
  *
  * @constructor
  */
-runmysteriet.ui.Rune = function () {
+runmysteriet.ui.Rune = function() {
 
-    /**
-     * Lista med alla skapade runor.
-     * @type {!Array<!rune.display.Graphic>}
-     */
     this.allRunes = [];
 
     /**
@@ -23,37 +23,39 @@ runmysteriet.ui.Rune = function () {
      */
     this.currentIndex = 0;
 
-    /**
-     * Prefix för sprite-filer.
-     * @type {string}
-     */
-    this.filePrefix = "";
+    this.filePrefix = "rune_";
 
-    /**
-     * Filnamnsdelar för run-sprites.
-     * @type {!Array<string>}
-     */
-    this.fileName = [];
+    this.fileName = [
+        "d",
+        "f",
+        "r",
+        "t",
+        "u",
+        "y"
+    ];
 };
 
+//------------------------------------------------------------------------------
+// CREATE
+//------------------------------------------------------------------------------
+
 /**
- * Skapar alla runor, shufflar dem och returnerar listan.
+ * Skapar alla runor och blandar dem.
  *
- * @this {runmysteriet.ui.Rune}
- * @return {!Array<!rune.display.Graphic>} Lista med rune-sprites.
+ * @return {!Array<!rune.display.Graphic>}
  */
-runmysteriet.ui.Rune.prototype.makeAllRunes = function () {
+runmysteriet.ui.Rune.prototype.makeAllRunes = function() {
 
-    this.filePrefix = "rune_";
-    this.fileName = ["d", "f", "r", "t", "u", "y"];
+    var i = 0;
+    var spriteName = "";
+    var runeSprite = null;
 
-    this.allRunes = [];
+    this.clear();
 
-    for (var i = 0; i < this.fileName.length; i++) {
+    for (i = 0; i < this.fileName.length; i++) {
+        spriteName = this.filePrefix + this.fileName[i];
 
-        var spriteName = this.filePrefix + this.fileName[i];
-
-        var runeSprite = new rune.display.Graphic(
+        runeSprite = new rune.display.Graphic(
             0,
             0,
             14,
@@ -65,41 +67,125 @@ runmysteriet.ui.Rune.prototype.makeAllRunes = function () {
     }
 
     this.shuffleRunes();
+
     return this.allRunes;
 };
 
+//------------------------------------------------------------------------------
+// SHUFFLE
+//------------------------------------------------------------------------------
+
 /**
- * Blandar runorna slumpmässigt (Fisher–Yates shuffle).
+ * Blandar rune-listan.
  *
- * @this {runmysteriet.ui.Rune}
  * @return {void}
  */
-runmysteriet.ui.Rune.prototype.shuffleRunes = function () {
+runmysteriet.ui.Rune.prototype.shuffleRunes = function() {
 
-    for (var i = this.allRunes.length - 1; i > 0; i--) {
+    var i = 0;
+    var j = 0;
+    var temp = null;
 
-        var j = Math.floor(Math.random() * (i + 1));
+    for (i = this.allRunes.length - 1; i > 0; i--) {
+        j = Math.floor(Math.random() * (i + 1));
 
-        var temp = this.allRunes[i];
+        temp = this.allRunes[i];
         this.allRunes[i] = this.allRunes[j];
         this.allRunes[j] = temp;
     }
 };
 
-/**
- * Returnerar nästa rune från listan (efter shuffle).
- *
- * @this {runmysteriet.ui.Rune}
- * @return {?rune.display.Graphic} En rune eller null om inga finns kvar.
- */
-runmysteriet.ui.Rune.prototype.getOneRune = function () {
+//------------------------------------------------------------------------------
+// GET
+//------------------------------------------------------------------------------
 
-    if (this.allRunes.length === 0) {
+/**
+ * Hämtar en rune från listan.
+ *
+ * @return {?rune.display.Graphic}
+ */
+runmysteriet.ui.Rune.prototype.getOneRune = function() {
+
+    if (!this.allRunes || this.allRunes.length === 0) {
         return null;
     }
 
-    // Ta första runan (efter shuffle)
+    /*
+     * Ta första runan efter shuffle.
+     */
     this.oneRune = this.allRunes.shift();
 
     return this.oneRune;
+};
+
+//------------------------------------------------------------------------------
+// REMOVE DISPLAY OBJECT
+//------------------------------------------------------------------------------
+
+/**
+ * Tar bort display object från stage.
+ *
+ * @param {?Object} object
+ * @return {void}
+ */
+runmysteriet.ui.Rune.prototype.removeDisplayObject = function(object) {
+
+    if (!object) {
+        return;
+    }
+
+    if (object.parent) {
+        object.parent.removeChild(object);
+        return;
+    }
+
+    if (object.stage) {
+        object.stage.removeChild(object);
+    }
+};
+
+//------------------------------------------------------------------------------
+// CLEAR
+//------------------------------------------------------------------------------
+
+/**
+ * Tar bort runor som klassen fortfarande äger.
+ *
+ * @return {void}
+ */
+runmysteriet.ui.Rune.prototype.clear = function() {
+
+    var i = 0;
+    var runeSprite = null;
+
+    if (this.allRunes) {
+        for (i = 0; i < this.allRunes.length; i++) {
+            runeSprite = this.allRunes[i];
+
+            this.removeDisplayObject(runeSprite);
+        }
+    }
+
+    this.removeDisplayObject(this.oneRune);
+
+    this.allRunes = [];
+    this.oneRune = null;
+    this.currentIndex = 0;
+};
+
+//------------------------------------------------------------------------------
+// DISPOSE
+//------------------------------------------------------------------------------
+
+/**
+ * Rensar Rune helt.
+ *
+ * @return {void}
+ */
+runmysteriet.ui.Rune.prototype.dispose = function() {
+
+    this.clear();
+
+    this.filePrefix = "";
+    this.fileName = [];
 };

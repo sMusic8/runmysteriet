@@ -139,3 +139,74 @@ runmysteriet.logic.GuessLetterBox.prototype.setActive = function(active) {
         this.downArrowText.visible = active === true;
     }
 };
+
+//------------------------------------------------------------------------------
+// REMOVE DISPLAY OBJECT
+//------------------------------------------------------------------------------
+
+/**
+ * Tar bort ett display object från stage.
+ *
+ * @param {?Object} object
+ * @return {void}
+ */
+runmysteriet.logic.GuessLetterBox.prototype.removeDisplayObject = function(object) {
+
+    if (!object) {
+        return;
+    }
+
+    if (object.parent) {
+        object.parent.removeChild(object);
+        return;
+    }
+
+    if (object.stage) {
+        object.stage.removeChild(object);
+    }
+};
+
+//------------------------------------------------------------------------------
+// CLEAR
+//------------------------------------------------------------------------------
+
+/**
+ * Tar bort alla display objects som hör till bokstavsrutan.
+ *
+ * @return {void}
+ */
+runmysteriet.logic.GuessLetterBox.prototype.clear = function() {
+
+    this.removeDisplayObject(this.m_box);
+    this.removeDisplayObject(this.m_text);
+    this.removeDisplayObject(this.m_background);
+    this.removeDisplayObject(this.m_letterText);
+
+    this.m_box = null;
+    this.m_text = null;
+    this.m_background = null;
+    this.m_letterText = null;
+};
+
+//------------------------------------------------------------------------------
+// DISPOSE
+//------------------------------------------------------------------------------
+
+/**
+ * Rensar GuessLetterBox helt.
+ *
+ * @return {void}
+ */
+runmysteriet.logic.GuessLetterBox.prototype.dispose = function() {
+
+    this.clear();
+
+    this.m_index = 0;
+    this.m_x = 0;
+    this.m_y = 0;
+    this.m_width = 0;
+    this.m_height = 0;
+
+    this.m_letter = "";
+    this.m_isActive = false;
+};

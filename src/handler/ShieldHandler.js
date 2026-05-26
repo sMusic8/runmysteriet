@@ -1,7 +1,6 @@
 //------------------------------------------------------------------------------
 // SHIELD HANDLER
 //------------------------------------------------------------------------------
-
 /**
  * Hanterar runor/shields som bygger upp ett ord i spelet.
  *
@@ -12,7 +11,13 @@
  * @param {number} levelNumber
  * @param {Array=} runeSpawns
  */
-runmysteriet.handler.ShieldHandler = function(stage, application, levelWidth, levelNumber, runeSpawns) {
+runmysteriet.handler.ShieldHandler = function(
+    stage,
+    application,
+    levelWidth,
+    levelNumber,
+    runeSpawns
+) {
 
     /** @type {!rune.display.Stage} */
     this.m_stage = stage;
@@ -21,18 +26,18 @@ runmysteriet.handler.ShieldHandler = function(stage, application, levelWidth, le
     this.application = application;
 
     /** @type {number} */
-    this.m_levelWidth = levelWidth;
+    this.m_levelWidth = levelWidth || 0;
 
     /** @type {number} */
     this.m_levelNumber = levelNumber || 1;
 
-    /** @type {Array} */
+    /** @type {!Array} */
     this.m_runeSpawns = runeSpawns || [];
 
-    /** @type {Array<!Object>} */
+    /** @type {!Array<!Object>} */
     this.m_shields = [];
 
-    /** @type {Array<!Object>} */
+    /** @type {!Array<!Object>} */
     this.m_collected = [];
 
     /** @type {string} */
@@ -41,23 +46,28 @@ runmysteriet.handler.ShieldHandler = function(stage, application, levelWidth, le
     /** @type {?Object} */
     this.m_wordData = null;
 
-    /** @type {Array<string>} */
+    /** @type {!Array<string>} */
     this.m_hints = [];
 
-    /** @type {Array<boolean>} */
+    /** @type {!Array<boolean>} */
     this.m_collectedMap = [];
 
     /** @type {number} */
     this.m_hiddenIndex = -1;
 
     /** @type {?Object} */
-    this.catchSound = this.application.sounds.sound.get("sound_catch");
-
-    /** @type {?Object} */
-    this.box = null;
+    this.catchSound = null;
 
     /** @type {?Function} */
     this.onCollectedChanged = null;
+
+    if (
+        this.application &&
+        this.application.sounds &&
+        this.application.sounds.sound
+    ) {
+        this.catchSound = this.application.sounds.sound.get("sound_catch");
+    }
 };
 
 /**
@@ -80,6 +90,8 @@ runmysteriet.handler.ShieldHandler.prototype.getWordResourceName = function() {
 
 /**
  * Initierar shields och genererar ordet som ska samlas.
+ *
+ * @return {void}
  */
 runmysteriet.handler.ShieldHandler.prototype.init = function() {
 
@@ -89,17 +101,26 @@ runmysteriet.handler.ShieldHandler.prototype.init = function() {
     var shield = null;
     var spawn = null;
 
+    /*
+     * Rensa bara skapade shields.
+     * Viktigt: m_runeSpawns ska inte tömmas här.
+     */
+    this.clear();
+
     wordData = this.getRandomWordData();
 
     if (wordData && wordData.word) {
-
         word = String(wordData.word || "").toUpperCase();
 
         this.m_wordData = wordData;
         this.m_word = word;
         this.m_hints = wordData.Subword || [];
-
     } else {
+        this.setFallbackWord();
+        word = this.m_word;
+    }
+
+    if (!word || word.length <= 0) {
         this.setFallbackWord();
         word = this.m_word;
     }
@@ -112,7 +133,6 @@ runmysteriet.handler.ShieldHandler.prototype.init = function() {
     }
 
     for (i = 0; i < word.length; i++) {
-
         if (i === this.m_hiddenIndex) {
             continue;
         }
@@ -123,7 +143,7 @@ runmysteriet.handler.ShieldHandler.prototype.init = function() {
         shield.x = spawn.x;
         shield.y = spawn.y;
 
-        shield.__collected = false;
+        shield.isCollected = false;
         shield.active = true;
         shield.wordIndex = i;
 
@@ -136,15 +156,26 @@ runmysteriet.handler.ShieldHandler.prototype.init = function() {
 
 /**
  * Sätter ett fallback-ord om resurser saknas.
+ *
+ * @return {void}
  */
 runmysteriet.handler.ShieldHandler.prototype.setFallbackWord = function() {
 
     if (this.m_levelNumber >= 11) {
-        this.m_wordData = { word: "warrior", Subword: ["fighter", "battle"] };
+        this.m_wordData = {
+            word: "warrior",
+            Subword: ["fighter", "battle"]
+        };
     } else if (this.m_levelNumber >= 6) {
-        this.m_wordData = { word: "shield", Subword: ["protection", "battle"] };
+        this.m_wordData = {
+            word: "shield",
+            Subword: ["protection", "battle"]
+        };
     } else {
-        this.m_wordData = { word: "raven", Subword: ["black bird", "viking sign"] };
+        this.m_wordData = {
+            word: "raven",
+            Subword: ["black bird", "viking sign"]
+        };
     }
 
     this.m_word = String(this.m_wordData.word || "").toUpperCase();
@@ -162,11 +193,13 @@ runmysteriet.handler.ShieldHandler.prototype.getRuneSpawn = function(index) {
     var spawn = null;
 
     if (this.m_runeSpawns && this.m_runeSpawns.length > 0) {
-
         spawn = this.m_runeSpawns[index % this.m_runeSpawns.length];
 
         if (spawn) {
-            return { x: spawn.x, y: spawn.y };
+            return {
+                x: spawn.x,
+                y: spawn.y
+            };
         }
     }
 
@@ -186,7 +219,7 @@ runmysteriet.handler.ShieldHandler.prototype.getFallbackRuneSpawn = function(ind
     var count = this.m_word ? this.m_word.length : 5;
     var spacing = 0;
 
-    spacing = (count > 1) ? (endX - startX) / (count - 1) : 0;
+    spacing = count > 1 ? (endX - startX) / (count - 1) : 0;
 
     return {
         x: startX + index * spacing,
@@ -227,7 +260,7 @@ runmysteriet.handler.ShieldHandler.prototype.getRandomWordData = function() {
     if (typeof data === "string") {
         try {
             data = JSON.parse(data);
-        } catch (e) {
+        } catch (error) {
             return null;
         }
     }
@@ -241,11 +274,14 @@ runmysteriet.handler.ShieldHandler.prototype.getRandomWordData = function() {
     return data[index];
 };
 
+//------------------------------------------------------------------------------
+// UPDATE
+//------------------------------------------------------------------------------
+
 /**
- * Uppdaterar alla shields och kontrollerar om någon spelare samlar upp dem.
+ * Uppdaterar shields och kollar om spelare samlar dem.
  *
- * @this {runmysteriet.handler.ShieldHandler}
- * @param {Array<runmysteriet.entity.Player>} players Lista av spelare att testa mot
+ * @param {?Array<!Object>} players
  * @return {void}
  */
 runmysteriet.handler.ShieldHandler.prototype.update = function(players) {
@@ -262,24 +298,34 @@ runmysteriet.handler.ShieldHandler.prototype.update = function(players) {
     /** @type {?runmysteriet.entity.Player} */
     var player = null;
 
-    if (!players) return;
+    if (!players || !this.m_shields) {
+        return;
+    }
 
-    for (i = 0; i < this.m_shields.length; i++) {
-
+    /*
+     * Baklänges eftersom collectShield tar bort från m_shields.
+     */
+    for (i = this.m_shields.length - 1; i >= 0; i--) {
         shield = this.m_shields[i];
 
-        if (!shield) continue;
-        if (shield.isCollected === true) continue;
-        if (shield.visible === false) continue;
+        if (!shield) {
+            continue;
+        }
+
+        if (shield.isCollected === true) {
+            continue;
+        }
+
+        if (shield.visible === false) {
+            continue;
+        }
 
         for (j = 0; j < players.length; j++) {
-
             player = players[j];
 
-            if (!player) continue;
-            if (player.isDead === true) continue;
-            if (player.visible === false) continue;
-            if (player.active === false) continue;
+            if (!this.isValidPlayer(player)) {
+                continue;
+            }
 
             if (shield.hitTestObject(player)) {
                 this.collectShield(shield);
@@ -288,11 +334,42 @@ runmysteriet.handler.ShieldHandler.prototype.update = function(players) {
         }
     }
 };
+
 /**
- * Hanterar insamling av en shield (pickup) och uppdaterar spelets state.
+ * Kontrollerar om spelare kan samla shield.
  *
- * @this {runmysteriet.handler.ShieldHandler}
- * @param {runmysteriet.entity.Shield} shield Shield som ska samlas in
+ * @param {?Object} player
+ * @return {boolean}
+ */
+runmysteriet.handler.ShieldHandler.prototype.isValidPlayer = function(player) {
+
+    if (!player) {
+        return false;
+    }
+
+    if (player.isDead === true) {
+        return false;
+    }
+
+    if (player.visible === false) {
+        return false;
+    }
+
+    if (player.active === false) {
+        return false;
+    }
+
+    return true;
+};
+
+//------------------------------------------------------------------------------
+// COLLECT
+//------------------------------------------------------------------------------
+
+/**
+ * Samlar upp en shield.
+ *
+ * @param {?runmysteriet.ui.Shield} shield
  * @return {void}
  */
 runmysteriet.handler.ShieldHandler.prototype.collectShield = function(shield) {
@@ -300,16 +377,22 @@ runmysteriet.handler.ShieldHandler.prototype.collectShield = function(shield) {
     /** @type {number} */
     var index = 0;
 
-    if (!shield || shield.__collected) return;
-
-    shield.__collected = true;
-    shield.active = false;
-
-    if (this.catchSound) {
-        this.catchSound.play(true);
+    if (!shield || shield.isCollected === true) {
+        return;
     }
 
-    this.m_stage.removeChild(shield);
+    shield.isCollected = true;
+    shield.active = false;
+    shield.visible = false;
+
+    this.playCatchSound();
+
+    /*
+     * Ta bara bort från stage.
+     * Kör inte dispose här, eftersom shield behövs i m_collected
+     * för getRuneString().
+     */
+    this.removeDisplayOnly(shield);
 
     index = this.m_shields.indexOf(shield);
 
@@ -329,9 +412,25 @@ runmysteriet.handler.ShieldHandler.prototype.collectShield = function(shield) {
 };
 
 /**
- * Genererar en sammansatt rune-sträng baserat på insamlade shields.
- * @this {runmysteriet.handler.ShieldHandler}
- * @return {string} Den sammansatta rune-strängen
+ * Spelar pickup-ljud.
+ *
+ * @return {void}
+ */
+runmysteriet.handler.ShieldHandler.prototype.playCatchSound = function() {
+
+    if (this.catchSound && typeof this.catchSound.play === "function") {
+        this.catchSound.play();
+    }
+};
+
+//------------------------------------------------------------------------------
+// STRING BUILDER
+//------------------------------------------------------------------------------
+
+/**
+ * Returnerar insamlade runor som text.
+ *
+ * @return {string}
  */
 runmysteriet.handler.ShieldHandler.prototype.getRuneString = function() {
 
@@ -340,17 +439,32 @@ runmysteriet.handler.ShieldHandler.prototype.getRuneString = function() {
 
     /** @type {number} */
     var i = 0;
+    var shield = null;
+
+    if (!this.m_collected) {
+        return result;
+    }
 
     for (i = 0; i < this.m_collected.length; i++) {
-        result += this.m_collected[i].rune;
+        shield = this.m_collected[i];
+
+        if (!shield) {
+            continue;
+        }
+
+        if (typeof shield.getRune === "function") {
+            result += shield.getRune();
+        } else {
+            result += shield.rune || "";
+        }
     }
 
     return result;
 };
+
 /**
- * Kontrollerar om alla nödvändiga runor har samlats in.
+ * Kontrollerar om alla placerade runor är insamlade.
  *
- * @this {runmysteriet.handler.ShieldHandler}
  * @return {boolean} True om alla nödvändiga runor är insamlade, annars false
  */
 runmysteriet.handler.ShieldHandler.prototype.allRunesColected = function() {
@@ -358,7 +472,9 @@ runmysteriet.handler.ShieldHandler.prototype.allRunesColected = function() {
     /** @type {number} */
     var placedRuneCount = 0;
 
-    if (!this.m_word || this.m_word.length <= 0) return false;
+    if (!this.m_word || this.m_word.length <= 0) {
+        return false;
+    }
 
     placedRuneCount = this.m_word.length;
 
@@ -370,15 +486,23 @@ runmysteriet.handler.ShieldHandler.prototype.allRunesColected = function() {
 };
 
 /**
- * Returnerar aktuell state-data för rune-/word-guess-systemet.
+ * Alias med rätt stavning.
  *
- * @this {runmysteriet.handler.ShieldHandler}
- * @return {{
- *   word: (string|Array<string>),
- *   Subword: (*),
- *   collectedMap: Object<string, boolean>,
- *   hiddenIndex: number
- * }} Objekt som beskriver aktuell guess-state
+ * @return {boolean}
+ */
+runmysteriet.handler.ShieldHandler.prototype.allRunesCollected = function() {
+
+    return this.allRunesColected();
+};
+
+//------------------------------------------------------------------------------
+// GETTERS
+//------------------------------------------------------------------------------
+
+/**
+ * Hämtar data till GuessWord.
+ *
+ * @return {!Object}
  */
 runmysteriet.handler.ShieldHandler.prototype.getGuessData = function() {
 
@@ -390,8 +514,64 @@ runmysteriet.handler.ShieldHandler.prototype.getGuessData = function() {
     };
 };
 
+//------------------------------------------------------------------------------
+// REMOVE DISPLAY OBJECT
+//------------------------------------------------------------------------------
+
 /**
- * Tar bort alla sköldar/runor från stage och rensar referenser.
+ * Tar bara bort display object från stage
+ * Används när objektet fortfarande behövs som data
+ *
+ * @param {?Object} object
+ * @return {void}
+ */
+runmysteriet.handler.ShieldHandler.prototype.removeDisplayOnly = function(object) {
+
+    if (!object) {
+        return;
+    }
+
+    if (object.parent) {
+        object.parent.removeChild(object);
+        return;
+    }
+
+    if (object.stage) {
+        object.stage.removeChild(object);
+    }
+};
+
+/**
+ * Tar bort display object och kör dispose/remove om objektet har det
+ *
+ * @param {?Object} object
+ * @return {void}
+ */
+runmysteriet.handler.ShieldHandler.prototype.removeDisplayObject = function(object) {
+
+    if (!object) {
+        return;
+    }
+
+    if (typeof object.dispose === "function") {
+        object.dispose();
+        return;
+    }
+
+    if (typeof object.remove === "function") {
+        object.remove();
+        return;
+    }
+
+    this.removeDisplayOnly(object);
+};
+
+//------------------------------------------------------------------------------
+// CLEAR
+//------------------------------------------------------------------------------
+
+/**
+ * Tar bort alla shields/runor från stage och tömmer listor.
  *
  * @return {void}
  */
@@ -404,15 +584,7 @@ runmysteriet.handler.ShieldHandler.prototype.clear = function() {
         for (i = 0; i < this.m_shields.length; i++) {
             shield = this.m_shields[i];
 
-            if (!shield) {
-                continue;
-            }
-
-            if (shield.parent) {
-                shield.parent.removeChild(shield);
-            } else if (shield.stage) {
-                shield.stage.removeChild(shield);
-            }
+            this.removeDisplayObject(shield);
         }
     }
 
@@ -420,31 +592,41 @@ runmysteriet.handler.ShieldHandler.prototype.clear = function() {
         for (i = 0; i < this.m_collected.length; i++) {
             shield = this.m_collected[i];
 
-            if (!shield) {
-                continue;
-            }
-
-            if (shield.parent) {
-                shield.parent.removeChild(shield);
-            } else if (shield.stage) {
-                shield.stage.removeChild(shield);
-            }
+            this.removeDisplayObject(shield);
         }
     }
 
     this.m_shields = [];
     this.m_collected = [];
     this.m_collectedMap = [];
-    this.m_runeSpawns = [];
 
     this.m_word = "";
     this.m_wordData = null;
     this.m_hints = [];
     this.m_hiddenIndex = -1;
+};
 
-    this.onCollectedChanged = null;
-    this.catchSound = null;
-    this.box = null;
-    this.application = null;
+//------------------------------------------------------------------------------
+// DISPOSE
+//------------------------------------------------------------------------------
+
+/**
+ * Rensar ShieldHandler helt.
+ *
+ * @return {void}
+ */
+runmysteriet.handler.ShieldHandler.prototype.dispose = function() {
+
+    this.clear();
+
     this.m_stage = null;
+    this.application = null;
+
+    this.m_levelWidth = 0;
+    this.m_levelNumber = 0;
+
+    this.m_runeSpawns = [];
+
+    this.catchSound = null;
+    this.onCollectedChanged = null;
 };

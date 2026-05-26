@@ -1,6 +1,7 @@
 //------------------------------------------------------------------------------
 // GUESS ALPHABET SELECTOR
 //------------------------------------------------------------------------------
+
 /**
  * Håller koll på vilken bokstav spelaren valt.
  *
@@ -18,7 +19,12 @@ runmysteriet.logic.GuessAlphabetSelector = function() {
     this.m_index = 0;
 };
 
+//------------------------------------------------------------------------------
+// PUBLIC METHODS
+//------------------------------------------------------------------------------
+
 /**
+ *
  * Alphabet selector som kan bläddra fram och tillbaka i en lista av bokstäver.
  * @constructor
  * @struct
@@ -56,6 +62,7 @@ runmysteriet.logic.GuessAlphabetSelector.prototype.next = function() {
 };
 
 /**
+ *
  * Går till föregående bokstav i listan.
  * Om det går under 0, hoppar vi till sista index.
  *
@@ -72,21 +79,40 @@ runmysteriet.logic.GuessAlphabetSelector.prototype.previous = function() {
     }
 };
 /**
- * Returnerar den aktuella bokstaven baserat på nuvarande index.
+ * Hämtar aktuell bokstav.
  *
- * @this {runmysteriet.logic.GuessAlphabetSelector}
- * @return {string} Den valda bokstaven.
+ * @return {string}
  */
 runmysteriet.logic.GuessAlphabetSelector.prototype.getLetter = function() {
+
+    if (!this.m_letters || this.m_letters.length === 0) {
+        return "";
+    }
+
     return this.m_letters[this.m_index];
 };
 
 /**
- * Återställer väljaren till första bokstaven i listan.
+ * Återställer valet till första bokstaven.
  *
- * @this {runmysteriet.logic.GuessAlphabetSelector}
  * @return {void}
  */
 runmysteriet.logic.GuessAlphabetSelector.prototype.reset = function() {
+
+    this.m_index = 0;
+};
+
+//------------------------------------------------------------------------------
+// DISPOSE
+//------------------------------------------------------------------------------
+
+/**
+ * Rensar GuessAlphabetSelector.
+ *
+ * @return {void}
+ */
+runmysteriet.logic.GuessAlphabetSelector.prototype.dispose = function() {
+
+    this.m_letters = [];
     this.m_index = 0;
 };

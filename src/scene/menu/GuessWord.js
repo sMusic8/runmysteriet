@@ -11,15 +11,29 @@
  * @param {number=} earnedScore
  * @param {number=} totalScore
  * @param {Object|string=} wordData
+ * @param {?Object=} avatarData
  */
-runmysteriet.scene.GuessWord = function(levelNumber, earnedScore, totalScore, wordData, avatarData) {
+runmysteriet.scene.GuessWord = function(
+    levelNumber,
+    earnedScore,
+    totalScore,
+    wordData,
+    avatarData
+) {
+
     rune.scene.Scene.call(this);
 
     this.m_gameInput = null;
+
     this.m_levelNumber = levelNumber || 1;
     this.m_earnedScore = earnedScore || 0;
     this.m_totalScore = totalScore || 0;
-    this.m_avatarData = avatarData || null;    
+
+    if (avatarData && typeof avatarData === "object") {
+        this.m_avatarData = avatarData;
+    } else {
+        this.m_avatarData = null;
+    }
 
     this.m_highscoreManager = null;
     this.m_highscoreSound = null;
@@ -58,33 +72,30 @@ runmysteriet.scene.GuessWord = function(levelNumber, earnedScore, totalScore, wo
     this.m_scoreText = null;
     this.m_messageText = null;
     this.m_correctWordText = null;
+
     this.m_failedGuess = false;
+    this.m_answeredCorrect = false;
 
     this.m_currentHintIndex = 0;
     this.m_hintCost = 20;
     this.m_wrongGuessPenalty = 10;
     this.m_wrongGuesses = 0;
     this.m_maxWrongGuesses = 3;
-    this.m_answeredCorrect = false;
 
     this.backgroundMusic = null;
     this.menuSound = null;
-
-    
 };
 
+//------------------------------------------------------------------------------
+// INHERITANCE
+//------------------------------------------------------------------------------
+
 runmysteriet.scene.GuessWord.prototype = Object.create(rune.scene.Scene.prototype);
+
 runmysteriet.scene.GuessWord.prototype.constructor = runmysteriet.scene.GuessWord;
-/**
- * Initierar GuessWord-scenen.
- *
- * Sätter upp musik, inputhantering, pussellogik, highscore-system
- * samt skapar alla visuella komponenter för spelet.
- */
-runmysteriet.scene.GuessWord.prototype.init = function () {
 
     // Kör parent-scenens init för korrekt uppstart
-    rune.scene.Scene.prototype.init.call(this);
+    rune.scene.Scene.prototype.init.call(this);{
 
     // Hämta ljud från ljudsystemet
     this.backgroundMusic = this.application.sounds.sound.get("sound_musicMenu");
@@ -97,7 +108,6 @@ runmysteriet.scene.GuessWord.prototype.init = function () {
         this.backgroundMusic.play();
     }
 
-    // Skapa highscore-hanterare
     this.m_highscoreManager =
         new runmysteriet.logic.HighscoreManager(this.application);
 
@@ -118,9 +128,11 @@ runmysteriet.scene.GuessWord.prototype.init = function () {
     this.createText();
     this.createLetterBoxes();
     this.updateLetterBoxes();
+
     this.createHighscoreNotice();
     this.checkHighscoreNotice(this.m_totalScore);
 }
+
 /**
  * Skapar all text-UI för GuessWord-scenen.
  */
@@ -140,26 +152,30 @@ runmysteriet.scene.GuessWord.prototype.createText = function () {
     this.m_letterText.y += 10;
     this.stage.addChild(this.m_letterText);
 
-    // Hint/instruktion för spelaren
-    this.m_hintText = new rune.text.BitmapField("HINT: PRESS T / TRIANGLE, COSTS 20 POINTS");
+    this.m_hintText = new rune.text.BitmapField(
+        "HINT: PRESS T / TRIANGLE, COSTS 20 POINTS"
+    );
+
     this.m_hintText.autoSize = true;
     this.m_hintText.center = this.application.screen.center;
     this.m_hintText.y += 40;
     this.m_hintText.scale = 0.8;
     this.stage.addChild(this.m_hintText);
 
-    // Poängvisning
-    this.m_scoreText = new rune.text.BitmapField("SCORE: " + this.m_totalScore);
+    this.m_scoreText = new rune.text.BitmapField(
+        "SCORE: " + this.m_totalScore
+    );
+
     this.m_scoreText.autoSize = true;
     this.m_scoreText.center = this.application.screen.center;
     this.m_scoreText.y += 65;
     this.m_scoreText.scale = 0.8;
     this.stage.addChild(this.m_scoreText);
 
-    // Spelinformation och kontroller
     this.m_messageText = new rune.text.BitmapField(
         "TRIES LEFT 3   UP/DOWN = LETTER, ENTER/CROSS = GUESS"
     );
+
     this.m_messageText.autoSize = true;
     this.m_messageText.center = this.application.screen.center;
     this.m_messageText.y += 90;
@@ -187,15 +203,14 @@ runmysteriet.scene.GuessWord.prototype.createLetterBoxes = function () {
 
     // Y-position för bokstavsraderna
     var y = this.application.screen.center.y - 35;
+    var i = 0;
+    var box = null;
 
     // Initiera array för alla bokstavsboxar
     this.m_letterBoxes = [];
 
-    // Skapa en box per bokstav i ordet
-    for (var i = 0; i < word.length; i++) {
-
-        // Skapa en individuell bokstavsbox
-        var box = new runmysteriet.logic.GuessLetterBox(
+    for (i = 0; i < word.length; i++) {
+        box = new runmysteriet.logic.GuessLetterBox(
             startX + i * (boxWidth + spacing),
             y,
             i
@@ -220,11 +235,9 @@ runmysteriet.scene.GuessWord.prototype.updateLetterBoxes = function () {
 
     // Hämta vald bokstav från alfabet-selektorn
     var selectedLetter = this.m_alphabetSelector.getLetter();
+    var i = 0;
 
-    // Loopa igenom alla bokstäver i ordet
-    for (var i = 0; i < word.length; i++) {
-
-        // Om bokstaven redan är avslöjad
+    for (i = 0; i < word.length; i++) {
         if (revealedMap[i] === true) {
             this.m_letterBoxes[i].setLetter(word.charAt(i));
             this.m_letterBoxes[i].setActive(false);
@@ -260,18 +273,12 @@ runmysteriet.scene.GuessWord.prototype.update = function(step) {
         return;
     }
 
-    /*
-     * Läs input EN gång.
-     * GameInput ska läsa keyboard + gamepad 0 + gamepad 1.
-     */
     input = this.m_gameInput.read(this.keyboard);
 
     this.updateVolumeInput(input);
     this.updateHighscoreNotice();
 
-
     if (this.m_answeredCorrect === true) {
-
         if (this.isConfirmPressed(input)) {
             this.goToLevelComplete();
         }
@@ -280,13 +287,12 @@ runmysteriet.scene.GuessWord.prototype.update = function(step) {
     }
 
     if (this.m_failedGuess === true) {
+        if (this.isConfirmPressed(input)) {
+            this.goToGameOver();
+        }
 
-    if (this.isConfirmPressed(input)) {
-        this.goToGameOver();
+        return;
     }
-
-    return;
-}
 
     if (!this.m_alphabetSelector || !this.m_puzzle) {
         return;
@@ -311,7 +317,6 @@ runmysteriet.scene.GuessWord.prototype.update = function(step) {
 
     if (input.choose) {
         this.checkAnswer(this.m_alphabetSelector.getLetter());
-        return;
     }
 };
 
@@ -328,26 +333,21 @@ runmysteriet.scene.GuessWord.prototype.updateVolumeInput = function(input) {
     }
 
     if (input.volumeUp === true) {
-
         this.backgroundMusic.volume += stepVol;
 
         if (this.backgroundMusic.volume > 1) {
             this.backgroundMusic.volume = 0;
         }
 
-        console.log("Volym:", this.backgroundMusic.volume.toFixed(2));
         return;
     }
 
     if (input.volumeDown === true) {
-
         this.backgroundMusic.volume -= stepVol;
 
         if (this.backgroundMusic.volume < 0) {
             this.backgroundMusic.volume = 1;
         }
-
-        console.log("Volym:", this.backgroundMusic.volume.toFixed(2));
     }
 };
 
@@ -357,13 +357,15 @@ runmysteriet.scene.GuessWord.prototype.updateVolumeInput = function(input) {
 
 runmysteriet.scene.GuessWord.prototype.buyHint = function() {
 
+    var hint = null;
+
     if (this.m_currentHintIndex >= this.m_hints.length) {
-        this.m_messageText.text = "NO MORE HINTS";
+        this.updateMessageText("NO MORE HINTS");
         return;
     }
 
     if (this.m_earnedScore < this.m_hintCost) {
-        this.m_messageText.text = "NOT ENOUGH POINTS FOR HINT";
+        this.updateMessageText("NOT ENOUGH POINTS FOR HINT");
         return;
     }
 
@@ -375,12 +377,20 @@ runmysteriet.scene.GuessWord.prototype.buyHint = function() {
 
     this.m_totalScore = this.m_scoreBeforeLevel + this.m_earnedScore;
 
-    var hint = this.m_hints[this.m_currentHintIndex];
+    hint = this.m_hints[this.m_currentHintIndex];
     this.m_currentHintIndex++;
 
-    this.m_hintText.text = "HINT " + this.m_currentHintIndex + ": " + String(hint).toUpperCase();
-    this.m_scoreText.text = "SCORE: " + this.m_totalScore;
-    this.m_messageText.text = "HINT COST 20 POINTS";
+    if (this.m_hintText) {
+        this.m_hintText.text =
+            "HINT " +
+            this.m_currentHintIndex +
+            ": " +
+            String(hint).toUpperCase();
+    }
+
+    this.updateScoreText();
+    this.updateMessageText("HINT COST 20 POINTS");
+    this.checkHighscoreNotice(this.m_totalScore);
 };
 
 //------------------------------------------------------------------------------
@@ -392,22 +402,21 @@ runmysteriet.scene.GuessWord.prototype.checkAnswer = function(letter) {
     var correct = this.m_puzzle.checkLetter(String(letter).toLowerCase());
 
     if (correct) {
-
         this.m_alphabetSelector.reset();
         this.updateLetterBoxes();
 
         if (this.m_puzzle.isComplete()) {
             this.m_answeredCorrect = true;
-            this.m_messageText.text = "RIGHT! PRESS ENTER TO CONTINUE";
-            return;
+            this.updateMessageText("RIGHT! CONTINUE: PRESS X / ENTER");            return;
         }
 
-        this.m_messageText.text = "RIGHT! NEXT LETTER";
+        this.updateMessageText("RIGHT! NEXT LETTER");
         return;
     }
 
     this.applyWrongGuessPenalty();
 };
+
 //------------------------------------------------------------------------------
 // CONFIRM
 //------------------------------------------------------------------------------
@@ -418,13 +427,16 @@ runmysteriet.scene.GuessWord.prototype.isConfirmPressed = function(input) {
         return false;
     }
 
-    return input.choose === true || input.pause === true;
+    return input.choose === true;
 };
+
 //------------------------------------------------------------------------------
 // LEVEL COMPLETE
 //------------------------------------------------------------------------------
 
 runmysteriet.scene.GuessWord.prototype.goToLevelComplete = function() {
+
+    this.stopBackgroundMusic();
 
     this.application.scenes.load([
         new runmysteriet.scene.LevelComplete(
@@ -435,6 +447,7 @@ runmysteriet.scene.GuessWord.prototype.goToLevelComplete = function() {
         )
     ]);
 };
+
 //------------------------------------------------------------------------------
 // WRONG GUESS
 //------------------------------------------------------------------------------
@@ -485,26 +498,26 @@ runmysteriet.scene.GuessWord.prototype.showCorrectWordText = function() {
     if (!this.m_correctWordText) {
         this.m_correctWordText = new rune.text.BitmapField("");
         this.m_correctWordText.autoSize = true;
-        this.m_correctWordText.scale = 0.8;
+        this.m_correctWordText.scale = 1;
 
         this.stage.addChild(this.m_correctWordText);
     }
 
-    this.m_correctWordText.text = "THE WORD WAS:  " + this.m_word.toUpperCase();
-    /*
-     * Placera texten precis ovanför bokstavsboxarna.
-     * Boxarna ligger på center.y - 35.
-     */
+    this.m_correctWordText.text =
+        "GAME OVER \n\n THE WORD WAS:  " + this.m_word.toUpperCase();
+
     this.m_correctWordText.center = this.application.screen.center;
     this.m_correctWordText.y = this.application.screen.center.y - 65;
 
-    this.updateMessageText("PRESS ENTER / CROSS TO CONTINUE");
-};
+    this.updateMessageText("CONTINUE: PRESS X / ENTER");
+}
 //------------------------------------------------------------------------------
 // GAME OVER
 //------------------------------------------------------------------------------
 
 runmysteriet.scene.GuessWord.prototype.goToGameOver = function() {
+
+    this.stopBackgroundMusic();
 
     this.application.scenes.load([
         new runmysteriet.scene.GameOver(
@@ -513,6 +526,11 @@ runmysteriet.scene.GuessWord.prototype.goToGameOver = function() {
         )
     ]);
 };
+
+//------------------------------------------------------------------------------
+// MESSAGE TEXT
+//------------------------------------------------------------------------------
+
 /**
  * Uppdaterar meddelandetext.
  *
@@ -527,6 +545,7 @@ runmysteriet.scene.GuessWord.prototype.updateMessageText = function(text) {
 
     this.m_messageText.text = text;
 };
+
 //------------------------------------------------------------------------------
 // SCORE TEXT
 //------------------------------------------------------------------------------
@@ -544,6 +563,7 @@ runmysteriet.scene.GuessWord.prototype.updateScoreText = function() {
 
     this.m_scoreText.text = "SCORE: " + this.m_totalScore;
 };
+
 //------------------------------------------------------------------------------
 // HIGHSCORE NOTICE
 //------------------------------------------------------------------------------
@@ -622,6 +642,7 @@ runmysteriet.scene.GuessWord.prototype.checkHighscoreNotice = function(score) {
         this.showHighscoreNotice();
     }
 };
+
 //------------------------------------------------------------------------------
 // REMOVE DISPLAY OBJECT
 //------------------------------------------------------------------------------
@@ -641,6 +662,7 @@ runmysteriet.scene.GuessWord.prototype.removeDisplayObject = function(object) {
         object.stage.removeChild(object);
     }
 };
+
 //------------------------------------------------------------------------------
 // SOUND
 //------------------------------------------------------------------------------
@@ -669,6 +691,7 @@ runmysteriet.scene.GuessWord.prototype.stopBackgroundMusic = function() {
         }
     }
 };
+
 //------------------------------------------------------------------------------
 // DISPOSE
 //------------------------------------------------------------------------------
@@ -695,6 +718,7 @@ runmysteriet.scene.GuessWord.prototype.dispose = function() {
 
             if (typeof box.clear === "function") {
                 box.clear();
+                continue;
             }
 
             this.removeDisplayObject(box.m_box);
@@ -734,6 +758,7 @@ runmysteriet.scene.GuessWord.prototype.dispose = function() {
     this.m_highscoreSound = null;
     this.m_highscoreTimer = 0;
     this.m_highscoreNotified = false;
+
     this.m_avatarData = null;
 
     this.backgroundMusic = null;

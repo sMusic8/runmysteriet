@@ -1,6 +1,7 @@
 //------------------------------------------------------------------------------
 // GUESS WORD PUZZLE
 //------------------------------------------------------------------------------
+
 /**
  * Hanterar ordlogiken i GuessWord.
  *
@@ -17,6 +18,7 @@ runmysteriet.logic.GuessWordPuzzle = function(guessData) {
     };
 
     this.m_word = String(this.m_guessData.word || "button").toLowerCase();
+
     this.m_collectedMap = this.m_guessData.collectedMap || [];
 
     this.m_revealedMap = [];
@@ -25,6 +27,12 @@ runmysteriet.logic.GuessWordPuzzle = function(guessData) {
 
     this.init();
 };
+
+//------------------------------------------------------------------------------
+// INIT
+//------------------------------------------------------------------------------
+
+
 /**
  * Initierar och bygger upp vilka bokstäver som är synliga.
  *
@@ -32,7 +40,10 @@ runmysteriet.logic.GuessWordPuzzle = function(guessData) {
  * @return {void}
  */
 runmysteriet.logic.GuessWordPuzzle.prototype.init = function() {
+
     var i = 0;
+
+    this.m_revealedMap = [];
 
     // Sätt vilka positioner som är avslöjade baserat på insamlade bokstäver
     for (i = 0; i < this.m_word.length; i++) {
@@ -43,14 +54,17 @@ runmysteriet.logic.GuessWordPuzzle.prototype.init = function() {
     this.findMissingIndexes();
 };
 
+//------------------------------------------------------------------------------
+// MISSING LETTERS
+//------------------------------------------------------------------------------
+
 /**
- * Hittar alla index i ordet som ännu inte är avslöjade.
- * Sparar dem i en lista för enkel navigering.
- *
+ * Hittar vilka bokstäver som saknas.
  * @this {runmysteriet.logic.GuessWordPuzzle}
  * @return {void}
  */
 runmysteriet.logic.GuessWordPuzzle.prototype.findMissingIndexes = function() {
+
     var i = 0;
 
     this.m_missingIndexes = [];
@@ -65,12 +79,34 @@ runmysteriet.logic.GuessWordPuzzle.prototype.findMissingIndexes = function() {
     this.m_currentMissingPointer = 0;
 };
 /**
- * Returnerar hela ordet.
- *
+ * Hämtar index för aktuell saknad bokstav.
  * @this {runmysteriet.logic.GuessWordPuzzle}
- * @return {string} Ordet.
+ * @return {number}
+ */
+runmysteriet.logic.GuessWordPuzzle.prototype.getCurrentMissingIndex = function() {
+
+    if (!this.m_missingIndexes) {
+        return -1;
+    }
+
+    if (this.m_currentMissingPointer >= this.m_missingIndexes.length) {
+        return -1;
+    }
+
+    return this.m_missingIndexes[this.m_currentMissingPointer];
+};
+
+//------------------------------------------------------------------------------
+// GETTERS
+//------------------------------------------------------------------------------
+
+/**
+ * Hämtar ordet.
+ *
+ * @return {string}
  */
 runmysteriet.logic.GuessWordPuzzle.prototype.getWord = function() {
+
     return this.m_word;
 };
 
@@ -81,24 +117,28 @@ runmysteriet.logic.GuessWordPuzzle.prototype.getWord = function() {
  * @return {!Array<boolean>} Lista med avslöjade positioner.
  */
 runmysteriet.logic.GuessWordPuzzle.prototype.getRevealedMap = function() {
+
     return this.m_revealedMap;
 };
 
 /**
- * Returnerar aktuellt index i ordet som saknar bokstav.
- * Om inga fler saknas returneras -1.
+ * Hämtar collected map.
  *
- * @this {runmysteriet.logic.GuessWordPuzzle}
- * @return {number} Index för saknad bokstav, eller -1 om inga finns kvar.
+ * @return {!Array<boolean>}
  */
-runmysteriet.logic.GuessWordPuzzle.prototype.getCurrentMissingIndex = function() {
+runmysteriet.logic.GuessWordPuzzle.prototype.getCollectedMap = function() {
 
-    // Kontrollera om vi gått utanför listan med saknade index
-    if (this.m_currentMissingPointer >= this.m_missingIndexes.length) {
-        return -1;
-    }
+    return this.m_collectedMap;
+};
 
-    return this.m_missingIndexes[this.m_currentMissingPointer];
+/**
+ * Hämtar alla saknade index.
+ *
+ * @return {!Array<number>}
+ */
+runmysteriet.logic.GuessWordPuzzle.prototype.getMissingIndexes = function() {
+
+    return this.m_missingIndexes;
 };
 /**
  * Kontrollerar om en given bokstav matchar nästa saknade position i ordet.
@@ -109,10 +149,12 @@ runmysteriet.logic.GuessWordPuzzle.prototype.getCurrentMissingIndex = function()
  * @return {boolean} true om bokstaven är korrekt, annars false.
  */
 runmysteriet.logic.GuessWordPuzzle.prototype.checkLetter = function(letter) {
-    var index = this.getCurrentMissingIndex();
+
+    var index = 0;
     var correctLetter = "";
 
-    // Om inga fler saknade index finns
+    index = this.getCurrentMissingIndex();
+
     if (index === -1) {
         return false;
     }
@@ -125,11 +167,16 @@ runmysteriet.logic.GuessWordPuzzle.prototype.checkLetter = function(letter) {
     if (letter === correctLetter) {
         this.m_revealedMap[index] = true;
         this.m_currentMissingPointer++;
+
         return true;
     }
 
     return false;
 };
+
+//------------------------------------------------------------------------------
+// COMPLETE
+//------------------------------------------------------------------------------
 
 /**
  * Kontrollerar om hela ordet är färdiggissat.
@@ -138,5 +185,32 @@ runmysteriet.logic.GuessWordPuzzle.prototype.checkLetter = function(letter) {
  * @return {boolean} true om alla bokstäver är avslöjade, annars false.
  */
 runmysteriet.logic.GuessWordPuzzle.prototype.isComplete = function() {
+
+    if (!this.m_missingIndexes) {
+        return true;
+    }
+
     return this.m_currentMissingPointer >= this.m_missingIndexes.length;
+};
+
+//------------------------------------------------------------------------------
+// DISPOSE
+//------------------------------------------------------------------------------
+
+/**
+ * Rensar GuessWordPuzzle.
+ *
+ * @return {void}
+ */
+runmysteriet.logic.GuessWordPuzzle.prototype.dispose = function() {
+
+    this.m_guessData = null;
+
+    this.m_word = "";
+
+    this.m_collectedMap = [];
+    this.m_revealedMap = [];
+    this.m_missingIndexes = [];
+
+    this.m_currentMissingPointer = 0;
 };

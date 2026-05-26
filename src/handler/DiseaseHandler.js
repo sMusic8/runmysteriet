@@ -9,12 +9,27 @@
  * @param {!rune.display.Stage} stage
  * @param {Object=} application
  */
-runmysteriet.handler.DiseaseHandler = function (stage, application) {
+runmysteriet.handler.DiseaseHandler = function(stage, application) {
 
-  this.stage = stage;
-  this.application = application || null;
+    /** @type {!rune.display.Stage} */
+    this.stage = stage;
 
-  this.diseases = [];
+    /** @type {?Object} */
+    this.application = application || null;
+
+    /** @type {!Array<!runmysteriet.entity.Disease>} */
+    this.diseases = [];
+
+    /** @type {?Object} */
+    this.sneezeSound = null;
+
+    if (
+        this.application &&
+        this.application.sounds &&
+        this.application.sounds.sound
+    ) {
+        this.sneezeSound = this.application.sounds.sound.get("sound_snez");
+    }
 };
 
 /**
@@ -30,182 +45,362 @@ runmysteriet.handler.DiseaseHandler.prototype.init = function (
   diseaseSpawns
 ) {
 
-  this.clear();
+    var i = 0;
+    var spawn = null;
 
-  if (!diseaseSpawns || diseaseSpawns.length === 0) {
-    return;
-  }
+    this.clear();
 
-  for (var i = 0; i < diseaseSpawns.length; i++) {
-    this.addDisease(
-      diseaseSpawns[i].type,
-      diseaseSpawns[i].x,
-      diseaseSpawns[i].y
-    );
-  }
-};
-/**
- * Skapar en ny Disease och lägger till den i scenen och registrerar den i handlern.
- *
- * @param {string} type - Typ av disease (bestämmer texture och damage).
- * @param {number} x - Position X i världen.
- * @param {number} y - Position Y i världen.
- * @return {!runmysteriet.entity.Disease} Den skapade disease-instansen.
- */
-runmysteriet.handler.DiseaseHandler.prototype.addDisease = function (
-  type,
-  x,
-  y
-) {
-  var disease = new runmysteriet.entity.Disease(x, y, type);
-
-  this.diseases.push(disease);
-  this.stage.addChild(disease);
-
-  disease.m_baseScale = 1.5;
-  disease.m_pulseSpeed = 0.006;
-  disease.m_pulseValue = Math.random() * Math.PI * 2;
-
-
-  var originalUpdate = disease.update;
-
-  disease.update = function (step) {
-
-    if (typeof originalUpdate === "function") {
-      originalUpdate.call(this, step);
+    if (!diseaseSpawns || diseaseSpawns.length === 0) {
+        return;
     }
 
-    this.m_pulseValue += this.m_pulseSpeed;
+    for (i = 0; i < diseaseSpawns.length; i++) {
+        spawn = diseaseSpawns[i];
 
-    var scale = this.m_baseScale + Math.sin(this.m_pulseValue) * 0.22;
+        if (!spawn) {
+            continue;
+        }
 
-    this.scaleX = scale;
-    this.scaleY = scale;
-  };
+        this.addDisease(
+            spawn.type,
+            spawn.x,
+            spawn.y
+        );
+    }
+};
 
-  return disease;
+//------------------------------------------------------------------------------
+// ADD DISEASE
+//------------------------------------------------------------------------------
+
+/**
+ * Skapar och lägger till en disease.
+ *
+ * @param {string=} type
+ * @param {number=} x
+ * @param {number=} y
+ * @return {!runmysteriet.entity.Disease}
+ */
+runmysteriet.handler.DiseaseHandler.prototype.addDisease = function(type, x, y) {
+
+    var disease = null;
+
+    disease = new runmysteriet.entity.Disease(x, y, type);
+
+    /*
+     * Pulse data.
+     * Stör inte sprite-animationen i Disease.update().
+     */
+    disease.m_baseScale = 1.5;
+    disease.m_pulseSpeed = 0.006;
+    disease.m_pulseValue = Math.random() * Math.PI * 2;
+
+    this.diseases.push(disease);
+    this.stage.addChild(disease);
+
+    return disease;
+};
+
+//------------------------------------------------------------------------------
+// UPDATE
+//------------------------------------------------------------------------------
+
+/**
+ * Uppdaterar sjukdomar och kollar kollision med spelare.
+ *
+ * @param {?Array<!Object>} players
+ * @param {number=} step
+ * @return {void}
+ */
+runmysteriet.handler.DiseaseHandler.prototype.update = function(players, step) {
+
+    var i = 0;
+    var j = 0;
+    var disease = null;
+    var player = null;
+
+    if (!players || !this.diseases) {
+        return;
+    }
+
+    for (i = this.diseases.length - 1; i >= 0; i--) {
+        disease = this.diseases[i];
+
+        if (!disease || disease.isActive !== true) {
+            this.diseases.splice(i, 1);
+            continue;
+        }
+
+        this.updateDisease(disease, step);
+
+        for (j = 0; j < players.length; j++) {
+            player = players[j];
+
+            if (!this.isValidPlayer(player)) {
+                continue;
+            }
+
+            if (this.hitTestPlayerDisease(player, disease)) {
+                this.damagePlayer(player, disease);
+                this.removeDiseaseAt(i);
+                break;
+            }
+        }
+    }
 };
 
 /**
- * Uppdaterar alla diseases, hanterar animation och collision mot spelare.
+ * Uppdaterar en disease visuellt.
  *
- * @param {!Array<!runmysteriet.entity.Player>} players - Lista med aktiva spelare.
- * @param {number} step - Game step / delta time.
+ * @param {!runmysteriet.entity.Disease} disease
+ * @param {number=} step
  * @return {void}
  */
-runmysteriet.handler.DiseaseHandler.prototype.update = function (
-  players,
-  step
-) {
+runmysteriet.handler.DiseaseHandler.prototype.updateDisease = function(disease, step) {
 
-  if (!players) {
-    return;
-  }
+    var scale = 1;
 
-  for (var i = this.diseases.length - 1; i >= 0; i--) {
-
-    var disease = this.diseases[i];
-
-    if (!disease || disease.isActive !== true) {
-      this.diseases.splice(i, 1);
-      continue;
+    if (!disease) {
+        return;
     }
 
     if (typeof disease.update === "function") {
-      disease.update(step);
+        disease.update(step);
     }
 
-    for (var j = 0; j < players.length; j++) {
+    disease.m_pulseValue += disease.m_pulseSpeed;
 
-      var player = players[j];
+    scale = disease.m_baseScale + Math.sin(disease.m_pulseValue) * 0.22;
 
-      if (!player || player.isDead === true) {
-        continue;
-      }
-
-      if (this.hitTestPlayerDisease(player, disease)) {
-
-        player.hp -= disease.damage;
-
-        if (player.hp < 0) {
-          player.hp = 0;
-        }
-
-        if (this.application &&
-            this.application.sounds &&
-            this.application.sounds.sound) {
-
-          var snezSound =
-            this.application.sounds.sound.get("sound_snez");
-
-          if (snezSound) {
-            snezSound.play();
-          }
-        }
-
-        disease.remove();
-        this.diseases.splice(i, 1);
-
-        break;
-      }
-    }
-  }
+    disease.scaleX = scale;
+    disease.scaleY = scale;
 };
+
 /**
- * Tar bort alla diseases från scenen och rensar interna listan.
+ * Kontrollerar om spelaren kan träffas av disease.
+ *
+ * @param {?Object} player
+ * @return {boolean}
+ */
+runmysteriet.handler.DiseaseHandler.prototype.isValidPlayer = function(player) {
+
+    if (!player) {
+        return false;
+    }
+
+    if (player.isDead === true) {
+        return false;
+    }
+
+    if (player.visible === false) {
+        return false;
+    }
+
+    if (player.active === false) {
+        return false;
+    }
+
+    return true;
+};
+
+//------------------------------------------------------------------------------
+// DAMAGE
+//------------------------------------------------------------------------------
+
+/**
+ * Skadar spelaren.
+ *
+ * @param {!Object} player
+ * @param {!runmysteriet.entity.Disease} disease
+ * @return {void}
+ */
+runmysteriet.handler.DiseaseHandler.prototype.damagePlayer = function(player, disease) {
+
+    if (!player || !disease) {
+        return;
+    }
+
+    player.hp -= disease.damage;
+
+    if (player.hp < 0) {
+        player.hp = 0;
+    }
+
+    this.playSneezeSound();
+};
+
+/**
+ * Spelar sjukdomsljud.
  *
  * @return {void}
  */
-runmysteriet.handler.DiseaseHandler.prototype.clear = function () {
+runmysteriet.handler.DiseaseHandler.prototype.playSneezeSound = function() {
 
-  for (var i = 0; i < this.diseases.length; i++) {
-
-    var disease = this.diseases[i];
-
-    if (disease && disease.parent) {
-      disease.parent.removeChild(disease);
+    if (this.sneezeSound && typeof this.sneezeSound.play === "function") {
+        this.sneezeSound.play();
     }
-  }
-
-  this.diseases = [];
 };
+
+//------------------------------------------------------------------------------
+// REMOVE DISEASE
+//------------------------------------------------------------------------------
+
 /**
- * Kontrollerar kollision mellan player och disease.
+ * Tar bort disease på index.
  *
- * @param {!runmysteriet.entity.Player} player - Spelaren som testas.
- * @param {!runmysteriet.entity.Disease} disease - Disease som testas.
- * @return {boolean} True om collision sker, annars false.
+ * @param {number} index
+ * @return {void}
  */
-runmysteriet.handler.DiseaseHandler.prototype.hitTestPlayerDisease =
-function (player, disease) {
+runmysteriet.handler.DiseaseHandler.prototype.removeDiseaseAt = function(index) {
 
-  if (!player || !disease) {
-    return false;
-  }
+    var disease = null;
 
-  var playerPaddingX = 8;
-  var diseasePaddingX = 2;
-  var diseasePaddingTop = 2;
-  var diseasePaddingBottom = 4;
+    if (!this.diseases || index < 0 || index >= this.diseases.length) {
+        return;
+    }
 
-  var playerLeft = player.x + playerPaddingX;
-  var playerRight = player.x + player.width - playerPaddingX;
+    disease = this.diseases[index];
 
-  var playerBottom = player.y + player.height / 2;
+    this.removeDisplayObject(disease);
+    this.diseases.splice(index, 1);
+};
 
-  var playerHitboxHeight = player.isCrouching ? 10 : player.height - 6;
-  var playerTop = playerBottom - playerHitboxHeight;
+//------------------------------------------------------------------------------
+// COLLISION
+//------------------------------------------------------------------------------
 
-  var diseaseLeft = disease.x + diseasePaddingX;
-  var diseaseRight = disease.x + disease.width - diseasePaddingX;
+/**
+ * Kollar collision mellan spelare och disease.
+ *
+ * @param {?Object} player
+ * @param {?runmysteriet.entity.Disease} disease
+ * @return {boolean}
+ */
+runmysteriet.handler.DiseaseHandler.prototype.hitTestPlayerDisease = function(
+    player,
+    disease
+) {
 
-  var diseaseTop = disease.y + diseasePaddingTop;
-  var diseaseBottom = disease.y + disease.height - diseasePaddingBottom;
+    var playerPaddingX = 8;
+    var diseasePaddingX = 2;
+    var diseasePaddingTop = 2;
+    var diseasePaddingBottom = 4;
 
-  return (
-    playerRight > diseaseLeft &&
-    playerLeft < diseaseRight &&
-    playerBottom > diseaseTop &&
-    playerTop < diseaseBottom
-  );
+    var playerLeft = 0;
+    var playerRight = 0;
+    var playerBottom = 0;
+    var playerHitboxHeight = 0;
+    var playerTop = 0;
+
+    var diseaseLeft = 0;
+    var diseaseRight = 0;
+    var diseaseTop = 0;
+    var diseaseBottom = 0;
+
+    if (!player || !disease) {
+        return false;
+    }
+
+    playerLeft = player.x + playerPaddingX;
+    playerRight = player.x + player.width - playerPaddingX;
+
+    playerBottom = player.y + player.height / 2;
+
+    playerHitboxHeight = player.isCrouching ? 10 : player.height - 6;
+    playerTop = playerBottom - playerHitboxHeight;
+
+    diseaseLeft = disease.x + diseasePaddingX;
+    diseaseRight = disease.x + disease.width - diseasePaddingX;
+
+    diseaseTop = disease.y + diseasePaddingTop;
+    diseaseBottom = disease.y + disease.height - diseasePaddingBottom;
+
+    return (
+        playerRight > diseaseLeft &&
+        playerLeft < diseaseRight &&
+        playerBottom > diseaseTop &&
+        playerTop < diseaseBottom
+    );
+};
+
+//------------------------------------------------------------------------------
+// REMOVE DISPLAY OBJECT
+//------------------------------------------------------------------------------
+
+/**
+ * Tar bort display object från stage.
+ *
+ * @param {?Object} object
+ * @return {void}
+ */
+runmysteriet.handler.DiseaseHandler.prototype.removeDisplayObject = function(object) {
+
+    if (!object) {
+        return;
+    }
+
+    if (typeof object.dispose === "function") {
+        object.dispose();
+        return;
+    }
+
+    if (typeof object.remove === "function") {
+        object.remove();
+        return;
+    }
+
+    if (object.parent) {
+        object.parent.removeChild(object);
+        return;
+    }
+
+    if (object.stage) {
+        object.stage.removeChild(object);
+    }
+};
+
+//------------------------------------------------------------------------------
+// CLEAR
+//------------------------------------------------------------------------------
+
+/**
+ * Tar bort alla disease från scenen.
+ *
+ * @return {void}
+ */
+runmysteriet.handler.DiseaseHandler.prototype.clear = function() {
+
+    var i = 0;
+    var disease = null;
+
+    if (!this.diseases) {
+        this.diseases = [];
+        return;
+    }
+
+    for (i = 0; i < this.diseases.length; i++) {
+        disease = this.diseases[i];
+
+        this.removeDisplayObject(disease);
+    }
+
+    this.diseases = [];
+};
+
+//------------------------------------------------------------------------------
+// DISPOSE
+//------------------------------------------------------------------------------
+
+/**
+ * Rensar DiseaseHandler helt.
+ *
+ * @return {void}
+ */
+runmysteriet.handler.DiseaseHandler.prototype.dispose = function() {
+
+    this.clear();
+
+    this.stage = null;
+    this.application = null;
+    this.sneezeSound = null;
 };

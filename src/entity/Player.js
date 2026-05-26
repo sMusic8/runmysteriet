@@ -11,31 +11,33 @@
  * @param {!Object} spriteConfig
  */
 runmysteriet.entity.Player = function(controls, spriteConfig) {
-//Superpanrop
+
+    var texture = "";
+
+    spriteConfig = spriteConfig || {};
+    texture = spriteConfig.texture || "spritesheet_freya_all";
+
     rune.display.Sprite.call(
         this,
         0,
         0,
         32,
         32,
-        spriteConfig.texture
+        texture
     );
 
     /** @type {!Object} */
-    this.controls = controls;
+    this.controls = controls || {};
 
     /** @type {!Object} */
     this.spriteConfig = spriteConfig;
 
     /** @type {string} */
-    this.normalTexture = spriteConfig.texture;
+    this.normalTexture = texture;
 
     /** @type {string} */
-    this.crouchTexture = spriteConfig.crouchTexture || spriteConfig.texture;
-    
-    /** @type {boolean} */
-    this.isCrouching = false;
-   
+    this.crouchTexture = spriteConfig.crouchTexture || texture;
+
     /** @type {string} */
     this.m_currentTexture = this.normalTexture;
 
@@ -49,7 +51,7 @@ runmysteriet.entity.Player = function(controls, spriteConfig) {
     this.gravity = 0.5;
 
     /** @type {number} */
-    this.jumpPower = - 10;
+    this.jumpPower = -10;
 
     /** @type {boolean} */
     this.isOnGround = false;
@@ -60,22 +62,74 @@ runmysteriet.entity.Player = function(controls, spriteConfig) {
     /** @type {boolean} */
     this.isMoving = false;
 
+    /** @type {boolean} */
+    this.isCrouching = false;
+
+    /** @type {boolean} */
+    this.wantsToCrouch = false;
+
+    /** @type {boolean} */
+    this.isAttacking = false;
+
+    /** @type {number} */
+    this.attackAnimationTimer = 0;
+
     /** @type {string} */
-    this.currentAnimation = " ";
+    this.currentAnimation = "";
 
-    this.isMoving = false;
-
+    /** @type {number} */
     this.direction = 1;
+
+    /** @type {boolean} */
+    this.flippedX = false;
+
+    /** @type {number} */
     this.attackCooldown = 0;
+
+    /** @type {number} */
     this.attackCooldownMax = 20;
 
+    /** @type {number} */
+    this.hp = 100;
+
+    /** @type {number} */
+    this.maxHp = 100;
+
+    /** @type {?Object} */
+    this.hpBar = null;
+
+    /** @type {boolean} */
+    this.isDead = false;
+
+    /** @type {boolean} */
+    this.active = true;
+
+    /** @type {?Object} */
+    this.currentPlatform = null;
+
+    /** @type {number} */
+    this.previousX = 0;
+
+    /** @type {number} */
+    this.previousY = 0;
 };
 
-runmysteriet.entity.Player.prototype = Object.create(rune.display.Sprite.prototype);
-runmysteriet.entity.Player.prototype.constructor = runmysteriet.entity.Player;
+//------------------------------------------------------------------------------
+// INHERITANCE
+//------------------------------------------------------------------------------
+
+runmysteriet.entity.Player.prototype =
+    Object.create(rune.display.Sprite.prototype);
+
+runmysteriet.entity.Player.prototype.constructor =
+    runmysteriet.entity.Player;
+
+//------------------------------------------------------------------------------
+// INIT
+//------------------------------------------------------------------------------
 
 /**
- * initsiera spelare.
+ * Initierar spelare.
  *
  * @return {void}
  */
@@ -95,6 +149,10 @@ runmysteriet.entity.Player.prototype.init = function() {
     this.playAnimation("idle");
 };
 
+//------------------------------------------------------------------------------
+// UPDATE
+//------------------------------------------------------------------------------
+
 /**
  * Uppdateringsloopen.
  *
@@ -104,17 +162,26 @@ runmysteriet.entity.Player.prototype.init = function() {
 runmysteriet.entity.Player.prototype.update = function(step) {
 
     rune.display.Sprite.prototype.update.call(this, step);
-
 };
 
+//------------------------------------------------------------------------------
+// ANIMATION
+//------------------------------------------------------------------------------
+
 /**
- * Uppdatera animationsstatus.
+ * Uppdaterar animationsstatus.
  *
  * @return {void}
  */
 runmysteriet.entity.Player.prototype.updateAnimation = function() {
 
-    //Attack ska gå före allt annat.
+    if (this.isDead === true || this.visible === false) {
+        return;
+    }
+
+    /*
+     * Attack ska gå före allt annat.
+     */
     if (this.isAttacking === true) {
         this.playAnimation("attack");
 
@@ -129,7 +196,9 @@ runmysteriet.entity.Player.prototype.updateAnimation = function() {
         return;
     }
 
-    //Krypning kommer före jump/run/idle.
+    /*
+     * Krypning kommer före jump/run/idle.
+     */
     if (this.isCrouching === true) {
         this.playAnimation("crouch");
         return;
@@ -156,11 +225,19 @@ runmysteriet.entity.Player.prototype.updateAnimation = function() {
  */
 runmysteriet.entity.Player.prototype.playAnimation = function(name) {
 
+    if (!name) {
+        return;
+    }
+
     if (this.currentAnimation !== name) {
         this.animation.gotoAndPlay(name);
         this.currentAnimation = name;
     }
 };
+
+//------------------------------------------------------------------------------
+// ATTACK
+//------------------------------------------------------------------------------
 
 /**
  * Kollar om spelaren kan attackera.
@@ -169,13 +246,17 @@ runmysteriet.entity.Player.prototype.playAnimation = function(name) {
  */
 runmysteriet.entity.Player.prototype.canAttack = function() {
 
+    if (this.isDead === true || this.active === false) {
+        return false;
+    }
+
     return this.attackCooldown <= 0;
 };
 
 /**
  * Startar attack cooldown.
  *
- * @return {undefined}
+ * @return {void}
  */
 runmysteriet.entity.Player.prototype.resetAttackCooldown = function() {
 
@@ -185,7 +266,7 @@ runmysteriet.entity.Player.prototype.resetAttackCooldown = function() {
 /**
  * Uppdaterar attack cooldown.
  *
- * @return {undefined}
+ * @return {void}
  */
 runmysteriet.entity.Player.prototype.updateAttackCooldown = function() {
 
@@ -194,11 +275,14 @@ runmysteriet.entity.Player.prototype.updateAttackCooldown = function() {
     }
 };
 
+//------------------------------------------------------------------------------
+// TEXTURE
+//------------------------------------------------------------------------------
+
 /**
- * Sätter spelarens textur (spritesheet/animationstextur) om den är annorlunda än nuvarande.
- *Funktionen undviker onödiga texture-uppdateringar genom att jämföra mot den senast använda texturen innan den appliceras.
+ * Sätter spelarens textur om den är annorlunda än nuvarande.
  *
- * @param {string} texture - Namnet på texturen som ska sättas på spelaren.
+ * @param {string} texture
  * @return {void}
  */
 runmysteriet.entity.Player.prototype.setPlayerTexture = function(texture) {
@@ -212,9 +296,102 @@ runmysteriet.entity.Player.prototype.setPlayerTexture = function(texture) {
     }
 
     this.m_currentTexture = texture;
-
-    /*
-     * texture-byte via texture-egenskapen
-     */
     this.texture = texture;
+};
+
+//------------------------------------------------------------------------------
+// REMOVE DISPLAY OBJECT
+//------------------------------------------------------------------------------
+
+/**
+ * Tar bort display object från stage.
+ *
+ * @param {?Object} object
+ * @return {void}
+ */
+runmysteriet.entity.Player.prototype.removeDisplayObject = function(object) {
+
+    if (!object) {
+        return;
+    }
+
+    if (object.parent) {
+        object.parent.removeChild(object);
+        return;
+    }
+
+    if (object.stage) {
+        object.stage.removeChild(object);
+    }
+};
+
+//------------------------------------------------------------------------------
+// REMOVE
+//------------------------------------------------------------------------------
+
+/**
+ * Tar bort spelaren från stage.
+ *
+ * @return {void}
+ */
+runmysteriet.entity.Player.prototype.remove = function() {
+
+    this.removeDisplayObject(this.hpBar);
+    this.removeDisplayObject(this);
+
+    this.hpBar = null;
+};
+
+//------------------------------------------------------------------------------
+// DISPOSE
+//------------------------------------------------------------------------------
+
+/**
+ * Rensar Player.
+ *
+ * @return {void}
+ */
+runmysteriet.entity.Player.prototype.dispose = function() {
+
+    this.remove();
+
+    this.controls = null;
+    this.spriteConfig = null;
+
+    this.normalTexture = "";
+    this.crouchTexture = "";
+    this.m_currentTexture = "";
+
+    this.speed = 0;
+    this.velocityY = 0;
+    this.gravity = 0;
+    this.jumpPower = 0;
+
+    this.isOnGround = false;
+    this.groundY = 0;
+
+    this.isMoving = false;
+    this.isCrouching = false;
+    this.wantsToCrouch = false;
+
+    this.isAttacking = false;
+    this.attackAnimationTimer = 0;
+    this.currentAnimation = "";
+
+    this.direction = 0;
+    this.flippedX = false;
+
+    this.attackCooldown = 0;
+    this.attackCooldownMax = 0;
+
+    this.hp = 0;
+    this.maxHp = 0;
+
+    this.isDead = true;
+    this.active = false;
+
+    this.currentPlatform = null;
+
+    this.previousX = 0;
+    this.previousY = 0;
 };

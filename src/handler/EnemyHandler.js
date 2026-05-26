@@ -17,9 +17,10 @@ runmysteriet.handler.EnemyHandler = function(stage) {
     this.enemies = [];
 
     /*
-     * Osynliga blockeringar ovanför Kristen så det inte går att hoppa över.
+     * Osynliga spärrar som hindrar spelaren från att gå vidare
+     * tills kopplad Kristen är död.
      */
-    this.caveBlockers = [];
+    this.enemyBlockers = [];
 };
 
 /**
@@ -29,7 +30,10 @@ runmysteriet.handler.EnemyHandler = function(stage) {
  * @param {!Array<!Object>} enemySpawns
  * @return {void}
  */
-runmysteriet.handler.EnemyHandler.prototype.init = function(levelConfig, enemySpawns) {
+runmysteriet.handler.EnemyHandler.prototype.init = function(
+    levelConfig,
+    enemySpawns
+) {
 
     var kristenCount = 0;
     var created = 0;
@@ -72,47 +76,60 @@ runmysteriet.handler.EnemyHandler.prototype.createKristen = function(spawn) {
         spawn.y
     );
 
-    // Skapa osynlig blocker ovanför Kristen och kopplar den till rätt
-    kristen.cave = null;
-    kristen.caveBlocker = blocker;
-
-    blocker.enemy = kristen;
-
-    this.caveBlockers.push(blocker);
     this.enemies.push(kristen);
-
-    //Blocker läggs till före Kristen.
-     
-    this.stage.addChild(blocker);
     this.stage.addChild(kristen);
+
+    /*
+     * Skapa spärr efter Kristen.
+     * Spärren är osynlig och stoppar spelaren tills Kristen dör.
+     */
+    blocker = this.createKristenBlocker(spawn, kristen);
+
+    kristen.enemyBlocker = blocker;
+    blocker.enemy = kristen;
 
     return kristen;
 };
 
+//------------------------------------------------------------------------------
+// CREATE BLOCKER
+//------------------------------------------------------------------------------
+
 /**
- * Skapar osynlig blocker ovanför Kristen.
+ * Skapar en osynlig spärr som går hela vägen uppifrån och ner.
  *
- * @param {!runmysteriet.entity.Kristen} kristen
+ * @param {!Object} spawn
+ * @param {!runmysteriet.entity.Kristen} enemy
  * @return {!rune.display.Graphic}
  */
-runmysteriet.handler.EnemyHandler.prototype.createKristenBlocker = function(kristen) {
+runmysteriet.handler.EnemyHandler.prototype.createKristenBlocker = function(
+    spawn,
+    enemy
+) {
 
     var blocker = null;
+    var blockerX = 0;
+    var blockerY = 0;
+    var blockerWidth = 48;
+    var blockerHeight = 2000;
+
+    blockerX = spawn.x + 70;
+    blockerY = -1000;
 
     blocker = new rune.display.Graphic(
-        kristen.x - 20,
-        kristen.y - 120,
-        kristen.width + 40, 
-        120
+        blockerX,
+        blockerY,
+        blockerWidth,
+        blockerHeight
     );
 
-    blocker.alpha = 0;
-    blocker.immovable = true;
-    blocker.isKristenBlocker = true;
+    blocker.alpha = 20;
+    blocker.visible = false;
+    blocker.isEnemyBlocker = true;
+    blocker.enemy = enemy;
 
-    if (rune.physics && rune.physics.Space) {
-        blocker.allowCollisions = rune.physics.Space.ANY;
-    }
+    this.enemyBlockers.push(blocker);
+    this.stage.addChild(blocker);
 
     return blocker;
 };
@@ -135,8 +152,6 @@ runmysteriet.handler.EnemyHandler.prototype.update = function(players) {
             continue;
         }
 
-        this.updateKristenBlocker(enemy);
-
         if (typeof enemy.faceNearestPlayer === "function") {
             enemy.faceNearestPlayer(players);
         }
@@ -144,73 +159,49 @@ runmysteriet.handler.EnemyHandler.prototype.update = function(players) {
         if (typeof enemy.checkPlayerCollisions === "function") {
             enemy.checkPlayerCollisions(players);
         }
-
-        this.checkBlockerCollisions(enemy, players);
     }
+
+    this.updateEnemyBlockers();
 };
 
-/**
- * Flyttar blockern så den följer Kristen när han patrullerar.
- *
- * @param {!runmysteriet.entity.Kristen} kristen
- * @return {void}
- */
-runmysteriet.handler.EnemyHandler.prototype.updateKristenBlocker = function(kristen) {
-
-    var blocker = null;
-
-    if (!kristen) {
-        return;
-    }
-
-    blocker = kristen.caveBlocker;
-
-    if (!blocker) {
-        return;
-    }
-
-    blocker.x = kristen.x - 20;
-    blocker.y = kristen.y - 120;
-};
+//------------------------------------------------------------------------------
+// ENEMY BLOCKERS
+//------------------------------------------------------------------------------
 
 /**
- * Stoppar spelaren om han försöker hoppa över Kristen.
+ * Tar bort spärrar vars Kristen är död.
  *
- * @param {!runmysteriet.entity.Kristen} kristen
- * @param {!Array<!Object>} players
  * @return {void}
  */
-runmysteriet.handler.EnemyHandler.prototype.checkBlockerCollisions = function(kristen, players) {
+runmysteriet.handler.EnemyHandler.prototype.updateEnemyBlockers = function() {
 
-    var blocker = null;
-    var player = null;
     var i = 0;
+    var blocker = null;
+    var enemy = null;
 
-    if (!kristen || !players) {
-        return;
-    }
+    for (i = this.enemyBlockers.length - 1; i >= 0; i--) {
+        blocker = this.enemyBlockers[i];
 
-    blocker = kristen.caveBlocker;
-
-    if (!blocker) {
-        return;
-    }
-
-    for (i = 0; i < players.length; i++) {
-        player = players[i];
-
-        if (!player || player.isDead === true) {
+        if (!blocker) {
+            this.enemyBlockers.splice(i, 1);
             continue;
         }
 
-        if (typeof player.hitTestAndSeparate === "function") {
-            player.hitTestAndSeparate(blocker);
+        enemy = blocker.enemy;
+
+        if (enemy && enemy.isDead === true) {
+            this.removeDisplayObject(blocker);
+            this.enemyBlockers.splice(i, 1);
         }
     }
 };
 
+//------------------------------------------------------------------------------
+// CLEAR
+//------------------------------------------------------------------------------
+
 /**
- * Tar bort alla kristna från scenen.
+ * Removes all enemies and enemy blockers from stage.
  *
  * @return {void}
  */
@@ -218,44 +209,101 @@ runmysteriet.handler.EnemyHandler.prototype.clear = function() {
 
     var i = 0;
     var enemy = null;
-    var blocker = null;
 
-    for (i = 0; i < this.enemies.length; i++) {
-        enemy = this.enemies[i];
+    /*
+     * Fiender.
+     */
+    if (this.enemies) {
+        for (i = 0; i < this.enemies.length; i++) {
+            enemy = this.enemies[i];
 
-        if (!enemy) {
-            continue;
-        }
+            if (!enemy) {
+                continue;
+            }
 
-        //Kristen skapar hpBar separat och lägger den direkt på stage så därför måste hpBar tas bort separat innan fienden tas bort.
-        if (enemy.hpBar && enemy.hpBar.stage) {
-            enemy.hpBar.stage.removeChild(enemy.hpBar);
-            enemy.hpBar = null;
-        }
+            if (typeof enemy.dispose === "function") {
+                enemy.dispose();
+            } else {
+                if (enemy.hpBar) {
+                    this.removeDisplayObject(enemy.hpBar);
+                    enemy.hpBar = null;
+                }
 
-        //Ta bort själva fienden från stage.
-        if (enemy.stage) {
-            enemy.stage.removeChild(enemy);
-        }
-
-        enemy.cave = null;
-        enemy.caveBlocker = null;
-    }
-
-    for (i = 0; i < this.caveBlockers.length; i++) {
-        blocker = this.caveBlockers[i];
-
-        if (!blocker) {
-            continue;
-        }
-
-        if (blocker.parent) {
-            blocker.parent.removeChild(blocker);
-        } else if (blocker.stage) {
-            blocker.stage.removeChild(blocker);
+                this.removeDisplayObject(enemy);
+            }
         }
     }
+
+    /*
+     * Spärrar.
+     */
+    this.clearDisplayList(this.enemyBlockers);
 
     this.enemies = [];
-    this.caveBlockers = [];
+    this.enemyBlockers = [];
+};
+
+//------------------------------------------------------------------------------
+// CLEAR DISPLAY LIST
+//------------------------------------------------------------------------------
+
+/**
+ * Tar bort alla display objects i en lista.
+ *
+ * @param {?Array} list
+ * @return {void}
+ */
+runmysteriet.handler.EnemyHandler.prototype.clearDisplayList = function(list) {
+
+    var i = 0;
+
+    if (!list) {
+        return;
+    }
+
+    for (i = 0; i < list.length; i++) {
+        this.removeDisplayObject(list[i]);
+    }
+};
+
+//------------------------------------------------------------------------------
+// REMOVE DISPLAY OBJECT
+//------------------------------------------------------------------------------
+
+/**
+ * Tar bort ett display object från stage.
+ *
+ * @param {?Object} object
+ * @return {void}
+ */
+runmysteriet.handler.EnemyHandler.prototype.removeDisplayObject = function(object) {
+
+    if (!object) {
+        return;
+    }
+
+    if (object.parent) {
+        object.parent.removeChild(object);
+        return;
+    }
+
+    if (object.stage) {
+        object.stage.removeChild(object);
+    }
+};
+
+//------------------------------------------------------------------------------
+// DISPOSE
+//------------------------------------------------------------------------------
+
+/**
+ * Rensar EnemyHandler helt.
+ *
+ * @return {void}
+ */
+runmysteriet.handler.EnemyHandler.prototype.dispose = function() {
+
+    this.clear();
+
+    this.stage = null;
 };
