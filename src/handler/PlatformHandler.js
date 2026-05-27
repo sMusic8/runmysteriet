@@ -9,46 +9,48 @@
  * @param {!rune.display.Stage} stage
  * @param {number} screenWidth
  */
-runmysteriet.handler.PlatformHandler = function(stage, screenWidth) {
+runmysteriet.handler.PlatformHandler = function (stage, screenWidth) {
+  /** @type {!rune.display.Stage} */
+  this.stage = stage;
 
-    /** @type {!rune.display.Stage} */
-    this.stage = stage;
+  /** @type {number} */
+  this.screenWidth = screenWidth;
 
-    /** @type {number} */
-    this.screenWidth = screenWidth;
+  /** @type {!Array} */
+  this.platforms = [];
 
-    /** @type {!Array} */
-    this.platforms = [];
+  /** @type {!Array} */
+  this.holes = [];
 
-    /** @type {!Array} */
-    this.holes = [];
+  /** @type {!Array} */
+  this.enemySpawns = [];
 
-    /** @type {!Array} */
-    this.enemySpawns = [];
+  /** @type {!Array} */
+  this.waterAreas = [];
 
-    /** @type {!Array} */
-    this.waterAreas = [];
+  /** @type {!Array} */
+  this.boats = [];
 
-    /** @type {!Array} */
-    this.boats = [];
+  /** @type {!Array} */
+  this.endZones = [];
 
-    /** @type {!Array} */
-    this.endZones = [];
+  /** @type {!Array} */
+  this.diseaseSpawns = [];
 
-    /** @type {!Array} */
-    this.diseaseSpawns = [];
+  /** @type {!Array} */
+  this.runeSpawns = [];
 
-    /** @type {!Array} */
-    this.runeSpawns = [];
+  /** @type {!Array} */
+  this.armorSpawns = [];
 
-    /** @type {!Array} */
-    this.armorSpawns = [];
+  /** @type {number} */
+  this.levelWidth = 0;
 
-    /** @type {number} */
-    this.levelWidth = 0;
+  /** @type {number} */
+  this.levelNumber = 1;
 
-    /** @type {number} */
-    this.levelNumber = 1;
+  /**@type {object} */
+  this.m_extra = null;
 };
 
 /**
@@ -57,102 +59,101 @@ runmysteriet.handler.PlatformHandler = function(stage, screenWidth) {
  * @param {number=} levelNumber
  * @return {void}
  */
-runmysteriet.handler.PlatformHandler.prototype.init = function(levelNumber) {
+runmysteriet.handler.PlatformHandler.prototype.init = function (levelNumber) {
+  var x = 0;
+  var i = 0;
+  var segment = null;
+  var result = null;
+  var SegmentClass = null;
 
-    var x = 0;
-    var i = 0;
-    var segment = null;
-    var result = null;
-    var SegmentClass = null;
+  var pool = null;
+  var beforeWaterCount = 0;
+  var afterWaterCount = 0;
+  var totalRandomCount = 0;
+  var chosenSegments = null;
 
-    var pool = null;
-    var beforeWaterCount = 0;
-    var afterWaterCount = 0;
-    var totalRandomCount = 0;
-    var chosenSegments = null;
+  /*
+   * Om PlatformHandler återanvänds ska gamla objekt bort först.
+   */
+  this.clear();
 
-    /*
-     * Om PlatformHandler återanvänds ska gamla objekt bort först.
-     */
-    this.clear();
+  this.levelNumber = levelNumber || 1;
 
-    this.levelNumber = levelNumber || 1;
+  pool = this.getSegmentPool();
 
-    pool = this.getSegmentPool();
+  beforeWaterCount = this.getSegmentsBeforeWaterCount();
+  afterWaterCount = this.getSegmentsAfterWaterCount();
+  totalRandomCount = beforeWaterCount + afterWaterCount;
 
-    beforeWaterCount = this.getSegmentsBeforeWaterCount();
-    afterWaterCount = this.getSegmentsAfterWaterCount();
-    totalRandomCount = beforeWaterCount + afterWaterCount;
+  chosenSegments = this.getRandomSegments(pool, totalRandomCount);
 
-    chosenSegments = this.getRandomSegments(pool, totalRandomCount);
+  //--------------------------------------------------------------------------
+  // START SEGMENT
+  //--------------------------------------------------------------------------
 
-    //--------------------------------------------------------------------------
-    // START SEGMENT
-    //--------------------------------------------------------------------------
+  segment = new runmysteriet.segments.Segment_Start();
+  result = segment.ground(this.stage, x, this.levelNumber);
 
-    segment = new runmysteriet.segments.Segment_Start();
-    result = segment.ground(this.stage, x, this.levelNumber);
+  this.addSegmentResult(result);
+  x = result.endX;
 
-    this.addSegmentResult(result);
-    x = result.endX;
+  //--------------------------------------------------------------------------
+  // SEGMENTS BEFORE WATER
+  //--------------------------------------------------------------------------
 
-    //--------------------------------------------------------------------------
-    // SEGMENTS BEFORE WATER
-    //--------------------------------------------------------------------------
+  for (i = 0; i < beforeWaterCount; i++) {
+    SegmentClass = chosenSegments[i];
 
-    for (i = 0; i < beforeWaterCount; i++) {
-        SegmentClass = chosenSegments[i];
-
-        if (!SegmentClass) {
-            continue;
-        }
-
-        segment = new SegmentClass();
-        result = segment.ground(this.stage, x, this.levelNumber);
-
-        this.addSegmentResult(result);
-        x = result.endX;
+    if (!SegmentClass) {
+      continue;
     }
 
-    //--------------------------------------------------------------------------
-    // WATER SEGMENT
-    //--------------------------------------------------------------------------
-
-    segment = new runmysteriet.segments.Segment_Water();
+    segment = new SegmentClass();
     result = segment.ground(this.stage, x, this.levelNumber);
 
     this.addSegmentResult(result);
     x = result.endX;
+  }
 
-    //--------------------------------------------------------------------------
-    // SEGMENTS AFTER WATER
-    //--------------------------------------------------------------------------
+  //--------------------------------------------------------------------------
+  // WATER SEGMENT
+  //--------------------------------------------------------------------------
 
-    for (i = 0; i < afterWaterCount; i++) {
-        SegmentClass = chosenSegments[beforeWaterCount + i];
+  segment = new runmysteriet.segments.Segment_Water();
+  result = segment.ground(this.stage, x, this.levelNumber);
 
-        if (!SegmentClass) {
-            continue;
-        }
+  this.addSegmentResult(result);
+  x = result.endX;
 
-        segment = new SegmentClass();
-        result = segment.ground(this.stage, x, this.levelNumber);
+  //--------------------------------------------------------------------------
+  // SEGMENTS AFTER WATER
+  //--------------------------------------------------------------------------
 
-        this.addSegmentResult(result);
-        x = result.endX;
+  for (i = 0; i < afterWaterCount; i++) {
+    SegmentClass = chosenSegments[beforeWaterCount + i];
+
+    if (!SegmentClass) {
+      continue;
     }
 
-    //--------------------------------------------------------------------------
-    // END SEGMENT
-    //--------------------------------------------------------------------------
-
-    segment = new runmysteriet.segments.Segment_End();
+    segment = new SegmentClass();
     result = segment.ground(this.stage, x, this.levelNumber);
 
     this.addSegmentResult(result);
     x = result.endX;
+  }
 
-    this.levelWidth = x;
+  //--------------------------------------------------------------------------
+  // END SEGMENT
+  //--------------------------------------------------------------------------
+
+  segment = new runmysteriet.segments.Segment_End();
+  result = segment.ground(this.stage, x, this.levelNumber); //m_extra blasndannat
+
+  this.addSegmentResult(result);
+  x = result.endX;
+
+  this.levelWidth = x;
 };
 
 //------------------------------------------------------------------------------
@@ -165,23 +166,34 @@ runmysteriet.handler.PlatformHandler.prototype.init = function(levelNumber) {
  * @param {?Object} result
  * @return {void}
  */
-runmysteriet.handler.PlatformHandler.prototype.addSegmentResult = function(result) {
+runmysteriet.handler.PlatformHandler.prototype.addSegmentResult = function (
+  result,
+) {
+  if (!result) {
+    return;
+  }
 
-    if (!result) {
-        return;
-    }
-
-    this.addPlatforms(result.platforms || []);
-    this.addHoles(result.holes || []);
-    this.addEnemySpawns(result.enemySpawns || []);
-    this.addWaterAreas(result.waterAreas || []);
-    this.addBoats(result.boats || []);
-    this.addEndZones(result.endZones || []);
-    this.addDiseaseSpawns(result.diseaseSpawns || []);
-    this.addRuneSpawns(result.runeSpawns || []);
-    this.addArmorSpawns(result.armorSpawns || []);
+  this.addPlatforms(result.platforms || []);
+  this.addHoles(result.holes || []);
+  this.addEnemySpawns(result.enemySpawns || []);
+  this.addWaterAreas(result.waterAreas || []);
+  this.addBoats(result.boats || []);
+  this.addEndZones(result.endZones || []);
+  this.addDiseaseSpawns(result.diseaseSpawns || []);
+  this.addRuneSpawns(result.runeSpawns || []);
+  this.addArmorSpawns(result.armorSpawns || []);
+  this.m_extra = result.m_extra || null;
 };
 
+//Komentera senare
+runmysteriet.handler.PlatformHandler.prototype.getExtra = function () {
+    return this.m_extra;
+};
+
+runmysteriet.handler.PlatformHandler.prototype.clearExtra = function () {
+    this.removeDisplayObject(this.m_extra);
+    this.m_extra = null;
+};
 //------------------------------------------------------------------------------
 // ADD COLLECTIONS
 //------------------------------------------------------------------------------
@@ -192,17 +204,18 @@ runmysteriet.handler.PlatformHandler.prototype.addSegmentResult = function(resul
  * @param {?Array} platforms
  * @return {void}
  */
-runmysteriet.handler.PlatformHandler.prototype.addPlatforms = function(platforms) {
+runmysteriet.handler.PlatformHandler.prototype.addPlatforms = function (
+  platforms,
+) {
+  var i = 0;
 
-    var i = 0;
+  if (!platforms) {
+    return;
+  }
 
-    if (!platforms) {
-        return;
-    }
-
-    for (i = 0; i < platforms.length; i++) {
-        this.platforms.push(platforms[i]);
-    }
+  for (i = 0; i < platforms.length; i++) {
+    this.platforms.push(platforms[i]);
+  }
 };
 
 /**
@@ -211,17 +224,16 @@ runmysteriet.handler.PlatformHandler.prototype.addPlatforms = function(platforms
  * @param {?Array} holes
  * @return {void}
  */
-runmysteriet.handler.PlatformHandler.prototype.addHoles = function(holes) {
+runmysteriet.handler.PlatformHandler.prototype.addHoles = function (holes) {
+  var i = 0;
 
-    var i = 0;
+  if (!holes) {
+    return;
+  }
 
-    if (!holes) {
-        return;
-    }
-
-    for (i = 0; i < holes.length; i++) {
-        this.holes.push(holes[i]);
-    }
+  for (i = 0; i < holes.length; i++) {
+    this.holes.push(holes[i]);
+  }
 };
 
 /**
@@ -230,17 +242,18 @@ runmysteriet.handler.PlatformHandler.prototype.addHoles = function(holes) {
  * @param {?Array} enemySpawns
  * @return {void}
  */
-runmysteriet.handler.PlatformHandler.prototype.addEnemySpawns = function(enemySpawns) {
+runmysteriet.handler.PlatformHandler.prototype.addEnemySpawns = function (
+  enemySpawns,
+) {
+  var i = 0;
 
-    var i = 0;
+  if (!enemySpawns) {
+    return;
+  }
 
-    if (!enemySpawns) {
-        return;
-    }
-
-    for (i = 0; i < enemySpawns.length; i++) {
-        this.enemySpawns.push(enemySpawns[i]);
-    }
+  for (i = 0; i < enemySpawns.length; i++) {
+    this.enemySpawns.push(enemySpawns[i]);
+  }
 };
 
 /**
@@ -249,17 +262,18 @@ runmysteriet.handler.PlatformHandler.prototype.addEnemySpawns = function(enemySp
  * @param {?Array} waterAreas
  * @return {void}
  */
-runmysteriet.handler.PlatformHandler.prototype.addWaterAreas = function(waterAreas) {
+runmysteriet.handler.PlatformHandler.prototype.addWaterAreas = function (
+  waterAreas,
+) {
+  var i = 0;
 
-    var i = 0;
+  if (!waterAreas) {
+    return;
+  }
 
-    if (!waterAreas) {
-        return;
-    }
-
-    for (i = 0; i < waterAreas.length; i++) {
-        this.waterAreas.push(waterAreas[i]);
-    }
+  for (i = 0; i < waterAreas.length; i++) {
+    this.waterAreas.push(waterAreas[i]);
+  }
 };
 
 /**
@@ -268,17 +282,16 @@ runmysteriet.handler.PlatformHandler.prototype.addWaterAreas = function(waterAre
  * @param {?Array} boats
  * @return {void}
  */
-runmysteriet.handler.PlatformHandler.prototype.addBoats = function(boats) {
+runmysteriet.handler.PlatformHandler.prototype.addBoats = function (boats) {
+  var i = 0;
 
-    var i = 0;
+  if (!boats) {
+    return;
+  }
 
-    if (!boats) {
-        return;
-    }
-
-    for (i = 0; i < boats.length; i++) {
-        this.boats.push(boats[i]);
-    }
+  for (i = 0; i < boats.length; i++) {
+    this.boats.push(boats[i]);
+  }
 };
 
 /**
@@ -287,17 +300,18 @@ runmysteriet.handler.PlatformHandler.prototype.addBoats = function(boats) {
  * @param {?Array} endZones
  * @return {void}
  */
-runmysteriet.handler.PlatformHandler.prototype.addEndZones = function(endZones) {
+runmysteriet.handler.PlatformHandler.prototype.addEndZones = function (
+  endZones,
+) {
+  var i = 0;
 
-    var i = 0;
+  if (!endZones) {
+    return;
+  }
 
-    if (!endZones) {
-        return;
-    }
-
-    for (i = 0; i < endZones.length; i++) {
-        this.endZones.push(endZones[i]);
-    }
+  for (i = 0; i < endZones.length; i++) {
+    this.endZones.push(endZones[i]);
+  }
 };
 
 /**
@@ -306,17 +320,18 @@ runmysteriet.handler.PlatformHandler.prototype.addEndZones = function(endZones) 
  * @param {?Array} diseaseSpawns
  * @return {void}
  */
-runmysteriet.handler.PlatformHandler.prototype.addDiseaseSpawns = function(diseaseSpawns) {
+runmysteriet.handler.PlatformHandler.prototype.addDiseaseSpawns = function (
+  diseaseSpawns,
+) {
+  var i = 0;
 
-    var i = 0;
+  if (!diseaseSpawns) {
+    return;
+  }
 
-    if (!diseaseSpawns) {
-        return;
-    }
-
-    for (i = 0; i < diseaseSpawns.length; i++) {
-        this.diseaseSpawns.push(diseaseSpawns[i]);
-    }
+  for (i = 0; i < diseaseSpawns.length; i++) {
+    this.diseaseSpawns.push(diseaseSpawns[i]);
+  }
 };
 
 /**
@@ -325,17 +340,18 @@ runmysteriet.handler.PlatformHandler.prototype.addDiseaseSpawns = function(disea
  * @param {?Array} runeSpawns
  * @return {void}
  */
-runmysteriet.handler.PlatformHandler.prototype.addRuneSpawns = function(runeSpawns) {
+runmysteriet.handler.PlatformHandler.prototype.addRuneSpawns = function (
+  runeSpawns,
+) {
+  var i = 0;
 
-    var i = 0;
+  if (!runeSpawns) {
+    return;
+  }
 
-    if (!runeSpawns) {
-        return;
-    }
-
-    for (i = 0; i < runeSpawns.length; i++) {
-        this.runeSpawns.push(runeSpawns[i]);
-    }
+  for (i = 0; i < runeSpawns.length; i++) {
+    this.runeSpawns.push(runeSpawns[i]);
+  }
 };
 
 /**
@@ -344,17 +360,18 @@ runmysteriet.handler.PlatformHandler.prototype.addRuneSpawns = function(runeSpaw
  * @param {?Array} armorSpawns
  * @return {void}
  */
-runmysteriet.handler.PlatformHandler.prototype.addArmorSpawns = function(armorSpawns) {
+runmysteriet.handler.PlatformHandler.prototype.addArmorSpawns = function (
+  armorSpawns,
+) {
+  var i = 0;
 
-    var i = 0;
+  if (!armorSpawns) {
+    return;
+  }
 
-    if (!armorSpawns) {
-        return;
-    }
-
-    for (i = 0; i < armorSpawns.length; i++) {
-        this.armorSpawns.push(armorSpawns[i]);
-    }
+  for (i = 0; i < armorSpawns.length; i++) {
+    this.armorSpawns.push(armorSpawns[i]);
+  }
 };
 
 //------------------------------------------------------------------------------
@@ -364,40 +381,35 @@ runmysteriet.handler.PlatformHandler.prototype.addArmorSpawns = function(armorSp
 /**
  * @return {!Array}
  */
-runmysteriet.handler.PlatformHandler.prototype.getEnemySpawns = function() {
-
-    return this.enemySpawns;
+runmysteriet.handler.PlatformHandler.prototype.getEnemySpawns = function () {
+  return this.enemySpawns;
 };
 
 /**
  * @return {!Array}
  */
-runmysteriet.handler.PlatformHandler.prototype.getEndZones = function() {
-
-    return this.endZones;
+runmysteriet.handler.PlatformHandler.prototype.getEndZones = function () {
+  return this.endZones;
 };
 /**
  * @return {!Array}
  */
-runmysteriet.handler.PlatformHandler.prototype.getDiseaseSpawns = function() {
-
-    return this.diseaseSpawns;
+runmysteriet.handler.PlatformHandler.prototype.getDiseaseSpawns = function () {
+  return this.diseaseSpawns;
 };
 
 /**
  * @return {!Array}
  */
-runmysteriet.handler.PlatformHandler.prototype.getRuneSpawns = function() {
-
-    return this.runeSpawns;
+runmysteriet.handler.PlatformHandler.prototype.getRuneSpawns = function () {
+  return this.runeSpawns;
 };
 
 /**
  * @return {!Array}
  */
-runmysteriet.handler.PlatformHandler.prototype.getArmorSpawns = function() {
-
-    return this.armorSpawns;
+runmysteriet.handler.PlatformHandler.prototype.getArmorSpawns = function () {
+  return this.armorSpawns;
 };
 
 //------------------------------------------------------------------------------
@@ -411,43 +423,42 @@ runmysteriet.handler.PlatformHandler.prototype.getArmorSpawns = function() {
  * @param {Function=} onPlayerDead
  * @return {void}
  */
-runmysteriet.handler.PlatformHandler.prototype.updateHoles = function(
-    players,
-    onPlayerDead
+runmysteriet.handler.PlatformHandler.prototype.updateHoles = function (
+  players,
+  onPlayerDead,
 ) {
+  var i = 0;
+  var j = 0;
+  var player = null;
+  var hole = null;
 
-    var i = 0;
-    var j = 0;
-    var player = null;
-    var hole = null;
+  if (!players || !this.holes) {
+    return;
+  }
 
-    if (!players || !this.holes) {
-        return;
+  for (i = 0; i < players.length; i++) {
+    player = players[i];
+
+    if (!player || player.isDead === true) {
+      continue;
     }
 
-    for (i = 0; i < players.length; i++) {
-        player = players[i];
+    for (j = 0; j < this.holes.length; j++) {
+      hole = this.holes[j];
 
-        if (!player || player.isDead === true) {
-            continue;
+      if (!hole || typeof hole.hasPlayerFallen !== "function") {
+        continue;
+      }
+
+      if (hole.hasPlayerFallen(player)) {
+        if (onPlayerDead) {
+          onPlayerDead(player, i);
         }
 
-        for (j = 0; j < this.holes.length; j++) {
-            hole = this.holes[j];
-
-            if (!hole || typeof hole.hasPlayerFallen !== "function") {
-                continue;
-            }
-
-            if (hole.hasPlayerFallen(player)) {
-                if (onPlayerDead) {
-                    onPlayerDead(player, i);
-                }
-
-                break;
-            }
-        }
+        break;
+      }
     }
+  }
 };
 
 //------------------------------------------------------------------------------
@@ -462,33 +473,30 @@ runmysteriet.handler.PlatformHandler.prototype.updateHoles = function(
  * @param {Object} tweens Tween-manager som hanterar animationer.
  * @return {void}
  */
-runmysteriet.handler.PlatformHandler.prototype.startBoatTweens = function(tweens) {
+runmysteriet.handler.PlatformHandler.prototype.startBoatTweens = function (
+  tweens,
+) {
+  /** @type {number} */
+  var i = 0;
 
-    /** @type {number} */
-    var i = 0;
+  /** @type {?Object} */
+  var boat = null;
 
-    /** @type {?Object} */
-    var boat = null;
+  if (!tweens || !this.boats) {
+    return;
+  }
 
-    if (!tweens || !this.boats) {
-        return;
+  for (i = 0; i < this.boats.length; i++) {
+    boat = this.boats[i];
+
+    if (!boat) {
+      continue;
     }
 
-    for (i = 0; i < this.boats.length; i++) {
-        boat = this.boats[i];
-
-        if (!boat) {
-            continue;
-        }
-
-        if (typeof boat.startTween === "function") {
-            boat.startTween(
-                tweens,
-                boat.minX,
-                boat.maxX
-            );
-        }
+    if (typeof boat.startTween === "function") {
+      boat.startTween(tweens, boat.minX, boat.maxX);
     }
+  }
 };
 
 //------------------------------------------------------------------------------
@@ -501,40 +509,39 @@ runmysteriet.handler.PlatformHandler.prototype.startBoatTweens = function(tweens
  * @param {number=} step
  * @return {void}
  */
-runmysteriet.handler.PlatformHandler.prototype.update = function(step) {
+runmysteriet.handler.PlatformHandler.prototype.update = function (step) {
+  /** @type {number} */
+  var i = 0;
 
-    /** @type {number} */
-    var i = 0;
+  /** @type {?Object} */
+  var hole = null;
 
-    /** @type {?Object} */
-    var hole = null;
+  /** @type {?Object} */
+  var platform = null;
 
-    /** @type {?Object} */
-    var platform = null;
+  if (this.holes) {
+    for (i = 0; i < this.holes.length; i++) {
+      hole = this.holes[i];
 
-    if (this.holes) {
-        for (i = 0; i < this.holes.length; i++) {
-            hole = this.holes[i];
-
-            if (hole && typeof hole.update === "function") {
-                hole.update(step);
-            }
-        }
+      if (hole && typeof hole.update === "function") {
+        hole.update(step);
+      }
     }
+  }
 
-    if (this.platforms) {
-        for (i = 0; i < this.platforms.length; i++) {
-            platform = this.platforms[i];
+  if (this.platforms) {
+    for (i = 0; i < this.platforms.length; i++) {
+      platform = this.platforms[i];
 
-            if (!platform || platform.isRaft !== true) {
-                continue;
-            }
+      if (!platform || platform.isRaft !== true) {
+        continue;
+      }
 
-            if (typeof platform.update === "function") {
-                platform.update(step);
-            }
-        }
+      if (typeof platform.update === "function") {
+        platform.update(step);
+      }
     }
+  }
 };
 
 //------------------------------------------------------------------------------
@@ -547,14 +554,14 @@ runmysteriet.handler.PlatformHandler.prototype.update = function(step) {
  *
  * @return {number}
  */
-runmysteriet.handler.PlatformHandler.prototype.getSegmentsBeforeWaterCount = function() {
-
+runmysteriet.handler.PlatformHandler.prototype.getSegmentsBeforeWaterCount =
+  function () {
     if (this.levelNumber >= 11) {
-        return 3;
+      return 3;
     }
 
     return 2;
-};
+  };
 
 /**
  * Returnerar antal plattformssegment som ska placeras efter vattenområdet.
@@ -562,46 +569,45 @@ runmysteriet.handler.PlatformHandler.prototype.getSegmentsBeforeWaterCount = fun
  *
  * @return {number}
  */
-runmysteriet.handler.PlatformHandler.prototype.getSegmentsAfterWaterCount = function() {
-
+runmysteriet.handler.PlatformHandler.prototype.getSegmentsAfterWaterCount =
+  function () {
     if (this.levelNumber >= 6) {
-        return 2;
+      return 2;
     }
 
     return 1;
-};
+  };
 /**
  * @return {!Array}
  */
-runmysteriet.handler.PlatformHandler.prototype.getSegmentPool = function() {
-
-    if (this.levelNumber >= 11) {
-        return [
-            runmysteriet.segments.Segment_1,
-            runmysteriet.segments.Segment_2,
-            runmysteriet.segments.Segment_3,
-            runmysteriet.segments.Segment_4,
-            runmysteriet.segments.Segment_5,
-            runmysteriet.segments.Segment_6
-        ];
-    }
-
-    if (this.levelNumber >= 6) {
-        return [
-            runmysteriet.segments.Segment_2,
-            runmysteriet.segments.Segment_3,
-            runmysteriet.segments.Segment_4,
-            runmysteriet.segments.Segment_5,
-            runmysteriet.segments.Segment_6
-        ];
-    }
-
+runmysteriet.handler.PlatformHandler.prototype.getSegmentPool = function () {
+  if (this.levelNumber >= 11) {
     return [
-        runmysteriet.segments.Segment_3,
-        runmysteriet.segments.Segment_4,
-        runmysteriet.segments.Segment_5,
-        runmysteriet.segments.Segment_6
+      runmysteriet.segments.Segment_1,
+      runmysteriet.segments.Segment_2,
+      runmysteriet.segments.Segment_3,
+      runmysteriet.segments.Segment_4,
+      runmysteriet.segments.Segment_5,
+      runmysteriet.segments.Segment_6,
     ];
+  }
+
+  if (this.levelNumber >= 6) {
+    return [
+      runmysteriet.segments.Segment_2,
+      runmysteriet.segments.Segment_3,
+      runmysteriet.segments.Segment_4,
+      runmysteriet.segments.Segment_5,
+      runmysteriet.segments.Segment_6,
+    ];
+  }
+
+  return [
+    runmysteriet.segments.Segment_3,
+    runmysteriet.segments.Segment_4,
+    runmysteriet.segments.Segment_5,
+    runmysteriet.segments.Segment_6,
+  ];
 };
 /**
  * Hämtar slumpade segmentklasser.
@@ -610,29 +616,28 @@ runmysteriet.handler.PlatformHandler.prototype.getSegmentPool = function() {
  * @param {number} count
  * @return {!Array}
  */
-runmysteriet.handler.PlatformHandler.prototype.getRandomSegments = function(
-    pool,
-    count
+runmysteriet.handler.PlatformHandler.prototype.getRandomSegments = function (
+  pool,
+  count,
 ) {
+  var copy = [];
+  var result = [];
+  var index = 0;
 
-    var copy = [];
-    var result = [];
-    var index = 0;
-
-    if (!pool) {
-        return result;
-    }
-
-    copy = pool.slice();
-
-    while (result.length < count && copy.length > 0) {
-        index = Math.floor(Math.random() * copy.length);
-
-        result.push(copy[index]);
-        copy.splice(index, 1);
-    }
-
+  if (!pool) {
     return result;
+  }
+
+  copy = pool.slice();
+
+  while (result.length < count && copy.length > 0) {
+    index = Math.floor(Math.random() * copy.length);
+
+    result.push(copy[index]);
+    copy.splice(index, 1);
+  }
+
+  return result;
 };
 
 //------------------------------------------------------------------------------
@@ -646,17 +651,16 @@ runmysteriet.handler.PlatformHandler.prototype.getRandomSegments = function(
  *
  * @return {number}
  */
-runmysteriet.handler.PlatformHandler.prototype.getArmorCount = function() {
+runmysteriet.handler.PlatformHandler.prototype.getArmorCount = function () {
+  if (this.levelNumber >= 11) {
+    return 4;
+  }
 
-    if (this.levelNumber >= 11) {
-        return 4;
-    }
+  if (this.levelNumber >= 6) {
+    return 3;
+  }
 
-    if (this.levelNumber >= 6) {
-        return 3;
-    }
-
-    return 2;
+  return 2;
 };
 
 //------------------------------------------------------------------------------
@@ -669,30 +673,31 @@ runmysteriet.handler.PlatformHandler.prototype.getArmorCount = function() {
  * @param {?Object} object
  * @return {void}
  */
-runmysteriet.handler.PlatformHandler.prototype.removeDisplayObject = function(object) {
+runmysteriet.handler.PlatformHandler.prototype.removeDisplayObject = function (
+  object,
+) {
+  if (!object) {
+    return;
+  }
 
-    if (!object) {
-        return;
-    }
+  if (typeof object.dispose === "function") {
+    object.dispose();
+    return;
+  }
 
-    if (typeof object.dispose === "function") {
-        object.dispose();
-        return;
-    }
+  if (typeof object.remove === "function") {
+    object.remove();
+    return;
+  }
 
-    if (typeof object.remove === "function") {
-        object.remove();
-        return;
-    }
+  if (object.parent) {
+    object.parent.removeChild(object);
+    return;
+  }
 
-    if (object.parent) {
-        object.parent.removeChild(object);
-        return;
-    }
-
-    if (object.stage) {
-        object.stage.removeChild(object);
-    }
+  if (object.stage) {
+    object.stage.removeChild(object);
+  }
 };
 
 //------------------------------------------------------------------------------
@@ -705,17 +710,18 @@ runmysteriet.handler.PlatformHandler.prototype.removeDisplayObject = function(ob
  * @param {?Array} list
  * @return {void}
  */
-runmysteriet.handler.PlatformHandler.prototype.clearDisplayList = function(list) {
+runmysteriet.handler.PlatformHandler.prototype.clearDisplayList = function (
+  list,
+) {
+  var i = 0;
 
-    var i = 0;
+  if (!list) {
+    return;
+  }
 
-    if (!list) {
-        return;
-    }
-
-    for (i = 0; i < list.length; i++) {
-        this.removeDisplayObject(list[i]);
-    }
+  for (i = 0; i < list.length; i++) {
+    this.removeDisplayObject(list[i]);
+  }
 };
 
 //------------------------------------------------------------------------------
@@ -727,26 +733,25 @@ runmysteriet.handler.PlatformHandler.prototype.clearDisplayList = function(list)
  *
  * @return {void}
  */
-runmysteriet.handler.PlatformHandler.prototype.clear = function() {
+runmysteriet.handler.PlatformHandler.prototype.clear = function () {
+  this.clearDisplayList(this.platforms);
+  this.clearDisplayList(this.holes);
+  this.clearDisplayList(this.waterAreas);
+  this.clearDisplayList(this.boats);
+  this.clearDisplayList(this.endZones);
 
-    this.clearDisplayList(this.platforms);
-    this.clearDisplayList(this.holes);
-    this.clearDisplayList(this.waterAreas);
-    this.clearDisplayList(this.boats);
-    this.clearDisplayList(this.endZones);
+  this.platforms = [];
+  this.holes = [];
+  this.enemySpawns = [];
+  this.waterAreas = [];
+  this.boats = [];
+  this.endZones = [];
+  this.diseaseSpawns = [];
+  this.runeSpawns = [];
+  this.armorSpawns = [];
 
-    this.platforms = [];
-    this.holes = [];
-    this.enemySpawns = [];
-    this.waterAreas = [];
-    this.boats = [];
-    this.endZones = [];
-    this.diseaseSpawns = [];
-    this.runeSpawns = [];
-    this.armorSpawns = [];
-
-    this.levelWidth = 0;
-    this.levelNumber = 1;
+  this.levelWidth = 0;
+  this.levelNumber = 1;
 };
 
 //------------------------------------------------------------------------------
@@ -758,10 +763,9 @@ runmysteriet.handler.PlatformHandler.prototype.clear = function() {
  *
  * @return {void}
  */
-runmysteriet.handler.PlatformHandler.prototype.dispose = function() {
+runmysteriet.handler.PlatformHandler.prototype.dispose = function () {
+  this.clear();
 
-    this.clear();
-
-    this.stage = null;
-    this.screenWidth = 0;
+  this.stage = null;
+  this.screenWidth = 0;
 };

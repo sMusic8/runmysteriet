@@ -61,7 +61,7 @@ this.extrap = false;
  * }}
  */
 runmysteriet.segments.Segment_End.prototype.ground = function(stage, startX, levelNumber) {
-
+console.log("Segment end");
     var segmentStart = startX || 0;
     var segmentEnd = segmentStart + this.length;
 
@@ -102,7 +102,8 @@ runmysteriet.segments.Segment_End.prototype.ground = function(stage, startX, lev
         waterAreas: waterAreas,
         boats: boats,
         endZones: endZones,
-        endX: segmentEnd
+        endX: segmentEnd,
+        m_extra: this.m_extra
     };
 };
 
@@ -336,22 +337,22 @@ runmysteriet.segments.Segment_End.prototype.getDiseasePositions = function(segme
         {
             type: "gray",
             x: segmentStart + 190,
-            y: this.groundY - 40
+            y: this.groundY - 50
         },
         {
             type: "brown",
             x: segmentStart + 320,
-            y: this.groundY - 40
+            y: this.groundY - 50
         },
         {
             type: "red",
             x: segmentStart + 460,
-            y: this.groundY - 40
+            y: this.groundY - 50
         },
         {
             type: "gray",
             x: segmentStart + 600,
-            y: this.groundY - 40
+            y: this.groundY - 50
         }
     ];
 };
@@ -499,9 +500,8 @@ runmysteriet.segments.Segment_End.prototype.addJumpPlatforms = function(stage, p
     30,
     "extra"
 );
-
 stage.addChild(this.m_extra);
-this.m_extraCollected = false;
+
 };
 
 /**
