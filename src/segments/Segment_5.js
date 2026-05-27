@@ -323,6 +323,7 @@ runmysteriet.segments.Segment_5.prototype.getRunePositions = function(segmentSta
             x: segmentStart + 600,
             y: this.groundY - 70
         }
+    ];
 };
 
 /**
