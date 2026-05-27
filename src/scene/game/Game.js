@@ -421,7 +421,7 @@ runmysteriet.scene.Game.prototype.createHUD = function () {
   this.m_hudHandler = new runmysteriet.handler.HudHandler(
     this.stage,
     this.application,
-    this.cameras,
+    this.cameras
   );
 
   this.m_hudHandler.init();
@@ -490,7 +490,7 @@ runmysteriet.scene.Game.prototype.init = function () {
    * @type {runmysteriet.logic.HighscoreManager}
    */
   this.m_highscoreManager = new runmysteriet.logic.HighscoreManager(
-    this.application,
+    this.application
   );
 
   /**
@@ -509,7 +509,7 @@ runmysteriet.scene.Game.prototype.init = function () {
     this.stage,
     this.camera,
     this.application.screen.width,
-    this.application.screen.height,
+    this.application.screen.height
   );
 
   this.m_backgroundHandler.init();
@@ -522,7 +522,7 @@ runmysteriet.scene.Game.prototype.init = function () {
    */
   this.m_platformHandler = new runmysteriet.handler.PlatformHandler(
     this.stage,
-    this.application.screen.width,
+    this.application.screen.width
   );
 
   this.m_platformHandler.init(this.m_levelNumber);
@@ -539,7 +539,7 @@ runmysteriet.scene.Game.prototype.init = function () {
   this.m_cloudHandler = new runmysteriet.handler.CloudHandler(
     this.stage,
     this.application.screen.width,
-    this.m_platformHandler.levelWidth,
+    this.m_platformHandler.levelWidth
   );
 
   this.m_cloudHandler.init();
@@ -556,7 +556,7 @@ runmysteriet.scene.Game.prototype.init = function () {
     this.application,
     this.m_gameInput,
     this.keyboard,
-    this.m_avatarData,
+    this.m_avatarData
   );
 
   this.m_playerHandler.init();
@@ -579,7 +579,7 @@ runmysteriet.scene.Game.prototype.init = function () {
 
   this.m_enemyHandler.init(
     this.m_levelConfig,
-    this.m_platformHandler.getEnemySpawns(),
+    this.m_platformHandler.getEnemySpawns()
   );
 
   this.m_playerHandler.setEnemyHandler(this.m_enemyHandler);
@@ -595,7 +595,7 @@ runmysteriet.scene.Game.prototype.init = function () {
     this.m_playerHandler,
     this.m_platformHandler,
     this.m_platformHandler.levelWidth,
-    this.m_levelNumber,
+    this.m_levelNumber
   );
 
   this.m_playerHandler.setCamera(this.camera);
@@ -609,12 +609,12 @@ runmysteriet.scene.Game.prototype.init = function () {
    */
   this.m_diseaseHandler = new runmysteriet.handler.DiseaseHandler(
     this.stage,
-    this.application,
+    this.application
   );
 
   this.m_diseaseHandler.init(
     this.m_levelNumber,
-    this.m_platformHandler.getDiseaseSpawns(),
+    this.m_platformHandler.getDiseaseSpawns()
   );
 
   // Rustning
@@ -627,7 +627,7 @@ runmysteriet.scene.Game.prototype.init = function () {
     this.stage,
     this.application,
     this.m_levelNumber,
-    this.m_platformHandler.getArmorSpawns(),
+    this.m_platformHandler.getArmorSpawns()
   );
 
   this.m_armorHandler.init();
@@ -653,7 +653,7 @@ runmysteriet.scene.Game.prototype.init = function () {
     this.application,
     this.m_platformHandler.levelWidth,
     this.m_levelNumber,
-    this.m_platformHandler.getRuneSpawns(),
+    this.m_platformHandler.getRuneSpawns()
   );
 
   this.m_shieldHandler.init();
@@ -668,7 +668,7 @@ runmysteriet.scene.Game.prototype.init = function () {
     this.stage,
     this.application,
     this.camera,
-    this.m_playerHandler,
+    this.m_playerHandler
   );
 
   // HUD
@@ -702,21 +702,21 @@ runmysteriet.scene.Game.prototype.update = function (step) {
 
   if (this.keyboard.justPressed("F1")) {
     this.application.scenes.load([
-      new runmysteriet.scene.Game(6, this.m_score, this.m_avatarData),
+      new runmysteriet.scene.Game(6, this.m_score, this.m_avatarData)
     ]);
     return;
   }
 
   if (this.keyboard.justPressed("F2")) {
     this.application.scenes.load([
-      new runmysteriet.scene.Game(15, this.m_score, this.m_avatarData),
+      new runmysteriet.scene.Game(15, this.m_score, this.m_avatarData)
     ]);
     return;
   }
 
   if (this.keyboard.justPressed("F3")) {
     this.application.scenes.load([
-      new runmysteriet.scene.Game(19, this.m_score, this.m_avatarData),
+      new runmysteriet.scene.Game(19, this.m_score, this.m_avatarData)
     ]);
     return;
   }
@@ -841,7 +841,7 @@ runmysteriet.scene.Game.prototype.updateHoles = function () {
       this.m_playerHandler.players,
       function (player, index) {
         self.m_playerHandler.killPlayer(player, index);
-      },
+      }
     );
   }
 };
@@ -935,7 +935,7 @@ runmysteriet.scene.Game.prototype.createStartCountdown = function () {
     cameraX,
     cameraY,
     this.application.screen.width,
-    this.application.screen.height,
+    this.application.screen.height
   );
 
   this.m_startCountdownOverlay.backgroundColor = "#000000";
@@ -1029,7 +1029,7 @@ runmysteriet.scene.Game.prototype.closeStartCountdown = function () {
 
   if (this.m_startCountdownOverlay && this.m_startCountdownOverlay.stage) {
     this.m_startCountdownOverlay.stage.removeChild(
-      this.m_startCountdownOverlay,
+      this.m_startCountdownOverlay
     );
   }
 
@@ -1148,7 +1148,7 @@ runmysteriet.scene.Game.prototype.createPauseMenu = function () {
     0,
     0,
     this.application.screen.width,
-    this.application.screen.height,
+    this.application.screen.height
   );
 
   this.m_pauseOverlay.backgroundColor = "#000000";
@@ -1177,7 +1177,7 @@ runmysteriet.scene.Game.prototype.createPauseMenu = function () {
     ["CONTINUE", "QUIT GAME"],
     0,
     22,
-    1,
+    1
   );
 
   this.m_pauseMenu.setVisible(false);
@@ -1322,7 +1322,7 @@ runmysteriet.scene.Game.prototype.playMenuSound = function () {
 runmysteriet.scene.Game.prototype.handleMenuListInput = function (
   menuList,
   input,
-  onChoose,
+  onChoose
 ) {
   if (!menuList || !input) {
     return;
@@ -1361,7 +1361,7 @@ runmysteriet.scene.Game.prototype.updateGameInfo = function () {
   }
 
   this.m_hudHandler.setScoreText(
-    "LEVEL " + this.m_levelNumber + " SCORE " + this.getTotalScore(),
+    "LEVEL " + this.m_levelNumber + " SCORE " + this.getTotalScore()
   );
 };
 /**
@@ -1631,10 +1631,10 @@ runmysteriet.scene.Game.prototype.winGame = function (winningPlayer) {
             data.earnedScore,
             data.totalScore,
             data.guessData,
-            data.avatarData,
+            data.avatarData
           ),
         ]);
-      },
+      }
     );
 
     return;
@@ -1647,8 +1647,8 @@ runmysteriet.scene.Game.prototype.winGame = function (winningPlayer) {
       earnedScore,
       totalScore,
       guessData,
-      this.m_avatarData,
-    ),
+      this.m_avatarData
+    )
   ]);
 };
 /**
@@ -1683,15 +1683,15 @@ runmysteriet.scene.Game.prototype.loseGame = function (reason) {
         this.m_avatarData,
         {
           score: totalScore,
-          reason: reason || "GAME OVER",
-        },
-      ),
+          reason: reason || "GAME OVER"
+        }
+      )
     ]);
     return;
   }
 
   this.application.scenes.load([
-    new runmysteriet.scene.GameOver(totalScore, reason || "GAME OVER"),
+    new runmysteriet.scene.GameOver(totalScore, reason || "GAME OVER")
   ]);
 };
 /**
@@ -1788,7 +1788,7 @@ runmysteriet.scene.Game.prototype.restartLevel = function () {
 
   this.m_enemyHandler.init(
     this.m_levelConfig,
-    this.m_platformHandler.getEnemySpawns(),
+    this.m_platformHandler.getEnemySpawns()
   );
 
   if (this.m_playerHandler) {

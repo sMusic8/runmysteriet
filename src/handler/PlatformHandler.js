@@ -167,7 +167,7 @@ runmysteriet.handler.PlatformHandler.prototype.init = function (levelNumber) {
  * @return {void}
  */
 runmysteriet.handler.PlatformHandler.prototype.addSegmentResult = function (
-  result,
+  result
 ) {
   if (!result) {
     return;
@@ -205,7 +205,7 @@ runmysteriet.handler.PlatformHandler.prototype.clearExtra = function () {
  * @return {void}
  */
 runmysteriet.handler.PlatformHandler.prototype.addPlatforms = function (
-  platforms,
+  platforms
 ) {
   var i = 0;
 
@@ -243,7 +243,7 @@ runmysteriet.handler.PlatformHandler.prototype.addHoles = function (holes) {
  * @return {void}
  */
 runmysteriet.handler.PlatformHandler.prototype.addEnemySpawns = function (
-  enemySpawns,
+  enemySpawns
 ) {
   var i = 0;
 
@@ -263,7 +263,7 @@ runmysteriet.handler.PlatformHandler.prototype.addEnemySpawns = function (
  * @return {void}
  */
 runmysteriet.handler.PlatformHandler.prototype.addWaterAreas = function (
-  waterAreas,
+  waterAreas
 ) {
   var i = 0;
 
@@ -301,7 +301,7 @@ runmysteriet.handler.PlatformHandler.prototype.addBoats = function (boats) {
  * @return {void}
  */
 runmysteriet.handler.PlatformHandler.prototype.addEndZones = function (
-  endZones,
+  endZones
 ) {
   var i = 0;
 
@@ -321,7 +321,7 @@ runmysteriet.handler.PlatformHandler.prototype.addEndZones = function (
  * @return {void}
  */
 runmysteriet.handler.PlatformHandler.prototype.addDiseaseSpawns = function (
-  diseaseSpawns,
+  diseaseSpawns
 ) {
   var i = 0;
 
@@ -341,7 +341,7 @@ runmysteriet.handler.PlatformHandler.prototype.addDiseaseSpawns = function (
  * @return {void}
  */
 runmysteriet.handler.PlatformHandler.prototype.addRuneSpawns = function (
-  runeSpawns,
+  runeSpawns
 ) {
   var i = 0;
 
@@ -361,7 +361,7 @@ runmysteriet.handler.PlatformHandler.prototype.addRuneSpawns = function (
  * @return {void}
  */
 runmysteriet.handler.PlatformHandler.prototype.addArmorSpawns = function (
-  armorSpawns,
+  armorSpawns
 ) {
   var i = 0;
 
@@ -425,7 +425,7 @@ runmysteriet.handler.PlatformHandler.prototype.getArmorSpawns = function () {
  */
 runmysteriet.handler.PlatformHandler.prototype.updateHoles = function (
   players,
-  onPlayerDead,
+  onPlayerDead
 ) {
   var i = 0;
   var j = 0;
@@ -474,7 +474,7 @@ runmysteriet.handler.PlatformHandler.prototype.updateHoles = function (
  * @return {void}
  */
 runmysteriet.handler.PlatformHandler.prototype.startBoatTweens = function (
-  tweens,
+  tweens
 ) {
   /** @type {number} */
   var i = 0;
@@ -618,7 +618,7 @@ runmysteriet.handler.PlatformHandler.prototype.getSegmentPool = function () {
  */
 runmysteriet.handler.PlatformHandler.prototype.getRandomSegments = function (
   pool,
-  count,
+  count
 ) {
   var copy = [];
   var result = [];
@@ -674,7 +674,7 @@ runmysteriet.handler.PlatformHandler.prototype.getArmorCount = function () {
  * @return {void}
  */
 runmysteriet.handler.PlatformHandler.prototype.removeDisplayObject = function (
-  object,
+  object
 ) {
   if (!object) {
     return;
@@ -711,7 +711,7 @@ runmysteriet.handler.PlatformHandler.prototype.removeDisplayObject = function (
  * @return {void}
  */
 runmysteriet.handler.PlatformHandler.prototype.clearDisplayList = function (
-  list,
+  list
 ) {
   var i = 0;
 
