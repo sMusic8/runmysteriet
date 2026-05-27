@@ -288,12 +288,12 @@ runmysteriet.segments.Segment_3.prototype.getDiseasePositions = function(segment
         },
         {
             type: "brown",
-            x: segmentStart + 560,
+            x: segmentStart + 460,
             y: this.groundY - 50
         },
         {
             type: "red",
-            x: segmentStart + 850,
+            x: segmentStart + 650,
             y: this.groundY - 50
         },
         {
