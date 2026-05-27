@@ -284,22 +284,22 @@ runmysteriet.segments.Segment_Water.prototype.getDiseasePositions = function(lef
         {
             type: "gray",
             x: leftLandX + 90,
-            y: this.groundY - 40
+            y: this.groundY - 50
         },
         {
             type: "brown",
             x: rightLandX + 80,
-            y: this.groundY - 40
+            y: this.groundY - 50
         },
         {
             type: "red",
-            x: rightLandX + 140,
-            y: this.groundY - 40
+            x: rightLandX + 150,
+            y: this.groundY - 50
         },
         {
             type: "gray",
             x: leftLandX + 190,
-            y: this.groundY - 40
+            y: this.groundY - 50
         }
     ];
 };

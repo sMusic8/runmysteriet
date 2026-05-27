@@ -200,15 +200,10 @@ runmysteriet.segments.Segment_3.prototype.addLavaHole = function(stage, holes, x
         200
     );
 
-    //Hole lägger själv ut sin lava.
-    
     hole.addToStage(stage);
 
-    //Hole sparas för dödslogik.
-     
     holes.push(hole);
 };
-
 
 /**
  * Lägger till trappplattformar över lavan.
@@ -289,25 +284,26 @@ runmysteriet.segments.Segment_3.prototype.getDiseasePositions = function(segment
         {
             type: "gray",
             x: segmentStart + 680,
-            y: this.groundY - 20
+            y: this.groundY - 50
         },
         {
             type: "brown",
             x: segmentStart + 760,
-            y: this.groundY - 25
+            y: this.groundY - 50
         },
         {
             type: "red",
             x: segmentStart + 850,
-            y: this.groundY - 30
+            y: this.groundY - 50
         },
         {
             type: "gray",
             x: segmentStart + 930,
-            y: this.groundY - 35
+            y: this.groundY - 50
         }
     ];
 };
+
 /**
  * Lägger till rune-positioner i en lista av spawn-punkter.
  *
@@ -377,7 +373,7 @@ runmysteriet.segments.Segment_3.prototype.getArmorPositions = function(segmentSt
     return [
         {
             x: segmentStart + 850,
-            y: this.groundY - 45
+            y: this.groundY - 40
         }
     ];
 };

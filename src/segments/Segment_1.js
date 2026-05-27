@@ -51,7 +51,7 @@ runmysteriet.segments.Segment_1 = function() {
  * }}
  */
 runmysteriet.segments.Segment_1.prototype.ground = function(stage, startX, levelNumber) {
-
+console.log("Segment 1")
     var segmentStart = startX || 0;
     var segmentEnd = segmentStart + this.length;
     var x = segmentStart;
@@ -296,22 +296,22 @@ runmysteriet.segments.Segment_1.prototype.getDiseasePositions = function(segment
         {
             type: "gray",
             x: segmentStart + 80,
-            y: this.groundY - 40
+            y: this.groundY - 50
         },
         {
             type: "brown",
             x: segmentStart + 760,
-            y: this.groundY - 40
+            y: this.groundY - 50
         },
         {
             type: "red",
             x: segmentStart + 850,
-            y: this.groundY - 40
+            y: this.groundY - 50
         },
         {
             type: "gray",
             x: segmentStart + 930,
-            y: this.groundY - 40
+            y: this.groundY - 50
         }
     ];
 };
@@ -356,6 +356,7 @@ runmysteriet.segments.Segment_1.prototype.getRunePositions = function(segmentSta
         }
     ];
 };
+
 /**
  * Lägger till armor-positioner i en lista av spawn-punkter.
  *
@@ -384,7 +385,7 @@ runmysteriet.segments.Segment_1.prototype.getArmorPositions = function(segmentSt
     return [
         {
             x: segmentStart + 850,
-            y: this.groundY - 45
+            y: this.groundY - 70
         }
     ];
 };

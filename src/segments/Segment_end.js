@@ -336,22 +336,22 @@ runmysteriet.segments.Segment_End.prototype.getDiseasePositions = function(segme
         {
             type: "gray",
             x: segmentStart + 190,
-            y: this.groundY - 40
+            y: this.groundY - 50
         },
         {
             type: "brown",
             x: segmentStart + 320,
-            y: this.groundY - 40
+            y: this.groundY - 50
         },
         {
             type: "red",
             x: segmentStart + 460,
-            y: this.groundY - 40
+            y: this.groundY - 50
         },
         {
             type: "gray",
             x: segmentStart + 600,
-            y: this.groundY - 40
+            y: this.groundY - 50
         }
     ];
 };
