@@ -100,7 +100,7 @@ runmysteriet.input.GameInput.prototype.readKeyboard = function(keyboard, input) 
         keyboard.justPressed("SPACE");
 
     input.back = input.back ||
-        keyboard.justPressed("ESCAPE");
+        keyboard.justPressed("ESCAPE") ||
         keyboard.justPressed("BACKSPACE");
 
     input.hint = input.hint ||
