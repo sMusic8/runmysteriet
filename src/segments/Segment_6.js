@@ -319,7 +319,7 @@ runmysteriet.segments.Segment_6.prototype.addRuneSpawns = function(runeSpawns, s
 runmysteriet.segments.Segment_6.prototype.getRunePositions = function(segmentStart) {
     return [
         {
-            x: segmentStart + 190,
+            x: segmentStart + 600,
             y: this.groundY - 70
         }
     ];

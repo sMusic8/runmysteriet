@@ -283,11 +283,7 @@ runmysteriet.segments.Segment_Water.prototype.addDiseases = function(diseaseSpaw
  */
 runmysteriet.segments.Segment_Water.prototype.getDiseasePositions = function(leftLandX, rightLandX) {
     return [
-        {
-            type: "gray",
-            x: leftLandX + 90,
-            y: this.groundY - 50
-        },
+       
         {
             type: "brown",
             x: rightLandX + 80,
@@ -310,8 +306,8 @@ runmysteriet.segments.Segment_Water.prototype.getDiseasePositions = function(lef
  *
  * @this {runmysteriet.segments.Segment_Water}
  * @param {!Array<!{x: number, y: number}>} runeSpawns Lista som fylls med rune-positioner.
- * @param {number} leftLandX X-position för vänster landmassa.
- * @param {number} rightLandX X-position för höger landmassa.
+ * @param {number} leftLandX X-position för vänster land.
+ * @param {number} rightLandX X-position för höger land.
  * @return {void}
  */
 runmysteriet.segments.Segment_Water.prototype.addRuneSpawns = function(runeSpawns, leftLandX, rightLandX) {
@@ -333,7 +329,7 @@ runmysteriet.segments.Segment_Water.prototype.addRuneSpawns = function(runeSpawn
  */
 runmysteriet.segments.Segment_Water.prototype.getRunePositions = function(leftLandX, rightLandX) {
     return [
-    
+    //spawnplats för runor
     ];
 };
 
@@ -365,10 +361,7 @@ runmysteriet.segments.Segment_Water.prototype.addArmorSpawns = function(armorSpa
  */
 runmysteriet.segments.Segment_Water.prototype.getArmorPositions = function(leftLandX, rightLandX) {
     return [
-        {
-            x: leftLandX + 210,
-            y: this.groundY - 45
-        },
+    
         {
             x: rightLandX + 220,
             y: this.groundY - 45

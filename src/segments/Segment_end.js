@@ -410,8 +410,8 @@ runmysteriet.segments.Segment_End.prototype.getRunePositions = function(segmentS
     return [
     
         {
-            x: segmentStart + 520,
-            y: this.groundY - 70
+            x: segmentStart + 550,
+            y: this.groundY - 100
         }
     ];
 };
