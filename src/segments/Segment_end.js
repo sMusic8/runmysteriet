@@ -37,8 +37,8 @@ runmysteriet.segments.Segment_End = function() {
     /** @type {string} */
     this.markerTexture = "grass_block";
 
-        console.log("segmentEnd");
-
+    /** @type {boolean} */  
+this.extrap = false;
 };
 
 /**
@@ -89,6 +89,8 @@ runmysteriet.segments.Segment_End.prototype.ground = function(stage, startX, lev
     this.addRuneSpawns(runeSpawns, segmentStart);
     this.addEndZone(stage, endZones, segmentEnd);
     this.addArmorSpawns(armorSpawns, segmentStart);
+
+   
 
     return {
         platforms: platforms,
@@ -489,6 +491,17 @@ runmysteriet.segments.Segment_End.prototype.addJumpPlatforms = function(stage, p
         this.groundY - 95,
         3
     );
+
+    this.m_extra = new rune.display.Graphic(
+    segmentStart + 720 + (3 * this.tileW) - 15,
+    this.groundY - 95 - 25,
+    30,
+    30,
+    "extra"
+);
+
+stage.addChild(this.m_extra);
+this.m_extraCollected = false;
 };
 
 /**
