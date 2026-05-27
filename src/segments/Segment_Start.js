@@ -271,7 +271,7 @@ runmysteriet.segments.Segment_Start.prototype.getDiseasePositions = function(seg
         },
         {
             type: "brown",
-            x: segmentStart + 520,
+            x: segmentStart + 420,
             y: this.groundY - 50
         }
     ];
@@ -303,7 +303,7 @@ runmysteriet.segments.Segment_Start.prototype.addRuneSpawns = function(runeSpawn
 runmysteriet.segments.Segment_Start.prototype.getRunePositions = function(segmentStart) {
     return [
         {
-            x: segmentStart + 1000,
+            x: segmentStart + 600,
             y: this.groundY - 70
         }
     ];

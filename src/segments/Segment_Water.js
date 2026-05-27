@@ -333,14 +333,7 @@ runmysteriet.segments.Segment_Water.prototype.addRuneSpawns = function(runeSpawn
  */
 runmysteriet.segments.Segment_Water.prototype.getRunePositions = function(leftLandX, rightLandX) {
     return [
-        {
-            x: leftLandX + 150,
-            y: this.groundY - 70
-        },
-        {
-            x: rightLandX + 150,
-            y: this.groundY - 70
-        }
+    
     ];
 };
 
