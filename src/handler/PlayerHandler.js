@@ -484,9 +484,9 @@ runmysteriet.handler.PlayerHandler.prototype.checkPlatform = function(player, pl
     }
 
     if (platform.isRaft === true) {
-        playerPaddingX = 8;
-        platformPaddingX = 10;
-        toleranceY = 4;
+        playerPaddingX = 3;
+        platformPaddingX = 0;
+        toleranceY = 10;
     }
 
     offsetY = this.getPlatformOffsetY(platform);

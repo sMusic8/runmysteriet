@@ -183,18 +183,21 @@ runmysteriet.segments.Segment_Water.prototype.addWater = function(stage, waterAr
  * @param {!runmysteriet.ui.graphic.Water} water
  */
 runmysteriet.segments.Segment_Water.prototype.addRaft = function(stage, platforms, water) {
+
+    var raftStartX = water.x - 20;
+    var raftStartY = water.y - 9;
+
     var raft = new runmysteriet.ui.graphic.Raft(
-        water.x + - 22,
-        water.y - 9
+        raftStartX,
+        raftStartY
     );
 
-    raft.minX = water.x - 5;
+    raft.minX = raftStartX;
     raft.maxX = water.x + this.waterWidth - raft.width + 20;
 
     stage.addChild(raft);
 
     //Flotten räknas som plattform så spelaren kan stå på den.
-     
     platforms.push(raft);
 };
 
