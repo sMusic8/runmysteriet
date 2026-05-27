@@ -289,7 +289,7 @@ runmysteriet.segments.Segment_3.prototype.getDiseasePositions = function(segment
         {
             type: "brown",
             x: segmentStart + 460,
-            y: this.groundY - 150
+            y: this.groundY - 190
         },
         {
             type: "red",
@@ -365,7 +365,7 @@ runmysteriet.segments.Segment_3.prototype.getArmorPositions = function(segmentSt
     return [
         {
             x: segmentStart + 860,
-            y: this.groundY - 40
+            y: this.groundY - 200
         }
     ];
 };
