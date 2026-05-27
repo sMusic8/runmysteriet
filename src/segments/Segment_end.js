@@ -84,7 +84,7 @@ console.log("Segment end");
      
     this.addGroundWithSmallLavaHoles(stage, platforms, holes, segmentStart);
     this.addJumpPlatforms(stage, platforms, segmentStart);
-    this.addGoalMarkers(stage, gateX, gateY);
+   // this.addGoalMarkers(stage, gateX, gateY);
     this.addDiseases(diseaseSpawns, segmentStart, levelNumber);
     this.addRuneSpawns(runeSpawns, segmentStart);
     this.addEndZone(stage, endZones, segmentEnd);
@@ -271,7 +271,7 @@ runmysteriet.segments.Segment_End.prototype.addTiles = function(stage, platforms
  * @param {number} gateX
  * @param {number} gateY
  */
-runmysteriet.segments.Segment_End.prototype.addGoalMarkers = function(stage, gateX, gateY) {
+/* runmysteriet.segments.Segment_End.prototype.addGoalMarkers = function(stage, gateX, gateY) {
     var j = 0;
     var marker = null;
 
@@ -286,7 +286,7 @@ runmysteriet.segments.Segment_End.prototype.addGoalMarkers = function(stage, gat
 
         stage.addChild(marker);
     }
-};
+}; */
 
 /**
  * Returnerar antal sjukdomar baserat på level.

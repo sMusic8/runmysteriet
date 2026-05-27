@@ -266,21 +266,16 @@ runmysteriet.segments.Segment_Start.prototype.getDiseasePositions = function(seg
     return [
         {
             type: "gray",
-            x: segmentStart + 330,
+            x: segmentStart + 320,
             y: this.groundY - 50
         },
         {
             type: "brown",
-            x: segmentStart + 380,
+            x: segmentStart + 420,
             y: this.groundY - 50
         },
         {
             type: "red",
-            x: segmentStart + 430,
-            y: this.groundY - 50
-        },
-        {
-            type: "gray",
             x: segmentStart + 470,
             y: this.groundY - 50
         }

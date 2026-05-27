@@ -30,6 +30,7 @@ runmysteriet.segments.Segment_2 = function() {
 
     /** @type {string} */
     this.lavaTexture = "lava";
+    
         console.log("segment2");
 
 };
