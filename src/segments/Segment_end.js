@@ -102,7 +102,8 @@ runmysteriet.segments.Segment_End.prototype.ground = function(stage, startX, lev
         waterAreas: waterAreas,
         boats: boats,
         endZones: endZones,
-        endX: segmentEnd
+        endX: segmentEnd,
+        m_extra: this.m_extra
     };
 };
 
@@ -499,9 +500,8 @@ runmysteriet.segments.Segment_End.prototype.addJumpPlatforms = function(stage, p
     30,
     "extra"
 );
-
 stage.addChild(this.m_extra);
-this.m_extraCollected = false;
+
 };
 
 /**
