@@ -30,7 +30,7 @@ runmysteriet.segments.Segment_2 = function() {
 
     /** @type {string} */
     this.lavaTexture = "lava";
-    
+
         console.log("segment2");
 
 };
@@ -370,15 +370,7 @@ runmysteriet.segments.Segment_2.prototype.addRuneSpawns = function(runeSpawns, s
 runmysteriet.segments.Segment_2.prototype.getRunePositions = function(segmentStart) {
     return [
         {
-            x: segmentStart + 90,
-            y: this.groundY - 70
-        },
-        {
-            x: segmentStart + 760,
-            y: this.groundY - 70
-        },
-        {
-            x: segmentStart + 900,
+            x: segmentStart + 600,
             y: this.groundY - 70
         }
     ];
