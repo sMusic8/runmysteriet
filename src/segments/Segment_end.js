@@ -61,7 +61,7 @@ this.extrap = false;
  * }}
  */
 runmysteriet.segments.Segment_End.prototype.ground = function(stage, startX, levelNumber) {
-
+console.log("Segment end");
     var segmentStart = startX || 0;
     var segmentEnd = segmentStart + this.length;
 

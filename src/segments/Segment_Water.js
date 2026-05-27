@@ -51,6 +51,8 @@ this.backgroundTexture = "backgroundWater";
  * }}
  */
 runmysteriet.segments.Segment_Water.prototype.ground = function(stage, startX, levelNumber) {
+    console.log("Segment vatten");
+    
     var x = startX || 0;
 this.addBackground(stage, x);
     var platforms = [];
