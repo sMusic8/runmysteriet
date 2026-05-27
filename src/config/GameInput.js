@@ -208,7 +208,7 @@ runmysteriet.input.GameInput.prototype.getGamepadByIndex = function(index) {
 };
 
 /**
- * Hämtar analog axel.
+ * Hämtar analog axel från Rune SDK gamepad.
  *
  * @param {?Object} gamepad
  * @param {number} index
@@ -220,6 +220,24 @@ runmysteriet.input.GameInput.prototype.getAxis = function(gamepad, index) {
         return 0;
     }
 
+    /*
+     * Rune SDK lägger vänsterspaken i stickLeft.
+     * index 0 = vänster/höger
+     * index 1 = upp/ner
+     */
+    if (gamepad.stickLeft) {
+        if (index === 0) {
+            return gamepad.stickLeft.x || 0;
+        }
+
+        if (index === 1) {
+            return gamepad.stickLeft.y || 0;
+        }
+    }
+
+    /*
+     * Reserv om annan gamepad-struktur används.
+     */
     if (gamepad.axes && gamepad.axes.length > index) {
         return gamepad.axes[index] || 0;
     }
@@ -228,9 +246,12 @@ runmysteriet.input.GameInput.prototype.getAxis = function(gamepad, index) {
         return gamepad.axis(index) || 0;
     }
 
+    if (typeof gamepad.getAxis === "function") {
+        return gamepad.getAxis(index) || 0;
+    }
+
     return 0;
 };
-
 /**
  * Läser analog joystick och lägger till riktning i input-objektet.
  *
@@ -418,10 +439,17 @@ runmysteriet.input.GameInput.prototype.readPlayerGamepad = function(gamepad, inp
             gamepad.justPressed("CROSS") ||
             gamepad.justPressed(0);
 
+        /*
+         * Spelaren kan slå med både fyrkant och cirkel.
+         * Cirkel ligger också kvar som back i menyer.
+         */
         input.attack = input.attack ||
             gamepad.justPressed("X") ||
             gamepad.justPressed("SQUARE") ||
-            gamepad.justPressed(2);
+            gamepad.justPressed(2) ||
+            gamepad.justPressed("B") ||
+            gamepad.justPressed("CIRCLE") ||
+            gamepad.justPressed(1);
 
         input.back = input.back ||
             gamepad.justPressed("B") ||
