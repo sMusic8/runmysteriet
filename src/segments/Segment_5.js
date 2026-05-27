@@ -322,16 +322,7 @@ runmysteriet.segments.Segment_5.prototype.getRunePositions = function(segmentSta
         {
             x: segmentStart + 600,
             y: this.groundY - 70
-        },
-        {
-            x: segmentStart + 700,
-            y: this.groundY - 70
-        },
-        {
-            x: segmentStart + 800,
-            y: this.groundY - 70
         }
-    ];
 };
 
 /**
