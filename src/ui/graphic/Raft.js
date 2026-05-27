@@ -37,10 +37,23 @@ runmysteriet.ui.graphic.Raft = function(x, y) {
     this.deltaX = 0;
 
     /*
-     * Flotten ska inte röra sig direkt.
+     * Flotten ska inte röra sig direkt
      */
     this.hasStarted = false;
     this.hasArrived = false;
+
+        /** @type {?rune.display.Graphic} */
+    this.m_warningIndicator = null;
+
+    /** @type {?rune.text.BitmapField} */
+    this.m_warningText = null;
+
+    /** @type {number} */
+    this.m_warningTimer = 0;
+
+    /** @type {boolean} */
+    this.m_isWarning = false;
+
 };
 
 //------------------------------------------------------------------------------
@@ -74,6 +87,153 @@ runmysteriet.ui.graphic.Raft.prototype.start = function() {
 
     this.hasStarted = true;
 };
+//------------------------------------------------------------------------------
+// WARNING
+//------------------------------------------------------------------------------
+
+/**
+ * Sätter om flotten ska visa varning.
+ *
+ * @param {boolean} value
+ * @return {void}
+ */
+runmysteriet.ui.graphic.Raft.prototype.setWarning = function(value) {
+
+    value = value === true;
+
+    if (this.m_isWarning === value) {
+        return;
+    }
+
+    this.m_isWarning = value;
+
+    if (this.m_isWarning === true) {
+        this.showWarning();
+    } else {
+        this.hideWarning();
+    }
+};
+
+/**
+ * Visar varning ovanför flotten.
+ *
+ * @return {void}
+ */
+runmysteriet.ui.graphic.Raft.prototype.showWarning = function() {
+
+    if (this.m_warningIndicator || this.m_warningText) {
+        return;
+    }
+
+    if (!this.stage) {
+        return;
+    }
+
+    this.m_warningIndicator = new rune.display.Graphic(
+        this.x + 2,
+        this.y - 18,
+        60,
+        16,
+        "boat_indicator"
+    );
+
+    this.m_warningText = new rune.text.BitmapField("DANGER");
+    this.m_warningText.autoSize = true;
+    this.m_warningText.x = this.x + 7;
+    this.m_warningText.y = this.y - 17;
+
+    this.stage.addChild(this.m_warningIndicator);
+    this.stage.addChild(this.m_warningText);
+
+    this.m_warningTimer = 0;
+};
+/**
+ * Tar bort varningen från flotten.
+ *
+ * @return {void}
+ */
+runmysteriet.ui.graphic.Raft.prototype.hideWarning = function() {
+
+    if (this.m_warningIndicator) {
+        this.removeDisplayObject(this.m_warningIndicator);
+        this.m_warningIndicator = null;
+    }
+
+    if (this.m_warningText) {
+        this.removeDisplayObject(this.m_warningText);
+        this.m_warningText = null;
+    }
+
+    this.m_warningTimer = 0;
+};
+
+/**
+ * Uppdaterar blinkande varning.
+ *
+ * @return {void}
+ */
+runmysteriet.ui.graphic.Raft.prototype.updateWarning = function() {
+
+    var alpha = 1;
+
+    if (this.m_isWarning !== true) {
+        return;
+    }
+
+    if (!this.m_warningIndicator || !this.m_warningText) {
+        this.showWarning();
+    }
+
+    if (!this.m_warningIndicator || !this.m_warningText) {
+        return;
+    }
+
+    this.m_warningTimer += 0.20;
+
+    alpha = 0.35 + Math.abs(Math.sin(this.m_warningTimer)) * 0.65;
+
+    this.m_warningIndicator.x = this.x + 2;
+    this.m_warningIndicator.y = this.y - 18;
+
+    this.m_warningText.x = this.x + 7;
+    this.m_warningText.y = this.y - 17;
+
+    this.m_warningIndicator.alpha = alpha;
+    this.m_warningText.alpha = alpha;
+};
+
+//------------------------------------------------------------------------------
+// COLLISION
+//------------------------------------------------------------------------------
+
+/**
+ * Returnerar flottens övre kollisionsyta.
+ *
+ * @return {number}
+ */
+runmysteriet.ui.graphic.Raft.prototype.getCollisionTop = function() {
+    return this.y;
+};
+
+/**
+ * Returnerar flottens vänstra kollisionsgräns.
+ * Gör flotten mindre känslig från vänster kant.
+ *
+ * @return {number}
+ */
+runmysteriet.ui.graphic.Raft.prototype.getCollisionLeft = function() {
+    return this.x + 10;
+};
+
+/**
+ * Returnerar flottens högra kollisionsgräns.
+ * Gör flotten mindre känslig från höger kant.
+ *
+ * @return {number}
+ */
+runmysteriet.ui.graphic.Raft.prototype.getCollisionRight = function() {
+    return this.x + this.width - 10;
+};
 
 //------------------------------------------------------------------------------
 // UPDATE
@@ -90,6 +250,8 @@ runmysteriet.ui.graphic.Raft.prototype.update = function(step) {
     //Spara position före rörelse.
      
     this.previousX = this.x;
+
+    this.updateWarning();
 
     //Om flotten inte har startat ska den stå still.
      
@@ -150,7 +312,7 @@ runmysteriet.ui.graphic.Raft.prototype.removeDisplayObject = function(object) {
  * @return {void}
  */
 runmysteriet.ui.graphic.Raft.prototype.remove = function() {
-
+    this.hideWarning();
     this.removeDisplayObject(this);
 };
 
@@ -183,4 +345,9 @@ runmysteriet.ui.graphic.Raft.prototype.dispose = function() {
 
     this.hasStarted = false;
     this.hasArrived = false;
+
+    this.m_warningIndicator = null;
+    this.m_warningText = null;
+    this.m_warningTimer = 0;
+    this.m_isWarning = false;
 };

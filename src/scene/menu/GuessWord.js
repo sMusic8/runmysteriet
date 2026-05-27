@@ -647,6 +647,25 @@ runmysteriet.scene.GuessWord.prototype.goToGameOver = function() {
 
     this.stopBackgroundMusic();
 
+    if (
+        this.m_highscoreManager &&
+        this.m_highscoreManager.isNewRecord(this.m_totalScore) === true
+    ) {
+        this.application.scenes.load([
+            new runmysteriet.scene.TextInputView(
+                function() {
+                    return "UP/DOWN = LETTER   ENTER/X = ADD/SAVE   BACK/ESC = DELETE";
+                },
+                this.m_avatarData,
+                {
+                    score: this.m_totalScore,
+                    reason: "TOO MANY WRONG GUESSES"
+                }
+            )
+        ]);
+        return;
+    }
+
     this.application.scenes.load([
         new runmysteriet.scene.GameOver(
             this.m_totalScore,
@@ -654,7 +673,6 @@ runmysteriet.scene.GuessWord.prototype.goToGameOver = function() {
         )
     ]);
 };
-
 /**
  * Uppdaterar meddelandetext.
  *

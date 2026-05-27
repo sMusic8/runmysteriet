@@ -130,6 +130,17 @@ runmysteriet.scene.GameOver.prototype.saveHighscore = function() {
         return;
     }
 
+    /*
+     * Om inget riktigt namn har skrivits ska GameOver inte autospara.
+     * Då ska spelaren först gå via TextInputView vid nytt highscore.
+     */
+    if (
+        !this.m_playerName ||
+        String(this.m_playerName).toUpperCase() === "PLAYER"
+    ) {
+        return;
+    }
+
     if (!runmysteriet.logic) {
         return;
     }
@@ -167,8 +178,8 @@ runmysteriet.scene.GameOver.prototype.createTitle = function() {
 
     this.m_title = new rune.text.BitmapField("GAME OVER");
     this.m_title.autoSize = true;
-    this.m_title.scaleX = 2;
-    this.m_title.scaleY = 2;
+    this.m_title.scaleX = 4;
+    this.m_title.scaleY = 4;
     this.m_title.center = this.application.screen.center;
     this.m_title.y = 18;
 
@@ -184,8 +195,8 @@ runmysteriet.scene.GameOver.prototype.createReasonText = function() {
 
     this.m_reasonText = new rune.text.BitmapField(this.m_reason);
     this.m_reasonText.autoSize = true;
-    this.m_reasonText.scaleX = 0.8;
-    this.m_reasonText.scaleY = 0.8;
+    this.m_reasonText.scaleX = 1;
+    this.m_reasonText.scaleY = 1;
     this.m_reasonText.center = this.application.screen.center;
     this.m_reasonText.y = 58;
 
@@ -237,7 +248,7 @@ runmysteriet.scene.GameOver.prototype.createHighscoreHud = function() {
      * Läggs till vänster så den inte krockar med menyn.
      */
     this.m_highscoreHud.x = 15;
-    this.m_highscoreHud.y = 112;
+    this.m_highscoreHud.y = 145;
 
     this.stage.addChild(this.m_highscoreHud);
 

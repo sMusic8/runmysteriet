@@ -250,6 +250,75 @@ runmysteriet.entity.EnglishBoat.prototype.isAboveRaft = function(raft) {
     return true;
 };
 
+//------------------------------------------------------------------------------
+// COALITION CONTROL
+//------------------------------------------------------------------------------
+/**
+ * Kollar om båten är till höger om flotten och ovanför flotten.
+ * Detta används bara för varning på flotten, inte för skada.
+ *
+ * @param {!Object} raft
+ * @return {boolean}
+ */
+runmysteriet.entity.EnglishBoat.prototype.isWarningAboveRaft = function(raft) {
+
+    var hitboxLeft = 0;
+    var hitboxCenterX = 0;
+    var hitboxBottom = 0;
+
+    var raftCenterX = 0;
+    var raftRight = 0;
+    var raftTop = 0;
+    var warningRightLimit = 0;
+
+    if (this.m_isDisposed === true) {
+        return false;
+    }
+
+    if (!raft || raft.isRaft !== true) {
+        return false;
+    }
+
+    hitboxLeft = this.x + this.hitboxOffsetX;
+    hitboxCenterX = hitboxLeft + this.hitboxWidth / 2;
+    hitboxBottom = this.y + this.hitboxOffsetY + this.hitboxHeight;
+
+    raftCenterX = raft.x + raft.width / 2;
+    raftRight = raft.x + raft.width;
+    raftTop = raft.y;
+
+    /*
+     * Hur långt åt höger om flotten varningen får synas.
+     */
+    warningRightLimit = raftRight + 90;
+
+    /*
+     * Om båten har kommit till vänster sida av flotten
+     * ska DANGER försvinna direkt.
+     */
+    if (hitboxCenterX < raftCenterX) {
+        return false;
+    }
+
+    /*
+     * Om båten är för långt till höger ska DANGER inte visas ännu.
+     */
+    if (hitboxCenterX > warningRightLimit) {
+        return false;
+    }
+
+    /*
+     * Båten måste vara ovanför flotten.
+     */
+    if (hitboxBottom > raftTop + 20) {
+        return false;
+    }
+
+    return true;
+};
+//------------------------------------------------------------------------------
+// COLLISION
+//------------------------------------------------------------------------------
 /**
  * Kollar om båten träffar spelaren.
  * Endast aktiv när båten är farlig.

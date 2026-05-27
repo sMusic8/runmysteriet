@@ -184,7 +184,7 @@ runmysteriet.segments.Segment_Water.prototype.addWater = function(stage, waterAr
  */
 runmysteriet.segments.Segment_Water.prototype.addRaft = function(stage, platforms, water) {
     var raft = new runmysteriet.ui.graphic.Raft(
-        water.x + 5,
+        water.x + - 22,
         water.y - 9
     );
 
@@ -290,7 +290,7 @@ runmysteriet.segments.Segment_Water.prototype.getDiseasePositions = function(lef
         },
         {
             type: "red",
-            x: rightLandX + 170,
+            x: rightLandX + 140,
             y: this.groundY - 40
         },
         {
