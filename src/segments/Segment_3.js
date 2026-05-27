@@ -364,7 +364,7 @@ runmysteriet.segments.Segment_3.prototype.addArmorSpawns = function(armorSpawns,
 runmysteriet.segments.Segment_3.prototype.getArmorPositions = function(segmentStart) {
     return [
         {
-            x: segmentStart + 850,
+            x: segmentStart + 860,
             y: this.groundY - 40
         }
     ];
