@@ -355,7 +355,7 @@ runmysteriet.segments.Segment_4.prototype.getArmorPositions = function(segmentSt
     return [
         {
             x: segmentStart + 780,
-            y: this.groundY - 125
+            y: this.groundY - 180
         }
     ];
 };
