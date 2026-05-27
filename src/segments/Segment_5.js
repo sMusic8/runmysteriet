@@ -30,6 +30,8 @@ runmysteriet.segments.Segment_5 = function() {
 
     /** @type {string} */
     this.lavaTexture = "lava";
+    console.log("Segment 5" );
+
 
 };
 
@@ -50,7 +52,6 @@ runmysteriet.segments.Segment_5 = function() {
  * }}
  */
 runmysteriet.segments.Segment_5.prototype.ground = function(stage, startX, levelNumber) {
-console.log("Segment 5");
     var segmentStart = startX || 0;
     var segmentEnd = segmentStart + this.length;
     var x = segmentStart;

@@ -271,12 +271,12 @@ runmysteriet.segments.Segment_Start.prototype.getDiseasePositions = function(seg
         },
         {
             type: "brown",
-            x: segmentStart + 420,
+            x: segmentStart + 520,
             y: this.groundY - 50
         },
         {
             type: "red",
-            x: segmentStart + 470,
+            x: segmentStart + 770,
             y: this.groundY - 50
         }
     ];
@@ -341,7 +341,7 @@ runmysteriet.segments.Segment_Start.prototype.addArmorSpawns = function(armorSpa
 runmysteriet.segments.Segment_Start.prototype.getArmorPositions = function(segmentStart) {
     return [
         {
-            x: segmentStart + 160,
+            x: segmentStart + 800,
             y: this.groundY - 45
         }
     ];
