@@ -1618,17 +1618,40 @@ runmysteriet.scene.Game.prototype.winGame = function(winningPlayer) {
  */
 runmysteriet.scene.Game.prototype.loseGame = function(reason) {
 
+    var totalScore = 0;
+
     if (this.m_gameEnd === true) {
         return;
     }
 
     this.m_gameEnd = true;
 
+    totalScore = this.getTotalScore();
+
     this.stopSound(this.backgroundMusic);
+
+    if (
+        this.m_highscoreManager &&
+        this.m_highscoreManager.isNewRecord(totalScore) === true
+    ) {
+        this.application.scenes.load([
+            new runmysteriet.scene.TextInputView(
+                function() {
+                    return "UP/DOWN = LETTER   ENTER/X = ADD/SAVE   BACK/ESC = DELETE";
+                },
+                this.m_avatarData,
+                {
+                    score: totalScore,
+                    reason: reason || "GAME OVER"
+                }
+            )
+        ]);
+        return;
+    }
 
     this.application.scenes.load([
         new runmysteriet.scene.GameOver(
-            this.getTotalScore(),
+            totalScore,
             reason || "GAME OVER"
         )
     ]);

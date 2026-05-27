@@ -9,8 +9,13 @@
  * @extends {rune.scene.Scene}
  * @param {Function=} getHelpText
  * @param {?Object=} avatarData
+ * @param {?Object=} highscoreData
  */
-runmysteriet.scene.TextInputView = function(getHelpText, avatarData) {
+runmysteriet.scene.TextInputView = function(
+    getHelpText,
+    avatarData,
+    highscoreData
+) {
 
     rune.scene.Scene.call(this);
 
@@ -32,6 +37,13 @@ runmysteriet.scene.TextInputView = function(getHelpText, avatarData) {
         this.m_avatarData = avatarData;
     } else {
         this.m_avatarData = null;
+    }
+
+    /** @type {?Object} */
+    if (highscoreData && typeof highscoreData === "object") {
+        this.m_highscoreData = highscoreData;
+    } else {
+        this.m_highscoreData = null;
     }
 
     /** @type {?runmysteriet.input.GameInput} */
@@ -66,6 +78,9 @@ runmysteriet.scene.TextInputView = function(getHelpText, avatarData) {
 
     /** @type {?Object} */
     this.menuSound = null;
+
+    /** @type {?Object} */
+    this.m_highscoreSound = null;
 };
 
 //------------------------------------------------------------------------------
@@ -93,7 +108,11 @@ runmysteriet.scene.TextInputView.prototype.init = function() {
 
     this.backgroundMusic = this.application.sounds.sound.get("sound_musicMenu");
     this.menuSound = this.application.sounds.sound.get("sound_menu");
-
+    this.m_highscoreSound = this.application.sounds.sound.get("sound_highscore");
+    
+    if (this.m_highscoreData && this.m_highscoreSound) {
+    this.m_highscoreSound.play();
+}
     if (this.backgroundMusic) {
         this.backgroundMusic.loop = true;
         this.backgroundMusic.volume = 0.5;
@@ -124,7 +143,9 @@ runmysteriet.scene.TextInputView.prototype.init = function() {
  */
 runmysteriet.scene.TextInputView.prototype.createText = function() {
 
-    this.m_titleText = new rune.text.BitmapField("WRITE YOUR NAMES");
+    this.m_titleText = new rune.text.BitmapField(
+    this.m_highscoreData ? "NEW HIGHSCORE!" : "WRITE YOUR NAMES"
+    );  
     this.m_titleText.autoSize = true;
     this.m_titleText.center = this.application.screen.center;
     this.m_titleText.y -= 80;
@@ -499,6 +520,17 @@ runmysteriet.scene.TextInputView.prototype.startGame = function() {
 
     this.stopBackgroundMusic();
 
+    if (this.m_highscoreData) {
+        this.application.scenes.load([
+            new runmysteriet.scene.GameOver(
+                this.m_highscoreData.score || 0,
+                this.m_highscoreData.reason || "GAME OVER",
+                playerData.highscoreName
+            )
+        ]);
+        return;
+    }
+
     this.application.scenes.load([
         new runmysteriet.scene.Game(
             1,
@@ -615,9 +647,11 @@ runmysteriet.scene.TextInputView.prototype.dispose = function() {
     this.m_titleText = null;
 
     this.m_avatarData = null;
+    this.m_highscoreData = null;
 
     this.backgroundMusic = null;
     this.menuSound = null;
+    this.m_highscoreSound = null;
 
     rune.scene.Scene.prototype.dispose.call(this);
 };

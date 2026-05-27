@@ -484,9 +484,9 @@ runmysteriet.handler.PlayerHandler.prototype.checkPlatform = function(player, pl
     }
 
     if (platform.isRaft === true) {
-        playerPaddingX = 3;
-        platformPaddingX = 0;
-        toleranceY = 10;
+        playerPaddingX = 8;
+        platformPaddingX = 10;
+        toleranceY = 4;
     }
 
     offsetY = this.getPlatformOffsetY(platform);
@@ -998,8 +998,9 @@ runmysteriet.handler.PlayerHandler.prototype.checkBoatDeath = function(player, i
     }
 };
 
+
 /**
- * Uppdaterar om båten är farlig
+ * Uppdaterar om båten är farlig och om flotten ska visa varning.
  *
  * @return {void}
  */
@@ -1019,6 +1020,22 @@ runmysteriet.handler.PlayerHandler.prototype.updateBoatDangerState = function() 
 
     boats = this.platformHandler.boats;
 
+    /*
+     * Nollställ först alla raft-varningar.
+     * Då försvinner DANGER direkt när båten inte längre är på höger sida.
+     */
+    for (j = 0; j < this.platforms.length; j++) {
+        platform = this.platforms[j];
+
+        if (
+            platform &&
+            platform.isRaft === true &&
+            typeof platform.setWarning === "function"
+        ) {
+            platform.setWarning(false);
+        }
+    }
+
     for (i = 0; i < boats.length; i++) {
         boat = boats[i];
 
@@ -1035,12 +1052,26 @@ runmysteriet.handler.PlayerHandler.prototype.updateBoatDangerState = function() 
                 continue;
             }
 
+            /*
+             * Båtens farliga läge fungerar som innan.
+             */
             if (
                 typeof boat.isAboveRaft === "function" &&
                 boat.isAboveRaft(platform)
             ) {
                 isDangerous = true;
-                break;
+            }
+
+            /*
+             * DANGER visas bara på flotten när båten är på höger sida
+             * och ovanför flotten.
+             */
+            if (
+                typeof boat.isWarningAboveRaft === "function" &&
+                boat.isWarningAboveRaft(platform) &&
+                typeof platform.setWarning === "function"
+            ) {
+                platform.setWarning(true);
             }
         }
 
