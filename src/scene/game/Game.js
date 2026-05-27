@@ -234,6 +234,22 @@ runmysteriet.scene.Game = function (levelNumber, score, avatarData) {
    * @type {?Object}
    */
   this.m_levelCompleteSequence = null;
+
+  /**
+ * Flagga som hindrar att highscore-notisen visas flera gånger.
+ * @type {boolean}
+ */
+  this.m_highscoreNotified = false;
+
+  /**
+ * highscore-notisen som redan visats
+ * "" = ingen notis
+ * "TOP5" = top 5-notis visad
+ * "HIGHSCORE" = första plats-notis visad
+ *
+ * @type {string}
+ */
+this.m_highscoreNoticeType = "";
 };
 
 runmysteriet.scene.Game.prototype = Object.create(rune.scene.Scene.prototype);
@@ -250,43 +266,43 @@ runmysteriet.scene.Game.prototype.createHighscoreNotice = function() {
      * Textfält som visar "NEW HIGHSCORE!".
      * @type {rune.text.BitmapField}
      */
-    this.m_highscoreText = new rune.text.BitmapField("NEW HIGHSCORE!");
+    this.m_highscoreText = new rune.text.BitmapField("");
     this.m_highscoreText.autoSize = true;
     this.m_highscoreText.visible = false;
 
     this.stage.addChild(this.m_highscoreText);
 };
 /**
- * Visar highscore-notis och spelar tillhörande ljud.
- * Säkerställer att notisen endast visas en gång per nivå.
+ * Visar highscore-/top 5-notis.
  *
+ * @param {string=} text
+ * @param {boolean=} playSound
  * @return {void}
  */
-runmysteriet.scene.Game.prototype.showHighscoreNotice = function() {
+runmysteriet.scene.Game.prototype.showHighscoreNotice = function(text, playSound) {
 
     if (this.m_highscoreNotified === true) {
         return;
     }
 
-    this.m_highscoreNotified = true;
-    this.m_highscoreTimer = 180;
+    text = text || "TOP 5 SCORE";
+    playSound = playSound === true;
 
-    /**
-     * Visuellt highscore-textfält.
-     * @type {?rune.text.BitmapField}
-     */
+    this.m_highscoreNotified = true;
+    this.m_highscoreTimer = 300;
+
     if (this.m_highscoreText) {
+        this.m_highscoreText.text = text;
         this.m_highscoreText.visible = true;
         this.m_highscoreText.alpha = 1;
         this.m_highscoreText.scaleX = 1;
         this.m_highscoreText.scaleY = 1;
     }
 
-    /**
-     * Ljud som spelas vid nytt highscore.
-     * @type {?Object}
+    /*
+     * Ljud spelas bara vid riktig första plats.
      */
-    if (this.m_highscoreSound) {
+    if (playSound === true && this.m_highscoreSound) {
         this.m_highscoreSound.play();
     }
 };
@@ -351,7 +367,7 @@ runmysteriet.scene.Game.prototype.updateHighscoreNotice = function() {
     }
 };
 /**
- * Kontrollerar om spelaren har satt ett nytt highscore.
+ * Kontrollerar om spelaren har satt highscore eller top 5-score.
  *
  * @param {number} score Aktuell poäng att kontrollera.
  * @return {void}
@@ -366,8 +382,22 @@ runmysteriet.scene.Game.prototype.checkHighscoreNotice = function(score) {
         return;
     }
 
+    /*
+     * Plats 1 
+     */
+    if (
+        typeof this.m_highscoreManager.isBestScore === "function" &&
+        this.m_highscoreManager.isBestScore(score) === true
+    ) {
+        this.showHighscoreNotice("NEW HIGHSCORE!", true);
+        return;
+    }
+
+    /*
+     * Plats 2-5: top 5, men inte highscore.
+     */
     if (this.m_highscoreManager.isNewRecord(score) === true) {
-        this.showHighscoreNotice();
+        this.showHighscoreNotice("TOP 5 SCORE", false);
     }
 };
 
@@ -1845,6 +1875,8 @@ runmysteriet.scene.Game.prototype.dispose = function() {
     this.m_highscoreSound = null;
     this.m_highscoreTimer = 0;
     this.m_highscoreNotified = false;
+    this.m_highscoreNoticeType = "";
+    
 
     //Pause UI kan ha skapats senare under spelet.
      

@@ -714,43 +714,46 @@ runmysteriet.scene.GuessWord.prototype.createHighscoreNotice = function() {
      * Textfält som visar highscore-notis.
      * @type {rune.text.BitmapField}
      */
-    this.m_highscoreText = new rune.text.BitmapField("NEW HIGHSCORE!");
+    this.m_highscoreText = new rune.text.BitmapField("");
     this.m_highscoreText.autoSize = true;
     this.m_highscoreText.visible = false;
 
     this.stage.addChild(this.m_highscoreText);
 };
 /**
- * Visar highscore-notis och spelar ljud första gången den triggas.
- * Startar även en timer för visningstiden.
+ * Visar highscore-/top 5-notis.
  *
+ * @param {string=} text
+ * @param {boolean=} playSound
  * @return {void}
  */
-runmysteriet.scene.GuessWord.prototype.showHighscoreNotice = function() {
+runmysteriet.scene.GuessWord.prototype.showHighscoreNotice = function(
+    text,
+    playSound
+) {
 
     if (this.m_highscoreNotified === true) {
         return;
     }
 
-    this.m_highscoreNotified = true;
-    this.m_highscoreTimer = 180;
+    text = text || "TOP 5 SCORE";
+    playSound = playSound === true;
 
-    /**
-     * Visuell highscore-notis.
-     * @type {?rune.text.BitmapField}
-     */
+    this.m_highscoreNotified = true;
+    this.m_highscoreTimer = 300;
+
     if (this.m_highscoreText) {
+        this.m_highscoreText.text = text;
         this.m_highscoreText.visible = true;
         this.m_highscoreText.alpha = 1;
         this.m_highscoreText.scaleX = 1;
         this.m_highscoreText.scaleY = 1;
     }
 
-    /**
-     * Ljud som spelas vid highscore.
-     * @type {?Object}
+    /*
+     * Ljud spelas bara vid första plats.
      */
-    if (this.m_highscoreSound) {
+    if (playSound === true && this.m_highscoreSound) {
         this.m_highscoreSound.play();
     }
 };

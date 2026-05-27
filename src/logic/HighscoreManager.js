@@ -162,6 +162,91 @@ runmysteriet.logic.HighscoreManager.prototype.isNewRecord = function(score) {
 };
 
 /**
+ *
+ * Returnerar
+ * 1 = nytt bästa highscore
+ * 2-5 = top 5 score
+ * -1 = hamnar inte på top 5
+ *
+ * @param {number} score
+ * @return {number}
+ */
+/**
+ * Kollar om score är bättre än plats 1.
+ *
+ * @param {number} score
+ * @return {boolean}
+ */
+runmysteriet.logic.HighscoreManager.prototype.isBestScore = function(score) {
+
+    var best = null;
+    var bestScore = 0;
+
+    score = this.normalizeScore(score);
+
+    if (score <= 0) {
+        return false;
+    }
+
+    best = this.getBest();
+
+    /*
+     * Om det inte finns något sparat score än,
+     * är detta första plats.
+     */
+    if (!best) {
+        return true;
+    }
+
+    bestScore = this.normalizeScore(best.score);
+
+    return score > bestScore;
+};
+runmysteriet.logic.HighscoreManager.prototype.getPlacement = function(score) {
+
+    var highscores = null;
+    var item = null;
+    var itemScore = 0;
+    var i = 0;
+
+    score = this.normalizeScore(score);
+
+    if (score <= 0) {
+        return -1;
+    }
+
+    if (!this.hasHighscoreSystem()) {
+        return -1;
+    }
+
+    highscores = this.getAll();
+
+    for (i = 0; i < highscores.length; i++) {
+        item = highscores[i];
+
+        if (!item) {
+            continue;
+        }
+
+        itemScore = this.normalizeScore(item.score);
+
+        if (score > itemScore) {
+            return i + 1;
+        }
+    }
+
+    /*
+     * när listan har mindre än 5 resultat får score en plats sist
+     */
+    if (highscores.length < 5) {
+        return highscores.length + 1;
+    }
+
+    return -1;
+};
+
+
+/**
  * Hämtar lägsta score på top 5-listan.
  *
  * @return {number}
