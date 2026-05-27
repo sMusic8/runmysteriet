@@ -311,7 +311,8 @@ runmysteriet.scene.Game.prototype.showHighscoreNotice = function (text, playSoun
      */
     if (playSound === true && this.m_highscoreSound) {
         this.m_highscoreSound.play();
-    }
+    }2
+}
 };
 /**
  * Uppdaterar highscore-notisen (animation, position och fade-out).
