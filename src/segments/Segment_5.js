@@ -273,12 +273,12 @@ runmysteriet.segments.Segment_5.prototype.getDiseasePositions = function(segment
     return [
         {
             type: "gray",
-            x: segmentStart + 80,
+            x: segmentStart + 100,
             y: this.groundY - 50
         },
         {
             type: "brown",
-            x: segmentStart + 320,
+            x: segmentStart + 300,
             y: this.groundY - 50
         },
         {
@@ -288,7 +288,7 @@ runmysteriet.segments.Segment_5.prototype.getDiseasePositions = function(segment
         },
         {
             type: "gray",
-            x: segmentStart + 900,
+            x: segmentStart + 500,
             y: this.groundY - 50
         }
     ];
@@ -320,15 +320,15 @@ runmysteriet.segments.Segment_5.prototype.addRuneSpawns = function(runeSpawns, s
 runmysteriet.segments.Segment_5.prototype.getRunePositions = function(segmentStart) {
     return [
         {
-            x: segmentStart + 90,
+            x: segmentStart + 600,
             y: this.groundY - 70
         },
         {
-            x: segmentStart + 620,
+            x: segmentStart + 700,
             y: this.groundY - 70
         },
         {
-            x: segmentStart + 860,
+            x: segmentStart + 800,
             y: this.groundY - 70
         }
     ];
