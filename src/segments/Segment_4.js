@@ -349,10 +349,11 @@ runmysteriet.segments.Segment_4.prototype.addArmorSpawns = function(armorSpawns,
  * @return {!Array<!{x: number, y: number}>} Lista med armor-koordinater.
  */
 runmysteriet.segments.Segment_4.prototype.getArmorPositions = function(segmentStart) {
-    return [
+    return [console.log("630"),
+        
         {
             x: segmentStart + 630,
-            y: this.groundY - 50
+            y: this.groundY - 90
         }
     ];
 };
