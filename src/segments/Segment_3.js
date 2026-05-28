@@ -327,7 +327,7 @@ runmysteriet.segments.Segment_3.prototype.addRuneSpawns = function(runeSpawns, s
 runmysteriet.segments.Segment_3.prototype.getRunePositions = function(segmentStart) {
     return [
         {
-            x: segmentStart + 600,
+            x: segmentStart + 800,
             y: this.groundY - 70
         }
     ];
@@ -358,10 +358,13 @@ runmysteriet.segments.Segment_3.prototype.addArmorSpawns = function(armorSpawns,
  * @return {!Array<!{x: number, y: number}>} Lista med armor-koordinater.
  */
 runmysteriet.segments.Segment_3.prototype.getArmorPositions = function(segmentStart) {
-    return [
+    return [console.log("460"),
         {
-            x: segmentStart + 860,
+            
+            x: segmentStart + 960,
             y: this.groundY - 80
+            
+            
         }
     ];
 };
