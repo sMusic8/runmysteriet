@@ -32,6 +32,7 @@ runmysteriet.handler.BackgroundHandler = function(stage, camera, screenWidth, sc
     this.backgroundTextures = [
         "background1",
         "background2",
+        "backgroundExtra",
         "background4"
     ];
 
