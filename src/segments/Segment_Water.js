@@ -23,7 +23,7 @@ runmysteriet.segments.Segment_Water = function() {
     this.waterHeight = 32;
 
     /** @type {number} */
-this.backgroundWidth = 405;
+this.backgroundWidth = 965;
 
 /** @type {number} */
 this.backgroundHeight = 225;
