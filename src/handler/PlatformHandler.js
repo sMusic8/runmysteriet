@@ -529,7 +529,7 @@ runmysteriet.handler.PlatformHandler.prototype.update = function (step) {
     }
   }
 
-  if (this.platforms) {
+/*   if (this.platforms) {
     for (i = 0; i < this.platforms.length; i++) {
       platform = this.platforms[i];
 
@@ -541,7 +541,7 @@ runmysteriet.handler.PlatformHandler.prototype.update = function (step) {
         platform.update(step);
       }
     }
-  }
+  } */
 };
 
 //------------------------------------------------------------------------------
@@ -594,19 +594,19 @@ runmysteriet.handler.PlatformHandler.prototype.getSegmentPool = function () {
 
   if (this.levelNumber >= 6) {
     return [
+      runmysteriet.segments.Segment_1,
       runmysteriet.segments.Segment_2,
       runmysteriet.segments.Segment_3,
       runmysteriet.segments.Segment_4,
       runmysteriet.segments.Segment_5,
-      runmysteriet.segments.Segment_6,
     ];
   }
 
   return [
+    runmysteriet.segments.Segment_1,
+    runmysteriet.segments.Segment_2,
     runmysteriet.segments.Segment_3,
     runmysteriet.segments.Segment_4,
-    runmysteriet.segments.Segment_5,
-    runmysteriet.segments.Segment_6,
   ];
 };
 /**
@@ -734,6 +734,7 @@ runmysteriet.handler.PlatformHandler.prototype.clearDisplayList = function (
  * @return {void}
  */
 runmysteriet.handler.PlatformHandler.prototype.clear = function () {
+  this.clearExtra();
   this.clearDisplayList(this.platforms);
   this.clearDisplayList(this.holes);
   this.clearDisplayList(this.waterAreas);

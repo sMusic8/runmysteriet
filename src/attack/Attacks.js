@@ -48,11 +48,12 @@ runmysteriet.attack.Attack = function(player) {
     this.damage = 35;
 
     /**
-     * Hur länge attacken syns.
+     * Hur länge attacken syns
+     * lägre är snabbare slag högre siffra långsammare o syns längre 
      *
      * @type {number}
      */
-    this.life = 8;
+    this.life = 5;
 
     /**
      * Hindrar attacken från att träffa flera gånger.

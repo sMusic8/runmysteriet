@@ -513,9 +513,9 @@ runmysteriet.entity.EnglishBoat.prototype.remove = function() {
  */
 runmysteriet.entity.EnglishBoat.prototype.dispose = function() {
 
-    this.m_isDisposed = true;
-
     this.remove();
+
+    this.m_isDisposed = true;
 
     this.damage = 0;
 
