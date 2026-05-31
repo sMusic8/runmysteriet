@@ -9,12 +9,13 @@
  * @param {!rune.display.Stage} stage
  * @param {number} screenWidth
  */
-runmysteriet.handler.PlatformHandler = function (stage, screenWidth) {
+runmysteriet.handler.PlatformHandler = function (stage, application, screenWidth) {
   /** @type {!rune.display.Stage} */
   this.stage = stage;
 
   /** @type {number} */
   this.screenWidth = screenWidth;
+  this.application = application;
 
   /** @type {!Array} */
   this.platforms = [];
@@ -191,6 +192,11 @@ runmysteriet.handler.PlatformHandler.prototype.getExtra = function () {
 };
 
 runmysteriet.handler.PlatformHandler.prototype.clearExtra = function () {
+    this.getSound = this.application.sounds.sound.get("sound_catch");
+
+  if (this.getSound) {
+    this.getSound.play();
+  }
     this.removeDisplayObject(this.m_extra);
     this.m_extra = null;
 };
