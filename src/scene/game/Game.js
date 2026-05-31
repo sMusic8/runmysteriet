@@ -788,6 +788,12 @@ runmysteriet.scene.Game.prototype.update = function (step) {
   ) {
     this.m_playerHandler.handleAutoScrollCameraBounds();
   }
+  if (
+    this.m_playerHandler &&
+    typeof this.m_playerHandler.checkAllEnemyBlockers === "function"
+) {
+    this.m_playerHandler.checkAllEnemyBlockers();
+}
 
   //Uppdatera Rune-kameran.
 

@@ -1095,7 +1095,7 @@ runmysteriet.handler.PlayerHandler.prototype.killPlayer = function(player, index
         return;
     }
 
-    //Om spelaren redan är död ska vi inte skapa flera dödsbilder.
+    //Om spelaren redan e död ska inte flera dödsbilder skapas.
      
     if (player.isDead === true) {
         return;
@@ -1185,7 +1185,7 @@ runmysteriet.handler.PlayerHandler.prototype.createDeathEffect = function(player
     effect.velocityX = 2.3;
     effect.velocityY = -1.3;
 
-    //Liten acceleration uppåt, som att den lyfter mer.
+    //Liten acceleration uppåt som att den lyfter mer.
      
     effect.accelerationY = -0.015;
 
@@ -1204,7 +1204,30 @@ runmysteriet.handler.PlayerHandler.prototype.createDeathEffect = function(player
     this.deathEffects.push(effect);
     this.stage.addChild(effect);
 };
+/**
+ * Kontrollerar enemy blockers för alla levande spelare.
+ *
+ * @return {void}
+ */
+runmysteriet.handler.PlayerHandler.prototype.checkAllEnemyBlockers = function() {
 
+    var i = 0;
+    var player = null;
+
+    if (!this.players) {
+        return;
+    }
+
+    for (i = 0; i < this.players.length; i++) {
+        player = this.players[i];
+
+        if (!player || player.isDead === true) {
+            continue;
+        }
+
+        this.checkEnemyBlockers(player);
+    }
+};
 //------------------------------------------------------------------------------
 // SOUND
 //------------------------------------------------------------------------------

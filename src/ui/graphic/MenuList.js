@@ -38,6 +38,18 @@ runmysteriet.ui.graphic.MenuList = function(
     /** @type {!Array<!rune.text.BitmapField>} */
     this.items = [];
 
+    /** @type {!Array<!rune.display.Graphic>} */
+    this.boxes = [];
+
+    /** @type {number} */
+    this.boxWidth = 80;
+
+    /** @type {number} */
+    this.boxHeight = 16;
+
+    /** @type {number} */
+    this.boxAlpha = 0.5;
+
     /** @type {number} */
     this.selectedIndex = 0;
 
@@ -49,12 +61,49 @@ runmysteriet.ui.graphic.MenuList = function(
 };
 
 /**
+ * Skapar en mörk transparent bakgrundsruta bakom ett menyval.
+ *
+ * @param {!rune.text.BitmapField} item Menytexten som rutan ska ligga bakom.
+ * @return {!rune.display.Graphic} Den skapade bakgrundsrutan.
+ */
+runmysteriet.ui.graphic.MenuList.prototype.createItemBox = function(item) {
+
+
+    /** @type {number} */
+    var cutLeftPosition = 5;
+
+
+    /** @type {!rune.display.Graphic} */
+    var box = new rune.display.Graphic(
+        0,
+        0,
+        this.boxWidth,
+        this.boxHeight
+    );
+
+    box.backgroundColor = "#000000";
+    box.alpha = this.boxAlpha;
+
+    box.x = this.application.screen.center.x - this.boxWidth / 2 + cutLeftPosition;
+    box.y = item.y - 3;
+
+    return box;
+};
+
+/**
+ * Skapar menyval och bakgrundsrutor.
  *
  * @return {void}
  */
 runmysteriet.ui.graphic.MenuList.prototype.create = function() {
 
+    /** @type {?rune.text.BitmapField} */
     var item = null;
+
+    /** @type {?rune.display.Graphic} */
+    var box = null;
+
+    /** @type {number} */
     var i = 0;
 
     this.clear();
@@ -69,15 +118,18 @@ runmysteriet.ui.graphic.MenuList.prototype.create = function() {
         item.scaleX = this.scale;
         item.scaleY = this.scale;
 
-        /*
-         * Centreras efter scalningen.
-         */
         item.center = this.application.screen.center;
         item.y += this.yOffset + i * this.spacing;
 
         item.visible = this.visible;
 
+        box = this.createItemBox(item);
+        box.visible = this.visible;
+
+        this.stage.addChild(box);
         this.stage.addChild(item);
+
+        this.boxes.push(box);
         this.items.push(item);
     }
 };
@@ -171,20 +223,30 @@ runmysteriet.ui.graphic.MenuList.prototype.getSelectedIndex = function() {
  */
 runmysteriet.ui.graphic.MenuList.prototype.setVisible = function(value) {
 
+    /** @type {number} */
     var i = 0;
+
+    /** @type {?rune.text.BitmapField} */
     var item = null;
 
-    this.visible = value;
+    /** @type {?rune.display.Graphic} */
+    var box = null;
 
-    if (!this.items) {
-        return;
-    }
+    this.visible = value;
 
     for (i = 0; i < this.items.length; i++) {
         item = this.items[i];
 
         if (item) {
             item.visible = value;
+        }
+    }
+
+    for (i = 0; i < this.boxes.length; i++) {
+        box = this.boxes[i];
+
+        if (box) {
+            box.visible = value;
         }
     }
 };
@@ -284,27 +346,37 @@ runmysteriet.ui.graphic.MenuList.prototype.removeDisplayObject = function(
 //------------------------------------------------------------------------------
 
 /**
- * Tar bort alla menyval från scenen och tömmer items-arrayen.
+ * Tar bort alla menyval och bakgrundsrutor från scenen.
  *
  * @return {void}
  */
 runmysteriet.ui.graphic.MenuList.prototype.clear = function() {
 
-    var item = null;
+    /** @type {number} */
     var i = 0;
 
-    if (!this.items) {
-        this.items = [];
-        return;
+    /** @type {?rune.text.BitmapField} */
+    var item = null;
+
+    /** @type {?rune.display.Graphic} */
+    var box = null;
+
+    if (this.items) {
+        for (i = 0; i < this.items.length; i++) {
+            item = this.items[i];
+            this.removeDisplayObject(item);
+        }
     }
 
-    for (i = 0; i < this.items.length; i++) {
-        item = this.items[i];
-
-        this.removeDisplayObject(item);
+    if (this.boxes) {
+        for (i = 0; i < this.boxes.length; i++) {
+            box = this.boxes[i];
+            this.removeDisplayObject(box);
+        }
     }
 
     this.items = [];
+    this.boxes = [];
 };
 
 //------------------------------------------------------------------------------
@@ -319,6 +391,11 @@ runmysteriet.ui.graphic.MenuList.prototype.clear = function() {
 runmysteriet.ui.graphic.MenuList.prototype.dispose = function() {
 
     this.clear();
+
+    this.boxes = [];
+    this.boxWidth = 0;
+    this.boxHeight = 0;
+    this.boxAlpha = 0; 
 
     this.stage = null;
     this.application = null;
