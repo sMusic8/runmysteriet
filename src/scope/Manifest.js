@@ -141,6 +141,8 @@ var runmysteriet = function() {
 
     m_this.particle = {};
 
+    
+
 
     /**
      * Public scope.

@@ -9,6 +9,7 @@ npx google-closure-compiler \
 --js "./../../lib/rune.js" \
 --js "./../../src/scope/Manifest.js" \
 --js "./../../src/data/resource/Requests.js" \
+--js "./../../src/logic/SceneDelay.js" \
 --js "./../../src/attack/Attacks.js" \
 --js "./../../src/attack/AttackParticle.js" \
 --js "./../../src/config/LevelConfig.js" \

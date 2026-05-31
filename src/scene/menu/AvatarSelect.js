@@ -14,7 +14,7 @@ runmysteriet.scene.AvatarSelect = function() {
 
     /**
      * Inputhantering för scenen.
-     * @type {?Object}
+     * @type {?runmysteriet.input.GameInput}
      */
     this.m_gameInput = null;
 
@@ -49,55 +49,91 @@ runmysteriet.scene.AvatarSelect = function() {
     this.m_hasStarted = false;
 
     /** @type {?rune.display.Graphic} */
+    this.m_background = null;
+
+    /** @type {?rune.display.Graphic} */
+    this.m_titleBox = null;
+
+    /** @type {?rune.display.Graphic} */
+    this.m_player1LabelBox = null;
+
+    /** @type {?rune.display.Graphic} */
+    this.m_player2LabelBox = null;
+
+    /** @type {?rune.display.Graphic} */
+    this.m_player1ReadyBox = null;
+
+    /** @type {?rune.display.Graphic} */
+    this.m_player2ReadyBox = null;
+
+    /** @type {?rune.display.Graphic} */
+    this.m_helpBox = null;
+
+    /** @type {?rune.display.Graphic} */
+    this.m_backBox = null;
+
+    /** @type {?rune.text.BitmapField} */
     this.m_titleText = null;
 
-    /** @type {?rune.display.Graphic} */
+    /** @type {?rune.text.BitmapField} */
     this.m_helpText = null;
 
-    /** @type {?rune.display.Graphic} */
+    /** @type {?rune.text.BitmapField} */
     this.m_backText = null;
 
-    /** @type {?rune.display.Graphic} */
+    /** @type {?rune.text.BitmapField} */
     this.m_player1Label = null;
 
-    /** @type {?rune.display.Graphic} */
+    /** @type {?rune.text.BitmapField} */
     this.m_player2Label = null;
 
-    /** @type {?rune.display.Graphic} */
+    /** @type {?rune.text.BitmapField} */
     this.m_player1ReadyText = null;
 
-    /** @type {?rune.display.Graphic} */
+    /** @type {?rune.text.BitmapField} */
     this.m_player2ReadyText = null;
 
-    /** @type {?rune.display.Graphic} */
+    /** @type {?rune.text.BitmapField} */
     this.m_player1Marker = null;
 
-    /** @type {?rune.display.Graphic} */
+    /** @type {?rune.text.BitmapField} */
     this.m_player2Marker = null;
 
     /**
      * Sprites för player 1 avatar-val.
-     * @type {!Array<!rune.display.Graphic>}
+     * @type {!Array<!rune.display.Sprite>}
      */
     this.m_player1Sprites = [];
 
     /**
      * Sprites för player 2 avatar-val.
-     * @type {!Array<!rune.display.Graphic>}
+     * @type {!Array<!rune.display.Sprite>}
      */
     this.m_player2Sprites = [];
 
     /**
      * Namn-labels för player 1.
-     * @type {!Array<!rune.display.Graphic>}
+     * @type {!Array<!rune.text.BitmapField>}
      */
     this.m_player1Names = [];
 
     /**
      * Namn-labels för player 2.
-     * @type {!Array<!rune.display.Graphic>}
+     * @type {!Array<!rune.text.BitmapField>}
      */
     this.m_player2Names = [];
+
+    /**
+     * Boxar bakom player 1 avatar-namn.
+     * @type {!Array<!rune.display.Graphic>}
+     */
+    this.m_player1NameBoxes = [];
+
+    /**
+     * Boxar bakom player 2 avatar-namn.
+     * @type {!Array<!rune.display.Graphic>}
+     */
+    this.m_player2NameBoxes = [];
 
     /** @type {number} */
     this.m_inputCooldown1 = 0;
@@ -108,44 +144,106 @@ runmysteriet.scene.AvatarSelect = function() {
     /** @type {number} */
     this.m_inputDelay = 10;
 
+
     /**
      * Ljud som spelas i menyn.
      * @type {?Object}
      */
     this.menuSound = null;
+
+    /** @type {?runmysteriet.logic.SceneDelay} */
+    this.m_sceneDelay = null;
 };
 
-runmysteriet.scene.AvatarSelect.prototype =
-    Object.create(rune.scene.Scene.prototype);
+runmysteriet.scene.AvatarSelect.prototype = Object.create(rune.scene.Scene.prototype);
 
-runmysteriet.scene.AvatarSelect.prototype.constructor =
-    runmysteriet.scene.AvatarSelect;
+runmysteriet.scene.AvatarSelect.prototype.constructor = runmysteriet.scene.AvatarSelect;
+
+//------------------------------------------------------------------------------
+// INIT
+//------------------------------------------------------------------------------
 
 /**
  * Initierar AvatarSelect-scenen.
- * Sätter upp input, ljud och UI-element.
  *
  * @this {runmysteriet.scene.AvatarSelect}
  * @return {void}
  */
 runmysteriet.scene.AvatarSelect.prototype.init = function() {
 
-    // Initiera parent scene
     rune.scene.Scene.prototype.init.call(this);
 
-    // Skapa input-hantering
     this.m_gameInput = new runmysteriet.input.GameInput(this.application);
-
-    // Hämta meny-ljud från sound manager
     this.menuSound = this.application.sounds.sound.get("sound_menu");
-
-    // Bygg UI
+    this.createSceneDelay();
+    this.createBackground();
     this.createText();
     this.createAvatarChoices();
 
-    // Uppdatera visning initialt
     this.updateView();
 };
+
+//------------------------------------------------------------------------------
+// CREATE BACKGROUND / BOXES
+//------------------------------------------------------------------------------
+
+/**
+ * Skapar svart färgbakgrund.
+ *
+ * @return {void}
+ */
+runmysteriet.scene.AvatarSelect.prototype.createBackground = function() {
+
+    this.m_background = new rune.display.Graphic(
+        0,
+        0,
+        this.application.screen.width,
+        this.application.screen.height
+    );
+
+    this.m_background.backgroundColor = "#000000";
+    this.m_background.alpha = 1;
+
+    this.stage.addChild(this.m_background);
+};
+
+/**
+ * Skapar en mörk transparent UI-box.
+ *
+ * @param {number} x
+ * @param {number} y
+ * @param {number} width
+ * @param {number} height
+ * @param {number=} alpha
+ * @return {!rune.display.Graphic}
+ */
+runmysteriet.scene.AvatarSelect.prototype.createTextBox = function(
+    x,
+    y,
+    width,
+    height,
+    alpha
+) {
+
+    /** @type {!rune.display.Graphic} */
+    var box = new rune.display.Graphic(
+        x,
+        y,
+        width,
+        height
+    );
+
+    box.backgroundColor = "#222222";
+    box.alpha = alpha || 0.75;
+
+    this.stage.addChild(box);
+
+    return box;
+};
+
+//------------------------------------------------------------------------------
+// CREATE TEXT
+//------------------------------------------------------------------------------
 
 /**
  * Skapar all text/UI för avatarselect-scenen.
@@ -154,6 +252,17 @@ runmysteriet.scene.AvatarSelect.prototype.init = function() {
  * @return {void}
  */
 runmysteriet.scene.AvatarSelect.prototype.createText = function() {
+
+    this.m_titleBox = this.createTextBox(120, 13, 165, 18, 0.75);
+
+    this.m_player1LabelBox = this.createTextBox(75, 46, 75, 14, 0.65);
+    this.m_player2LabelBox = this.createTextBox(263, 46, 75, 14, 0.65);
+
+    this.m_player1ReadyBox = this.createTextBox(50, 168, 95, 16, 0.65);
+    this.m_player2ReadyBox = this.createTextBox(235, 168, 95, 16, 0.65);
+
+    this.m_helpBox = this.createTextBox(60, 191, 300, 14, 0.55);
+    this.m_backBox = this.createTextBox(60, 206, 300, 14, 0.55);
 
     this.m_titleText = new rune.text.BitmapField("SELECT AVATAR");
     this.m_titleText.autoSize = true;
@@ -185,23 +294,22 @@ runmysteriet.scene.AvatarSelect.prototype.createText = function() {
     this.m_player2ReadyText.y = 172;
     this.stage.addChild(this.m_player2ReadyText);
 
-    this.m_helpText = new rune.text.BitmapField("LEFT/RIGHT = SELECT   CROSS/A = READY");
+    this.m_helpText = new rune.text.BitmapField(
+        "LEFT/RIGHT = SELECT   CROSS/A = READY"
+    );
     this.m_helpText.autoSize = true;
-    this.m_helpText.scaleX = 1;
-    this.m_helpText.scaleY = 1;
     this.m_helpText.x = 65;
     this.m_helpText.y = 195;
     this.stage.addChild(this.m_helpText);
 
-    this.m_backText = new rune.text.BitmapField("CIRCLE/B/ESC = BACK OR UNREADY");
+    this.m_backText = new rune.text.BitmapField(
+        "CIRCLE/B/ESC = BACK OR UNREADY"
+    );
     this.m_backText.autoSize = true;
-    this.m_backText.scaleX = 1;
-    this.m_backText.scaleY = 1;
     this.m_backText.x = 65;
     this.m_backText.y = 210;
     this.stage.addChild(this.m_backText);
 
-    // Markörer som visar vald avatar för respektive spelare
     this.m_player1Marker = new rune.text.BitmapField("v");
     this.m_player1Marker.autoSize = true;
     this.stage.addChild(this.m_player1Marker);
@@ -210,6 +318,10 @@ runmysteriet.scene.AvatarSelect.prototype.createText = function() {
     this.m_player2Marker.autoSize = true;
     this.stage.addChild(this.m_player2Marker);
 };
+
+//------------------------------------------------------------------------------
+// CREATE AVATARS
+//------------------------------------------------------------------------------
 
 /**
  * Skapar avatarval för båda spelarna.
@@ -227,20 +339,35 @@ runmysteriet.scene.AvatarSelect.prototype.createAvatarChoices = function() {
  * Skapar avatarval för en specifik spelare.
  *
  * @this {runmysteriet.scene.AvatarSelect}
- * @param {number} playerIndex Index för spelaren (0 eller 1).
+ * @param {number} playerIndex Index för spelaren.
  * @return {void}
  */
 runmysteriet.scene.AvatarSelect.prototype.createPlayerAvatarChoices = function(playerIndex) {
 
+    /** @type {number} */
     var i = 0;
+
+    /** @type {?Object} */
     var avatar = null;
+
+    /** @type {?rune.display.Sprite} */
     var sprite = null;
+
+    /** @type {?rune.text.BitmapField} */
     var nameText = null;
+
+    /** @type {?rune.display.Graphic} */
+    var nameBox = null;
+
+    /** @type {number} */
     var baseX = 0;
+
+    /** @type {number} */
     var y = 0;
+
+    /** @type {number} */
     var spacing = 65;
 
-    // Placering beroende på spelare
     if (playerIndex === 0) {
         baseX = 45;
         y = 85;
@@ -250,7 +377,6 @@ runmysteriet.scene.AvatarSelect.prototype.createPlayerAvatarChoices = function(p
     }
 
     for (i = 0; i < this.m_avatars.length; i++) {
-
         avatar = this.m_avatars[i];
 
         sprite = new rune.display.Sprite(
@@ -269,10 +395,16 @@ runmysteriet.scene.AvatarSelect.prototype.createPlayerAvatarChoices = function(p
 
         this.stage.addChild(sprite);
 
+        nameBox = this.createTextBox(
+            baseX + i * spacing - 8,
+            y + 65,
+            55,
+            14,
+            0.55
+        );
+
         nameText = new rune.text.BitmapField(avatar.name);
         nameText.autoSize = true;
-        nameText.scaleX = 1;
-        nameText.scaleY = 1;
         nameText.x = baseX + i * spacing - 2;
         nameText.y = y + 68;
 
@@ -281,16 +413,21 @@ runmysteriet.scene.AvatarSelect.prototype.createPlayerAvatarChoices = function(p
         if (playerIndex === 0) {
             this.m_player1Sprites.push(sprite);
             this.m_player1Names.push(nameText);
+            this.m_player1NameBoxes.push(nameBox);
         } else {
             this.m_player2Sprites.push(sprite);
             this.m_player2Names.push(nameText);
+            this.m_player2NameBoxes.push(nameBox);
         }
     }
 };
 
+//------------------------------------------------------------------------------
+// UPDATE
+//------------------------------------------------------------------------------
+
 /**
  * Uppdateringsloop för AvatarSelect-scenen.
- * Hanterar input, cooldowns och startvillkor.
  *
  * @this {runmysteriet.scene.AvatarSelect}
  * @param {number} step Tidssteg från game loop.
@@ -298,11 +435,17 @@ runmysteriet.scene.AvatarSelect.prototype.createPlayerAvatarChoices = function(p
  */
 runmysteriet.scene.AvatarSelect.prototype.update = function(step) {
 
+    /** @type {?Object} */
     var input = null;
 
     rune.scene.Scene.prototype.update.call(this, step);
 
-    // Avsluta om spelet redan har startat
+    if (this.m_sceneDelay && this.m_sceneDelay.isActive()) {
+    this.m_sceneDelay.update();
+    this.updateHelpSignal();
+    return;
+}
+
     if (this.m_hasStarted === true) {
         return;
     }
@@ -311,19 +454,9 @@ runmysteriet.scene.AvatarSelect.prototype.update = function(step) {
         return;
     }
 
-    /*
-     * Gemensam menyinput.
-     * Detta gör att ESC / BACKSPACE / Circle / B kan gå tillbaka
-     * även innan spelarna har valt avatar.
-     */
     input = this.m_gameInput.read(this.keyboard);
 
     if (input && input.back === true) {
-
-        /*
-         * Om någon redan är READY ska back först avvälja READY.
-         * Om ingen är READY går man tillbaka till huvudmenyn.
-         */
         if (this.m_player1Ready === true || this.m_player2Ready === true) {
             this.m_player1Ready = false;
             this.m_player2Ready = false;
@@ -341,29 +474,28 @@ runmysteriet.scene.AvatarSelect.prototype.update = function(step) {
         this.m_inputCooldown1--;
     }
 
-    // Hantera cooldown för player 2
     if (this.m_inputCooldown2 > 0) {
         this.m_inputCooldown2--;
     }
 
-    // Uppdatera val för båda spelare
     this.updatePlayerSelection(0);
     this.updatePlayerSelection(1);
 
-    // Starta spelet om båda är redo
     if (this.m_player1Ready === true && this.m_player2Ready === true) {
         this.startGame();
     }
 };
+
 /**
  * Uppdaterar avatarval för en specifik spelare.
  *
  * @this {runmysteriet.scene.AvatarSelect}
- * @param {number} playerIndex Index för spelaren (0 eller 1).
+ * @param {number} playerIndex Index för spelaren.
  * @return {void}
  */
 runmysteriet.scene.AvatarSelect.prototype.updatePlayerSelection = function(playerIndex) {
 
+    /** @type {?Object} */
     var input = null;
 
     if (!this.m_gameInput) {
@@ -374,13 +506,16 @@ runmysteriet.scene.AvatarSelect.prototype.updatePlayerSelection = function(playe
 
     if (playerIndex === 0) {
         this.updatePlayer1Selection(input);
-    } else if (playerIndex === 1) {
+        return;
+    }
+
+    if (playerIndex === 1) {
         this.updatePlayer2Selection(input);
     }
 };
 
 /**
- * Hanterar input för spelare 1 i avatarselect.
+ * Hanterar input för spelare 1.
  *
  * @this {runmysteriet.scene.AvatarSelect}
  * @param {?Object} input Spelarens inputdata.
@@ -392,9 +527,7 @@ runmysteriet.scene.AvatarSelect.prototype.updatePlayer1Selection = function(inpu
         return;
     }
 
-    // BACK: avmarkera eller gå tillbaka till meny
     if (input.back) {
-
         if (this.m_player1Ready === true) {
             this.m_player1Ready = false;
             this.playMenuSound();
@@ -406,26 +539,28 @@ runmysteriet.scene.AvatarSelect.prototype.updatePlayer1Selection = function(inpu
         return;
     }
 
-    // Vänster/höger: byt avatar
     if (this.m_player1Ready !== true && this.m_inputCooldown1 <= 0) {
-
         if (input.left || input.right) {
-            this.m_player1Index = this.getNextAvatarIndex(this.m_player1Index);
+            this.m_player1Index =
+                this.getNextAvatarIndex(this.m_player1Index);
+
             this.m_inputCooldown1 = this.m_inputDelay;
+
             this.playMenuSound();
             this.updateView();
         }
     }
 
-    // Välj/confirm
     if (input.choose || input.jump) {
         this.m_player1Ready = true;
+
         this.playMenuSound();
         this.updateView();
     }
 };
+
 /**
- * Hanterar input för spelare 2 i avatarselect.
+ * Hanterar input för spelare 2.
  *
  * @this {runmysteriet.scene.AvatarSelect}
  * @param {?Object} input Spelarens inputdata.
@@ -437,9 +572,7 @@ runmysteriet.scene.AvatarSelect.prototype.updatePlayer2Selection = function(inpu
         return;
     }
 
-    // BACK: avmarkera eller gå tillbaka till meny
     if (input.back) {
-
         if (this.m_player2Ready === true) {
             this.m_player2Ready = false;
             this.playMenuSound();
@@ -451,31 +584,32 @@ runmysteriet.scene.AvatarSelect.prototype.updatePlayer2Selection = function(inpu
         return;
     }
 
-    // Vänster/höger
     if (this.m_player2Ready !== true && this.m_inputCooldown2 <= 0) {
-
         if (input.left || input.right) {
-            this.m_player2Index = this.getNextAvatarIndex(this.m_player2Index);
+            this.m_player2Index =
+                this.getNextAvatarIndex(this.m_player2Index);
+
             this.m_inputCooldown2 = this.m_inputDelay;
+
             this.playMenuSound();
             this.updateView();
         }
     }
 
-    // Välj/confirm
     if (input.choose || input.jump) {
         this.m_player2Ready = true;
+
         this.playMenuSound();
         this.updateView();
     }
 };
 
 /**
- * Returnerar nästa avatar-index (loopar tillbaka till 0 vid slutet).
+ * Returnerar nästa avatar-index.
  *
  * @this {runmysteriet.scene.AvatarSelect}
  * @param {number} index Nuvarande index.
- * @return {number} Nästa index i avatarlistan.
+ * @return {number} Nästa index.
  */
 runmysteriet.scene.AvatarSelect.prototype.getNextAvatarIndex = function(index) {
 
@@ -489,7 +623,7 @@ runmysteriet.scene.AvatarSelect.prototype.getNextAvatarIndex = function(index) {
 };
 
 /**
- * Uppdaterar hela avatar-vyn (markers, text och alpha).
+ * Uppdaterar hela avatar-vyn.
  *
  * @this {runmysteriet.scene.AvatarSelect}
  * @return {void}
@@ -499,33 +633,36 @@ runmysteriet.scene.AvatarSelect.prototype.updateView = function() {
     this.updateMarkers();
     this.updateReadyText();
     this.updateAvatarAlpha();
+    this.updateHelpSignal();
 };
 
 /**
- * Uppdaterar markörernas position ovanför vald avatar.
+ * Uppdaterar markörernas position.
  *
  * @this {runmysteriet.scene.AvatarSelect}
  * @return {void}
  */
 runmysteriet.scene.AvatarSelect.prototype.updateMarkers = function() {
 
+    /** @type {?rune.display.Sprite} */
     var p1Sprite = this.m_player1Sprites[this.m_player1Index];
+
+    /** @type {?rune.display.Sprite} */
     var p2Sprite = this.m_player2Sprites[this.m_player2Index];
 
-    // Player 1 marker
     if (this.m_player1Marker && p1Sprite) {
         this.m_player1Marker.x = p1Sprite.x + 22;
         this.m_player1Marker.y = p1Sprite.y - 18;
     }
 
-    // Player 2 marker
     if (this.m_player2Marker && p2Sprite) {
         this.m_player2Marker.x = p2Sprite.x + 22;
         this.m_player2Marker.y = p2Sprite.y - 18;
     }
 };
+
 /**
- * Uppdaterar text som visar om spelarna är redo eller inte.
+ * Uppdaterar READY/NOT READY-text och signalboxar.
  *
  * @this {runmysteriet.scene.AvatarSelect}
  * @return {void}
@@ -535,14 +672,99 @@ runmysteriet.scene.AvatarSelect.prototype.updateReadyText = function() {
     if (this.m_player1ReadyText) {
         this.m_player1ReadyText.text =
             this.m_player1Ready === true ? "READY" : "NOT READY";
+
+        this.m_player1ReadyText.alpha =
+            this.m_player1Ready === true ? 1 : 0.75;
+
+        this.m_player1ReadyText.x =
+            this.m_player1Ready === true ? 72 : 55;
     }
 
     if (this.m_player2ReadyText) {
         this.m_player2ReadyText.text =
             this.m_player2Ready === true ? "READY" : "NOT READY";
+
+        this.m_player2ReadyText.alpha =
+            this.m_player2Ready === true ? 1 : 0.75;
+
+        this.m_player2ReadyText.x =
+            this.m_player2Ready === true ? 257 : 240;
+    }
+
+    if (this.m_player1ReadyBox) {
+        this.m_player1ReadyBox.x =
+            this.m_player1Ready === true ? 65 : 50;
+
+        this.m_player1ReadyBox.width =
+            this.m_player1Ready === true ? 65 : 95;
+
+        this.m_player1ReadyBox.alpha =
+            this.m_player1Ready === true ? 1 : 0.65;
+
+        this.m_player1ReadyBox.backgroundColor =
+            this.m_player1Ready === true ? "#444444" : "#222222";
+    }
+
+    if (this.m_player2ReadyBox) {
+        this.m_player2ReadyBox.x =
+            this.m_player2Ready === true ? 250 : 235;
+
+        this.m_player2ReadyBox.width =
+            this.m_player2Ready === true ? 65 : 95;
+
+        this.m_player2ReadyBox.alpha =
+            this.m_player2Ready === true ? 1 : 0.65;
+
+        this.m_player2ReadyBox.backgroundColor =
+            this.m_player2Ready === true ? "#444444" : "#222222";
     }
 };
 
+/**
+ * Uppdaterar instruktionsrutan beroende på spelarstatus.
+ *
+ * @this {runmysteriet.scene.AvatarSelect}
+ * @return {void}
+ */
+runmysteriet.scene.AvatarSelect.prototype.updateHelpSignal = function() {
+
+    /** @type {number} */
+    var seconds = 0;
+
+    if (!this.m_helpText || !this.m_helpBox) {
+        return;
+    }
+
+    if (this.m_sceneDelay && this.m_sceneDelay.isActive()) {
+        seconds = this.m_sceneDelay.getRemainingSeconds(30);
+
+        if (seconds < 1) {
+            seconds = 1;
+        }
+
+        this.m_helpText.text = "STARTING IN " + seconds + "...";
+        this.m_helpText.x = 135;
+
+        this.m_helpBox.backgroundColor = "#555555";
+        this.m_helpBox.alpha = 1;
+        return;
+    }
+
+    if (this.m_player1Ready === true || this.m_player2Ready === true) {
+        this.m_helpText.text = "WAITING FOR BOTH PLAYERS";
+        this.m_helpText.x = 95;
+
+        this.m_helpBox.backgroundColor = "#444444";
+        this.m_helpBox.alpha = 0.9;
+        return;
+    }
+
+    this.m_helpText.text = "LEFT/RIGHT = SELECT   CROSS/A = READY";
+    this.m_helpText.x = 55;
+
+    this.m_helpBox.backgroundColor = "#333333";
+    this.m_helpBox.alpha = 0.75;
+};
 /**
  * Uppdaterar alpha på avatars och namn beroende på vald index.
  *
@@ -551,11 +773,10 @@ runmysteriet.scene.AvatarSelect.prototype.updateReadyText = function() {
  */
 runmysteriet.scene.AvatarSelect.prototype.updateAvatarAlpha = function() {
 
+    /** @type {number} */
     var i = 0;
 
-    // Player 1 visuals
     for (i = 0; i < this.m_player1Sprites.length; i++) {
-
         if (this.m_player1Sprites[i]) {
             this.m_player1Sprites[i].alpha =
                 i === this.m_player1Index ? 1.0 : 0.45;
@@ -565,11 +786,14 @@ runmysteriet.scene.AvatarSelect.prototype.updateAvatarAlpha = function() {
             this.m_player1Names[i].alpha =
                 i === this.m_player1Index ? 1.0 : 0.45;
         }
+
+        if (this.m_player1NameBoxes[i]) {
+            this.m_player1NameBoxes[i].alpha =
+                i === this.m_player1Index ? 0.85 : 0.35;
+        }
     }
 
-    // Player 2 visuals
     for (i = 0; i < this.m_player2Sprites.length; i++) {
-
         if (this.m_player2Sprites[i]) {
             this.m_player2Sprites[i].alpha =
                 i === this.m_player2Index ? 1.0 : 0.45;
@@ -579,49 +803,83 @@ runmysteriet.scene.AvatarSelect.prototype.updateAvatarAlpha = function() {
             this.m_player2Names[i].alpha =
                 i === this.m_player2Index ? 1.0 : 0.45;
         }
+
+        if (this.m_player2NameBoxes[i]) {
+            this.m_player2NameBoxes[i].alpha =
+                i === this.m_player2Index ? 0.85 : 0.35;
+        }
     }
 };
+
+//------------------------------------------------------------------------------
+// NAVIGATION
+//------------------------------------------------------------------------------
+
 /**
- * Går tillbaka till huvudmenyn från avatarselect.
+ * Går tillbaka till huvudmenyn.
  *
  * @this {runmysteriet.scene.AvatarSelect}
  * @return {void}
  */
 runmysteriet.scene.AvatarSelect.prototype.goBackToMenu = function() {
 
-    // Förhindra att scenen startas/byter state flera gånger
     if (this.m_hasStarted === true) {
         return;
     }
 
     this.m_hasStarted = true;
 
-    // Spela meny-ljud vid navigering
     this.playMenuSound();
 
-    // Ladda huvudmenyn
     this.application.scenes.load([
         new runmysteriet.scene.Menu()
     ]);
 };
+
 /**
- * Startar spelet med valda avatars för båda spelar
+ * Startar fördröjningen innan spelet laddas.
  *
  * @this {runmysteriet.scene.AvatarSelect}
  * @return {void}
  */
 runmysteriet.scene.AvatarSelect.prototype.startGame = function() {
 
+    if (this.m_hasStarted === true) {
+        return;
+    }
+
+    if (this.m_sceneDelay && this.m_sceneDelay.isActive()) {
+        return;
+    }
+
+    this.playMenuSound();
+
+    if (this.m_sceneDelay) {
+        this.m_sceneDelay.start(90);
+    } else {
+        this.loadGame();
+    }
+
+    this.updateView();
+};
+
+/**
+ * Laddar Game-scenen med valda avatars.
+ *
+ * @this {runmysteriet.scene.AvatarSelect}
+ * @return {void}
+ */
+runmysteriet.scene.AvatarSelect.prototype.loadGame = function() {
+
+    /** @type {?Object} */
     var avatarData = null;
 
-    // Förhindra dubbel start
     if (this.m_hasStarted === true) {
         return;
     }
 
     this.m_hasStarted = true;
 
-    // Bygg data för båda spelare
     avatarData = {
         player1: {
             name: this.m_avatars[this.m_player1Index].name,
@@ -633,12 +891,14 @@ runmysteriet.scene.AvatarSelect.prototype.startGame = function() {
         }
     };
 
-    // Ladda spel-scenen
     this.application.scenes.load([
         new runmysteriet.scene.Game(1, 0, avatarData)
     ]);
 };
 
+//------------------------------------------------------------------------------
+// SOUND
+//------------------------------------------------------------------------------
 
 /**
  * Spelar meny-ljud om det finns laddat.
@@ -648,9 +908,28 @@ runmysteriet.scene.AvatarSelect.prototype.startGame = function() {
  */
 runmysteriet.scene.AvatarSelect.prototype.playMenuSound = function() {
 
-    if (this.menuSound) {
+    if (this.menuSound && typeof this.menuSound.play === "function") {
         this.menuSound.play();
     }
+};
+
+
+/**
+ * Skapar scenfördröjning innan spelet startar.
+ *
+ * @return {void}
+ */
+runmysteriet.scene.AvatarSelect.prototype.createSceneDelay = function() {
+
+    /** @type {runmysteriet.scene.AvatarSelect} */
+    var self = this;
+
+    this.m_sceneDelay = new runmysteriet.logic.SceneDelay(
+        90,
+        function() {
+            self.loadGame();
+        }
+    );
 };
 
 //------------------------------------------------------------------------------
@@ -679,10 +958,6 @@ runmysteriet.scene.AvatarSelect.prototype.removeDisplayObject = function(object)
     }
 };
 
-//------------------------------------------------------------------------------
-// CLEAR DISPLAY LIST
-//------------------------------------------------------------------------------
-
 /**
  * Tar bort alla objekt i en array från stage.
  *
@@ -691,6 +966,7 @@ runmysteriet.scene.AvatarSelect.prototype.removeDisplayObject = function(object)
  */
 runmysteriet.scene.AvatarSelect.prototype.clearDisplayList = function(list) {
 
+    /** @type {number} */
     var i = 0;
 
     if (!list) {
@@ -713,17 +989,17 @@ runmysteriet.scene.AvatarSelect.prototype.clearDisplayList = function(list) {
  */
 runmysteriet.scene.AvatarSelect.prototype.dispose = function() {
 
-    /*
-     * Sprites och namntexter för avatarval.
-     */
+        if (this.m_sceneDelay) {
+        this.m_sceneDelay.dispose();
+    }
+    
     this.clearDisplayList(this.m_player1Sprites);
     this.clearDisplayList(this.m_player2Sprites);
     this.clearDisplayList(this.m_player1Names);
     this.clearDisplayList(this.m_player2Names);
+    this.clearDisplayList(this.m_player1NameBoxes);
+    this.clearDisplayList(this.m_player2NameBoxes);
 
-    /*
-     * Textobjekt.
-     */
     this.removeDisplayObject(this.m_titleText);
     this.removeDisplayObject(this.m_helpText);
     this.removeDisplayObject(this.m_backText);
@@ -737,22 +1013,26 @@ runmysteriet.scene.AvatarSelect.prototype.dispose = function() {
     this.removeDisplayObject(this.m_player1Marker);
     this.removeDisplayObject(this.m_player2Marker);
 
-    /*
-     * Töm arrayer.
-     */
+    this.removeDisplayObject(this.m_titleBox);
+    this.removeDisplayObject(this.m_player1LabelBox);
+    this.removeDisplayObject(this.m_player2LabelBox);
+    this.removeDisplayObject(this.m_player1ReadyBox);
+    this.removeDisplayObject(this.m_player2ReadyBox);
+    this.removeDisplayObject(this.m_helpBox);
+    this.removeDisplayObject(this.m_backBox);
+    this.removeDisplayObject(this.m_background);
+
     this.m_avatars = [];
 
-    // Sprites
     this.m_player1Sprites = [];
     this.m_player2Sprites = [];
 
-    // Namnlabels
     this.m_player1Names = [];
     this.m_player2Names = [];
 
-    /*
-     * Nolla display-referenser.
-     */
+    this.m_player1NameBoxes = [];
+    this.m_player2NameBoxes = [];
+
     this.m_titleText = null;
     this.m_helpText = null;
     this.m_backText = null;
@@ -766,10 +1046,17 @@ runmysteriet.scene.AvatarSelect.prototype.dispose = function() {
     this.m_player1Marker = null;
     this.m_player2Marker = null;
 
-    /*
-     * Nolla input/state.
-     */
+    this.m_titleBox = null;
+    this.m_player1LabelBox = null;
+    this.m_player2LabelBox = null;
+    this.m_player1ReadyBox = null;
+    this.m_player2ReadyBox = null;
+    this.m_helpBox = null;
+    this.m_backBox = null;
+    this.m_background = null;
+
     this.m_gameInput = null;
+    this.m_sceneDelay = null;
 
     this.m_player1Index = 0;
     this.m_player2Index = 1;
@@ -783,13 +1070,7 @@ runmysteriet.scene.AvatarSelect.prototype.dispose = function() {
     this.m_inputCooldown2 = 0;
     this.m_inputDelay = 0;
 
-    /*
-     * Ljudreferens.
-     */
     this.menuSound = null;
 
-    /*
-     * Rune Scene dispose sist.
-     */
     rune.scene.Scene.prototype.dispose.call(this);
 };
