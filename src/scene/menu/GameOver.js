@@ -24,6 +24,9 @@ runmysteriet.scene.GameOver = function(score, reason, playerName) {
     /** @type {string} */
     this.m_playerName = playerName || "PLAYER";
 
+    /** @type {?rune.display.Graphic} */
+    this.m_background = null;
+
     /** @type {?rune.text.BitmapField} */
     this.m_title = null;
 
@@ -35,6 +38,12 @@ runmysteriet.scene.GameOver = function(score, reason, playerName) {
 
     /** @type {?Object} */
     this.m_highscoreHud = null;
+
+    /** @type {?rune.display.Graphic} */
+    this.m_screenOverlay = null;
+
+    /** @type {?rune.display.Graphic} */
+    this.m_highscoreBox = null;
 
     /** @type {?Object} */
     this.m_volumeHud = null;
@@ -96,14 +105,15 @@ runmysteriet.scene.GameOver.prototype.init = function() {
      */
     this.saveHighscore();
 
+    this.createBackground();
+    this.createScreenOverlay();
     this.createTitle();
     this.createReasonText();
     this.createScoreText();
+    this.createHighscoreBox();
     this.createHighscoreHud();
     this.createMenu();
     this.createVolumeHud();
-
-    this.positionMenu();
 };
 
 //------------------------------------------------------------------------------
@@ -187,6 +197,44 @@ runmysteriet.scene.GameOver.prototype.createTitle = function() {
 };
 
 /**
+ * Skapar bakgrund för Game Over-skärmen.
+ *
+ * @return {void}
+ */
+runmysteriet.scene.GameOver.prototype.createBackground = function() {
+
+    this.m_background = new rune.display.Graphic(
+        0,
+        0,
+        this.application.screen.width,
+        this.application.screen.height,
+        "background_menu"
+    );
+
+    this.stage.addChild(this.m_background);
+};
+
+/**
+ * Skapar en mörk transparent ruta över hela Game Over-skärmen.
+ *
+ * @return {void}
+ */
+runmysteriet.scene.GameOver.prototype.createScreenOverlay = function() {
+
+    this.m_screenOverlay = new rune.display.Graphic(
+        0,
+        0,
+        this.application.screen.width,
+        this.application.screen.height
+    );
+
+    this.m_screenOverlay.backgroundColor = "#000000";
+    this.m_screenOverlay.alpha = 0.4;
+
+    this.stage.addChild(this.m_screenOverlay);
+};
+
+/**
  * Skapar text som visar varför det blev Game Over.
  *
  * @return {void}
@@ -222,7 +270,25 @@ runmysteriet.scene.GameOver.prototype.createScoreText = function() {
 
     this.stage.addChild(this.m_scoreText);
 };
+/**
+ * Skapar en mörk transparent ruta bakom highscore-listan.
+ *
+ * @return {void}
+ */
+runmysteriet.scene.GameOver.prototype.createHighscoreBox = function() {
 
+    this.m_highscoreBox = new rune.display.Graphic(
+        10,
+        140,
+        140,
+        70
+    );
+
+    this.m_highscoreBox.backgroundColor = "#000000";
+    this.m_highscoreBox.alpha = 0.5;
+
+    this.stage.addChild(this.m_highscoreBox);
+};
 /**
  * Skapar highscore-listan.
  *
@@ -593,21 +659,23 @@ runmysteriet.scene.GameOver.prototype.dispose = function() {
 
     this.removeDisplayObject(this.m_volumeHud);
     this.removeDisplayObject(this.m_highscoreHud);
+    this.removeDisplayObject(this.m_highscoreBox);
     this.removeDisplayObject(this.m_scoreText);
     this.removeDisplayObject(this.m_reasonText);
     this.removeDisplayObject(this.m_title);
+    this.removeDisplayObject(this.m_screenOverlay);
 
     this.m_menu = null;
     this.m_volumeHud = null;
     this.m_highscoreHud = null;
+    this.m_highscoreBox = null;
     this.m_scoreText = null;
     this.m_reasonText = null;
     this.m_title = null;
-
+    this.m_screenOverlay = null;
     this.m_menuSound = null;
     this.backgroundMusic = null;
     this.m_gameInput = null;
-
     this.m_score = 0;
     this.m_reason = "";
     this.m_playerName = "PLAYER";
