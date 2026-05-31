@@ -232,11 +232,6 @@ runmysteriet.segments.Segment_Water.prototype.addBoat = function(stage, boats, w
 
 /**
  * Returnerar antal sjukdomar baserat på level.
- *
- * Level 1-5: 2 sjukdomar
- * Level 6-10: 3 sjukdomar
- * Level 11+: 4 sjukdomar
- *
  * @param {number=} levelNumber
  * @return {number}
  */
@@ -275,7 +270,6 @@ runmysteriet.segments.Segment_Water.prototype.addDiseases = function(diseaseSpaw
 
 /**
  * Returnerar sjukdomspositioner för vattensegmentet.
- * Positionerna ligger på vänster och höger mark.
  *
  * @param {number} leftLandX
  * @param {number} rightLandX

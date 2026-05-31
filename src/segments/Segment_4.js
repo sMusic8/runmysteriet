@@ -75,8 +75,11 @@ runmysteriet.segments.Segment_4.prototype.ground = function(stage, startX, level
 
     x += holeWidth;
 
-    this.addLandingGround(stage, platforms, x);
-    x += 8 * this.tileW;
+    this.addTiles(stage, platforms, x, this.groundY, 5, this.groundTexture);
+    x += 5 * this.tileW;
+
+    this.addLavaHole(stage, holes, x, 96);
+    x += 96;
 
     this.addRemainingGround(stage, platforms, x, segmentEnd);
     this.addDiseases(diseaseSpawns, segmentStart, levelNumber);
@@ -194,31 +197,27 @@ runmysteriet.segments.Segment_4.prototype.addLavaHole = function(stage, holes, x
 };
 
 /**
- * Lägger till zig-zag-plattformar över lavan.
+ * Lägger till roligare plattformar över lavan.
+ * Plattformarna skapar en låg väg och en högre risk/reward-väg.
  *
  * @param {!rune.display.Stage} stage
  * @param {!Array<!Object>} platforms
  * @param {number} x
  */
 runmysteriet.segments.Segment_4.prototype.addZigZagPlatforms = function(stage, platforms, x) {
-    var j = 0;
-    var px = 0;
-    var py = 0;
 
-    for (j = 0; j < 6; j++) {
-        px = x + 35 + (j * 58);
-        py = this.groundY - (j % 2 === 0 ? 60 : 105);
-
-        this.addTiles(stage, platforms, px, py, 2, this.platformTexture);
-    }
+    //tiles över lavan
+    this.addTiles(stage, platforms, x + 35,  this.groundY - 45, 2, this.platformTexture);
+    this.addTiles(stage, platforms, x + 105, this.groundY - 75, 2, this.platformTexture);
+    this.addTiles(stage, platforms, x + 175, this.groundY - 45, 2, this.platformTexture);
+    this.addTiles(stage, platforms, x + 245, this.groundY - 75, 2, this.platformTexture);
+    this.addTiles(stage, platforms, x + 145, this.groundY - 125, 2, this.platformTexture);
+    this.addTiles(stage, platforms, x + 305, this.groundY - 105, 2, this.platformTexture);
+    this.addTiles(stage, platforms, x + 325, this.groundY - 45, 2, this.platformTexture);
 };
 
 /**
- * Returnerar antal sjukdomar baserat på level.
- *
- * Level 1-5: 2 sjukdomar
- * Level 6-10: 3 sjukdomar
- * Level 11+: 4 sjukdomar
+ * Returnerar sjukdomar.
  *
  * @param {number=} levelNumber
  * @return {number}
@@ -255,37 +254,36 @@ runmysteriet.segments.Segment_4.prototype.addDiseases = function(diseaseSpawns, 
 };
 
 /**
- * Returnerar sjukdomspositioner för Segment 4.
- * Positionerna ligger på startmark/slutmark, inte över lavahålet.
+ * Returnerar sjukdomspositioner
  *
  * @param {number} segmentStart
  * @return {!Array<!Object>}
  */
 runmysteriet.segments.Segment_4.prototype.getDiseasePositions = function(segmentStart) {
     return [
-        {
+         {
             type: "gray",
             x: segmentStart + 80,
             y: this.groundY - 50
         },
         {
             type: "red",
-            x: segmentStart + 360,
-            y: this.groundY - 96
+            x: segmentStart + 315,
+            y: this.groundY - 120
         },
         {
             type: "brown",
-            x: segmentStart + 650,
-            y: this.groundY - 50
+            x: segmentStart + 455,
+            y: this.groundY - 95
         },
         {
             type: "red",
-            x: segmentStart + 780,
+            x: segmentStart + 670,
             y: this.groundY - 50
         },
         {
             type: "gray",
-            x: segmentStart + 900,
+            x: segmentStart + 850,
             y: this.groundY - 50
         }
     ];
@@ -318,8 +316,8 @@ runmysteriet.segments.Segment_4.prototype.addRuneSpawns = function(runeSpawns, s
 runmysteriet.segments.Segment_4.prototype.getRunePositions = function(segmentStart) {
     return [
         {
-            x: segmentStart + 600,
-            y: this.groundY - 70
+            x: segmentStart + 360,
+            y: this.groundY - 160
         }
     ];
 };
@@ -351,8 +349,8 @@ runmysteriet.segments.Segment_4.prototype.addArmorSpawns = function(armorSpawns,
 runmysteriet.segments.Segment_4.prototype.getArmorPositions = function(segmentStart) {
     return [
         {
-            x: segmentStart + 630,
-            y: this.groundY - 90
+            x: segmentStart + 880,
+            y: this.groundY - 45
         }
     ];
 };

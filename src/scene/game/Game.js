@@ -132,13 +132,6 @@ runmysteriet.scene.Game = function (levelNumber, score, avatarData) {
    * @type {number}
    */
   this.m_highscoreTimer = 0;
-
-  /**
-   * Flagga för om highscore redan visats.
-   * @type {boolean}
-   */
-  this.m_highscoreNotified = false;
-
   /**
    * Pausläge för spelet.
    * @type {boolean}
@@ -260,26 +253,19 @@ runmysteriet.scene.Game.prototype.constructor = runmysteriet.scene.Game;
  *
  * @return {void}
  */
-runmysteriet.scene.Game.prototype.createHighscoreNotice = function () {
-  /**
-   * Textfält som visar "NEW HIGHSCORE!".
-   * @type {rune.text.BitmapField}
-   */
-  this.m_highscoreText = new rune.text.BitmapField("NEW HIGHSCORE!");
-  this.m_highscoreText.autoSize = true;
-  this.m_highscoreText.visible = false;
 runmysteriet.scene.Game.prototype.createHighscoreNotice = function() {
 
     /**
-     * Textfält som visar "NEW HIGHSCORE!".
+     * Textfält som visar highscore-notis.
      * @type {rune.text.BitmapField}
      */
     this.m_highscoreText = new rune.text.BitmapField("");
     this.m_highscoreText.autoSize = true;
     this.m_highscoreText.visible = false;
 
-  this.stage.addChild(this.m_highscoreText);
+    this.stage.addChild(this.m_highscoreText);
 };
+
 /**
  * Visar highscore-/top 5-notis.
  *
@@ -287,10 +273,11 @@ runmysteriet.scene.Game.prototype.createHighscoreNotice = function() {
  * @param {boolean=} playSound
  * @return {void}
  */
-runmysteriet.scene.Game.prototype.showHighscoreNotice = function (text, playSound) {
-  if (this.m_highscoreNotified === true) {
-    return;
-  }
+runmysteriet.scene.Game.prototype.showHighscoreNotice = function(text, playSound) {
+
+    if (this.m_highscoreNotified === true) {
+        return;
+    }
 
     text = text || "TOP 5 SCORE";
     playSound = playSound === true;
@@ -306,13 +293,9 @@ runmysteriet.scene.Game.prototype.showHighscoreNotice = function (text, playSoun
         this.m_highscoreText.scaleY = 1;
     }
 
-    /*
-     * Ljud spelas bara vid riktig första plats.
-     */
     if (playSound === true && this.m_highscoreSound) {
         this.m_highscoreSound.play();
-    }2
-}
+    }
 };
 /**
  * Uppdaterar highscore-notisen (animation, position och fade-out).
@@ -597,6 +580,9 @@ runmysteriet.scene.Game.prototype.init = function () {
     this.m_platformHandler.levelWidth,
     this.m_levelNumber
   );
+  var baseAutoScrollSpeed = this.m_cameraHandler.speed;
+
+  this.m_cameraHandler.speed = this.m_levelConfig.getAutoScrollSpeed(baseAutoScrollSpeed);
 
   this.m_playerHandler.setCamera(this.camera);
   this.m_playerHandler.setCameraHandler(this.m_cameraHandler);
@@ -802,6 +788,12 @@ runmysteriet.scene.Game.prototype.update = function (step) {
   ) {
     this.m_playerHandler.handleAutoScrollCameraBounds();
   }
+  if (
+    this.m_playerHandler &&
+    typeof this.m_playerHandler.checkAllEnemyBlockers === "function"
+) {
+    this.m_playerHandler.checkAllEnemyBlockers();
+}
 
   //Uppdatera Rune-kameran.
 
@@ -901,7 +893,7 @@ runmysteriet.scene.Game.prototype.updateExtra = function () {
       return;
     }
     for (i = 0; i < players.length; i++) {
-      player = players[i];
+      var player = players[i];
 
       if (m_extra.hitTestObject(player)) {
         this.addScore(25);

@@ -164,7 +164,7 @@ runmysteriet.segments.Segment_5.prototype.addTiles = function(stage, platforms, 
 };
 
 /**
- * Lägger till två mindre lavahål med stenplattformar efter varje hål.
+ * Lägger till flera mindre lavahål med stenplattformar i luften.
  *
  * @param {!rune.display.Stage} stage
  * @param {!Array<!Object>} platforms
@@ -173,28 +173,31 @@ runmysteriet.segments.Segment_5.prototype.addTiles = function(stage, platforms, 
  * @return {number}
  */
 runmysteriet.segments.Segment_5.prototype.addSmallLavaHoles = function(stage, platforms, holes, x) {
-    var i = 0;
-    var holeWidth = 80;
-    var py = 0;
+    var holeWidth = 64;
 
-    for (i = 0; i < 2; i++) {
-        this.addLavaHole(stage, holes, x, holeWidth);
+    this.addLavaHole(stage, holes, x, holeWidth);
+    x += holeWidth;
 
-        x += holeWidth;
+    this.addTiles(stage, platforms, x, this.groundY - 25, 2, this.platformTexture);
+    x += 2 * this.tileW;
 
-        py = this.groundY - (i * 20);
+    this.addLavaHole(stage, holes, x, holeWidth);
+    x += holeWidth;
 
-        this.addTiles(
-            stage,
-            platforms,
-            x,
-            py,
-            4,
-            this.platformTexture
-        );
+    this.addTiles(stage, platforms, x, this.groundY - 50, 2, this.platformTexture);
+    x += 2 * this.tileW;
 
-        x += 4 * this.tileW;
-    }
+    this.addLavaHole(stage, holes, x, holeWidth);
+    x += holeWidth;
+
+    this.addTiles(stage, platforms, x, this.groundY - 30, 2, this.platformTexture);
+    x += 2 * this.tileW;
+
+    this.addLavaHole(stage, holes, x, holeWidth);
+    x += holeWidth;
+
+    this.addTiles(stage, platforms, x, this.groundY - 55, 2, this.platformTexture);
+    x += 2 * this.tileW;
 
     return x;
 };
@@ -264,7 +267,6 @@ runmysteriet.segments.Segment_5.prototype.addDiseases = function(diseaseSpawns, 
 
 /**
  * Returnerar sjukdomspositioner för Segment 5.
- * Positionerna ligger på markytor och inte över lavahålen.
  *
  * @param {number} segmentStart
  * @return {!Array<!Object>}
@@ -278,17 +280,17 @@ runmysteriet.segments.Segment_5.prototype.getDiseasePositions = function(segment
         },
         {
             type: "brown",
-            x: segmentStart + 300,
-            y: this.groundY - 50
+            x: segmentStart + 365,
+            y: this.groundY - 95
         },
         {
             type: "red",
-            x: segmentStart + 400,
-            y: this.groundY - 50
+            x: segmentStart + 625,
+            y: this.groundY - 105
         },
         {
             type: "gray",
-            x: segmentStart + 500,
+            x: segmentStart + 780,
             y: this.groundY - 50
         }
     ];
@@ -320,8 +322,8 @@ runmysteriet.segments.Segment_5.prototype.addRuneSpawns = function(runeSpawns, s
 runmysteriet.segments.Segment_5.prototype.getRunePositions = function(segmentStart) {
     return [
         {
-            x: segmentStart + 600,
-            y: this.groundY - 70
+            x: segmentStart + 625,
+            y: this.groundY - 120
         }
     ];
 };

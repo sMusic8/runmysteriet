@@ -158,6 +158,7 @@ runmysteriet.handler.PlayerHandler.prototype.update = function() {
     this.keepPlayersInsideLevel();
     this.updateAttacks();
     this.updateDeathEffects();
+    this.updateAttackEmitters();
 
     for (var i = 0; i < this.players.length; i++) {
 
@@ -1094,7 +1095,7 @@ runmysteriet.handler.PlayerHandler.prototype.killPlayer = function(player, index
         return;
     }
 
-    //Om spelaren redan är död ska vi inte skapa flera dödsbilder.
+    //Om spelaren redan e död ska inte flera dödsbilder skapas.
      
     if (player.isDead === true) {
         return;
@@ -1126,7 +1127,7 @@ runmysteriet.handler.PlayerHandler.prototype.killPlayer = function(player, index
 };
 
 /**
- * Skapar en attack framför spelaren.
+ * Skapar en attack-efekt framför spelaren.
  *
  * @param {!runmysteriet.entity.Player} player
  * @return {undefined}
@@ -1184,7 +1185,7 @@ runmysteriet.handler.PlayerHandler.prototype.createDeathEffect = function(player
     effect.velocityX = 2.3;
     effect.velocityY = -1.3;
 
-    //Liten acceleration uppåt, som att den lyfter mer.
+    //Liten acceleration uppåt som att den lyfter mer.
      
     effect.accelerationY = -0.015;
 
@@ -1203,7 +1204,30 @@ runmysteriet.handler.PlayerHandler.prototype.createDeathEffect = function(player
     this.deathEffects.push(effect);
     this.stage.addChild(effect);
 };
+/**
+ * Kontrollerar enemy blockers för alla levande spelare.
+ *
+ * @return {void}
+ */
+runmysteriet.handler.PlayerHandler.prototype.checkAllEnemyBlockers = function() {
 
+    var i = 0;
+    var player = null;
+
+    if (!this.players) {
+        return;
+    }
+
+    for (i = 0; i < this.players.length; i++) {
+        player = this.players[i];
+
+        if (!player || player.isDead === true) {
+            continue;
+        }
+
+        this.checkEnemyBlockers(player);
+    }
+};
 //------------------------------------------------------------------------------
 // SOUND
 //------------------------------------------------------------------------------
@@ -1509,8 +1533,41 @@ runmysteriet.handler.PlayerHandler.prototype.createAttackEmitter = function(x, y
     this.stage.addChild(emitter);
     this.attackEmitters.push(emitter);
 
-    emitter.emit(10);
+    emitter.emit(20);
+    emitter.life = 20;
 };
+/**
+ * Uppdaterar och tar bort gamla attack-emitters.
+ *
+ * @return {void}
+ */
+runmysteriet.handler.PlayerHandler.prototype.updateAttackEmitters = function() {
+
+    var i = 0;
+    var emitter = null;
+
+    if (!this.attackEmitters) {
+        this.attackEmitters = [];
+        return;
+    }
+
+    for (i = this.attackEmitters.length - 1; i >= 0; i--) {
+        emitter = this.attackEmitters[i];
+
+        if (!emitter) {
+            this.attackEmitters.splice(i, 1);
+            continue;
+        }
+
+        emitter.life--;
+
+        if (emitter.life <= 0) {
+            this.removeDisplayObject(emitter);
+            this.attackEmitters.splice(i, 1);
+        }
+    }
+}; 
+
 
 //------------------------------------------------------------------------------
 // ENEMY BLOCKERS

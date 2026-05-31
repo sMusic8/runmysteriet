@@ -22,7 +22,7 @@ runmysteriet.scene.Menu = function() {
     rune.scene.Scene.call(this);
 
     this.menuList = null;
-
+    this.m_highscoreBox = null;
     this.menuSound = null;
     this.backgroundMusic = null;
 
@@ -65,6 +65,7 @@ runmysteriet.scene.Menu.prototype.init = function() {
     this.createBackground();
     this.createControllerImage();
     this.createTitle();
+    this.createHighscoreBox();
     this.createHighscoreHud();
     this.createMenuList();
     this.createVolumeHud();
@@ -151,6 +152,28 @@ runmysteriet.scene.Menu.prototype.createTitle = function() {
 
     this.stage.addChild(this.m_subtitleText);
 };
+/**
+ * Skapar en mörk transparent ruta bakom highscore-listan.
+ *
+ * @method
+ * @memberof runmysteriet.scene.Menu
+ *
+ * @return {void}
+ */
+runmysteriet.scene.Menu.prototype.createHighscoreBox = function() {
+
+    this.m_highscoreBox = new rune.display.Graphic(
+        10,
+        145,
+        145,
+        70
+    );
+
+    this.m_highscoreBox.backgroundColor = "#000000";
+    this.m_highscoreBox.alpha = 0.5;
+
+    this.stage.addChild(this.m_highscoreBox);
+};
 
   /**
      * HUD som visar highscores.
@@ -164,7 +187,7 @@ runmysteriet.scene.Menu.prototype.createHighscoreHud = function() {
     );
 
     this.m_highscoreHud.x = 15;
-    this.m_highscoreHud.y = 150;
+    this.m_highscoreHud.y = 148;
 
     this.stage.addChild(this.m_highscoreHud);
 };
@@ -440,6 +463,7 @@ runmysteriet.scene.Menu.prototype.dispose = function() {
 
     this.removeDisplayObject(this.m_volumeHud);
     this.removeDisplayObject(this.m_highscoreHud);
+    this.removeDisplayObject(this.m_highscoreBox);
     this.removeDisplayObject(this.m_subtitleText);
     this.removeDisplayObject(this.m_titleText);
     this.removeDisplayObject(this.m_controller);
@@ -449,6 +473,7 @@ runmysteriet.scene.Menu.prototype.dispose = function() {
 
     this.m_volumeHud = null;
     this.m_highscoreHud = null;
+    this.m_highscoreBox = null;
     this.m_subtitleText = null;
     this.m_titleText = null;
     this.m_controller = null;

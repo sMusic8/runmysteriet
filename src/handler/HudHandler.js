@@ -183,19 +183,19 @@ runmysteriet.handler.HudHandler.prototype.update = function() {
     if (this.m_runeText && this.m_runeTextBg) {
         runeBoxWidth = this.m_runeText.width + 10;
 
-        if (runeBoxWidth < 190) {
-            runeBoxWidth = 190;
+        if (runeBoxWidth < 120) {
+            runeBoxWidth = 120;
         }
 
         this.m_runeTextBg.width = runeBoxWidth;
         this.m_runeTextBg.height = 15;
 
-        this.m_runeTextBg.x = cameraX + 5;
+        this.m_runeTextBg.x = cameraX + 145;
         this.m_runeTextBg.y =
             cameraY +
             screenHeight -
             this.m_runeTextBg.height -
-            2;
+            198;
 
         this.m_runeText.x = this.m_runeTextBg.x + 5;
         this.m_runeText.y = this.m_runeTextBg.y + 3;
