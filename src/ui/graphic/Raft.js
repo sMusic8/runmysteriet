@@ -132,12 +132,12 @@ runmysteriet.ui.graphic.Raft.prototype.showWarning = function() {
     this.m_warningIndicator = new rune.display.Graphic(
         this.x + 2,
         this.y - 18,
-        60,
+        80,
         16,
         "boat_indicator"
     );
 
-    this.m_warningText = new rune.text.BitmapField("DANGER");
+    this.m_warningText = new rune.text.BitmapField("DANGER,WAIT");
     this.m_warningText.autoSize = true;
     this.m_warningText.x = this.x + 7;
     this.m_warningText.y = this.y - 17;
