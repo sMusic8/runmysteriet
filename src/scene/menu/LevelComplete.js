@@ -48,6 +48,20 @@ runmysteriet.scene.LevelComplete = function(
     this.m_titleText = null;
     this.m_earnedText = null;
     this.m_totalText = null;
+    /** @type {?rune.display.Graphic} */
+    this.m_titleBox = null;
+
+    /** @type {?rune.display.Graphic} */
+    this.m_earnedBox = null;
+
+    /** @type {?rune.display.Graphic} */
+    this.m_totalBox = null;
+
+    /** @type {!Array<!rune.display.Graphic>} */
+    this.menuBoxes = [];
+
+    /** @type {?runmysteriet.logic.SceneDelay} */
+    this.m_sceneDelay = null;
 };
 
 runmysteriet.scene.LevelComplete.prototype =
@@ -82,6 +96,8 @@ runmysteriet.scene.LevelComplete.prototype.init = function() {
      * @type {?Object}
      */
     this.backgroundMusic = this.application.sounds.sound.get("sound_musicMenu");
+    
+    this.createSceneDelay();
 
     if (this.backgroundMusic) {
         this.backgroundMusic.loop = true;
@@ -94,6 +110,39 @@ runmysteriet.scene.LevelComplete.prototype.init = function() {
     this.updateMenu();
 };
 /**
+ * Skapar en mörk transparent UI-box.
+ *
+ * @param {number} x
+ * @param {number} y
+ * @param {number} width
+ * @param {number} height
+ * @param {number=} alpha
+ * @return {!rune.display.Graphic}
+ */
+runmysteriet.scene.LevelComplete.prototype.createTextBox = function(
+    x,
+    y,
+    width,
+    height,
+    alpha
+) {
+
+    /** @type {!rune.display.Graphic} */
+    var box = new rune.display.Graphic(
+        x,
+        y,
+        width,
+        height
+    );
+
+    box.backgroundColor = "#222222";
+    box.alpha = alpha || 0.7;
+
+    this.stage.addChild(box);
+
+    return box;
+};
+/**
  * Skapar textobjekt för LevelComplete-scenen.
  * Visar nivåstatus samt poänginformation.
  *
@@ -101,20 +150,21 @@ runmysteriet.scene.LevelComplete.prototype.init = function() {
  */
 runmysteriet.scene.LevelComplete.prototype.createTexts = function() {
 
-    /**
-     * Titeltext som varierar beroende på nivåstatus.
-     * @type {string}
-     */
+    /** @type {string} */
     var titleText = "";
 
     titleText = (this.levelNumber >= this.maxLevel)
         ? "YOU WON THE WHOLE GAME"
         : "LEVEL " + this.levelNumber + " COMPLETE";
 
-    /**
-     * Titeltext för scenen.
-     * @type {rune.text.BitmapField}
-     */
+    this.m_titleBox = this.createTextBox(
+        115,
+        35,
+        210,
+        18,
+        0.75
+    );
+
     this.m_titleText = new rune.text.BitmapField(titleText);
     this.m_titleText.autoSize = true;
     this.m_titleText.center = this.application.screen.center;
@@ -122,10 +172,14 @@ runmysteriet.scene.LevelComplete.prototype.createTexts = function() {
 
     this.stage.addChild(this.m_titleText);
 
-    /**
-     * Text som visar poäng som tjänats i nivån.
-     * @type {rune.text.BitmapField}
-     */
+    this.m_earnedBox = this.createTextBox(
+        145,
+        75,
+        150,
+        16,
+        0.65
+    );
+
     this.m_earnedText = new rune.text.BitmapField(
         "EARNED SCORE +" + this.earnedScore
     );
@@ -136,10 +190,14 @@ runmysteriet.scene.LevelComplete.prototype.createTexts = function() {
 
     this.stage.addChild(this.m_earnedText);
 
-    /**
-     * Text som visar totalpoäng.
-     * @type {rune.text.BitmapField}
-     */
+    this.m_totalBox = this.createTextBox(
+        150,
+        100,
+        140,
+        16,
+        0.65
+    );
+
     this.m_totalText = new rune.text.BitmapField(
         "TOTAL SCORE " + this.totalScore
     );
@@ -167,6 +225,11 @@ runmysteriet.scene.LevelComplete.prototype.update = function(step) {
     var input = null;
 
     rune.scene.Scene.prototype.update.call(this, step);
+
+    if (this.m_sceneDelay && this.m_sceneDelay.isActive()) {
+    this.m_sceneDelay.update();
+    return;
+}
 
     if (!this.m_gameInput) {
         return;
@@ -277,14 +340,24 @@ runmysteriet.scene.LevelComplete.prototype.createMenu = function() {
         : ["BACK TO MAIN MENU"];
 
     for (i = 0; i < labels.length; i++) {
-        item = new rune.text.BitmapField(labels[i]);
-        item.autoSize = true;
-        item.center = this.application.screen.center;
-        item.y += 45 + i * 22;
-        item.scale = 0.8;
+    item = new rune.text.BitmapField(labels[i]);
+    item.autoSize = true;
+    item.center = this.application.screen.center;
+    item.y += 45 + i * 22;
+    item.scale = 0.8;
 
-        this.stage.addChild(item);
-        this.menuItems.push(item);
+    this.menuBoxes.push(
+        this.createTextBox(
+            130,
+            item.y - 3,
+            150,
+            16,
+            0.55
+        )
+    );
+
+    this.stage.addChild(item);
+    this.menuItems.push(item);
     }
 };/**
  * Uppdaterar menyn i LevelComplete-scenen.
@@ -312,6 +385,9 @@ runmysteriet.scene.LevelComplete.prototype.updateMenu = function() {
      */
     var text = "";
 
+    /** @type {?rune.display.Graphic} */
+    var box = null;
+
     for (i = 0; i < this.menuItems.length; i++) {
         item = this.menuItems[i];
 
@@ -324,7 +400,80 @@ runmysteriet.scene.LevelComplete.prototype.updateMenu = function() {
         item.text = (i === this.selectedIndex)
             ? " > " + text
             : text;
+
+            box = this.menuBoxes[i];
+
+    if (box) {
+        box.alpha = (i === this.selectedIndex) ? 0.9 : 0.5;
+        box.backgroundColor = (i === this.selectedIndex)
+            ? "#444444"
+            : "#222222";
+}
     }
+};
+/**
+ * Skapar scenfördröjning för nästa level.
+ *
+ * @return {void}
+ */
+runmysteriet.scene.LevelComplete.prototype.createSceneDelay = function() {
+
+    /** @type {runmysteriet.scene.LevelComplete} */
+    var self = this;
+
+    if (
+        !runmysteriet.logic ||
+        typeof runmysteriet.logic.SceneDelay !== "function"
+    ) {
+        this.m_sceneDelay = null;
+        return;
+    }
+
+    this.m_sceneDelay = new runmysteriet.logic.SceneDelay(
+        90,
+        function() {
+            self.loadNextLevel();
+        }
+    );
+};
+
+/**
+ * Startar osynlig paus innan nästa level laddas.
+ *
+ * @return {void}
+ */
+runmysteriet.scene.LevelComplete.prototype.startNextLevelDelay = function() {
+
+    if (this.m_sceneDelay && this.m_sceneDelay.isActive()) {
+        return;
+    }
+
+    this.playMenuSound();
+
+    if (this.m_sceneDelay) {
+        this.m_sceneDelay.start(90);
+        return;
+    }
+
+    this.loadNextLevel();
+};
+
+/**
+ * Laddar nästa level.
+ *
+ * @return {void}
+ */
+runmysteriet.scene.LevelComplete.prototype.loadNextLevel = function() {
+
+    this.stopBackgroundMusic();
+
+    this.application.scenes.load([
+        new runmysteriet.scene.Game(
+            this.levelNumber + 1,
+            this.totalScore,
+            this.m_avatarData
+        )
+    ]);
 };
 
 /**
@@ -336,16 +485,7 @@ runmysteriet.scene.LevelComplete.prototype.updateMenu = function() {
 runmysteriet.scene.LevelComplete.prototype.chooseSelected = function() {
 
     if (this.levelNumber < this.maxLevel && this.selectedIndex === 0) {
-        this.stopBackgroundMusic();
-
-        this.application.scenes.load([
-            new runmysteriet.scene.Game(
-                this.levelNumber + 1,
-                this.totalScore,
-                this.m_avatarData
-            )
-        ]);
-
+        this.startNextLevelDelay();
         return;
     }
 
@@ -426,18 +566,36 @@ runmysteriet.scene.LevelComplete.prototype.dispose = function() {
      * @type {number}
      */
     var i = 0;
+    if (this.m_sceneDelay) {
+    this.m_sceneDelay.dispose();
+}
 
     this.stopBackgroundMusic();
 
     this.removeDisplayObject(this.m_titleText);
     this.removeDisplayObject(this.m_earnedText);
     this.removeDisplayObject(this.m_totalText);
+    this.removeDisplayObject(this.m_titleBox);
+    this.removeDisplayObject(this.m_earnedBox);
+    this.removeDisplayObject(this.m_totalBox);
 
     if (this.menuItems) {
         for (i = 0; i < this.menuItems.length; i++) {
             this.removeDisplayObject(this.menuItems[i]);
         }
     }
+    if (this.menuBoxes) {
+    for (i = 0; i < this.menuBoxes.length; i++) {
+        this.removeDisplayObject(this.menuBoxes[i]);
+    }
+}   
+
+    this.m_titleBox = null;
+    this.m_earnedBox = null;
+    this.m_totalBox = null;
+
+    this.menuBoxes = [];
+    this.m_sceneDelay = null;
 
     this.m_titleText = null;
     this.m_earnedText = null;
