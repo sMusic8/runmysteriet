@@ -503,10 +503,11 @@ runmysteriet.scene.Game.prototype.init = function () {
    * Handler för plattformar.
    * @type {runmysteriet.handler.PlatformHandler}
    */
-  this.m_platformHandler = new runmysteriet.handler.PlatformHandler(
-    this.stage,
-    this.application.screen.width
-  );
+this.m_platformHandler = new runmysteriet.handler.PlatformHandler(
+  this.stage,
+  this.application,
+  this.application.screen.width
+);
 
   this.m_platformHandler.init(this.m_levelNumber);
   this.m_platformHandler.startBoatTweens(this.tweens);
