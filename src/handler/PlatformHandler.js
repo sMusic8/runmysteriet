@@ -192,11 +192,7 @@ runmysteriet.handler.PlatformHandler.prototype.getExtra = function () {
 };
 
 runmysteriet.handler.PlatformHandler.prototype.clearExtra = function () {
-    this.getSound = this.application.sounds.sound.get("sound_catch");
-
-  if (this.getSound) {
-    this.getSound.play();
-  }
+  
     this.removeDisplayObject(this.m_extra);
     this.m_extra = null;
 };
