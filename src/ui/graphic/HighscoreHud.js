@@ -5,9 +5,6 @@
 /**
  * Visar highscore på skärmen.
  *
- * Om maxItems är 1 visas bara bästa highscore.
- * Om maxItems är 5 visas top 5-lista.
- *
  * @constructor
  * @extends {rune.text.BitmapField}
  * @param {!Object} application
@@ -19,10 +16,6 @@ runmysteriet.ui.graphic.HighscoreHud = function(application, maxItems) {
 
     this.application = application;
 
-    /*
-     * 1 = visa bara bästa highscore.
-     * 5 = visa top 5.
-     */
     this.m_maxItems = maxItems || 1;
 
     if (this.m_maxItems < 1) {
@@ -142,10 +135,6 @@ runmysteriet.ui.graphic.HighscoreHud.prototype.createTopListText = function() {
     return lines.join("\n");
 };
 
-//------------------------------------------------------------------------------
-// REMOVE DISPLAY OBJECT
-//------------------------------------------------------------------------------
-
 /**
  * Tar bort display object från stage.
  *
@@ -168,10 +157,6 @@ runmysteriet.ui.graphic.HighscoreHud.prototype.removeDisplayObject = function(ob
     }
 };
 
-//------------------------------------------------------------------------------
-// REMOVE
-//------------------------------------------------------------------------------
-
 /**
  * Tar bort HighscoreHud från stage.
  *
@@ -181,10 +166,6 @@ runmysteriet.ui.graphic.HighscoreHud.prototype.remove = function() {
 
     this.removeDisplayObject(this);
 };
-
-//------------------------------------------------------------------------------
-// DISPOSE
-//------------------------------------------------------------------------------
 
 /**
  * Rensar HighscoreHud.

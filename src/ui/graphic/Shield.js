@@ -5,11 +5,6 @@
 /**
  * Shield / rune collectible.
  *
- * Denna klass äger det visuella:
- * - shield-bilden
- * - rune-grafiken ovanpå shielden
- * - pulserande effekt
- *
  * @constructor
  * @extends {rune.display.Graphic}
  * @param {number=} x
@@ -104,19 +99,11 @@ runmysteriet.ui.Shield = function(x, y) {
     this.m_pulseValue = Math.random() * 10;
 };
 
-//------------------------------------------------------------------------------
-// INHERITANCE
-//------------------------------------------------------------------------------
-
 runmysteriet.ui.Shield.prototype =
     Object.create(rune.display.Graphic.prototype);
 
 runmysteriet.ui.Shield.prototype.constructor =
     runmysteriet.ui.Shield;
-
-//------------------------------------------------------------------------------
-// RUNE
-//------------------------------------------------------------------------------
 
 /**
  * Sätter vilken bokstav shielden innehåller.
@@ -139,16 +126,8 @@ runmysteriet.ui.Shield.prototype.getRune = function() {
     return this.rune || "";
 };
 
-//------------------------------------------------------------------------------
-// RUNE GRAPHIC
-//------------------------------------------------------------------------------
-
 /**
  * Skapar visuell rune-grafik ovanpå shielden.
- *
- * Viktigt:
- * ShieldHandler ska bara anropa denna metod.
- * ShieldHandler ska inte själv skapa rune-sprites.
  *
  * @param {!Object} stage
  * @return {void}
@@ -184,10 +163,7 @@ runmysteriet.ui.Shield.prototype.createRuneGraphic = function(stage) {
 
     this.updateRuneGraphicPosition();
 
-    /*
-     * Runan läggs på stage efter shielden.
-     * Då hamnar den visuellt ovanpå shielden.
-     */
+    // Runan läggs på stage efter shielden.
     stage.addChild(this.m_runeGraphic);
 };
 
@@ -203,11 +179,6 @@ runmysteriet.ui.Shield.prototype.updateRuneGraphicPosition = function() {
     var runeWidth = 0;
     var runeHeight = 0;
 
-    /*
-     * Justera dessa om runan ska flyttas lite visuellt.
-     * offsetX: + höger / - vänster
-     * offsetY: + ned / - upp
-     */
     var offsetX = -2;
     var offsetY = -3;
 
@@ -237,10 +208,6 @@ runmysteriet.ui.Shield.prototype.getRuneGraphic = function() {
 
     return this.m_runeGraphic;
 };
-
-//------------------------------------------------------------------------------
-// UPDATE
-//------------------------------------------------------------------------------
 
 /**
  * Uppdaterar shield-effekt och rune-position.
@@ -279,15 +246,9 @@ runmysteriet.ui.Shield.prototype.update = function(step) {
     this.updateRuneGraphicPosition();
 };
 
-//------------------------------------------------------------------------------
-// COLLECT
-//------------------------------------------------------------------------------
-
 /**
  * Markerar shielden som insamlad.
  *
- * Kör inte dispose här, eftersom ShieldHandler sparar shielden i m_collected
- * för att kunna läsa ut bokstaven senare.
  *
  * @return {void}
  */
@@ -299,10 +260,6 @@ runmysteriet.ui.Shield.prototype.collect = function() {
 
     this.remove();
 };
-
-//------------------------------------------------------------------------------
-// REMOVE DISPLAY OBJECT
-//------------------------------------------------------------------------------
 
 /**
  * Tar bort display object från stage.
@@ -326,10 +283,6 @@ runmysteriet.ui.Shield.prototype.removeDisplayObject = function(object) {
     }
 };
 
-//------------------------------------------------------------------------------
-// REMOVE
-//------------------------------------------------------------------------------
-
 /**
  * Tar bort shield och dess visuella rune från stage.
  *
@@ -340,10 +293,6 @@ runmysteriet.ui.Shield.prototype.remove = function() {
     this.removeDisplayObject(this.m_runeGraphic);
     this.removeDisplayObject(this);
 };
-
-//------------------------------------------------------------------------------
-// DISPOSE
-//------------------------------------------------------------------------------
 
 /**
  * Rensar Shield helt.

@@ -313,10 +313,6 @@ runmysteriet.ui.graphic.MenuList.prototype.setCameraPosition = function(
     }
 };
 
-//------------------------------------------------------------------------------
-// REMOVE DISPLAY OBJECT
-//------------------------------------------------------------------------------
-
 /**
  * Tar bort display object från stage.
  *
@@ -340,10 +336,6 @@ runmysteriet.ui.graphic.MenuList.prototype.removeDisplayObject = function(
         object.stage.removeChild(object);
     }
 };
-
-//------------------------------------------------------------------------------
-// CLEAR
-//------------------------------------------------------------------------------
 
 /**
  * Tar bort alla menyval och bakgrundsrutor från scenen.
@@ -378,10 +370,6 @@ runmysteriet.ui.graphic.MenuList.prototype.clear = function() {
     this.items = [];
     this.boxes = [];
 };
-
-//------------------------------------------------------------------------------
-// DISPOSE
-//------------------------------------------------------------------------------
 
 /**
  * Rensar menylistan och släpper referenser.

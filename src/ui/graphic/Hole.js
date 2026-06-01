@@ -20,10 +20,8 @@ runmysteriet.ui.graphic.Hole = function(x, y, width, height, fallLimitY) {
 
     this.fallLimitY = fallLimitY || 360;
 
-    /*
-     * Lava som fyller hela hålet.
-     * En bild per hål, inte massa tiles.
-     */
+    //Lava som fyller hela hålet.
+     
     var lavaBleedX = 2;
     var lavaBleedY = 2;
     var lavaOffsetY = -25;
@@ -38,16 +36,11 @@ runmysteriet.ui.graphic.Hole = function(x, y, width, height, fallLimitY) {
 
     this.lava.baseY = y - lavaBleedY + lavaOffsetY;
 
-    /*
-     * Enkel lava-effekt.
-     */
+    //Enkel lava-effekt.
+     
     this.lava.time = Math.random() * 100;
     this.lava.alpha = 0.9;
 };
-
-//------------------------------------------------------------------------------
-// INHERITANCE
-//------------------------------------------------------------------------------
 
 runmysteriet.ui.graphic.Hole.prototype =
     Object.create(rune.display.DisplayObject.prototype);
@@ -86,7 +79,7 @@ runmysteriet.ui.graphic.Hole.prototype.update = function(step) {
 
     this.lava.time += 0.08;
 
-    //Väldigt liten rörelse så lavan känns levande.
+    //Liten rörelse så lavan känns levande.
      
     this.lava.y = this.lava.baseY + Math.sin(this.lava.time) * 2;
 
@@ -139,10 +132,6 @@ runmysteriet.ui.graphic.Hole.prototype.hasPlayerFallen = function(player) {
     );
 };
 
-//------------------------------------------------------------------------------
-// REMOVE DISPLAY OBJECT
-//------------------------------------------------------------------------------
-
 /**
  * Tar bort display object från stage.
  *
@@ -165,10 +154,6 @@ runmysteriet.ui.graphic.Hole.prototype.removeDisplayObject = function(object) {
     }
 };
 
-//------------------------------------------------------------------------------
-// REMOVE
-//------------------------------------------------------------------------------
-
 /**
  * Tar bort hålets lava från stage.
  *
@@ -178,17 +163,10 @@ runmysteriet.ui.graphic.Hole.prototype.remove = function() {
 
     this.removeDisplayObject(this.lava);
 
-    /*
-     * tas det bort säkert från stage också
-     */
     this.removeDisplayObject(this);
 
     this.lava = null;
 };
-
-//------------------------------------------------------------------------------
-// DISPOSE
-//------------------------------------------------------------------------------
 
 /**
  * Rensar Hole helt.
