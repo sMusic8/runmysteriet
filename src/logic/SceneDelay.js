@@ -4,7 +4,6 @@
 
 /**
  * Hanterar en fördröjning innan en callback körs.
- * Kan användas för scenövergångar, countdowns och korta väntelägen.
  *
  * @constructor
  * @param {number=} delayFrames Antal frames att vänta.
@@ -29,7 +28,7 @@ runmysteriet.logic.SceneDelay = function(delayFrames, onComplete) {
 /**
  * Startar fördröjningen.
  *
- * @param {number=} delayFrames Valfritt nytt antal frames.
+ * @param {number=} delayFrames valfritt nytt antal frames.
  * @return {void}
  */
 runmysteriet.logic.SceneDelay.prototype.start = function(delayFrames) {

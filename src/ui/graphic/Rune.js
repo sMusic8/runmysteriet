@@ -3,7 +3,7 @@
 //------------------------------------------------------------------------------
 
 /**
- * Skapar och hanterar rune-grafik.
+ * Skapar och hanterar run-grafik.
  *
  * @constructor
  */
@@ -34,10 +34,6 @@ runmysteriet.ui.Rune = function() {
         "y"
     ];
 };
-
-//------------------------------------------------------------------------------
-// CREATE
-//------------------------------------------------------------------------------
 
 /**
  * Skapar alla runor och blandar dem.
@@ -71,10 +67,6 @@ runmysteriet.ui.Rune.prototype.makeAllRunes = function() {
     return this.allRunes;
 };
 
-//------------------------------------------------------------------------------
-// SHUFFLE
-//------------------------------------------------------------------------------
-
 /**
  * Blandar rune-listan.
  *
@@ -95,10 +87,6 @@ runmysteriet.ui.Rune.prototype.shuffleRunes = function() {
     }
 };
 
-//------------------------------------------------------------------------------
-// GET
-//------------------------------------------------------------------------------
-
 /**
  * Hämtar en rune från listan.
  *
@@ -110,17 +98,12 @@ runmysteriet.ui.Rune.prototype.getOneRune = function() {
         return null;
     }
 
-    /*
-     * Ta första runan efter shuffle.
-     */
+    //Ta första runan efter shuffle.
+     
     this.oneRune = this.allRunes.shift();
 
     return this.oneRune;
 };
-
-//------------------------------------------------------------------------------
-// REMOVE DISPLAY OBJECT
-//------------------------------------------------------------------------------
 
 /**
  * Tar bort display object från stage.
@@ -143,10 +126,6 @@ runmysteriet.ui.Rune.prototype.removeDisplayObject = function(object) {
         object.stage.removeChild(object);
     }
 };
-
-//------------------------------------------------------------------------------
-// CLEAR
-//------------------------------------------------------------------------------
 
 /**
  * Tar bort runor som klassen fortfarande äger.
@@ -172,10 +151,6 @@ runmysteriet.ui.Rune.prototype.clear = function() {
     this.oneRune = null;
     this.currentIndex = 0;
 };
-
-//------------------------------------------------------------------------------
-// DISPOSE
-//------------------------------------------------------------------------------
 
 /**
  * Rensar Rune helt.

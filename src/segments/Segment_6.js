@@ -268,7 +268,7 @@ runmysteriet.segments.Segment_6.prototype.addDiseases = function(diseaseSpawns, 
 
 /**
  * Returnerar sjukdomspositioner för Segment 6.
- * Positionerna ligger på säkra markytor, inte över lavahålen.
+ * Positionerna ligger på säkra markytor.
  *
  * @param {number} segmentStart
  * @return {!Array<!Object>}

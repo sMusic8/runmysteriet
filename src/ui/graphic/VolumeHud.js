@@ -82,10 +82,6 @@ runmysteriet.ui.graphic.VolumeHud.prototype.updateText = function() {
     this.text = "VOLUME: " + volume + "%";
 };
 
-//------------------------------------------------------------------------------
-// REMOVE DISPLAY OBJECT
-//------------------------------------------------------------------------------
-
 /**
  * Tar bort display object från stage.
  *
@@ -108,10 +104,6 @@ runmysteriet.ui.graphic.VolumeHud.prototype.removeDisplayObject = function(objec
     }
 };
 
-//------------------------------------------------------------------------------
-// REMOVE
-//------------------------------------------------------------------------------
-
 /**
  * Tar bort VolumeHud från stage.
  *
@@ -121,10 +113,6 @@ runmysteriet.ui.graphic.VolumeHud.prototype.remove = function() {
 
     this.removeDisplayObject(this);
 };
-
-//------------------------------------------------------------------------------
-// DISPOSE
-//------------------------------------------------------------------------------
 
 /**
  * Rensar VolumeHud.

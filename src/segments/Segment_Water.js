@@ -4,7 +4,6 @@
 
 /**
  * Vattensegment.
- * Innehåller mark, vatten, flotte, båt och sjukdomar.
  *
  * @constructor
  */
@@ -255,7 +254,6 @@ runmysteriet.segments.Segment_Water.prototype.getDiseaseCount = function(levelNu
 
 /**
  * Lägger till sjukdomar på landytorna.
- * Sjukdomar placeras inte i vattenområdet.
  *
  * @param {!Array<!Object>} diseaseSpawns
  * @param {number} leftLandX

@@ -14,10 +14,6 @@ runmysteriet.config.LevelConfig = function(levelNumber) {
     this.levelNumber = levelNumber || 1;
 };
 
-//------------------------------------------------------------------------------
-// LEVELS
-//------------------------------------------------------------------------------
-
 /**
  * Returnerar max antal level
  *
@@ -27,10 +23,6 @@ runmysteriet.config.LevelConfig.prototype.getMaxLevel = function() {
 
     return 20;
 };
-
-//------------------------------------------------------------------------------
-// ENEMIES
-//------------------------------------------------------------------------------
 
 /**
  * Returnerar max antal kristna fiender för en bana.
@@ -48,13 +40,8 @@ runmysteriet.config.LevelConfig.prototype.getKristenCount = function() {
     return count;
 };
 
-//------------------------------------------------------------------------------
-// CAMERA
-//------------------------------------------------------------------------------
-
 /**
  * Returnerar autoscroll-speed baserat på level.
- * Level 1 startar med nuvarande speed.
  * Varje level efter det ökar speed med 2%.
  *
  * @param {number} baseSpeed

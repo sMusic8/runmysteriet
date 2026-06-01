@@ -74,19 +74,11 @@ runmysteriet.entity.Disease = function(x, y, type) {
     this.animation.gotoAndPlay("idle");
 };
 
-//------------------------------------------------------------------------------
-// INHERITANCE
-//------------------------------------------------------------------------------
-
 runmysteriet.entity.Disease.prototype =
     Object.create(rune.display.Sprite.prototype);
 
 runmysteriet.entity.Disease.prototype.constructor =
     runmysteriet.entity.Disease;
-
-//------------------------------------------------------------------------------
-// STATIC DATA
-//------------------------------------------------------------------------------
 
 /**
  * Returnerar data för en viss disease-typ.
@@ -116,10 +108,6 @@ runmysteriet.entity.Disease.getData = function(type) {
     };
 };
 
-//------------------------------------------------------------------------------
-// UPDATE
-//------------------------------------------------------------------------------
-
 /**
  * Uppdaterar disease varje frame.
  *
@@ -136,16 +124,9 @@ runmysteriet.entity.Disease.prototype.update = function(step) {
 
     this.m_floatTime += 0.08;
 
-    /*
-     * Svävande rörelse:
-     * rör sig upp/ner kring baseY.
-     */
+    //Svävande rörelse, rör sig upp/ner kring baseY.
     this.y = this.baseY + Math.sin(this.m_floatTime) * 2;
 };
-
-//------------------------------------------------------------------------------
-// REMOVE DISPLAY OBJECT
-//------------------------------------------------------------------------------
 
 /**
  * Tar bort display object från stage.
@@ -169,10 +150,6 @@ runmysteriet.entity.Disease.prototype.removeDisplayObject = function(object) {
     }
 };
 
-//------------------------------------------------------------------------------
-// REMOVE
-//------------------------------------------------------------------------------
-
 /**
  * Tar bort disease från spelet.
  *
@@ -184,10 +161,6 @@ runmysteriet.entity.Disease.prototype.remove = function() {
 
     this.removeDisplayObject(this);
 };
-
-//------------------------------------------------------------------------------
-// DISPOSE
-//------------------------------------------------------------------------------
 
 /**
  * Rensar Disease.

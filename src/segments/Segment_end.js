@@ -4,7 +4,6 @@
 
 /**
  * Slutsegment för en nivå.
- * Segmentet skapar målområdet, bakgrund, sjukdomar och målzon.
  *
  * @constructor
  */
@@ -310,7 +309,6 @@ runmysteriet.segments.Segment_End.prototype.getDiseaseCount = function(levelNumb
 
 /**
  * Lägger till sjukdomar i början/mitten av slutsegmentet.
- * De placeras inte nära målzonen.
  *
  * @param {!Array<!Object>} diseaseSpawns
  * @param {number} segmentStart

@@ -24,28 +24,18 @@ runmysteriet.ui.Platform = function(x, y, width, height, texture) {
         texture || "bana-gras1"
     );
 
-    /*
-     * Kollisionsyta.
-     * Gör hitboxen lite smalare än grafiken så spelaren inte fastnar i kanter.
-     */
+    //Kollisionsyta, gör hitboxen lite smalare än grafiken så spelaren inte fastnar i kanter.
+     
     this.collisionPaddingLeft = 4;
     this.collisionPaddingRight = 4;
     this.collisionPaddingTop = 0;
 };
-
-//------------------------------------------------------------------------------
-// INHERITANCE
-//------------------------------------------------------------------------------
 
 runmysteriet.ui.Platform.prototype =
     Object.create(rune.display.Graphic.prototype);
 
 runmysteriet.ui.Platform.prototype.constructor =
     runmysteriet.ui.Platform;
-
-//------------------------------------------------------------------------------
-// INIT
-//------------------------------------------------------------------------------
 
 /**
  * Initializes platform.
@@ -56,10 +46,6 @@ runmysteriet.ui.Platform.prototype.init = function() {
 
     rune.display.Graphic.prototype.init.call(this);
 };
-
-//------------------------------------------------------------------------------
-// COLLISION
-//------------------------------------------------------------------------------
 
 /**
  * Hämtar vänster kollisionskant.
@@ -91,10 +77,6 @@ runmysteriet.ui.Platform.prototype.getCollisionTop = function() {
     return this.y + this.collisionPaddingTop;
 };
 
-//------------------------------------------------------------------------------
-// REMOVE DISPLAY OBJECT
-//------------------------------------------------------------------------------
-
 /**
  * Tar bort display object från stage.
  *
@@ -117,10 +99,6 @@ runmysteriet.ui.Platform.prototype.removeDisplayObject = function(object) {
     }
 };
 
-//------------------------------------------------------------------------------
-// REMOVE
-//------------------------------------------------------------------------------
-
 /**
  * Tar bort plattformen från stage.
  *
@@ -130,10 +108,6 @@ runmysteriet.ui.Platform.prototype.remove = function() {
 
     this.removeDisplayObject(this);
 };
-
-//------------------------------------------------------------------------------
-// DISPOSE
-//------------------------------------------------------------------------------
 
 /**
  * Rensar Platform.

@@ -29,10 +29,6 @@ runmysteriet.logic.GuessAlphabetSelector = function() {
     this.m_index = 0;
 };
 
-//------------------------------------------------------------------------------
-// PUBLIC METHODS
-//------------------------------------------------------------------------------
-
 /**
  * Går till föregående bokstav.
  *

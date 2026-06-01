@@ -36,9 +36,8 @@ runmysteriet.ui.graphic.Raft = function(x, y) {
     this.previousX = this.x;
     this.deltaX = 0;
 
-    /*
-     * Flotten ska inte röra sig direkt
-     */
+    //Flotten ska inte röra sig direkt
+     
     this.hasStarted = false;
     this.hasArrived = false;
 
@@ -56,19 +55,11 @@ runmysteriet.ui.graphic.Raft = function(x, y) {
 
 };
 
-//------------------------------------------------------------------------------
-// INHERITANCE
-//------------------------------------------------------------------------------
-
 runmysteriet.ui.graphic.Raft.prototype =
     Object.create(rune.display.Graphic.prototype);
 
 runmysteriet.ui.graphic.Raft.prototype.constructor =
     runmysteriet.ui.graphic.Raft;
-
-//------------------------------------------------------------------------------
-// START
-//------------------------------------------------------------------------------
 
 /**
  * Startar flotten.
@@ -77,19 +68,12 @@ runmysteriet.ui.graphic.Raft.prototype.constructor =
  */
 runmysteriet.ui.graphic.Raft.prototype.start = function() {
 
-    /*
-     * VIKTIGT - ta inte bort denna check
-     * annars kan rörelsen startas om varje frame och då hackar flotten
-     */
     if (this.hasStarted === true || this.hasArrived === true) {
         return;
     }
 
     this.hasStarted = true;
 };
-//------------------------------------------------------------------------------
-// WARNING
-//------------------------------------------------------------------------------
 
 /**
  * Sätter om flotten ska visa varning.
@@ -147,6 +131,7 @@ runmysteriet.ui.graphic.Raft.prototype.showWarning = function() {
 
     this.m_warningTimer = 0;
 };
+
 /**
  * Tar bort varningen från flotten.
  *
@@ -202,10 +187,6 @@ runmysteriet.ui.graphic.Raft.prototype.updateWarning = function() {
     this.m_warningText.alpha = alpha;
 };
 
-//------------------------------------------------------------------------------
-// COLLISION
-//------------------------------------------------------------------------------
-
 /**
  * Returnerar flottens övre kollisionsyta.
  *
@@ -234,10 +215,6 @@ runmysteriet.ui.graphic.Raft.prototype.getCollisionLeft = function() {
 runmysteriet.ui.graphic.Raft.prototype.getCollisionRight = function() {
     return this.x + this.width - 10;
 };
-
-//------------------------------------------------------------------------------
-// UPDATE
-//------------------------------------------------------------------------------
 
 /**
  * Uppdaterar flottens rörelse.
@@ -276,10 +253,6 @@ runmysteriet.ui.graphic.Raft.prototype.update = function(step) {
     this.deltaX = this.x - this.previousX;
 };
 
-//------------------------------------------------------------------------------
-// REMOVE DISPLAY OBJECT
-//------------------------------------------------------------------------------
-
 /**
  * Tar bort display object från stage.
  *
@@ -302,10 +275,6 @@ runmysteriet.ui.graphic.Raft.prototype.removeDisplayObject = function(object) {
     }
 };
 
-//------------------------------------------------------------------------------
-// REMOVE
-//------------------------------------------------------------------------------
-
 /**
  * Tar bort flotten från stage
  *
@@ -315,10 +284,6 @@ runmysteriet.ui.graphic.Raft.prototype.remove = function() {
     this.hideWarning();
     this.removeDisplayObject(this);
 };
-
-//------------------------------------------------------------------------------
-// DISPOSE
-//------------------------------------------------------------------------------
 
 /**
  * Rensar Raft

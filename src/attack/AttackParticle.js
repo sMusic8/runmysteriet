@@ -21,7 +21,7 @@ runmysteriet.particle.AttackParticle = function() {
     );
 
     /**
-     * Genomskinlighet (1 = helt synlig, 0 = helt osynlig)
+     * Genomskinlighet '
      * @type {number}
      */
     this.alpha = 1;

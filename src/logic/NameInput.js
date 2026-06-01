@@ -24,9 +24,6 @@ runmysteriet.logic.NameInput = function(maxLength) {
     }
 };
 
-//------------------------------------------------------------------------------
-// LETTER SELECTOR
-//------------------------------------------------------------------------------
 /**
  * Går till nästa bokstav i alfabetväljaren.
  *
@@ -67,10 +64,6 @@ runmysteriet.logic.NameInput.prototype.getSelectedLetter = function() {
 
     return this.m_selector.getLetter();
 };
-
-//------------------------------------------------------------------------------
-// NAME EDIT
-//------------------------------------------------------------------------------
 
 /**
  * Lägger till vald bokstav i namnet.
@@ -116,10 +109,6 @@ runmysteriet.logic.NameInput.prototype.reset = function() {
         this.m_selector.reset();
     }
 };
-
-//------------------------------------------------------------------------------
-// GETTERS
-//------------------------------------------------------------------------------
 
 /**
  * Namnet exakt som spelaren har skrivit det, utan PLAYER-standard.
@@ -174,10 +163,6 @@ runmysteriet.logic.NameInput.prototype.getName = function() {
 
     return this.m_name.toUpperCase();
 };
-
-//------------------------------------------------------------------------------
-// DISPOSE
-//------------------------------------------------------------------------------
 
 /**
  * Rensar NameInput.

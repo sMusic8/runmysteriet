@@ -4,7 +4,6 @@
 
 /**
  * Segment 1.
- * Skapar ett lavasegment med små plattformar, fiender och sjukdomar.
  *
  * @constructor
  */
@@ -95,10 +94,6 @@ runmysteriet.segments.Segment_1.prototype.ground = function(stage, startX, level
         endX: segmentEnd
     };
 };
-
-//------------------------------------------------------------------------------
-// GROUND
-//------------------------------------------------------------------------------
 
 /**
  * Lägger till startmark.
@@ -197,10 +192,6 @@ runmysteriet.segments.Segment_1.prototype.addTiles = function(stage, platforms, 
     }
 };
 
-//------------------------------------------------------------------------------
-// LAVA
-//------------------------------------------------------------------------------
-
 /**
  * Lägger till lavahålet.
  *
@@ -242,10 +233,6 @@ runmysteriet.segments.Segment_1.prototype.addPlatformsOverLava = function(stage,
     this.addTiles(stage, platforms, x + 280, this.groundY - 90, 2, this.platformTexture);
     this.addTiles(stage, platforms, x + 360, this.groundY - 60, 2, this.platformTexture);
 };
-
-//------------------------------------------------------------------------------
-// DISEASES
-//------------------------------------------------------------------------------
 
 /**
  * Returnerar antal sjukdomar baserat på level.
@@ -317,10 +304,6 @@ runmysteriet.segments.Segment_1.prototype.getDiseasePositions = function(segment
     ];
 };
 
-//------------------------------------------------------------------------------
-// RUNES
-//------------------------------------------------------------------------------
-
 /**
  * Lägger till rune-positioner i en lista av spawn-punkter.
  *
@@ -353,10 +336,6 @@ runmysteriet.segments.Segment_1.prototype.getRunePositions = function(segmentSta
         }
     ];
 };
-
-//------------------------------------------------------------------------------
-// ARMOR
-//------------------------------------------------------------------------------
 
 /**
  * Lägger till armor-positioner i en lista av spawn-punkter.

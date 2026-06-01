@@ -28,7 +28,7 @@ runmysteriet.ui.graphic.Water.prototype.constructor =
     runmysteriet.ui.graphic.Water;
 
 /**
- * Checks if player is touching water.
+ *Kollar om spelaren rör vattnet.
  *
  * @param {?Object} player
  * @return {boolean}
@@ -46,10 +46,6 @@ runmysteriet.ui.graphic.Water.prototype.isTouchingPlayer = function(player) {
         player.y < this.y + this.height
     );
 };
-
-//------------------------------------------------------------------------------
-// REMOVE DISPLAY OBJECT
-//------------------------------------------------------------------------------
 
 /**
  * Tar bort display object från stage.
@@ -73,10 +69,6 @@ runmysteriet.ui.graphic.Water.prototype.removeDisplayObject = function(object) {
     }
 };
 
-//------------------------------------------------------------------------------
-// REMOVE
-//------------------------------------------------------------------------------
-
 /**
  * Tar bort Water från stage.
  *
@@ -86,10 +78,6 @@ runmysteriet.ui.graphic.Water.prototype.remove = function() {
 
     this.removeDisplayObject(this);
 };
-
-//------------------------------------------------------------------------------
-// DISPOSE
-//------------------------------------------------------------------------------
 
 /**
  * Rensar Water.

@@ -3,10 +3,7 @@
 //------------------------------------------------------------------------------
 
 /**
- * Hanterar highscore via Rune SDK.
- *
- * Rune SDK sparar highscores i localStorage.
- * Spelet ska inte skriva tillbaka till JSON-filen i asset-mappen.
+ * Hanterar highscore via Rune SDK..
  *
  * @constructor
  * @param {!Object} application
@@ -17,12 +14,8 @@ runmysteriet.logic.HighscoreManager = function(application) {
     this.application = application;
 };
 
-//------------------------------------------------------------------------------
-// SAVE
-//------------------------------------------------------------------------------
-
 /**
- * Sparar score till Rune highscore.
+ * Sparar score till highscore.
  *
  * @param {!runmysteriet.logic.HighscoreEntry} entry
  * @return {number}
@@ -57,10 +50,6 @@ runmysteriet.logic.HighscoreManager.prototype.save = function(entry) {
         0
     );
 };
-
-//------------------------------------------------------------------------------
-// GET
-//------------------------------------------------------------------------------
 
 /**
  * Hämtar alla highscores, max 5 st.
@@ -126,10 +115,6 @@ runmysteriet.logic.HighscoreManager.prototype.getBest = function() {
     return item;
 };
 
-//------------------------------------------------------------------------------
-// TOP 5 CHECK
-//------------------------------------------------------------------------------
-
 /**
  * Kollar om score hamnar på top 5-listan.
  *
@@ -149,9 +134,8 @@ runmysteriet.logic.HighscoreManager.prototype.isNewRecord = function(score) {
 
     highscores = this.getAll();
 
-    /*
-     * Om färre än 5 finns sparade ska spelaren få skriva namn.
-     */
+    //Om färre än 5 finns sparade ska spelaren få skriva namn.
+     
     if (highscores.length < 5) {
         return true;
     }
@@ -190,10 +174,8 @@ runmysteriet.logic.HighscoreManager.prototype.isBestScore = function(score) {
 
     best = this.getBest();
 
-    /*
-     * Om det inte finns något sparat score än,
-     * är detta första plats.
-     */
+    //Om det inte finns något sparat score än är detta första plats.
+     
     if (!best) {
         return true;
     }
@@ -235,9 +217,8 @@ runmysteriet.logic.HighscoreManager.prototype.getPlacement = function(score) {
         }
     }
 
-    /*
-     * när listan har mindre än 5 resultat får score en plats sist
-     */
+    //När listan har mindre än 5 resultat får score en plats sist
+     
     if (highscores.length < 5) {
         return highscores.length + 1;
     }
@@ -262,11 +243,6 @@ runmysteriet.logic.HighscoreManager.prototype.getLowestTopScore = function() {
         return 0;
     }
 
-    /*
-     * Rune-listan antas vara sorterad:
-     * 0 = plats 1
-     * 4 = plats 5
-     */
     item = highscores[4];
     if (!item) {
         return 0;
@@ -274,10 +250,6 @@ runmysteriet.logic.HighscoreManager.prototype.getLowestTopScore = function() {
 
     return this.normalizeScore(item.score);
 };
-
-//------------------------------------------------------------------------------
-// DUPLICATE CHECK
-//------------------------------------------------------------------------------
 
 /**
  * Hindrar att samma namn + samma score läggs in flera gånger.
@@ -318,12 +290,8 @@ runmysteriet.logic.HighscoreManager.prototype.hasSameEntry = function(name, scor
     return false;
 };
 
-//------------------------------------------------------------------------------
-// HELPERS
-//------------------------------------------------------------------------------
-
 /**
- * Kontrollerar att Rune highscore-system finns.
+ * Kontrollerar att highscore-system finns.
  *
  * @return {boolean}
  */
@@ -368,10 +336,6 @@ runmysteriet.logic.HighscoreManager.prototype.normalizeScore = function(score) {
 
     return score;
 };
-
-//------------------------------------------------------------------------------
-// DISPOSE
-//------------------------------------------------------------------------------
 
 /**
  * Rensar HighscoreManager.

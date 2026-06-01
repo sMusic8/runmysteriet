@@ -49,7 +49,6 @@ runmysteriet.attack.Attack = function(player) {
 
     /**
      * Hur länge attacken syns
-     * lägre är snabbare slag högre siffra långsammare o syns längre 
      *
      * @type {number}
      */
@@ -63,19 +62,11 @@ runmysteriet.attack.Attack = function(player) {
     this.hasHit = false;
 };
 
-//------------------------------------------------------------------------------
-// INHERITANCE
-//------------------------------------------------------------------------------
-
 runmysteriet.attack.Attack.prototype =
     Object.create(rune.display.Graphic.prototype);
 
 runmysteriet.attack.Attack.prototype.constructor =
     runmysteriet.attack.Attack;
-
-//------------------------------------------------------------------------------
-// UPDATE
-//------------------------------------------------------------------------------
 
 /**
  * Uppdaterar attacken.
@@ -93,10 +84,6 @@ runmysteriet.attack.Attack.prototype.update = function(step) {
         this.remove();
     }
 };
-
-//------------------------------------------------------------------------------
-// REMOVE DISPLAY OBJECT
-//------------------------------------------------------------------------------
 
 /**
  * Tar bort display object från stage.
@@ -120,10 +107,6 @@ runmysteriet.attack.Attack.prototype.removeDisplayObject = function(object) {
     }
 };
 
-//------------------------------------------------------------------------------
-// REMOVE
-//------------------------------------------------------------------------------
-
 /**
  * Tar bort attacken från scenen.
  *
@@ -133,10 +116,6 @@ runmysteriet.attack.Attack.prototype.remove = function() {
 
     this.removeDisplayObject(this);
 };
-
-//------------------------------------------------------------------------------
-// DISPOSE
-//------------------------------------------------------------------------------
 
 /**
  * Rensar Attack.

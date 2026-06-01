@@ -42,10 +42,6 @@ runmysteriet.logic.GuessLetterBox = function(x, y, index) {
     this.downArrowText = null;
 };
 
-//------------------------------------------------------------------------------
-// CREATE
-//------------------------------------------------------------------------------
-
 /**
  * Skapar boxen och texterna.
  *
@@ -64,10 +60,6 @@ runmysteriet.logic.GuessLetterBox.prototype.create = function(stage) {
     this.box.backgroundColor = "#ffffff";
     stage.addChild(this.box);
 
-    /*
-     * Skapa inte BitmapField med tom text.
-     * Rune kan krascha om texten får 0 i bredd/höjd.
-     */
     this.letterText = new rune.text.BitmapField("A");
     this.letterText.autoSize = true;
     this.letterText.x = this.x + 9;
@@ -89,10 +81,6 @@ runmysteriet.logic.GuessLetterBox.prototype.create = function(stage) {
     this.downArrowText.visible = false;
     stage.addChild(this.downArrowText);
 };
-
-//------------------------------------------------------------------------------
-// LETTER STATE
-//------------------------------------------------------------------------------
 
 /**
  * Visar en låst/insamlad bokstav.
@@ -145,9 +133,9 @@ runmysteriet.logic.GuessLetterBox.prototype.setActive = function(active) {
 
     if (this.box) {
         if (active === true) {
-            this.box.backgroundColor = "#0000ff";
+            this.box.backgroundColor = "#3d3d6f";
         } else {
-            this.box.backgroundColor = "#008100";
+            this.box.backgroundColor = "#4e8f4e";
         }
     }
 
@@ -159,10 +147,6 @@ runmysteriet.logic.GuessLetterBox.prototype.setActive = function(active) {
         this.downArrowText.visible = active === true;
     }
 };
-
-//------------------------------------------------------------------------------
-// REMOVE DISPLAY OBJECT
-//------------------------------------------------------------------------------
 
 /**
  * Tar bort ett display object från stage.
@@ -185,10 +169,6 @@ runmysteriet.logic.GuessLetterBox.prototype.removeDisplayObject = function(objec
         object.stage.removeChild(object);
     }
 };
-
-//------------------------------------------------------------------------------
-// DISPOSE
-//------------------------------------------------------------------------------
 
 /**
  * Rensar ut GuessLetterBox helt

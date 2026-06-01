@@ -4,7 +4,6 @@
 
 /**
  * Segment 5.
- * Innehåller mindre lavahål, stenplattformar och sjukdomar.
  *
  * @constructor
  */
@@ -223,7 +222,7 @@ runmysteriet.segments.Segment_5.prototype.addLavaHole = function(stage, holes, x
      
     hole.addToStage(stage);
 
-    //ole sparas för dödslogik.
+    //Hole sparas för dödslogik.
      
     holes.push(hole);
 };

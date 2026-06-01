@@ -28,11 +28,6 @@ runmysteriet.logic.GuessWordPuzzle = function(guessData) {
     this.init();
 };
 
-//------------------------------------------------------------------------------
-// INIT
-//------------------------------------------------------------------------------
-
-
 /**
  * Initierar och bygger upp vilka bokstäver som är synliga.
  *
@@ -53,10 +48,6 @@ runmysteriet.logic.GuessWordPuzzle.prototype.init = function() {
     // Bygg lista över saknade index
     this.findMissingIndexes();
 };
-
-//------------------------------------------------------------------------------
-// MISSING LETTERS
-//------------------------------------------------------------------------------
 
 /**
  * Hittar vilka bokstäver som saknas.
@@ -95,10 +86,6 @@ runmysteriet.logic.GuessWordPuzzle.prototype.getCurrentMissingIndex = function()
 
     return this.m_missingIndexes[this.m_currentMissingPointer];
 };
-
-//------------------------------------------------------------------------------
-// GETTERS
-//------------------------------------------------------------------------------
 
 /**
  * Hämtar ordet.
@@ -159,7 +146,7 @@ runmysteriet.logic.GuessWordPuzzle.prototype.checkLetter = function(letter) {
         return false;
     }
 
-    // Säkerställ att vi alltid jämför lowercase-strängar
+    // Säkerställ alltid jämför lowercase-strängar
     letter = String(letter || "").toLowerCase();
     correctLetter = this.m_word.charAt(index).toLowerCase();
 
@@ -173,10 +160,6 @@ runmysteriet.logic.GuessWordPuzzle.prototype.checkLetter = function(letter) {
 
     return false;
 };
-
-//------------------------------------------------------------------------------
-// COMPLETE
-//------------------------------------------------------------------------------
 
 /**
  * Kontrollerar om hela ordet är färdiggissat.
@@ -192,10 +175,6 @@ runmysteriet.logic.GuessWordPuzzle.prototype.isComplete = function() {
 
     return this.m_currentMissingPointer >= this.m_missingIndexes.length;
 };
-
-//------------------------------------------------------------------------------
-// DISPOSE
-//------------------------------------------------------------------------------
 
 /**
  * Rensar GuessWordPuzzle.
