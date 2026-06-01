@@ -33,8 +33,11 @@ runmysteriet.handler.AutoScrollCameraHandler = function(
     /** @type {number} */
     this.levelWidth = levelWidth || 0;
 
-    //Flytta med hela pixlar för att undvika HUD/text-skakar
+    //Flytta med hela pixlar för att undvika HUD och text-skakar
     this.speed = 2;
+
+    /** @type {boolean} */
+    this.m_paused = false;
 
     /*
      * 1 = varje frame
@@ -69,9 +72,16 @@ runmysteriet.handler.AutoScrollCameraHandler = function(
  */
 runmysteriet.handler.AutoScrollCameraHandler.prototype.update = function(step) {
 
+    
+    if (this.m_paused === true) {
+    return;
+    }
+
     if (!this.camera || !this.camera.viewport) {
         return;
     }
+
+    
 
     this.updateDeathSlowMotion();
 
@@ -132,6 +142,19 @@ runmysteriet.handler.AutoScrollCameraHandler.prototype.moveCamera = function() {
 
     //För att minska HUD/text-skak.
     this.camera.viewport.x = Math.round(this.camera.viewport.x);
+};
+
+/**
+ * Pausar eller startar autoscroll.
+ *
+ * @param {boolean} paused
+ * @return {void}
+ */
+runmysteriet.handler.AutoScrollCameraHandler.prototype.setPaused = function(
+    paused
+) {
+
+    this.m_paused = paused === true;
 };
 
 /**

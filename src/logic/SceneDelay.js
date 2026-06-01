@@ -23,7 +23,7 @@ runmysteriet.logic.SceneDelay = function(delayFrames, onComplete) {
 
     /** @type {?Function} */
     this.m_onComplete = onComplete || null;
-    console.log(typeof runmysteriet.logic.SceneDelay);
+
 };
 
 /**

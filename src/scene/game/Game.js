@@ -764,7 +764,7 @@ runmysteriet.scene.Game.prototype.update = function (step) {
   //Spelaren uppdateras före kameran.
 
   if (this.m_playerHandler) {
-    this.m_playerHandler.update();
+    this.m_playerHandler.update()
   }
 
   //Kollisioner
@@ -774,6 +774,7 @@ runmysteriet.scene.Game.prototype.update = function (step) {
   this.updateArmor();
   this.updateExtra();
   this.updateShields();
+  this.updateEnemyCameraBlock();
 
   //Autoscroll-kameran flyttas efter spelaren.
 
@@ -846,7 +847,7 @@ runmysteriet.scene.Game.prototype.updateHoles = function () {
  */
 runmysteriet.scene.Game.prototype.updateEnemies = function () {
   if (this.m_enemyHandler && this.m_playerHandler) {
-    this.m_enemyHandler.update(this.m_playerHandler.players);
+    this.m_enemyHandler.update(this.m_playerHandler.players, this.m_isPaused);
   }
 };
 
@@ -1191,6 +1192,13 @@ runmysteriet.scene.Game.prototype.createPauseMenu = function () {
 runmysteriet.scene.Game.prototype.openPauseMenu = function () {
   this.m_isPaused = true;
 
+  if (
+    this.m_enemyHandler &&
+    typeof this.m_enemyHandler.stopFightSound === "function"
+  ) {
+      this.m_enemyHandler.stopFightSound();
+  }
+
   this.createPauseMenu();
   this.updatePauseMenuPosition();
 
@@ -1331,6 +1339,29 @@ runmysteriet.scene.Game.prototype.playMenuSound = function () {
 
   if (menuSound) {
     menuSound.play();
+  }
+};
+/**
+ * Pausar autoscroll när en levande Kristen blockerar kamerans fight-zon
+ *
+ * @return {void}
+ */
+runmysteriet.scene.Game.prototype.updateEnemyCameraBlock = function() {
+
+    var paused = false;
+
+    if (
+        this.m_enemyHandler &&
+        typeof this.m_enemyHandler.shouldPauseAutoScroll === "function"
+    ) {
+        paused = this.m_enemyHandler.shouldPauseAutoScroll(this.camera);
+    }
+
+   if (
+      this.m_cameraHandler &&
+      typeof this.m_cameraHandler.setPaused === "function"
+  ) {
+      this.m_cameraHandler.setPaused(paused);
   }
 };
 /**
