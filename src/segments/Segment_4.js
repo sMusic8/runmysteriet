@@ -4,7 +4,6 @@
 
 /**
  * Segment 4.
- * Skapar ett lavahål med zig-zag-plattformar och sjukdomar.
  *
  * @constructor
  */
@@ -198,7 +197,7 @@ runmysteriet.segments.Segment_4.prototype.addLavaHole = function(stage, holes, x
 
 /**
  * Lägger till roligare plattformar över lavan.
- * Plattformarna skapar en låg väg och en högre risk/reward-väg.
+ * Plattformarna skapar en låg väg och en högre
  *
  * @param {!rune.display.Stage} stage
  * @param {!Array<!Object>} platforms

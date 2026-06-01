@@ -4,7 +4,6 @@
 
 /**
  * Segment 2.
- * Skapar ett stenbaserat lavasegment med plattformar, fiender och sjukdomar.
  *
  * @constructor
  */

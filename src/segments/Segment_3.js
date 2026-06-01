@@ -4,7 +4,6 @@
 
 /**
  * Segment 3.
- * Skapar ett lavasegment med stigande plattformar, fiender och sjukdomar.
  *
  * @constructor
  */
@@ -97,10 +96,6 @@ runmysteriet.segments.Segment_3.prototype.ground = function(stage, startX, level
     };
 };
 
-//------------------------------------------------------------------------------
-// GROUND
-//------------------------------------------------------------------------------
-
 /**
  * Lägger till startmark.
  *
@@ -191,10 +186,6 @@ runmysteriet.segments.Segment_3.prototype.addTiles = function(stage, platforms, 
     }
 };
 
-//------------------------------------------------------------------------------
-// LAVA
-//------------------------------------------------------------------------------
-
 /**
  * Lägger till lavahålet.
  *
@@ -221,8 +212,7 @@ runmysteriet.segments.Segment_3.prototype.addLavaHole = function(stage, holes, x
 
 /**
  * Lägger till trappplattformar över lavan.
- * Plattformarna går uppåt och avslutas med en lättare landningsplattform.
- *
+ * 
  * @param {!rune.display.Stage} stage
  * @param {!Array<!Object>} platforms
  * @param {!Array<!Object>} enemySpawns
@@ -236,10 +226,6 @@ runmysteriet.segments.Segment_3.prototype.addStairPlatforms = function(stage, pl
     this.addTiles(stage, platforms, x + 285, this.groundY - 130, 2, this.platformTexture);
     this.addTiles(stage, platforms, x + 365, this.groundY - 85, 2, this.platformTexture);
 };
-
-//------------------------------------------------------------------------------
-// DISEASES
-//------------------------------------------------------------------------------
 
 /**
  * Returnerar antal sjukdomar baserat på level.
@@ -311,10 +297,6 @@ runmysteriet.segments.Segment_3.prototype.getDiseasePositions = function(segment
     ];
 };
 
-//------------------------------------------------------------------------------
-// RUNES
-//------------------------------------------------------------------------------
-
 /**
  * Lägger till rune-positioner i en lista av spawn-punkter.
  *
@@ -347,10 +329,6 @@ runmysteriet.segments.Segment_3.prototype.getRunePositions = function(segmentSta
         }
     ];
 };
-
-//------------------------------------------------------------------------------
-// ARMOR
-//------------------------------------------------------------------------------
 
 /**
  * Lägger till armor-positioner i en lista av spawn-punkter.

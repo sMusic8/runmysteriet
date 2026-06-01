@@ -4,8 +4,6 @@
 
 /**
  * Startsegment för en nivå.
- * Segmentet ger spelaren en startyta innan resten av banan börjar.
- *
  * @constructor
  */
 runmysteriet.segments.Segment_Start = function() {
@@ -257,7 +255,6 @@ runmysteriet.segments.Segment_Start.prototype.addDiseases = function(diseaseSpaw
 
 /**
  * Returnerar sjukdomspositioner för startsegmentet.
- * Positionerna är flyttade så de inte hamnar direkt över lavahålet.
  *
  * @param {number} segmentStart
  * @return {!Array<!Object>}
