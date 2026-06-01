@@ -75,9 +75,6 @@ runmysteriet.scene.Menu.prototype.init = function() {
 /**
  * Skapar och lägger till bakgrunden för huvudmenyn.
  * 
- * Genererar en grafisk bakgrund som täcker hela skärmen och
- * lägger till den i scenens stage.
- * 
  * @method
  * @memberof runmysteriet.scene.Menu
  * 
@@ -439,10 +436,6 @@ runmysteriet.scene.Menu.prototype.removeDisplayObject = function(object) {
 };
 /**
  * Rensar och frigör resurser för huvudmenyn.
- * 
- * Stoppar bakgrundsmusik, städar upp menykomponenter och tar bort alla
- * display-objekt från scenen. Nollställer referenser för att undvika
- * minnesläckor och anropar sedan basklassens dispose-metod.
  * 
  * @method
  * @memberof runmysteriet.scene.Menu

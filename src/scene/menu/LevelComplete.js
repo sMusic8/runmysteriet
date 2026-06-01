@@ -144,7 +144,6 @@ runmysteriet.scene.LevelComplete.prototype.createTextBox = function(
 };
 /**
  * Skapar textobjekt för LevelComplete-scenen.
- * Visar nivåstatus samt poänginformation.
  *
  * @return {void}
  */
@@ -356,7 +355,9 @@ runmysteriet.scene.LevelComplete.prototype.createMenu = function() {
     this.stage.addChild(item);
     this.menuItems.push(item);
     }
-};/**
+};
+
+/**
  * Uppdaterar menyn i LevelComplete-scenen.
  *
  * @return {void}

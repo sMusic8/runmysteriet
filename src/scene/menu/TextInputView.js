@@ -83,19 +83,12 @@ runmysteriet.scene.TextInputView = function(
     this.m_highscoreSound = null;
 };
 
-//------------------------------------------------------------------------------
-// INHERITANCE
-//------------------------------------------------------------------------------
-
 runmysteriet.scene.TextInputView.prototype =
     Object.create(rune.scene.Scene.prototype);
 
 runmysteriet.scene.TextInputView.prototype.constructor =
     runmysteriet.scene.TextInputView;
 
-//------------------------------------------------------------------------------
-// INIT
-//------------------------------------------------------------------------------
 
 /**
  * Initierar TextInputView.
@@ -131,10 +124,6 @@ runmysteriet.scene.TextInputView.prototype.init = function() {
     this.createText();
     this.updateText();
 };
-
-//------------------------------------------------------------------------------
-// CREATE TEXT
-//------------------------------------------------------------------------------
 
 /**
  * Skapar all text på scenen.
@@ -184,10 +173,6 @@ runmysteriet.scene.TextInputView.prototype.createText = function() {
     this.m_startText.scale = 0.8;
     this.stage.addChild(this.m_startText);
 };
-
-//------------------------------------------------------------------------------
-// UPDATE
-//------------------------------------------------------------------------------
 
 /**
  * Uppdaterar namninput.
@@ -256,10 +241,6 @@ runmysteriet.scene.TextInputView.prototype.update = function(step) {
     }
 };
 
-//------------------------------------------------------------------------------
-// INPUT HELPERS
-//------------------------------------------------------------------------------
-
 /**
  * Tar bort bokstav eller går tillbaka till spelare 1.
  *
@@ -308,10 +289,6 @@ runmysteriet.scene.TextInputView.prototype.chooseLetterOrStart = function() {
     }
 };
 
-//------------------------------------------------------------------------------
-// VOLUME
-//------------------------------------------------------------------------------
-
 /**
  * Hanterar volym med gemensam GameInput.
  *
@@ -344,10 +321,6 @@ runmysteriet.scene.TextInputView.prototype.updateVolumeInput = function(input) {
         }
     }
 };
-
-//------------------------------------------------------------------------------
-// TEXT UPDATE
-//------------------------------------------------------------------------------
 
 /**
  * Uppdaterar all text.
@@ -465,16 +438,8 @@ runmysteriet.scene.TextInputView.prototype.areBothNamesComplete = function() {
     );
 };
 
-//------------------------------------------------------------------------------
-// PLAYER DATA
-//------------------------------------------------------------------------------
-
 /**
  * Skapar playerData som skickas vidare genom spelet.
- *
- * Viktigt:
- * highscoreName skickas i ett objekt.
- * Om den skickas som string tappas den bort i Game.
  *
  * @param {string} player1Name
  * @param {string} player2Name
@@ -502,10 +467,6 @@ runmysteriet.scene.TextInputView.prototype.createPlayerData = function(
 
     return playerData;
 };
-
-//------------------------------------------------------------------------------
-// START GAME
-//------------------------------------------------------------------------------
 
 /**
  * Startar spelet och skickar med namn till highscore-flödet.
@@ -540,10 +501,6 @@ runmysteriet.scene.TextInputView.prototype.startGame = function() {
     ]);
 };
 
-//------------------------------------------------------------------------------
-// SOUND
-//------------------------------------------------------------------------------
-
 /**
  * Stoppar bakgrundsmusik säkert.
  *
@@ -574,10 +531,6 @@ runmysteriet.scene.TextInputView.prototype.stopBackgroundMusic = function() {
     }
 };
 
-//------------------------------------------------------------------------------
-// REMOVE DISPLAY OBJECT
-//------------------------------------------------------------------------------
-
 /**
  * Tar bort display object från stage.
  *
@@ -601,10 +554,6 @@ runmysteriet.scene.TextInputView.prototype.removeDisplayObject = function(
         object.stage.removeChild(object);
     }
 };
-
-//------------------------------------------------------------------------------
-// DISPOSE
-//------------------------------------------------------------------------------
 
 /**
  * Rensar TextInputView.
