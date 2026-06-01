@@ -48,6 +48,16 @@ runmysteriet.handler.LevelCompleteSequence = function(
         "b2",
         "b3",
         "b4",
+        "b5",
+        "b1",
+        "b2",
+        "b3",
+        "b4",
+        "b5",
+        "b1",
+        "b2",
+        "b3",
+        "b4",
         "b5"
     ];
 
@@ -312,31 +322,26 @@ runmysteriet.handler.LevelCompleteSequence.prototype.restorePlayers = function()
 //------------------------------------------------------------------------------
 
 /**
- * Uppdaterar textens position så den ligger ovanför avatarerna.
+ * Uppdaterar textens position så den ligger i mitten av kameran.
  *
  * @return {void}
  */
 runmysteriet.handler.LevelCompleteSequence.prototype.updateTextPosition = function() {
 
-    var centerX = 0;
-    var topY = 0;
-
-    if (!this.m_text) {
+    if (!this.m_text || !this.m_application || !this.m_application.screen) {
         return;
     }
 
-    centerX = this.getPlayersCenterX();
-    topY = this.getPlayersTopY();
+    this.m_text.x =
+        this.getCameraX() +
+        this.m_application.screen.width / 2 -
+        this.m_text.width / 2;
 
-    if (topY === 0) {
-        this.positionTextCenterScreen();
-        return;
-    }
-
-    this.m_text.x = centerX - this.m_text.width / 2;
-    this.m_text.y = topY - 38;
+    this.m_text.y =
+        this.getCameraY() +
+        this.m_application.screen.height / 2 -
+        this.m_text.height / 2;
 };
-
 /**
  * Placerar texten i mitten av kameran om spelare saknas.
  *
@@ -360,24 +365,40 @@ runmysteriet.handler.LevelCompleteSequence.prototype.positionTextCenterScreen = 
 };
 
 /**
- * Enkel pop-effekt på texten.
+ * pop-effekt på texten i slutet av lvl
  *
  * @return {void}
  */
 runmysteriet.handler.LevelCompleteSequence.prototype.updateTextPop = function() {
 
-    var scale = 1;
+    var scale = 2;
+    var bounce = 0;
 
     if (!this.m_text) {
         return;
     }
 
+    /*
+     * Snabb pop in.
+     */
     if (this.m_timer < 10) {
-        scale = 0.2 + this.m_timer * 0.09;
-    } else if (this.m_timer < 18) {
-        scale = 1.1 - (this.m_timer - 10) * 0.0125;
-    } else {
-        scale = 1;
+        scale = 0.3 + this.m_timer * 0.17;
+    }
+
+    /*
+     * Bounce i ungefär 1 sekund.
+     * Vid 30 fps är 30 frames ungefär 1 sekund.
+     */
+    else if (this.m_timer < 60) {
+        bounce = Math.sin((this.m_timer - 10) * 0.45) * 0.16;
+        scale = 2 + bounce;
+    }
+
+    /*
+     * Stabil storlek efter bounce.
+     */
+    else {
+        scale = 2;
     }
 
     this.m_text.scaleX = scale;
@@ -416,7 +437,7 @@ runmysteriet.handler.LevelCompleteSequence.prototype.createFlowers = function() 
     for (i = 0; i < this.m_flowerTextures.length; i++) {
         texture = this.m_flowerTextures[i];
 
-        offsetX = -48 + i * 24;
+        offsetX = -78 + i * 24;
 
         flower = new rune.display.Graphic(
             centerX + offsetX,
@@ -435,10 +456,11 @@ runmysteriet.handler.LevelCompleteSequence.prototype.createFlowers = function() 
 
         this.m_flowerData.push({
             flower: flower,
-            velocityX: -1.8 + i * 0.9,
-            velocityY: -3.5 - Math.random() * 2,
-            gravity: 0.22,
-            rotationSpeed: -8 + i * 4
+            velocityX: -2.4 + i * 0.4,
+            velocityY: -4.2 - Math.random() * 2.5,
+            gravity: 0.20,
+            rotationSpeed: -10 + i * 2
+            
         });
     }
 };
