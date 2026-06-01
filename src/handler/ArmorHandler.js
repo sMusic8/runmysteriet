@@ -3,7 +3,7 @@
 //------------------------------------------------------------------------------
 
 /**
- * ansvarar för att skapa, uppdatera och hantera armor objekt
+ * Ansvarar för att skapa, uppdatera och hantera armor objekt
  *
  * @constructor
  * @param {!rune.display.Stage} stage
@@ -222,10 +222,6 @@ runmysteriet.handler.ArmorHandler.prototype.isValidPlayer = function(player) {
     return true;
 };
 
-//------------------------------------------------------------------------------
-// BLINK
-//------------------------------------------------------------------------------
-
 /**
  * Hanterar blink-effekt för armor
  *
@@ -311,10 +307,6 @@ runmysteriet.handler.ArmorHandler.prototype.playCatchSound = function() {
     }
 };
 
-//------------------------------------------------------------------------------
-// REMOVE ARMOR
-//------------------------------------------------------------------------------
-
 /**
  * Tar bort armor och dess box från stage
  *
@@ -332,10 +324,6 @@ runmysteriet.handler.ArmorHandler.prototype.removeArmor = function(armor) {
 
     armor.__box = null;
 };
-
-//------------------------------------------------------------------------------
-// REMOVE DISPLAY OBJECT
-//------------------------------------------------------------------------------
 
 /**
  * Tar bort display object från stage
@@ -359,12 +347,6 @@ runmysteriet.handler.ArmorHandler.prototype.removeDisplayObject = function(objec
     }
 };
 
-//------------------------------------------------------------------------------
-// CLEAR
-//------------------------------------------------------------------------------
-
-/**
- * Tar bort alla armor från scenen och rensar listan
 /**
  * Tar bort alla armor-objekt från scenen och rensar interna listan.
  *
@@ -390,10 +372,6 @@ runmysteriet.handler.ArmorHandler.prototype.clear = function() {
 
     this.m_armors = [];
 };
-
-//------------------------------------------------------------------------------
-// DISPOSE
-//------------------------------------------------------------------------------
 
 /**
  * Städar ArmorHandler helt

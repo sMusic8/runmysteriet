@@ -73,9 +73,8 @@ runmysteriet.handler.PlatformHandler.prototype.init = function (levelNumber) {
   var totalRandomCount = 0;
   var chosenSegments = null;
 
-  /*
-   * Om PlatformHandler återanvänds ska gamla objekt bort först.
-   */
+  //Om PlatformHandler återanvänds ska gamla objekt bort först.
+   
   this.clear();
 
   this.levelNumber = levelNumber || 1;
@@ -88,19 +87,11 @@ runmysteriet.handler.PlatformHandler.prototype.init = function (levelNumber) {
 
   chosenSegments = this.getRandomSegments(pool, totalRandomCount);
 
-  //--------------------------------------------------------------------------
-  // START SEGMENT
-  //--------------------------------------------------------------------------
-
   segment = new runmysteriet.segments.Segment_Start();
   result = segment.ground(this.stage, x, this.levelNumber);
 
   this.addSegmentResult(result);
   x = result.endX;
-
-  //--------------------------------------------------------------------------
-  // SEGMENTS BEFORE WATER
-  //--------------------------------------------------------------------------
 
   for (i = 0; i < beforeWaterCount; i++) {
     SegmentClass = chosenSegments[i];
@@ -116,19 +107,11 @@ runmysteriet.handler.PlatformHandler.prototype.init = function (levelNumber) {
     x = result.endX;
   }
 
-  //--------------------------------------------------------------------------
-  // WATER SEGMENT
-  //--------------------------------------------------------------------------
-
   segment = new runmysteriet.segments.Segment_Water();
   result = segment.ground(this.stage, x, this.levelNumber);
 
   this.addSegmentResult(result);
   x = result.endX;
-
-  //--------------------------------------------------------------------------
-  // SEGMENTS AFTER WATER
-  //--------------------------------------------------------------------------
 
   for (i = 0; i < afterWaterCount; i++) {
     SegmentClass = chosenSegments[beforeWaterCount + i];
@@ -143,11 +126,6 @@ runmysteriet.handler.PlatformHandler.prototype.init = function (levelNumber) {
     this.addSegmentResult(result);
     x = result.endX;
   }
-
-  //--------------------------------------------------------------------------
-  // END SEGMENT
-  //--------------------------------------------------------------------------
-
   segment = new runmysteriet.segments.Segment_End();
   result = segment.ground(this.stage, x, this.levelNumber); //m_extra blasndannat
 
@@ -156,10 +134,6 @@ runmysteriet.handler.PlatformHandler.prototype.init = function (levelNumber) {
 
   this.levelWidth = x;
 };
-
-//------------------------------------------------------------------------------
-// SEGMENT RESULT
-//------------------------------------------------------------------------------
 
 /**
  * Lägger till allt som ett segment skapat.
@@ -190,20 +164,25 @@ runmysteriet.handler.PlatformHandler.prototype.addSegmentResult = function (
   }
 };
 
-//Komentera senare
+/**
+ * Returnerar referensen till "extra"-objektet i PlatformHandler.
+ * 
+ * @return {*} m_extra Det sparade extra-objektet, eller undefined om det inte finns.
+ */
 runmysteriet.handler.PlatformHandler.prototype.getExtra = function () {
     return this.m_extra;
 };
 
+/**
+ * Tar bort och nollställer "extra"-objektet i PlatformHandler.
+ *
+ * @return {void}
+ */
 runmysteriet.handler.PlatformHandler.prototype.clearExtra = function () {
   
     this.removeDisplayObject(this.m_extra);
     this.m_extra = null;
 };
-
-//------------------------------------------------------------------------------
-// EXTRA PULSE
-//------------------------------------------------------------------------------
 
 /**
  * Förbereder extra-poäng-bilden för pulserande effekt.
@@ -257,9 +236,6 @@ runmysteriet.handler.PlatformHandler.prototype.updateExtraPulse = function() {
     this.m_extra.scaleX = pulse;
     this.m_extra.scaleY = pulse;
 };
-//------------------------------------------------------------------------------
-// ADD COLLECTIONS
-//------------------------------------------------------------------------------
 
 /**
  * Lägger till plattformar.
@@ -437,10 +413,6 @@ runmysteriet.handler.PlatformHandler.prototype.addArmorSpawns = function (
   }
 };
 
-//------------------------------------------------------------------------------
-// GET COLLECTIONS
-//------------------------------------------------------------------------------
-
 /**
  * @return {!Array}
  */
@@ -474,10 +446,6 @@ runmysteriet.handler.PlatformHandler.prototype.getRuneSpawns = function () {
 runmysteriet.handler.PlatformHandler.prototype.getArmorSpawns = function () {
   return this.armorSpawns;
 };
-
-//------------------------------------------------------------------------------
-// UPDATE HOLES
-//------------------------------------------------------------------------------
 
 /**
  * Uppdaterar hål och kontrollerar om spelare faller.
@@ -524,10 +492,6 @@ runmysteriet.handler.PlatformHandler.prototype.updateHoles = function (
   }
 };
 
-//------------------------------------------------------------------------------
-// BOAT TWEENS
-//------------------------------------------------------------------------------
-
 /**
  * Startar tween-animationer för alla registrerade båtar.
  *
@@ -562,10 +526,6 @@ runmysteriet.handler.PlatformHandler.prototype.startBoatTweens = function (
   }
 };
 
-//------------------------------------------------------------------------------
-// UPDATE
-//------------------------------------------------------------------------------
-
 /**
  * Uppdaterar plattformsrelaterade objekt.
  *
@@ -592,26 +552,8 @@ runmysteriet.handler.PlatformHandler.prototype.update = function (step) {
     }
   }
 
-/*   if (this.platforms) {
-    for (i = 0; i < this.platforms.length; i++) {
-      platform = this.platforms[i];
-
-      if (!platform || platform.isRaft !== true) {
-        continue;
-      }
-
-      if (typeof platform.update === "function") {
-        platform.update(step);
-      }
-    }
-  } */
-
       this.updateExtraPulse();
 };
-
-//------------------------------------------------------------------------------
-// LEVEL STRUCTURE
-//------------------------------------------------------------------------------
 
 /**
  * Returnerar antal plattformssegment som ska placeras före vattenområdet.
@@ -705,10 +647,6 @@ runmysteriet.handler.PlatformHandler.prototype.getRandomSegments = function (
   return result;
 };
 
-//------------------------------------------------------------------------------
-// ARMOR COUNT
-//------------------------------------------------------------------------------
-
 /**
  * Returnerar antal armor som kan spawnas beroende på nivå.
  * ArmorHandler har också egen count-logik, men metoden får ligga kvar
@@ -727,10 +665,6 @@ runmysteriet.handler.PlatformHandler.prototype.getArmorCount = function () {
 
   return 2;
 };
-
-//------------------------------------------------------------------------------
-// REMOVE DISPLAY OBJECT
-//------------------------------------------------------------------------------
 
 /**
  * Tar bort ett display object från stage.
@@ -765,10 +699,6 @@ runmysteriet.handler.PlatformHandler.prototype.removeDisplayObject = function (
   }
 };
 
-//------------------------------------------------------------------------------
-// CLEAR DISPLAY LIST
-//------------------------------------------------------------------------------
-
 /**
  * Tar bort alla display objects i en lista.
  *
@@ -788,10 +718,6 @@ runmysteriet.handler.PlatformHandler.prototype.clearDisplayList = function (
     this.removeDisplayObject(list[i]);
   }
 };
-
-//------------------------------------------------------------------------------
-// CLEAR
-//------------------------------------------------------------------------------
 
 /**
  * Tar bort alla plattformsobjekt från stage och tömmer listor.
@@ -819,10 +745,6 @@ runmysteriet.handler.PlatformHandler.prototype.clear = function () {
   this.levelWidth = 0;
   this.levelNumber = 1;
 };
-
-//------------------------------------------------------------------------------
-// DISPOSE
-//------------------------------------------------------------------------------
 
 /**
  * Rensar PlatformHandler helt.

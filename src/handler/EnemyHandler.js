@@ -21,8 +21,7 @@ runmysteriet.handler.EnemyHandler = function(stage, application) {
     this.enemies = [];
 
     /**
-     * Osynliga spärrar som hindrar spelaren från att gå vidare
-     * tills kopplad Kristen är död.
+     * Osynliga spärrar som hindrar spelaren från att gå vidare tills kopplad Kristen är död.
      * @type {!Array<!Object>}
      */
     this.enemyBlockers = [];
@@ -104,10 +103,6 @@ runmysteriet.handler.EnemyHandler.prototype.createKristen = function(spawn) {
     return kristen;
 };
 
-//------------------------------------------------------------------------------
-// CREATE BLOCKER
-//------------------------------------------------------------------------------
-
 /**
  * Skapar en osynlig spärr som går hela vägen uppifrån och ner
  *
@@ -183,10 +178,6 @@ runmysteriet.handler.EnemyHandler.prototype.update = function(players, isPaused)
     this.updateFightSound(players);
 };
 
-//------------------------------------------------------------------------------
-// UPDATE ENEMY BLOCKERS
-//------------------------------------------------------------------------------
-
 /**
  * Tar bort spärrar vars Kristen är död.
  *
@@ -214,9 +205,6 @@ runmysteriet.handler.EnemyHandler.prototype.updateEnemyBlockers = function() {
         }
     }
 };
-//------------------------------------------------------------------------------
-// FIGHT SOUND
-//------------------------------------------------------------------------------
 
 /**
  * Uppdaterar fight-ljudet.
@@ -306,10 +294,9 @@ runmysteriet.handler.EnemyHandler.prototype.startFightSound = function() {
         return;
     }
 
-    /*
-     * styrs via mediaElement
-     * 
-     */
+    //Styrs via mediaElement
+     
+     
     if (
         this.fightSound.m_source &&
         this.fightSound.m_source.mediaElement
@@ -330,9 +317,8 @@ runmysteriet.handler.EnemyHandler.prototype.startFightSound = function() {
         return;
     }
 
-    /*
-     * Fallback om mediaElement inte finns.
-     */
+    //Fallback om mediaElement inte finns.
+     
     this.fightSound.loop = true;
     this.fightSound.volume = 0.5;
     this.fightSound.play();
@@ -347,12 +333,6 @@ runmysteriet.handler.EnemyHandler.prototype.startFightSound = function() {
 runmysteriet.handler.EnemyHandler.prototype.stopFightSound = function() {
 
     var mediaElement = null;
-
-    /*
-     * Viktigt:
-     * clear() körs redan i init(), innan fightSound alltid finns.
-     * Därför måste metoden tåla null.
-     */
     if (!this.fightSound) {
         this.fightSoundPlaying = false;
         return;
@@ -386,7 +366,7 @@ runmysteriet.handler.EnemyHandler.prototype.stopFightSound = function() {
 
 /**
  * Kontrollerar om autoscroll ska pausas för att en levande Kristen
- * blockerar spelaren i kamerans fight-zon.
+ * Blockerar spelaren i kamerans fight-zon.
  *
  * @param {?rune.camera.Camera} camera
  * @return {boolean}
@@ -442,10 +422,6 @@ runmysteriet.handler.EnemyHandler.prototype.shouldPauseAutoScroll = function(
     return false;
 };
 
-//------------------------------------------------------------------------------
-// CLEAR
-//------------------------------------------------------------------------------
-
 /**
  * Tar bort alla kristna och spärrar från stage och tömmer listorna
  *
@@ -458,9 +434,8 @@ runmysteriet.handler.EnemyHandler.prototype.clear = function() {
 
     this.stopFightSound();
 
-    /*
-     * Fiender.
-     */
+    //Fiender.
+     
     if (this.enemies) {
         for (i = 0; i < this.enemies.length; i++) {
             enemy = this.enemies[i];
@@ -482,18 +457,13 @@ runmysteriet.handler.EnemyHandler.prototype.clear = function() {
         }
     }
 
-    /*
-     * Spärrar.
-     */
+    //Spärrar.
+     
     this.clearDisplayList(this.enemyBlockers);
 
     this.enemies = [];
     this.enemyBlockers = [];
 };
-
-//------------------------------------------------------------------------------
-// CLEAR DISPLAY LIST
-//------------------------------------------------------------------------------
 
 /**
  * Tar bort alla display objects i en lista.
@@ -513,10 +483,6 @@ runmysteriet.handler.EnemyHandler.prototype.clearDisplayList = function(list) {
         this.removeDisplayObject(list[i]);
     }
 };
-
-//------------------------------------------------------------------------------
-// REMOVE DISPLAY OBJECT
-//------------------------------------------------------------------------------
 
 /**
  * Tar bort ett display object från stage.
@@ -539,10 +505,6 @@ runmysteriet.handler.EnemyHandler.prototype.removeDisplayObject = function(objec
         object.stage.removeChild(object);
     }
 };
-
-//------------------------------------------------------------------------------
-// DISPOSE
-//------------------------------------------------------------------------------
 
 /**
  * Rensar EnemyHandler helt.
