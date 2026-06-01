@@ -17,7 +17,7 @@ runmysteriet.particle.AttackParticle = function() {
         0,   //Y-position
         16,  //Bredd
         16,  //Höjd
-        "effect_attack"
+        "attack_effect"
     );
 
     /**
