@@ -64,19 +64,11 @@ runmysteriet.scene.GameOver = function(score, reason, playerName) {
     this.m_highscoreSaved = false;
 };
 
-//------------------------------------------------------------------------------
-// INHERITANCE
-//------------------------------------------------------------------------------
-
 runmysteriet.scene.GameOver.prototype =
     Object.create(rune.scene.Scene.prototype);
 
 runmysteriet.scene.GameOver.prototype.constructor =
     runmysteriet.scene.GameOver;
-
-//------------------------------------------------------------------------------
-// INIT
-//------------------------------------------------------------------------------
 
 /**
  * Initierar GameOver.
@@ -98,11 +90,7 @@ runmysteriet.scene.GameOver.prototype.init = function() {
         this.backgroundMusic.play();
     }
 
-    /*
-     * 
-     * Spara score innan highscore-HUD skapas.
-     * Annars kan listan laddas innan nya resultatet finns.
-     */
+    //Spara score innan highscore-HUD skapas.
     this.saveHighscore();
 
     this.createBackground();
@@ -116,10 +104,6 @@ runmysteriet.scene.GameOver.prototype.init = function() {
     this.positionMenu();
     this.createVolumeHud();
 };
-
-//------------------------------------------------------------------------------
-// HIGHSCORE SAVE
-//------------------------------------------------------------------------------
 
 /**
  * Sparar score till highscore-listan.
@@ -141,10 +125,6 @@ runmysteriet.scene.GameOver.prototype.saveHighscore = function() {
         return;
     }
 
-    /*
-     * Om inget riktigt namn har skrivits ska GameOver inte autospara.
-     * Då ska spelaren först gå via TextInputView vid nytt highscore.
-     */
     if (
         !this.m_playerName ||
         String(this.m_playerName).toUpperCase() === "PLAYER"
@@ -175,10 +155,6 @@ runmysteriet.scene.GameOver.prototype.saveHighscore = function() {
         manager.save(entry);
     }
 };
-
-//------------------------------------------------------------------------------
-// CREATE
-//------------------------------------------------------------------------------
 
 /**
  * Skapar titeltext.
@@ -311,18 +287,15 @@ runmysteriet.scene.GameOver.prototype.createHighscoreHud = function() {
         5
     );
 
-    /*
-     * Synlig placering.
-     * Läggs till vänster så den inte krockar med menyn.
-     */
+    //Synlig placering, läggs till vänster så den inte krockar med menyn.
+    
     this.m_highscoreHud.x = 15;
     this.m_highscoreHud.y = 145;
 
     this.stage.addChild(this.m_highscoreHud);
 
-    /*
-     * Om HighscoreHud har reload-metod, använd den.
-     */
+    //Om HighscoreHud har reload-metod, använd den.
+     
     if (typeof this.m_highscoreHud.reload === "function") {
         this.m_highscoreHud.reload();
     }
@@ -390,10 +363,6 @@ runmysteriet.scene.GameOver.prototype.positionMenu = function() {
     this.m_menu.y = 135;
 };
 
-//------------------------------------------------------------------------------
-// UPDATE
-//------------------------------------------------------------------------------
-
 /**
  * Uppdaterar GameOver.
  *
@@ -415,10 +384,6 @@ runmysteriet.scene.GameOver.prototype.update = function(step) {
     this.handleVolumeInput(input);
     this.handleMenuInput(input);
 };
-
-//------------------------------------------------------------------------------
-// INPUT
-//------------------------------------------------------------------------------
 
 /**
  * Hanterar menyinput.
@@ -505,10 +470,6 @@ runmysteriet.scene.GameOver.prototype.updateVolumeHud = function() {
     }
 };
 
-//------------------------------------------------------------------------------
-// CHOOSE
-//------------------------------------------------------------------------------
-
 /**
  * Utför valt menyval.
  *
@@ -533,10 +494,6 @@ runmysteriet.scene.GameOver.prototype.chooseMenuItem = function() {
         this.goToMenu();
     }
 };
-
-//------------------------------------------------------------------------------
-// NAVIGATION
-//------------------------------------------------------------------------------
 
 /**
  * Startar nytt spel.
@@ -565,10 +522,6 @@ runmysteriet.scene.GameOver.prototype.goToMenu = function() {
         new runmysteriet.scene.Menu()
     ]);
 };
-
-//------------------------------------------------------------------------------
-// SOUND
-//------------------------------------------------------------------------------
 
 /**
  * Spelar menyljud.
@@ -612,10 +565,6 @@ runmysteriet.scene.GameOver.prototype.stopBackgroundMusic = function() {
     }
 };
 
-//------------------------------------------------------------------------------
-// REMOVE DISPLAY OBJECT
-//------------------------------------------------------------------------------
-
 /**
  * Tar bort display object från stage.
  *
@@ -637,10 +586,6 @@ runmysteriet.scene.GameOver.prototype.removeDisplayObject = function(object) {
         object.stage.removeChild(object);
     }
 };
-
-//------------------------------------------------------------------------------
-// DISPOSE
-//------------------------------------------------------------------------------
 
 /**
  * Rensar GameOver.

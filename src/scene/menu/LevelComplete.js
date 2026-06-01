@@ -211,7 +211,6 @@ runmysteriet.scene.LevelComplete.prototype.createTexts = function() {
 
 /**
  * Uppdaterar LevelComplete-scenen varje frame.
- * Hanterar input, volym och meny-navigering.
  *
  * @param {number} step Tidssteg (delta time) för uppdatering.
  * @return {void}
@@ -274,7 +273,6 @@ runmysteriet.scene.LevelComplete.prototype.update = function(step) {
 };
 /**
  * Hanterar volyminmatning i LevelComplete-scenen.
- * Justerar bakgrundsmusikens volym baserat på input.
  *
  * @param {?Object} input Inläst spelarinput.
  * @return {void}
@@ -311,7 +309,6 @@ runmysteriet.scene.LevelComplete.prototype.updateVolumeInput = function(input) {
 };
 /**
  * Skapar menyalternativ för LevelComplete-scenen.
- * Anpassar valen beroende på om sista nivån är klar.
  *
  * @return {void}
  */
@@ -361,7 +358,6 @@ runmysteriet.scene.LevelComplete.prototype.createMenu = function() {
     }
 };/**
  * Uppdaterar menyn i LevelComplete-scenen.
- * Markerar valt alternativ med en indikator.
  *
  * @return {void}
  */
@@ -478,7 +474,6 @@ runmysteriet.scene.LevelComplete.prototype.loadNextLevel = function() {
 
 /**
  * Utför vald menyhandling i LevelComplete-scenen.
- * Startar nästa nivå eller går tillbaka till huvudmenyn.
  *
  * @return {void}
  */
@@ -555,7 +550,6 @@ runmysteriet.scene.LevelComplete.prototype.removeDisplayObject = function(object
 
 /**
  * Rensar upp LevelComplete-scenen och frigör alla resurser.
- * Stoppar ljud, tar bort UI-element och nollställer intern data.
  *
  * @return {void}
  */
