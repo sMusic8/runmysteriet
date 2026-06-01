@@ -73,6 +73,30 @@ runmysteriet.scene.TextInputView = function(
     /** @type {?rune.text.BitmapField} */
     this.m_startText = null;
 
+    /** @type {?rune.display.Graphic} */
+    this.m_background = null;
+
+    /** @type {?rune.display.Graphic} */
+    this.m_screenOverlay = null;
+
+    /** @type {?rune.display.Graphic} */
+    this.m_headerPanel = null;
+
+    /** @type {?rune.display.Graphic} */
+    this.m_namePanel = null;
+
+    /** @type {?rune.display.Graphic} */
+    this.m_player1Panel = null;
+
+    /** @type {?rune.display.Graphic} */
+    this.m_player2Panel = null;
+
+    /** @type {?rune.display.Graphic} */
+    this.m_letterPanel = null;
+
+    /** @type {?rune.display.Graphic} */
+    this.m_controlsPanel = null;
+
     /** @type {?Object} */
     this.backgroundMusic = null;
 
@@ -126,51 +150,206 @@ runmysteriet.scene.TextInputView.prototype.init = function() {
 };
 
 /**
- * Skapar all text på scenen.
+ * Skapar all text på scene
  *
  * @return {void}
  */
+/**
+ * Retunerar rubrik för vilken typ av score det är
+ *
+ * @return {string}
+ */
+runmysteriet.scene.TextInputView.prototype.getTitleText = function() {
+
+    if (
+        this.m_highscoreData &&
+        this.m_highscoreData.title
+    ) {
+        return String(this.m_highscoreData.title);
+    }
+
+    if (this.m_highscoreData) {
+        return "TOP 5 SCORE";
+    }
+
+    return "WRITE YOUR NAMES";
+};
+
 runmysteriet.scene.TextInputView.prototype.createText = function() {
 
+    var centerX = this.application.screen.center.x;
+    var screenW = this.application.screen.width;
+    var screenH = this.application.screen.height;
+
+    /*
+     * Bakgrund.
+     */
+    this.m_background = new rune.display.Graphic(
+        0,
+        0,
+        screenW,
+        screenH,
+        "backgroundExtra"
+    );
+
+    this.stage.addChild(this.m_background);
+
+    /*
+     * Mörk overlay, samma känsla som GuessWord.
+     */
+    this.m_screenOverlay = new rune.display.Graphic(
+        0,
+        0,
+        screenW,
+        screenH
+    );
+
+    this.m_screenOverlay.backgroundColor = "#000000";
+    this.m_screenOverlay.alpha = 0.30;
+    this.stage.addChild(this.m_screenOverlay);
+
+    /*
+     * Toppanel.
+     */
+    this.m_headerPanel = new rune.display.Graphic(
+        14,
+        8,
+        screenW - 28,
+        46
+    );
+
+    this.m_headerPanel.backgroundColor = "#050b0b";
+    this.m_headerPanel.alpha = 0.82;
+    this.stage.addChild(this.m_headerPanel);
+
+    /*
+     * Namnpanel.
+     */
+    this.m_namePanel = new rune.display.Graphic(
+        centerX - 175,
+        70,
+        350,
+        86
+    );
+
+    this.m_namePanel.backgroundColor = "#050b0b";
+    this.m_namePanel.alpha = 0.82;
+    this.stage.addChild(this.m_namePanel);
+
+    /*
+     * Separata rader för spelarna.
+     */
+    this.m_player1Panel = new rune.display.Graphic(
+        centerX - 155,
+        82,
+        310,
+        28
+    );
+
+    this.m_player1Panel.backgroundColor = "#000000";
+    this.m_player1Panel.alpha = 0.45;
+    this.stage.addChild(this.m_player1Panel);
+
+    this.m_player2Panel = new rune.display.Graphic(
+        centerX - 155,
+        118,
+        310,
+        28
+    );
+
+    this.m_player2Panel.backgroundColor = "#000000";
+    this.m_player2Panel.alpha = 0.45;
+    this.stage.addChild(this.m_player2Panel);
+
+    /*
+     * Selected letter / status-panel.
+     */
+    this.m_letterPanel = new rune.display.Graphic(
+        centerX - 135,
+        171,
+        270,
+        28
+    );
+
+    this.m_letterPanel.backgroundColor = "#050b0b";
+    this.m_letterPanel.alpha = 0.90;
+    this.stage.addChild(this.m_letterPanel);
+
+    /*
+     * Kontrollpanel längst ner.
+     */
+    this.m_controlsPanel = new rune.display.Graphic(
+        18,
+        screenH - 36,
+        screenW - 36,
+        26
+    );
+
+    this.m_controlsPanel.backgroundColor = "#050b0b";
+    this.m_controlsPanel.alpha = 0.82;
+    this.stage.addChild(this.m_controlsPanel);
+
+    /*
+     * Titel.
+     */
     this.m_titleText = new rune.text.BitmapField(
-    this.m_highscoreData ? "NEW HIGHSCORE!" : "WRITE YOUR NAMES"
-    );  
+    this.getTitleText()
+);
+
     this.m_titleText.autoSize = true;
-    this.m_titleText.center = this.application.screen.center;
-    this.m_titleText.y -= 80;
+    this.m_titleText.centerX = centerX;
+    this.m_titleText.y = 13;
+    this.m_titleText.scale = 1.2;
     this.stage.addChild(this.m_titleText);
 
-    this.m_helpText = new rune.text.BitmapField(String(this.getHelpText()));
-    this.m_helpText.autoSize = true;
-    this.m_helpText.center = this.application.screen.center;
-    this.m_helpText.y -= 55;
-    this.m_helpText.scale = 0.65;
-    this.stage.addChild(this.m_helpText);
-
+    /*
+     * Player 1.
+     */
     this.m_player1Text = new rune.text.BitmapField(" ");
     this.m_player1Text.autoSize = true;
-    this.m_player1Text.center = this.application.screen.center;
-    this.m_player1Text.y -= 15;
+    this.m_player1Text.scale = 0.62;
+    this.m_player1Text.centerX = centerX;
+    this.m_player1Text.y = 91;
     this.stage.addChild(this.m_player1Text);
 
+    /*
+     * Player 2.
+     */
     this.m_player2Text = new rune.text.BitmapField(" ");
     this.m_player2Text.autoSize = true;
-    this.m_player2Text.center = this.application.screen.center;
-    this.m_player2Text.y += 20;
+    this.m_player2Text.scale = 0.62;
+    this.m_player2Text.centerX = centerX;
+    this.m_player2Text.y = 127;
     this.stage.addChild(this.m_player2Text);
 
+    /*
+     * Vald bokstav.
+     */
     this.m_letterText = new rune.text.BitmapField(" ");
     this.m_letterText.autoSize = true;
-    this.m_letterText.center = this.application.screen.center;
-    this.m_letterText.y += 60;
-    this.m_letterText.scale = 0.8;
+    this.m_letterText.scale = 0.62;
+    this.m_letterText.centerX = centerX;
+    this.m_letterText.y = 180;
     this.stage.addChild(this.m_letterText);
 
+    /*
+     * Kontrolltext längst ner
+     */
+    this.m_helpText = new rune.text.BitmapField(String(this.getHelpText()));
+    this.m_helpText.autoSize = true;
+    this.m_helpText.scale = 0.45;
+    this.m_helpText.centerX = centerX;
+    this.m_helpText.y = screenH - 29;
+    this.stage.addChild(this.m_helpText);
+
+    /*
+     * Start/status-text
+     */
     this.m_startText = new rune.text.BitmapField(" ");
     this.m_startText.autoSize = true;
-    this.m_startText.center = this.application.screen.center;
-    this.m_startText.y += 90;
-    this.m_startText.scale = 0.8;
+    this.m_startText.scale = 0.58;
+    this.m_startText.centerX = centerX;
+    this.m_startText.y = 210;
     this.stage.addChild(this.m_startText);
 };
 
@@ -329,31 +508,34 @@ runmysteriet.scene.TextInputView.prototype.updateVolumeInput = function(input) {
  */
 runmysteriet.scene.TextInputView.prototype.updateText = function() {
 
+    var centerX = this.application.screen.center.x;
+    var screenH = this.application.screen.height;
+
     if (!this.m_nameInputs || this.m_nameInputs.length < 2) {
         return;
     }
 
     if (this.m_player1Text) {
         this.m_player1Text.text = this.formatPlayerRow(0);
-        this.m_player1Text.center = this.application.screen.center;
-        this.m_player1Text.y -= 15;
+        this.m_player1Text.centerX = centerX;
+        this.m_player1Text.y = 91;
     }
 
     if (this.m_player2Text) {
         this.m_player2Text.text = this.formatPlayerRow(1);
-        this.m_player2Text.center = this.application.screen.center;
-        this.m_player2Text.y += 20;
+        this.m_player2Text.centerX = centerX;
+        this.m_player2Text.y = 127;
     }
 
     if (this.m_letterText) {
         this.m_letterText.text =
-            "SELECTED LETTER: " +
+            "LETTER: " +
             this.m_nameInputs[this.m_currentPlayer]
                 .getSelectedLetter()
                 .toUpperCase();
 
-        this.m_letterText.center = this.application.screen.center;
-        this.m_letterText.y += 60;
+        this.m_letterText.centerX = centerX;
+        this.m_letterText.y = 180;
     }
 
     if (this.m_startText) {
@@ -365,11 +547,15 @@ runmysteriet.scene.TextInputView.prototype.updateText = function() {
             this.m_startText.text = "FILL IN PLAYER 2";
         }
 
-        this.m_startText.center = this.application.screen.center;
-        this.m_startText.y += 90;
+        this.m_startText.centerX = centerX;
+        this.m_startText.y = 210;
+    }
+
+    if (this.m_helpText) {
+        this.m_helpText.centerX = centerX;
+        this.m_helpText.y = screenH - 29;
     }
 };
-
 /**
  * Formaterar namnrad för spelare.
  *
@@ -397,7 +583,7 @@ runmysteriet.scene.TextInputView.prototype.formatPlayerRow = function(index) {
     maxLength = nameInput.getMaxLength();
 
     text = isActive ? "> " : "  ";
-    text += "PLAYER " + (index + 1) + ": ";
+    text += "P" + (index + 1) + ": ";
 
     for (i = 0; i < maxLength; i++) {
         letter = rawName.charAt(i);
@@ -415,7 +601,11 @@ runmysteriet.scene.TextInputView.prototype.formatPlayerRow = function(index) {
             letter = " ";
         }
 
-        text += "[" + letter + "] ";
+        text += "[" + letter + "]";
+
+        if (i < maxLength - 1) {
+            text += " ";
+        }
     }
 
     return text;
@@ -583,6 +773,14 @@ runmysteriet.scene.TextInputView.prototype.dispose = function() {
     this.removeDisplayObject(this.m_player1Text);
     this.removeDisplayObject(this.m_helpText);
     this.removeDisplayObject(this.m_titleText);
+    this.removeDisplayObject(this.m_controlsPanel);
+    this.removeDisplayObject(this.m_letterPanel);
+    this.removeDisplayObject(this.m_player2Panel);
+    this.removeDisplayObject(this.m_player1Panel);
+    this.removeDisplayObject(this.m_namePanel);
+    this.removeDisplayObject(this.m_headerPanel);
+    this.removeDisplayObject(this.m_screenOverlay);
+    this.removeDisplayObject(this.m_background);
 
     this.m_gameInput = null;
     this.m_nameInputs = [];
@@ -594,6 +792,14 @@ runmysteriet.scene.TextInputView.prototype.dispose = function() {
     this.m_player1Text = null;
     this.m_helpText = null;
     this.m_titleText = null;
+    this.m_controlsPanel = null;
+    this.m_letterPanel = null;
+    this.m_player2Panel = null;
+    this.m_player1Panel = null;
+    this.m_namePanel = null;
+    this.m_headerPanel = null;
+    this.m_screenOverlay = null;
+    this.m_background = null;
 
     this.m_avatarData = null;
     this.m_highscoreData = null;

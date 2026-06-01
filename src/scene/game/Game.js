@@ -181,6 +181,17 @@ runmysteriet.scene.Game = function (levelNumber, score, avatarData) {
   this.menuSound = null;
 
   /**
+   * Ljud som spelas när båten kommer in i kameran
+   * @type {?Object}
+   */
+  this.m_boatWarningSound = null;
+
+  /**
+   * Håller koll på vilka båtar som redan spelat ljud
+   * @type {!Array<!Object>}
+   */
+  this.m_seenBoatSounds = [];
+  /**
    * Inputhantering för spelet.
    * @type {?Object}
    */
@@ -513,7 +524,12 @@ runmysteriet.scene.Game.prototype.init = function () {
     this.backgroundMusic.volume = 0.5;
     this.backgroundMusic.play();
   }
-
+  /**
+   *  Ljud för båtvarning
+   *  @type {?Object}
+   */
+  this.m_boatWarningSound = this.application.sounds.sound.get("scareBoat");
+  
   /**
    * Highscore-hanterare.
    * @type {runmysteriet.logic.HighscoreManager}
@@ -796,6 +812,7 @@ runmysteriet.scene.Game.prototype.update = function (step) {
   this.updateExtra();
   this.updateShields();
   this.updateEnemyCameraBlock();
+  this.updateBoatWarningSound();
 
   //Autoscroll-kameran flyttas efter spelaren.
 
@@ -933,6 +950,95 @@ runmysteriet.scene.Game.prototype.updateExtra = function () {
   }
 };
 
+/**
+ * Spelar ett varningsljud när en båt kommer in i kamerans synfält.
+ *
+ * @return {void}
+ */
+runmysteriet.scene.Game.prototype.updateBoatWarningSound = function() {
+
+    var boats = null;
+    var boat = null;
+    var i = 0;
+
+    var cameraX = 0;
+    var cameraRight = 0;
+
+    if (!this.m_platformHandler || !this.m_platformHandler.boats) {
+        return;
+    }
+
+    if (!this.camera || !this.camera.viewport) {
+        return;
+    }
+
+    if (!this.m_boatWarningSound) {
+        return;
+    }
+
+    boats = this.m_platformHandler.boats;
+
+    cameraX = this.camera.viewport.x;
+    cameraRight = cameraX + this.application.screen.width;
+
+    for (i = 0; i < boats.length; i++) {
+        boat = boats[i];
+
+        if (!boat) {
+            continue;
+        }
+
+        /*
+         * Om båten syns i kameran och ljudet inte redan spelats för denna båt.
+         */
+        if (
+            boat.x + boat.width >= cameraX &&
+            boat.x <= cameraRight &&
+            this.hasBoatPlayedSound(boat) !== true
+        ) {
+            this.playBoatWarningSound();
+            this.m_seenBoatSounds.push(boat);
+        }
+    }
+};
+
+/**
+ * Kontrollerar om en båt redan har spelat sitt ljud.
+ *
+ * @param {?Object} boat
+ * @return {boolean}
+ */
+runmysteriet.scene.Game.prototype.hasBoatPlayedSound = function(boat) {
+
+    var i = 0;
+
+    if (!boat || !this.m_seenBoatSounds) {
+        return false;
+    }
+
+    for (i = 0; i < this.m_seenBoatSounds.length; i++) {
+        if (this.m_seenBoatSounds[i] === boat) {
+            return true;
+        }
+    }
+
+    return false;
+};
+
+/**
+ * Spelar båtvarningsljudet.
+ *
+ * @return {void}
+ */
+runmysteriet.scene.Game.prototype.playBoatWarningSound = function() {
+
+    if (
+        this.m_boatWarningSound &&
+        typeof this.m_boatWarningSound.play === "function"
+    ) {
+        this.m_boatWarningSound.play();
+    }
+};
 /**
  * Skapar start-countdown innan spelet börjar.
  *
@@ -1746,18 +1852,25 @@ runmysteriet.scene.Game.prototype.loseGame = function (reason) {
     this.m_highscoreManager &&
     this.m_highscoreManager.isNewRecord(totalScore) === true
   ) {
+    
+
     this.application.scenes.load([
-      new runmysteriet.scene.TextInputView(
+    new runmysteriet.scene.TextInputView(
         function () {
-          return "UP/DOWN = LETTER   ENTER/X = ADD/SAVE   BACK/ESC = DELETE";
+            return "UP/DOWN = LETTER   ENTER/X = ADD/SAVE   BACK/ESC = DELETE";
         },
         this.m_avatarData,
         {
-          score: totalScore,
-          reason: reason || "GAME OVER"
+            score: totalScore,
+            reason: reason || "GAME OVER",
+            title: (
+                this.m_highscoreManager &&
+                typeof this.m_highscoreManager.isBestScore === "function" &&
+                this.m_highscoreManager.isBestScore(totalScore) === true
+            ) ? "NEW HIGHSCORE!" : "TOP 5 SCORE"
         }
-      )
-    ]);
+    )
+]);
     return;
   }
 
@@ -2097,6 +2210,8 @@ runmysteriet.scene.Game.prototype.dispose = function () {
 
   this.backgroundMusic = null;
   this.menuSound = null;
+  this.m_boatWarningSound = null;
+  this.m_seenBoatSounds = [];
 
   this.m_gameInput = null;
   this.camera = null;
