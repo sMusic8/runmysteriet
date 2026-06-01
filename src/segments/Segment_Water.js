@@ -67,9 +67,11 @@ this.addBackground(stage, x);
     var leftLandX = x;
     var water = null;
     var rightLandX = 0;
+    var leftLand = null;
+    var rightLand = null;
 
-    this.addLeftLand(stage, platforms, x);
-    x += this.tileSize;
+    leftLand = this.addLeftLand(stage, platforms, x);
+    x += leftLand.width;
 
     water = this.addWater(stage, waterAreas, x);
 
@@ -80,9 +82,9 @@ this.addBackground(stage, x);
     x += this.waterWidth;
 
     rightLandX = x;
-    this.addRightLand(stage, platforms, x);
-
-    x += this.tileSize;
+    rightLand = this.addRightLand(stage, platforms, x);
+    x += rightLand.width;
+    
 
     this.addDiseases(diseaseSpawns, leftLandX, rightLandX, levelNumber);
     this.addRuneSpawns(runeSpawns, leftLandX, rightLandX);
@@ -119,6 +121,7 @@ runmysteriet.segments.Segment_Water.prototype.addLeftLand = function(stage, plat
 
     stage.addChild(platform);
     platforms.push(platform);
+    return platform;
 };
 
 /**
@@ -155,6 +158,7 @@ runmysteriet.segments.Segment_Water.prototype.addRightLand = function(stage, pla
 
     stage.addChild(platform);
     platforms.push(platform);
+    return platform;
 };
 
 /**

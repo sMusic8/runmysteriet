@@ -99,7 +99,7 @@ runmysteriet.scene.GameOver.prototype.init = function() {
     }
 
     /*
-     * Viktigt:
+     * 
      * Spara score innan highscore-HUD skapas.
      * Annars kan listan laddas innan nya resultatet finns.
      */
@@ -113,6 +113,7 @@ runmysteriet.scene.GameOver.prototype.init = function() {
     this.createHighscoreBox();
     this.createHighscoreHud();
     this.createMenu();
+    this.positionMenu();
     this.createVolumeHud();
 };
 
@@ -270,6 +271,7 @@ runmysteriet.scene.GameOver.prototype.createScoreText = function() {
 
     this.stage.addChild(this.m_scoreText);
 };
+
 /**
  * Skapar en mörk transparent ruta bakom highscore-listan.
  *

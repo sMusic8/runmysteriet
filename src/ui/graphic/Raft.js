@@ -190,7 +190,7 @@ runmysteriet.ui.graphic.Raft.prototype.updateWarning = function() {
 
     this.m_warningTimer += 0.20;
 
-    alpha = 0.35 + Math.abs(Math.sin(this.m_warningTimer)) * 0.65;
+    alpha = 0.50 + Math.abs(Math.sin(this.m_warningTimer)) * 0.65;
 
     this.m_warningIndicator.x = this.x + 2;
     this.m_warningIndicator.y = this.y - 18;
