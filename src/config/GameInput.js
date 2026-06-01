@@ -49,8 +49,7 @@ runmysteriet.input.GameInput.prototype.read = function(keyboard) {
 
     /*
      * Båda gamepads används för meny/global input.
-     * Det gör att både joystick 1 och joystick 2 kan pausa,
-     * välja i menyer och ändra volym.
+     * Det gör att både joystick 1 och joystick 2 kan pausa, välja i menyer och ändra volym.
      */
     this.readGamepadByIndex(0, input);
     this.readGamepadByIndex(1, input);
@@ -235,9 +234,8 @@ runmysteriet.input.GameInput.prototype.getAxis = function(gamepad, index) {
         }
     }
 
-    /*
-     * Reserv om annan gamepad-struktur används.
-     */
+    //Reserv om annan gamepad-struktur används.
+     
     if (gamepad.axes && gamepad.axes.length > index) {
         return gamepad.axes[index] || 0;
     }
@@ -439,10 +437,8 @@ runmysteriet.input.GameInput.prototype.readPlayerGamepad = function(gamepad, inp
             gamepad.justPressed("CROSS") ||
             gamepad.justPressed(0);
 
-        /*
-         * Spelaren kan slå med både fyrkant och cirkel.
-         * Cirkel ligger också kvar som back i menyer.
-         */
+        //Spelaren kan slå med både fyrkant och cirkel.
+         
         input.attack = input.attack ||
             gamepad.justPressed("X") ||
             gamepad.justPressed("SQUARE") ||
