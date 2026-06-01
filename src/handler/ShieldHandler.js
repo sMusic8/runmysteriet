@@ -80,10 +80,6 @@ runmysteriet.handler.ShieldHandler = function(
     }
 };
 
-//------------------------------------------------------------------------------
-// WORD RESOURCE
-//------------------------------------------------------------------------------
-
 /**
  * Returnerar namn på ordresurs beroende på nivå.
  *
@@ -101,10 +97,6 @@ runmysteriet.handler.ShieldHandler.prototype.getWordResourceName = function() {
 
     return "words5";
 };
-
-//------------------------------------------------------------------------------
-// INIT
-//------------------------------------------------------------------------------
 
 /**
  * Initierar shields och genererar ordet som ska samlas.
@@ -165,31 +157,23 @@ runmysteriet.handler.ShieldHandler.prototype.init = function() {
         shield.active = true;
         shield.wordIndex = i;
 
-        /*
-         * Bokstaven sparas för logiken.
-         */
+        //Bokstaven sparas för logiken.
+         
         shield.setRune(word.charAt(i));
 
         this.m_shields.push(shield);
 
-        /*
-         * Lägg först shield på stage.
-         */
+        //Lägg först shield på stage.
+         
         this.m_stage.addChild(shield);
 
-        /*
-         * Sedan ber vi shielden själv skapa sin rune-grafik.
-         * ShieldHandler skapar alltså INTE rune-sprites.
-         */
+        //Sedan ber vi shielden själv skapa sin rune-grafik.
+         
         if (typeof shield.createRuneGraphic === "function") {
             shield.createRuneGraphic(this.m_stage);
         }
     }
 };
-
-//------------------------------------------------------------------------------
-// FALLBACK WORD
-//------------------------------------------------------------------------------
 
 /**
  * Sätter ett fallback-ord om resurser saknas.
@@ -218,10 +202,6 @@ runmysteriet.handler.ShieldHandler.prototype.setFallbackWord = function() {
     this.m_word = String(this.m_wordData.word || "").toUpperCase();
     this.m_hints = this.m_wordData.Subword || [];
 };
-
-//------------------------------------------------------------------------------
-// RUNE SPAWN
-//------------------------------------------------------------------------------
 
 /**
  * Returnerar spawnpunkt för en rune/shield.
@@ -270,10 +250,6 @@ runmysteriet.handler.ShieldHandler.prototype.getFallbackRuneSpawn = function(
     };
 };
 
-//------------------------------------------------------------------------------
-// WORD DATA
-//------------------------------------------------------------------------------
-
 /**
  * Hämtar slumpmässigt ord från resource systemet.
  *
@@ -321,10 +297,6 @@ runmysteriet.handler.ShieldHandler.prototype.getRandomWordData = function() {
     return data[index];
 };
 
-//------------------------------------------------------------------------------
-// UPDATE
-//------------------------------------------------------------------------------
-
 /**
  * Uppdaterar shields och kollar om spelare samlar dem.
  *
@@ -342,9 +314,8 @@ runmysteriet.handler.ShieldHandler.prototype.update = function(players) {
         return;
     }
 
-    /*
-     * Baklänges eftersom collectShield tar bort från m_shields.
-     */
+    //Baklänges eftersom collectShield tar bort från m_shields.
+     
     for (i = this.m_shields.length - 1; i >= 0; i--) {
         shield = this.m_shields[i];
 
@@ -360,11 +331,7 @@ runmysteriet.handler.ShieldHandler.prototype.update = function(players) {
             continue;
         }
 
-        /*
-         * Säkerhet:
-         * Om shieldens update inte körs av stage av någon anledning,
-         * håll rune-grafiken rätt positionerad ändå.
-         */
+        
         if (typeof shield.updateRuneGraphicPosition === "function") {
             shield.updateRuneGraphicPosition();
         }
@@ -411,10 +378,6 @@ runmysteriet.handler.ShieldHandler.prototype.isValidPlayer = function(player) {
     return true;
 };
 
-//------------------------------------------------------------------------------
-// COLLECT
-//------------------------------------------------------------------------------
-
 /**
  * Samlar upp en shield.
  *
@@ -435,11 +398,7 @@ runmysteriet.handler.ShieldHandler.prototype.collectShield = function(shield) {
 
     this.playCatchSound();
 
-    /*
-     * Ta bort visuellt från stage.
-     * Kör inte dispose här eftersom shield behövs i m_collected
-     * för getRuneString().
-     */
+
     if (typeof shield.remove === "function") {
         shield.remove();
     } else {
@@ -474,10 +433,6 @@ runmysteriet.handler.ShieldHandler.prototype.playCatchSound = function() {
         this.catchSound.play();
     }
 };
-
-//------------------------------------------------------------------------------
-// STRING BUILDER
-//------------------------------------------------------------------------------
 
 /**
  * Returnerar insamlade runor som text.
@@ -543,10 +498,6 @@ runmysteriet.handler.ShieldHandler.prototype.allRunesCollected = function() {
     return this.allRunesColected();
 };
 
-//------------------------------------------------------------------------------
-// GETTERS
-//------------------------------------------------------------------------------
-
 /**
  * Hämtar data till GuessWord.
  *
@@ -561,10 +512,6 @@ runmysteriet.handler.ShieldHandler.prototype.getGuessData = function() {
         hiddenIndex: this.m_hiddenIndex
     };
 };
-
-//------------------------------------------------------------------------------
-// REMOVE DISPLAY OBJECT
-//------------------------------------------------------------------------------
 
 /**
  * Tar bara bort display object från stage.
@@ -618,10 +565,6 @@ runmysteriet.handler.ShieldHandler.prototype.removeDisplayObject = function(
     this.removeDisplayOnly(object);
 };
 
-//------------------------------------------------------------------------------
-// CLEAR
-//------------------------------------------------------------------------------
-
 /**
  * Tar bort alla shields/runor från stage och tömmer listor.
  *
@@ -665,10 +608,6 @@ runmysteriet.handler.ShieldHandler.prototype.clear = function() {
     this.m_hints = [];
     this.m_hiddenIndex = -1;
 };
-
-//------------------------------------------------------------------------------
-// DISPOSE
-//------------------------------------------------------------------------------
 
 /**
  * Rensar ShieldHandler helt.

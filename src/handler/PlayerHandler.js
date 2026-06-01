@@ -679,9 +679,8 @@ runmysteriet.handler.PlayerHandler.prototype.checkPlayerPlatform = function(play
      
     otherHeadY = this.getPlayerHeadY(other);
 
-    /*
-     * spelaren måste ha varit ovanför i förra framen, detta hindrar också att spelaren snappas upp från sidan eller underifrån
-     */
+    //Spelaren måste ha varit ovanför i förra framen, detta hindrar också att spelaren snappas upp från sidan eller underifrån
+     
     wasAbove = playerPreviousFootY <= otherHeadY + toleranceY;
 
     //Spelaren måste faktiskt ha nått ner till den andra spelaren
@@ -1053,9 +1052,8 @@ runmysteriet.handler.PlayerHandler.prototype.updateBoatDangerState = function() 
                 continue;
             }
 
-            /*
-             * Båtens farliga läge fungerar som innan.
-             */
+            //Båtens farliga läge fungerar som innan.
+             
             if (
                 typeof boat.isAboveRaft === "function" &&
                 boat.isAboveRaft(platform)
@@ -1063,10 +1061,8 @@ runmysteriet.handler.PlayerHandler.prototype.updateBoatDangerState = function() 
                 isDangerous = true;
             }
 
-            /*
-             * DANGER visas bara på flotten när båten är på höger sida
-             * och ovanför flotten.
-             */
+            //DANGER visas bara på flotten när båten är på höger sida och ovanför flotten.
+             
             if (
                 typeof boat.isWarningAboveRaft === "function" &&
                 boat.isWarningAboveRaft(platform) &&
@@ -1228,9 +1224,6 @@ runmysteriet.handler.PlayerHandler.prototype.checkAllEnemyBlockers = function() 
         this.checkEnemyBlockers(player);
     }
 };
-//------------------------------------------------------------------------------
-// SOUND
-//------------------------------------------------------------------------------
 
 /**
  * Spelar ljud vid attack
@@ -1444,7 +1437,6 @@ runmysteriet.handler.PlayerHandler.prototype.setCamera = function(camera) {
 
 /**
  * Hindrar levande spelare från att lämna kamerans synliga område.
- * Detta gör att spelarna inte kan gå ifrån varandra.
  *
  * @return {void}
  */
@@ -1574,11 +1566,6 @@ runmysteriet.handler.PlayerHandler.prototype.updateAttackEmitters = function() {
     }
 }; 
 
-
-//------------------------------------------------------------------------------
-// ENEMY BLOCKERS
-//------------------------------------------------------------------------------
-
 /**
  * Stoppar spelaren från att gå vidare tills kopplad Kristen är död.
  *
@@ -1640,9 +1627,8 @@ runmysteriet.handler.PlayerHandler.prototype.checkEnemyBlockers = function(playe
 
         enemy = blocker.enemy;
 
-        /*
-         * Om Kristen är död ska spärren inte stoppa spelaren.
-         */
+        //Om Kristen är död ska spärren inte stoppa spelaren.
+         
         if (enemy && enemy.isDead === true) {
             continue;
         }
@@ -1660,10 +1646,8 @@ runmysteriet.handler.PlayerHandler.prototype.checkEnemyBlockers = function(playe
             playerBottom > blockerTop &&
             playerTop < blockerBottom;
 
-        /*
-         * Fångar fall där spelaren rör sig snabbt och passerar
-         * från ena sidan till andra sidan mellan två frames.
-         */
+        //Fångar fall där spelaren rör sig snabbt och passerar från ena sidan till andra sidan mellan två frames.
+         
         crossedFromLeft =
             previousRight <= blockerLeft &&
             playerRight >= blockerLeft;
@@ -1828,10 +1812,6 @@ runmysteriet.handler.PlayerHandler.prototype.setCameraHandler = function(cameraH
     this.cameraHandler = cameraHandler;
 };
 
-//------------------------------------------------------------------------------
-// REMOVE DISPLAY OBJECT
-//------------------------------------------------------------------------------
-
 /**
  * Tar bort display object från stage.
  *
@@ -1864,10 +1844,6 @@ runmysteriet.handler.PlayerHandler.prototype.removeDisplayObject = function(obje
     }
 };
 
-//------------------------------------------------------------------------------
-// CLEAR
-//------------------------------------------------------------------------------
-
 /**
  * Tar bort spelare, hp-bars, attacker, dödseffekter och emitters från stage.
  *
@@ -1881,9 +1857,8 @@ runmysteriet.handler.PlayerHandler.prototype.clear = function() {
     var effect = null;
     var emitter = null;
 
-    /*
-     * Spelare och hp-bars.
-     */
+    //Spelare och hp-bars.
+     
     if (this.players) {
         for (i = 0; i < this.players.length; i++) {
             player = this.players[i];
@@ -1901,9 +1876,8 @@ runmysteriet.handler.PlayerHandler.prototype.clear = function() {
         }
     }
 
-    /*
-     * Attacker.
-     */
+    //Attacker.
+     
     if (this.attacks) {
         for (i = 0; i < this.attacks.length; i++) {
             attack = this.attacks[i];
@@ -1912,9 +1886,8 @@ runmysteriet.handler.PlayerHandler.prototype.clear = function() {
         }
     }
 
-    /*
-     * Döds-effekter.
-     */
+    //Döds-effekter.
+     
     if (this.deathEffects) {
         for (i = 0; i < this.deathEffects.length; i++) {
             effect = this.deathEffects[i];
@@ -1923,9 +1896,8 @@ runmysteriet.handler.PlayerHandler.prototype.clear = function() {
         }
     }
 
-    /*
-     * Attack particle emitters.
-     */
+    //Attack particle emitters.
+     
     if (this.attackEmitters) {
         for (i = 0; i < this.attackEmitters.length; i++) {
             emitter = this.attackEmitters[i];
@@ -1939,10 +1911,6 @@ runmysteriet.handler.PlayerHandler.prototype.clear = function() {
     this.deathEffects = [];
     this.attackEmitters = [];
 };
-
-//------------------------------------------------------------------------------
-// DISPOSE
-//------------------------------------------------------------------------------
 
 /**
  * Rensar PlayerHandler helt.

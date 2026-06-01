@@ -39,17 +39,12 @@ runmysteriet.handler.AutoScrollCameraHandler = function(
     /** @type {boolean} */
     this.m_paused = false;
 
-    /*
-     * 1 = varje frame
-     * 2 = varannan frame
-     * 3 = var tredje frame
-     */
+  
     this.scrollDelay = 1;
     this.scrollCounter = 0;
 
-    /*
-     * Death slow motion.
-     */
+    //Death slow motion.
+     
     this.deathSlowTimer = 0;
     this.deathSlowDuration = 90;
     this.deathSlowScrollDelay = 6;
@@ -100,9 +95,8 @@ runmysteriet.handler.AutoScrollCameraHandler.prototype.update = function(step) {
         }
     }
 
-    /*
-     * Kameran rör sig först efter det kollar vi om flotten nu ligger i mitten.
-     */
+    //Kameran rör sig först efter det kollar vi om flotten nu ligger i mitten.
+     
     this.moveCamera();
     this.checkRaftPause();
 };
@@ -307,14 +301,8 @@ runmysteriet.handler.AutoScrollCameraHandler.prototype.getCurrentScrollDelay = f
     return this.scrollDelay;
 };
 
-//------------------------------------------------------------------------------
-// DISPOSE
-//------------------------------------------------------------------------------
-
 /**
  * Rensar AutoScrollCameraHandler.
- *
- * Äger inga stage-objekt, släpper bara referenser.
  *
  * @return {void}
  */

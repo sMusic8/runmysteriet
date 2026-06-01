@@ -47,9 +47,8 @@ runmysteriet.handler.HudHandler = function(stage, application, cameras) {
  */
 runmysteriet.handler.HudHandler.prototype.init = function() {
 
-    /*
-     * Säkerhet om HUD råkar initieras om.
-     */
+    //Säkerhet om HUD råkar initieras om.
+     
     this.clear();
 
     this.m_timerText = new rune.text.BitmapField("COLLECT ALL RUNES");
@@ -258,10 +257,6 @@ runmysteriet.handler.HudHandler.prototype.reloadHighscore = function() {
     }
 };
 
-//------------------------------------------------------------------------------
-// REMOVE DISPLAY OBJECT
-//------------------------------------------------------------------------------
-
 /**
  * Tar bort display object från stage.
  *
@@ -304,9 +299,6 @@ runmysteriet.handler.HudHandler.prototype.clear = function() {
             this.m_shieldHandler.onCollectedChanged = null;
         }
 }
-//------------------------------------------------------------------------------
-// CLEAR
-//------------------------------------------------------------------------------
 
 /**
  * Tar bort HUD-objekt från stage.
@@ -334,10 +326,6 @@ runmysteriet.handler.HudHandler.prototype.clear = function() {
 
     this.m_shieldHandler = null;
 };
-
-//------------------------------------------------------------------------------
-// DISPOSE
-//------------------------------------------------------------------------------
 
 /**
  * Rensar HudHandler helt.

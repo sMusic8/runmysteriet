@@ -71,10 +71,6 @@ runmysteriet.handler.LevelCompleteSequence = function(
     }
 };
 
-//------------------------------------------------------------------------------
-// PUBLIC METHODS
-//------------------------------------------------------------------------------
-
 /**
  * Startar level complete-sekvensen.
  *
@@ -91,9 +87,8 @@ runmysteriet.handler.LevelCompleteSequence.prototype.start = function(
         return;
     }
 
-    /*
-     * Säkerställ att inget gammalt ligger kvar.
-     */
+    //Säkerställ att inget gammalt ligger kvar.
+     
     this.clear();
 
     this.m_active = true;
@@ -106,11 +101,6 @@ runmysteriet.handler.LevelCompleteSequence.prototype.start = function(
 
     this.savePlayersStartData();
 
-    /*
-     * Ordning:
-     * overlay först, sedan blommor, text sist.
-     * Då hamnar LEVEL COMPLETE överst.
-     */
     this.createOverlay();
     this.createFlowers();
     this.createText();
@@ -156,10 +146,6 @@ runmysteriet.handler.LevelCompleteSequence.prototype.isActive = function() {
     return this.m_active === true;
 };
 
-//------------------------------------------------------------------------------
-// CREATE
-//------------------------------------------------------------------------------
-
 /**
  * Skapar mörk overlay.
  *
@@ -204,10 +190,6 @@ runmysteriet.handler.LevelCompleteSequence.prototype.createText = function() {
 
     this.m_stage.addChild(this.m_text);
 };
-
-//------------------------------------------------------------------------------
-// PLAYERS
-//------------------------------------------------------------------------------
 
 /**
  * Sparar spelarnas startpositioner.
@@ -267,27 +249,21 @@ runmysteriet.handler.LevelCompleteSequence.prototype.updatePlayers = function() 
             continue;
         }
 
-        /*
-         * 0-15 frames:
-         * Spelaren hukar.
-         */
+        //0-15 frames, spelaren hukar.
+         
         if (this.m_timer <= 15) {
             player.y = data.startY + 8;
         }
 
-        /*
-         * 16-45 frames:
-         * Spelaren hoppar upp och landar.
-         */
+        //16-45 frames, spelaren hoppar upp och landar.
+         
         else if (this.m_timer <= 45) {
             jumpOffset = Math.sin((this.m_timer - 15) / 30 * Math.PI) * 28;
             player.y = data.startY - jumpOffset;
         }
 
-        /*
-         * Efter hoppet:
-         * tillbaka till startposition.
-         */
+        //Efter hoppet, tillbaka till startposition.
+         
         else {
             player.y = data.startY;
         }
@@ -316,10 +292,6 @@ runmysteriet.handler.LevelCompleteSequence.prototype.restorePlayers = function()
         }
     }
 };
-
-//------------------------------------------------------------------------------
-// TEXT
-//------------------------------------------------------------------------------
 
 /**
  * Uppdaterar textens position så den ligger i mitten av kameran.
@@ -405,10 +377,6 @@ runmysteriet.handler.LevelCompleteSequence.prototype.updateTextPop = function() 
     this.m_text.scaleY = scale;
 };
 
-//------------------------------------------------------------------------------
-// FLOWERS
-//------------------------------------------------------------------------------
-
 /**
  * Skapar små blommor runt avatarerna.
  *
@@ -480,9 +448,8 @@ runmysteriet.handler.LevelCompleteSequence.prototype.updateFlowers = function() 
         return;
     }
 
-    /*
-     * Blommorna börjar när avatarerna hoppar.
-     */
+    //Blommorna börjar när avatarerna hoppar.
+     
     if (this.m_timer < 18) {
         return;
     }
@@ -537,10 +504,6 @@ runmysteriet.handler.LevelCompleteSequence.prototype.clearFlowers = function() {
     this.m_flowerData = [];
 };
 
-//------------------------------------------------------------------------------
-// SOUND
-//------------------------------------------------------------------------------
-
 /**
  * Spelar jubelljud.
  *
@@ -560,10 +523,6 @@ runmysteriet.handler.LevelCompleteSequence.prototype.playCheerSound = function()
         this.m_cheerSound.play();
     }
 };
-
-//------------------------------------------------------------------------------
-// POSITION HELPERS
-//------------------------------------------------------------------------------
 
 /**
  * Hämtar mittenpositionen mellan levande spelare.
@@ -669,10 +628,6 @@ runmysteriet.handler.LevelCompleteSequence.prototype.getCameraY = function() {
     return 0;
 };
 
-//------------------------------------------------------------------------------
-// FINISH
-//------------------------------------------------------------------------------
-
 /**
  * Avslutar sekvensen och kör callback.
  *
@@ -689,10 +644,6 @@ runmysteriet.handler.LevelCompleteSequence.prototype.finish = function() {
         onComplete(completeData);
     }
 };
-
-//------------------------------------------------------------------------------
-// REMOVE DISPLAY OBJECT
-//------------------------------------------------------------------------------
 
 /**
  * Tar bort ett objekt från stage.
@@ -715,10 +666,6 @@ runmysteriet.handler.LevelCompleteSequence.prototype.removeDisplayObject = funct
         object.stage.removeChild(object);
     }
 };
-
-//------------------------------------------------------------------------------
-// CLEAR
-//------------------------------------------------------------------------------
 
 /**
  * Rensar sekvensen.
@@ -747,10 +694,6 @@ runmysteriet.handler.LevelCompleteSequence.prototype.clear = function() {
 
     this.m_hasPlayedSound = false;
 };
-
-//------------------------------------------------------------------------------
-// DISPOSE
-//------------------------------------------------------------------------------
 
 /**
  * Rensar alla referenser.

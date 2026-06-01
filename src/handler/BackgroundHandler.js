@@ -92,10 +92,6 @@ runmysteriet.handler.BackgroundHandler.prototype.update = function() {
     }
 };
 
-//------------------------------------------------------------------------------
-// REMOVE DISPLAY OBJECT
-//------------------------------------------------------------------------------
-
 /**
  * Tar bort ett display object från stage.
  *
@@ -117,10 +113,6 @@ runmysteriet.handler.BackgroundHandler.prototype.removeDisplayObject = function(
         object.stage.removeChild(object);
     }
 };
-
-//------------------------------------------------------------------------------
-// CLEAR
-//------------------------------------------------------------------------------
 
 /**
  * Tar bort alla bakgrunder från stage.
@@ -144,10 +136,6 @@ runmysteriet.handler.BackgroundHandler.prototype.clear = function() {
 
     this.backgrounds = [];
 };
-
-//------------------------------------------------------------------------------
-// DISPOSE
-//------------------------------------------------------------------------------
 
 /**
  * Rensar BackgroundHandler helt.

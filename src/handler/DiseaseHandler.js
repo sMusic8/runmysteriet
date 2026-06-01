@@ -69,10 +69,6 @@ runmysteriet.handler.DiseaseHandler.prototype.init = function (
     }
 };
 
-//------------------------------------------------------------------------------
-// ADD DISEASE
-//------------------------------------------------------------------------------
-
 /**
  * Skapar och lägger till en disease.
  *
@@ -87,10 +83,7 @@ runmysteriet.handler.DiseaseHandler.prototype.addDisease = function(type, x, y) 
 
     disease = new runmysteriet.entity.Disease(x, y, type);
 
-    /*
-     * Pulse data.
-     * Stör inte sprite-animationen i Disease.update().
-     */
+    //Pulse data
     disease.m_baseScale = 1.5;
     disease.m_pulseSpeed = 0.006;
     disease.m_pulseValue = Math.random() * Math.PI * 2;
@@ -100,10 +93,6 @@ runmysteriet.handler.DiseaseHandler.prototype.addDisease = function(type, x, y) 
 
     return disease;
 };
-
-//------------------------------------------------------------------------------
-// UPDATE
-//------------------------------------------------------------------------------
 
 /**
  * Uppdaterar sjukdomar och kollar kollision med spelare.
@@ -203,10 +192,6 @@ runmysteriet.handler.DiseaseHandler.prototype.isValidPlayer = function(player) {
     return true;
 };
 
-//------------------------------------------------------------------------------
-// DAMAGE
-//------------------------------------------------------------------------------
-
 /**
  * Skadar spelaren.
  *
@@ -241,10 +226,6 @@ runmysteriet.handler.DiseaseHandler.prototype.playSneezeSound = function() {
     }
 };
 
-//------------------------------------------------------------------------------
-// REMOVE DISEASE
-//------------------------------------------------------------------------------
-
 /**
  * Tar bort disease på index.
  *
@@ -264,10 +245,6 @@ runmysteriet.handler.DiseaseHandler.prototype.removeDiseaseAt = function(index) 
     this.removeDisplayObject(disease);
     this.diseases.splice(index, 1);
 };
-
-//------------------------------------------------------------------------------
-// COLLISION
-//------------------------------------------------------------------------------
 
 /**
  * Kollar collision mellan spelare och disease.
@@ -323,10 +300,6 @@ runmysteriet.handler.DiseaseHandler.prototype.hitTestPlayerDisease = function(
     );
 };
 
-//------------------------------------------------------------------------------
-// REMOVE DISPLAY OBJECT
-//------------------------------------------------------------------------------
-
 /**
  * Tar bort display object från stage.
  *
@@ -359,10 +332,6 @@ runmysteriet.handler.DiseaseHandler.prototype.removeDisplayObject = function(obj
     }
 };
 
-//------------------------------------------------------------------------------
-// CLEAR
-//------------------------------------------------------------------------------
-
 /**
  * Tar bort alla disease från scenen.
  *
@@ -386,10 +355,6 @@ runmysteriet.handler.DiseaseHandler.prototype.clear = function() {
 
     this.diseases = [];
 };
-
-//------------------------------------------------------------------------------
-// DISPOSE
-//------------------------------------------------------------------------------
 
 /**
  * Rensar DiseaseHandler helt.
