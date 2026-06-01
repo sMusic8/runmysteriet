@@ -149,8 +149,6 @@ runmysteriet.scene.GuessWord = function(
     this.m_triesHearts = [];
 
     /**
-     * Byt detta om din hjärtbild heter något annat i Requests.js.
-     * Exempel: "heart" istället för "hart".
      *
      * @type {string}
      */
@@ -158,6 +156,9 @@ runmysteriet.scene.GuessWord = function(
 
     /** @type {?Object} */
     this.m_wrongSound = null;
+
+    /** @type {?Object} */
+    this.m_rightSound = null;
 
     /** @type {!Array<!Object>} */
     this.m_effects = [];
@@ -227,12 +228,8 @@ runmysteriet.scene.GuessWord.prototype.init = function() {
 
     this.backgroundMusic = this.application.sounds.sound.get("sound_musicMenu");
     this.menuSound = this.application.sounds.sound.get("sound_menu");
-
-    /*
-     * Tillfälligt felljud.
-     * Byt till "sound_wrong" om du lägger till ett eget felljud i Requests.js.
-     */
     this.m_wrongSound = this.application.sounds.sound.get("fail");
+    this.m_rightSound = this.application.sounds.sound.get("lvl_up");
 
     if (this.backgroundMusic) {
         this.backgroundMusic.loop = true;
@@ -270,7 +267,6 @@ runmysteriet.scene.GuessWord.prototype.init = function() {
     this.updateLetterBoxes();
     this.updateTriesHearts();
 
-    this.createInfoText();
     this.createFeedbackText();
     this.createControlsText();
 
@@ -360,46 +356,10 @@ runmysteriet.scene.GuessWord.prototype.createWordPanel = function() {
 
     this.stage.addChild(this.m_wordPanel);
 };
-/**
- * Skapar hintpanel.
- *
- * @return {void}
- */
-/**
- * Hintpanel används inte längre.
- * Hint visas i feedbackrutan och kontrollraden.
- *
- * @return {void}
- */
-runmysteriet.scene.GuessWord.prototype.createHintPanel = function() {
-};
+
 
 /**
- * Skapar feedbackpanel.
- *
- * @return {void}
- */
-runmysteriet.scene.GuessWord.prototype.createFeedbackPanel = function() {
-
-    var centerX = this.application.screen.center.x;
-
-    this.m_feedbackBox = new rune.display.Graphic(
-        centerX - 125,
-        168,
-        250,
-        24
-    );
-
-    this.m_feedbackBox.backgroundColor = "#050b0b";
-    this.m_feedbackBox.alpha = 0.95;
-
-    this.stage.addChild(this.m_feedbackBox);
-
-    this.m_feedbackBoxStartX = this.m_feedbackBox.x;
-};
-
-/**
- * Skapar kontrollpanelen längst ner.
+ * Skapar kontrollpanelen längst ner
  *
  * @return {void}
  */
@@ -515,16 +475,6 @@ runmysteriet.scene.GuessWord.prototype.createLetterBoxes = function() {
         this.m_letterBoxes.push(box);
     }
 };
-
-/**
- * Extra infotext används inte längre
- * Kontroller visas längst ner och hint visas i feedback.
- *
- * @return {void}
- */
-runmysteriet.scene.GuessWord.prototype.createInfoText = function() {
-};
-
 /**
  * Skapar feedbacktext.
  *
@@ -566,7 +516,7 @@ runmysteriet.scene.GuessWord.prototype.createFeedbackPanel = function() {
 };
 
 /**
- * Skapar instruktionstext längst ner.
+ * Skapar instruktionstext längst ner
  *
  * @return {void}
  */
@@ -589,7 +539,7 @@ runmysteriet.scene.GuessWord.prototype.createControlsText = function() {
 //------------------------------------------------------------------------------
 
 /**
- * Uppdaterar bokstavsrutor.
+ * Uppdaterar bokstavsrutor
  *
  * @return {void}
  */
@@ -601,20 +551,26 @@ runmysteriet.scene.GuessWord.prototype.updateLetterBoxes = function() {
     var selectedLetter = this.m_alphabetSelector.getLetter();
 
     var i = 0;
+    var box = null;
 
     for (i = 0; i < word.length; i++) {
-        if (revealedMap[i] === true) {
-            this.m_letterBoxes[i].setLetter(word.charAt(i));
-            this.m_letterBoxes[i].setActive(false);
+        box = this.m_letterBoxes[i];
 
-        } else if (i === currentIndex) {
-            this.m_letterBoxes[i].setPreviewLetter(selectedLetter);
-            this.m_letterBoxes[i].setActive(true);
-
-        } else {
-            this.m_letterBoxes[i].clear();
-            this.m_letterBoxes[i].setActive(false);
+        if (!box) {
+            continue;
         }
+
+        if (revealedMap[i] === true) {
+            box.setFound(word.charAt(i));
+            continue;
+        }
+
+        if (i === currentIndex) {
+            box.setPreview(selectedLetter);
+            continue;
+        }
+
+        box.setEmpty();
     }
 };
 
@@ -813,9 +769,10 @@ runmysteriet.scene.GuessWord.prototype.checkAnswer = function(letter) {
     var correct = this.m_puzzle.checkLetter(String(letter).toLowerCase());
 
     if (correct) {
+        this.playRightSound();
+
         this.m_alphabetSelector.reset();
         this.updateLetterBoxes();
-
         if (this.m_puzzle.isComplete()) {
             this.m_answeredCorrect = true;
             this.updateMessageText("WORD COMPLETE", "right");
@@ -1066,7 +1023,7 @@ runmysteriet.scene.GuessWord.prototype.updateShake = function() {
 };
 
 /**
- * Spelar felljud.
+ * spelar felljudet
  *
  * @return {void}
  */
@@ -1076,7 +1033,17 @@ runmysteriet.scene.GuessWord.prototype.playWrongSound = function() {
         this.m_wrongSound.play();
     }
 };
+/**
+ * Spelar ljud vid rätt gissning av bokstav
+ *
+ * @return {void}
+ */
+runmysteriet.scene.GuessWord.prototype.playRightSound = function() {
 
+    if (this.m_rightSound && typeof this.m_rightSound.play === "function") {
+        this.m_rightSound.play();
+    }
+};
 /**
  * Skapar små blommor vid rätt svar.
  *
@@ -1463,6 +1430,7 @@ runmysteriet.scene.GuessWord.prototype.dispose = function() {
     this.backgroundMusic = null;
     this.menuSound = null;
     this.m_wrongSound = null;
+    this.m_rightSound = null;
 
     this.m_failedGuess = false;
     this.m_answeredCorrect = false;

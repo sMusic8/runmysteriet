@@ -1746,18 +1746,25 @@ runmysteriet.scene.Game.prototype.loseGame = function (reason) {
     this.m_highscoreManager &&
     this.m_highscoreManager.isNewRecord(totalScore) === true
   ) {
+    
+
     this.application.scenes.load([
-      new runmysteriet.scene.TextInputView(
+    new runmysteriet.scene.TextInputView(
         function () {
-          return "UP/DOWN = LETTER   ENTER/X = ADD/SAVE   BACK/ESC = DELETE";
+            return "UP/DOWN = LETTER   ENTER/X = ADD/SAVE   BACK/ESC = DELETE";
         },
         this.m_avatarData,
         {
-          score: totalScore,
-          reason: reason || "GAME OVER"
+            score: totalScore,
+            reason: reason || "GAME OVER",
+            title: (
+                this.m_highscoreManager &&
+                typeof this.m_highscoreManager.isBestScore === "function" &&
+                this.m_highscoreManager.isBestScore(totalScore) === true
+            ) ? "NEW HIGHSCORE!" : "TOP 5 SCORE"
         }
-      )
-    ]);
+    )
+]);
     return;
   }
 

@@ -42,7 +42,7 @@ runmysteriet.ui.graphic.MenuList = function(
     this.boxes = [];
 
     /** @type {number} */
-    this.boxWidth = 80;
+    this.boxWidth = 160;
 
     /** @type {number} */
     this.boxHeight = 16;
