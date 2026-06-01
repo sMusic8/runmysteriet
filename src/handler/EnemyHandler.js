@@ -150,12 +150,18 @@ runmysteriet.handler.EnemyHandler.prototype.createKristenBlocker = function(
  * Uppdaterar alla kristna.
  *
  * @param {!Array<!runmysteriet.entity.Player>} players
+ * @param {boolean=} isPaused
  * @return {void}
  */
-runmysteriet.handler.EnemyHandler.prototype.update = function(players) {
+runmysteriet.handler.EnemyHandler.prototype.update = function(players, isPaused) {
 
     var i = 0;
     var enemy = null;
+
+    if (isPaused === true) {
+        this.stopFightSound();
+        return;
+    }
 
     for (i = 0; i < this.enemies.length; i++) {
         enemy = this.enemies[i];
@@ -174,7 +180,7 @@ runmysteriet.handler.EnemyHandler.prototype.update = function(players) {
     }
 
     this.updateEnemyBlockers();
-    this.updateFightSound();
+    this.updateFightSound(players);
 };
 
 //------------------------------------------------------------------------------
@@ -214,26 +220,61 @@ runmysteriet.handler.EnemyHandler.prototype.updateEnemyBlockers = function() {
 
 /**
  * Uppdaterar fight-ljudet.
- * Ljudet spelas så länge minst en Kristen lever.
+ * Ljudet spelas när minst en levande spelare är nära en levande Kristen.
  *
+ * @param {!Array<!runmysteriet.entity.Player>} players
  * @return {void}
  */
-runmysteriet.handler.EnemyHandler.prototype.updateFightSound = function() {
+runmysteriet.handler.EnemyHandler.prototype.updateFightSound = function(players) {
 
     var i = 0;
+    var j = 0;
     var enemy = null;
-    var hasAliveKristen = false;
+    var player = null;
+
+    var enemyCenterX = 0;
+    var playerCenterX = 0;
+    var distance = 0;
+
+    var fightDistance = 400;
+    var shouldPlayFightSound = false;
+
+    if (!players) {
+        this.stopFightSound();
+        return;
+    }
 
     for (i = 0; i < this.enemies.length; i++) {
         enemy = this.enemies[i];
 
-        if (enemy && enemy.isDead !== true) {
-            hasAliveKristen = true;
+        if (!enemy || enemy.isDead === true) {
+            continue;
+        }
+
+        enemyCenterX = enemy.x + enemy.width / 2;
+
+        for (j = 0; j < players.length; j++) {
+            player = players[j];
+
+            if (!player || player.isDead === true) {
+                continue;
+            }
+
+            playerCenterX = player.x + player.width / 2;
+            distance = Math.abs(playerCenterX - enemyCenterX);
+
+            if (distance <= fightDistance) {
+                shouldPlayFightSound = true;
+                break;
+            }
+        }
+
+        if (shouldPlayFightSound === true) {
             break;
         }
     }
 
-    if (hasAliveKristen === true) {
+    if (shouldPlayFightSound === true) {
         this.startFightSound();
     } else {
         this.stopFightSound();
@@ -312,8 +353,14 @@ runmysteriet.handler.EnemyHandler.prototype.stopFightSound = function() {
 
     var mediaElement = null;
 
+    /*
+     * Om ljudet inte finns behöver vi bara återställa flaggan.
+     */
+    if (!this.fightSound) {
+        this.fightSoundPlaying = false;
+        return;
+    }
     if (
-        this.fightSound &&
         this.fightSound.m_source &&
         this.fightSound.m_source.mediaElement
     ) {
@@ -329,13 +376,10 @@ runmysteriet.handler.EnemyHandler.prototype.stopFightSound = function() {
             mediaElement.currentTime = 0;
         } catch (error) {
         }
-    } else if (this.fightSound && typeof this.fightSound.stop === "function") {
-        this.fightSound.stop();
     }
 
     this.fightSoundPlaying = false;
 };
-
 //------------------------------------------------------------------------------
 // CLEAR
 //------------------------------------------------------------------------------
