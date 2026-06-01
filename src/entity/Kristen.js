@@ -134,7 +134,6 @@ runmysteriet.entity.Kristen.prototype.update = function (step) {
 
   if (this.hpBar) {
 
-    // Position
     this.hpBar.x = this.x;
     this.hpBar.y = this.y - 8;
 
@@ -157,7 +156,6 @@ runmysteriet.entity.Kristen.prototype.update = function (step) {
       newTexture = "hpbar4";
     }
 
-    // Byt texture om behövs
     if (newTexture !== this.currentHpTexture) {
 
       this.currentHpTexture = newTexture;
@@ -352,10 +350,6 @@ runmysteriet.entity.Kristen.prototype.checkPlayerCollisions = function (players)
   }
 };
 
-//------------------------------------------------------------------------------
-// REMOVE DISPLAY OBJECT
-//------------------------------------------------------------------------------
-
 /**
  * Tar bort display object från stage.
  *
@@ -377,10 +371,6 @@ runmysteriet.entity.Kristen.prototype.removeDisplayObject = function(object) {
         object.stage.removeChild(object);
     }
 };
-
-//------------------------------------------------------------------------------
-// DISPOSE
-//------------------------------------------------------------------------------
 
 /**
  * Rensar Kristen och objekt som Kristen själv äger.
