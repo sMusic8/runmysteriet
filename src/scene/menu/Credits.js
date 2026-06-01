@@ -24,10 +24,14 @@ runmysteriet.scene.Credits = function() {
 runmysteriet.scene.Credits.prototype = Object.create(rune.scene.Scene.prototype);
 runmysteriet.scene.Credits.prototype.constructor = runmysteriet.scene.Credits;
 
-//------------------------------------------------------------------------------
-// INIT
-//------------------------------------------------------------------------------
-
+/**
+ * @description
+ * Initierar Credits-scenen. Denna metod anropas när scenen startas och ansvarar för att konfigurera inmatning, ljud samt visuella element.
+ *
+ * @this runmysteriet.scene.Credits
+ *
+ * @returns {void}
+ */
 runmysteriet.scene.Credits.prototype.init = function() {
 
     rune.scene.Scene.prototype.init.call(this);
@@ -50,11 +54,11 @@ runmysteriet.scene.Credits.prototype.init = function() {
     this.createBackButton();
     this.createVolumeHud();
 };
-
-//------------------------------------------------------------------------------
-// CREATE
-//------------------------------------------------------------------------------
-
+/**
+ * Skapar bakgrunden för credits-scenen.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.Credits.prototype.createBackground = function() {
 
     this.m_background = new rune.display.Graphic(
@@ -67,7 +71,11 @@ runmysteriet.scene.Credits.prototype.createBackground = function() {
 
     this.stage.addChild(this.m_background);
 };
-
+/**
+ * Skapar en centrerad vit informationsruta i credits-scenen.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.Credits.prototype.createBox = function() {
 
     var boxWidth = 520;
@@ -89,6 +97,11 @@ runmysteriet.scene.Credits.prototype.createBox = function() {
     this.stage.addChild(this.m_box);
 };
 
+/**
+ * Skapar titeltexten för credits-scenen.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.Credits.prototype.createTitle = function() {
 
     this.m_titleText = new rune.text.BitmapField("CREDITS");
@@ -103,6 +116,11 @@ runmysteriet.scene.Credits.prototype.createTitle = function() {
         this.m_box.y + 25;
 };
 
+/**
+ * Skapar brödtexten i credits-scenen.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.Credits.prototype.createText = function() {
 
     this.m_text = new rune.text.BitmapField(
@@ -126,6 +144,11 @@ runmysteriet.scene.Credits.prototype.createText = function() {
     this.m_text.y = this.m_box.y + 80;
 };
 
+/**
+ * Skapar en “back”-knapp i credits-scenen.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.Credits.prototype.createBackButton = function() {
 
     this.m_backButton = new rune.text.BitmapField("BACK");
@@ -140,6 +163,11 @@ runmysteriet.scene.Credits.prototype.createBackButton = function() {
         this.m_box.y + this.m_box.height + 15;
 };
 
+/**
+ * Skapar volume HUD i credits-scenen.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.Credits.prototype.createVolumeHud = function() {
 
     this.m_volumeHud = new runmysteriet.ui.graphic.VolumeHud(
@@ -150,10 +178,11 @@ runmysteriet.scene.Credits.prototype.createVolumeHud = function() {
     this.stage.addChild(this.m_volumeHud);
 };
 
-//------------------------------------------------------------------------------
-// UPDATE
-//------------------------------------------------------------------------------
-
+/**
+ * Uppdaterar credits-scenen.
+ * @param {number} step Tidssteg för uppdateringen
+ * @return {void}
+ */
 runmysteriet.scene.Credits.prototype.update = function(step) {
 
     rune.scene.Scene.prototype.update.call(this, step);
@@ -161,10 +190,11 @@ runmysteriet.scene.Credits.prototype.update = function(step) {
     this.handleInput();
 };
 
-//------------------------------------------------------------------------------
-// INPUT
-//------------------------------------------------------------------------------
-
+/**
+ * Hanterar input i credits-scenen.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.Credits.prototype.handleInput = function() {
 
     var input = null;
@@ -179,6 +209,12 @@ runmysteriet.scene.Credits.prototype.handleInput = function() {
     this.handleBackInput(input);
 };
 
+/**
+ * Hanterar input för att gå tillbaka till huvudmenyn.
+ *
+ * @param {Object} input Inmatningsobjekt från spelkontrollen
+ * @return {void}
+ */
 runmysteriet.scene.Credits.prototype.handleBackInput = function(input) {
 
     if (!input) {
@@ -190,7 +226,14 @@ runmysteriet.scene.Credits.prototype.handleBackInput = function(input) {
         this.goToMenu();
     }
 };
-
+/**
+ * Hanterar volyminput i credits-scenen.
+ *
+ * Volymen loopar mellan 0 och 1 om gränserna passeras.
+ *
+ * @param {Object} input Inmatningsobjekt från spelkontrollen
+ * @return {void}
+ */
 runmysteriet.scene.Credits.prototype.handleVolumeInput = function(input) {
 
     var stepVol = 0.1;
@@ -220,7 +263,11 @@ runmysteriet.scene.Credits.prototype.handleVolumeInput = function(input) {
         this.updateVolumeHud();
     }
 };
-
+/**
+ * Uppdaterar volym-HUD:en i credits-scenen.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.Credits.prototype.updateVolumeHud = function() {
 
     if (this.m_volumeHud &&
@@ -230,17 +277,22 @@ runmysteriet.scene.Credits.prototype.updateVolumeHud = function() {
     }
 };
 
-//------------------------------------------------------------------------------
-// SOUND
-//------------------------------------------------------------------------------
-
+/**
+ * Spelar upp meny-ljud i credits-scenen.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.Credits.prototype.playMenuSound = function() {
 
     if (this.menuSound && typeof this.menuSound.play === "function") {
         this.menuSound.play();
     }
 };
-
+/**
+ * Stoppar bakgrundsmusiken i credits-scenen.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.Credits.prototype.stopBackgroundMusic = function() {
 
     if (
@@ -251,11 +303,11 @@ runmysteriet.scene.Credits.prototype.stopBackgroundMusic = function() {
         this.backgroundMusic.m_source.mediaElement.pause();
     }
 };
-
-//------------------------------------------------------------------------------
-// NAVIGATION
-//------------------------------------------------------------------------------
-
+/**
+ * Navigerar tillbaka till huvudmenyn från credits-scenen.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.Credits.prototype.goToMenu = function() {
 
     this.stopBackgroundMusic();
@@ -264,10 +316,6 @@ runmysteriet.scene.Credits.prototype.goToMenu = function() {
         new runmysteriet.scene.Menu()
     ]);
 };
-
-//------------------------------------------------------------------------------
-// REMOVE DISPLAY OBJECT
-//------------------------------------------------------------------------------
 
 /**
  * Tar bort ett objekt från stage.
@@ -291,10 +339,11 @@ runmysteriet.scene.Credits.prototype.removeDisplayObject = function(object) {
     }
 };
 
-//------------------------------------------------------------------------------
-// DISPOSE
-//------------------------------------------------------------------------------
-
+/**
+ * Rensar upp Credits-scenen innan den förstörs.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.Credits.prototype.dispose = function() {
 
     this.stopBackgroundMusic();

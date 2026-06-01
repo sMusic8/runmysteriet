@@ -159,10 +159,6 @@ runmysteriet.scene.AvatarSelect.prototype = Object.create(rune.scene.Scene.proto
 
 runmysteriet.scene.AvatarSelect.prototype.constructor = runmysteriet.scene.AvatarSelect;
 
-//------------------------------------------------------------------------------
-// INIT
-//------------------------------------------------------------------------------
-
 /**
  * Initierar AvatarSelect-scenen.
  *
@@ -182,10 +178,6 @@ runmysteriet.scene.AvatarSelect.prototype.init = function() {
 
     this.updateView();
 };
-
-//------------------------------------------------------------------------------
-// CREATE BACKGROUND / BOXES
-//------------------------------------------------------------------------------
 
 /**
  * Skapar svart färgbakgrund.
@@ -240,10 +232,6 @@ runmysteriet.scene.AvatarSelect.prototype.createTextBox = function(
 
     return box;
 };
-
-//------------------------------------------------------------------------------
-// CREATE TEXT
-//------------------------------------------------------------------------------
 
 /**
  * Skapar all text/UI för avatarselect-scenen.
@@ -318,10 +306,6 @@ runmysteriet.scene.AvatarSelect.prototype.createText = function() {
     this.m_player2Marker.autoSize = true;
     this.stage.addChild(this.m_player2Marker);
 };
-
-//------------------------------------------------------------------------------
-// CREATE AVATARS
-//------------------------------------------------------------------------------
 
 /**
  * Skapar avatarval för båda spelarna.
@@ -421,10 +405,6 @@ runmysteriet.scene.AvatarSelect.prototype.createPlayerAvatarChoices = function(p
         }
     }
 };
-
-//------------------------------------------------------------------------------
-// UPDATE
-//------------------------------------------------------------------------------
 
 /**
  * Uppdateringsloop för AvatarSelect-scenen.
@@ -811,10 +791,6 @@ runmysteriet.scene.AvatarSelect.prototype.updateAvatarAlpha = function() {
     }
 };
 
-//------------------------------------------------------------------------------
-// NAVIGATION
-//------------------------------------------------------------------------------
-
 /**
  * Går tillbaka till huvudmenyn.
  *
@@ -896,10 +872,6 @@ runmysteriet.scene.AvatarSelect.prototype.loadGame = function() {
     ]);
 };
 
-//------------------------------------------------------------------------------
-// SOUND
-//------------------------------------------------------------------------------
-
 /**
  * Spelar meny-ljud om det finns laddat.
  *
@@ -931,10 +903,6 @@ runmysteriet.scene.AvatarSelect.prototype.createSceneDelay = function() {
         }
     );
 };
-
-//------------------------------------------------------------------------------
-// REMOVE DISPLAY OBJECT
-//------------------------------------------------------------------------------
 
 /**
  * Tar bort display object från stage.
@@ -977,10 +945,6 @@ runmysteriet.scene.AvatarSelect.prototype.clearDisplayList = function(list) {
         this.removeDisplayObject(list[i]);
     }
 };
-
-//------------------------------------------------------------------------------
-// DISPOSE
-//------------------------------------------------------------------------------
 
 /**
  * Rensar AvatarSelect-scenen.
