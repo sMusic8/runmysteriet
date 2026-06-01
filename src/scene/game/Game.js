@@ -371,9 +371,8 @@ runmysteriet.scene.Game.prototype.checkHighscoreNotice = function (score) {
     return;
   }
 
-    /*
-     * Plats 1 
-     */
+    //Plats 1 
+     
     if (
         typeof this.m_highscoreManager.isBestScore === "function" &&
         this.m_highscoreManager.isBestScore(score) === true
@@ -382,9 +381,8 @@ runmysteriet.scene.Game.prototype.checkHighscoreNotice = function (score) {
         return;
     }
 
-    /*
-     * Plats 2-5: top 5, men inte highscore.
-     */
+    //Plats 2-5: top 5, men inte highscore.
+     
     if (this.m_highscoreManager.isNewRecord(score) === true) {
         this.showHighscoreNotice("TOP 5 SCORE", false);
     }
@@ -431,9 +429,8 @@ runmysteriet.scene.Game.prototype.bringPlatformsToFront = function() {
         return;
     }
 
-    /*
-     * plattformar framför moln
-     */
+    //Plattformar framför moln
+     
     if (this.m_platformHandler.platforms) {
         for (i = 0; i < this.m_platformHandler.platforms.length; i++) {
             platform = this.m_platformHandler.platforms[i];
@@ -450,9 +447,8 @@ runmysteriet.scene.Game.prototype.bringPlatformsToFront = function() {
         }
     }
 
-    /*
-     * extra 25 läggs framför molnen
-     */
+    //Extra 25 läggs framför molnen
+     
     if (typeof this.m_platformHandler.getExtra === "function") {
         extra = this.m_platformHandler.getExtra();
     } else {
@@ -500,8 +496,6 @@ runmysteriet.scene.Game.prototype.init = function () {
    */
   this.camera = this.cameras.getCameraAt(0);
 
-  // Musik
-
   /**
    * Bakgrundsmusik för spelet.
    * @type {?Object}
@@ -534,8 +528,6 @@ runmysteriet.scene.Game.prototype.init = function () {
    */
   this.m_highscoreSound = this.application.sounds.sound.get("sound_highscore");
 
-  // Bakgrund
-
   /**
    * Handler för bakgrund.
    * @type {runmysteriet.handler.BackgroundHandler}
@@ -548,8 +540,6 @@ runmysteriet.scene.Game.prototype.init = function () {
   );
 
   this.m_backgroundHandler.init();
-
-  // Plattformar
 
   /**
    * Handler för plattformar.
@@ -566,8 +556,6 @@ this.m_platformHandler = new runmysteriet.handler.PlatformHandler(
 
   this.m_finishX = this.m_platformHandler.levelWidth - 50;
 
-  // Moln
-
   /**
    * Handler för moln.
    * @type {runmysteriet.handler.CloudHandler}
@@ -580,8 +568,6 @@ this.m_platformHandler = new runmysteriet.handler.PlatformHandler(
 
   this.m_cloudHandler.init();
   this.bringPlatformsToFront();
-
-  // Spelare
 
   /**
    * Handler för spelaren.
@@ -598,15 +584,11 @@ this.m_platformHandler = new runmysteriet.handler.PlatformHandler(
 
   this.m_playerHandler.init();
 
-  // Level config
-
   /**
    * Konfiguration för aktuell nivå.
    * @type {runmysteriet.config.LevelConfig}
    */
   this.m_levelConfig = new runmysteriet.config.LevelConfig(this.m_levelNumber);
-
-  // Fiender
 
   /**
    * Handler för fiender.
@@ -620,8 +602,6 @@ this.m_platformHandler = new runmysteriet.handler.PlatformHandler(
   );
 
   this.m_playerHandler.setEnemyHandler(this.m_enemyHandler);
-
-  // Kamera
 
   /**
    * Automatisk kamerahantering.
@@ -641,8 +621,6 @@ this.m_platformHandler = new runmysteriet.handler.PlatformHandler(
   this.m_playerHandler.setCamera(this.camera);
   this.m_playerHandler.setCameraHandler(this.m_cameraHandler);
 
-  // Sjukdomar
-
   /**
    * Handler för sjukdomar/effects.
    * @type {runmysteriet.handler.DiseaseHandler}
@@ -656,8 +634,6 @@ this.m_platformHandler = new runmysteriet.handler.PlatformHandler(
     this.m_levelNumber,
     this.m_platformHandler.getDiseaseSpawns()
   );
-
-  // Rustning
 
   /**
    * Handler för armor.
@@ -682,8 +658,6 @@ this.m_platformHandler = new runmysteriet.handler.PlatformHandler(
     }
   };
 
-  // Sköldar / runor
-
   /**
    * Handler för sköldar/runor.
    * @type {runmysteriet.handler.ShieldHandler}
@@ -698,8 +672,6 @@ this.m_platformHandler = new runmysteriet.handler.PlatformHandler(
 
   this.m_shieldHandler.init();
 
-  // Level complete sequence
-
   /**
    * Sekvens som hanterar level complete-övergång.
    * @type {runmysteriet.handler.LevelCompleteSequence}
@@ -711,12 +683,8 @@ this.m_platformHandler = new runmysteriet.handler.PlatformHandler(
     this.m_playerHandler
   );
 
-  // HUD
-
   this.createHUD();
   this.updateGameInfo();
-
-  // Highscore notifikation
 
   this.createHighscoreNotice();
 
@@ -982,8 +950,7 @@ runmysteriet.scene.Game.prototype.createStartCountdown = function () {
     cameraY = this.camera.viewport.y;
   }
 
-  //Mörk overlay som ger blur-/pauskänsla.
-
+  //Mörk overlay.
   this.m_startCountdownOverlay = new rune.display.Graphic(
     cameraX,
     cameraY,
@@ -1093,9 +1060,8 @@ runmysteriet.scene.Game.prototype.closeStartCountdown = function () {
   this.m_startCountdownOverlay = null;
   this.m_startCountdownText = null;
 
-  /*
-   * Starta tweens igen.
-   */
+  //Starta tweens igen.
+   
   if (this.tweens) {
     this.tweens.paused = false;
   }
@@ -1140,7 +1106,6 @@ runmysteriet.scene.Game.prototype.updateVolumeInput = function (input) {
 };
 /**
  * Hanterar input för pausmenyn.
- * Öppnar/stänger paus, samt hanterar menyval när spelet är pausat.
  *
  * @param {?Object} input Inläst spelarinput.
  * @return {void}
@@ -1238,7 +1203,6 @@ runmysteriet.scene.Game.prototype.createPauseMenu = function () {
 
 /**
  * Öppnar pausmenyn och stoppar spelets aktivitet.
- * Visar overlay, titel och meny samt pausar animationer och musik.
  *
  * @return {void}
  */
@@ -1364,7 +1328,6 @@ runmysteriet.scene.Game.prototype.playCatchSound = function() {
 };
 /**
  * Avslutar spelet och återgår till huvudmenyn.
- * Stoppar musik och markerar spelet som avslutat innan scenbyte.
  *
  * @return {void}
  */
@@ -1383,7 +1346,6 @@ runmysteriet.scene.Game.prototype.quitToMenu = function () {
 };
 /**
  * Spelar upp meny-ljudet vid UI-interaktion.
- * Hämtar ljudet från sound-systemet och spelar det om det finns.
  *
  * @return {void}
  */
@@ -1925,10 +1887,7 @@ runmysteriet.scene.Game.prototype.removeDisplayObject = function (object) {
 };
 
 /**
- * Stoppar ett Rune-ljud säkert.
- *
- * Använder inte sound.stop(), eftersom Rune kan krascha
- * om ljudets interna mediaElement redan är null.
+ * Stoppar ljud
  *
  * @param {?Object} sound
  * @return {void}
