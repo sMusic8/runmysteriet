@@ -32,8 +32,6 @@ runmysteriet.handler.CloudHandler = function(stage, screenWidth, levelWidth) {
 
 /**
  * Funktionen skapar ett förutbestämt antal moln och placerar dem jämnt fördelat
- * över levelWidth med slumpmässig offset, skala och höjdvariation.
- * Varje moln får en individuell hastighet för att skapa parallax-effekt.
  *
  * @return {void}
  */
@@ -122,9 +120,6 @@ runmysteriet.handler.CloudHandler.prototype.clear = function() {
 
     this.clouds = [];
 };
-//------------------------------------------------------------------------------
-// DISPOSE
-//------------------------------------------------------------------------------
 
 /**
  * Rensar CloudHandler helt.
