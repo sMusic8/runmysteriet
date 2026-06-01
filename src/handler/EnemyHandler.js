@@ -7,20 +7,31 @@
  *
  * @constructor
  * @param {!rune.display.Stage} stage
+ * @param {!Object} application
  */
-runmysteriet.handler.EnemyHandler = function(stage) {
+runmysteriet.handler.EnemyHandler = function(stage, application) {
 
     /** @type {!rune.display.Stage} */
     this.stage = stage;
 
+    /** @type {?Object} */
+    this.application = application || null;
+
     /** @type {!Array<!runmysteriet.entity.Kristen>} */
     this.enemies = [];
 
-    /*
+    /**
      * Osynliga spärrar som hindrar spelaren från att gå vidare
      * tills kopplad Kristen är död.
+     * @type {!Array<!Object>}
      */
     this.enemyBlockers = [];
+
+    /** @type {?Object} */
+    this.fightSound = null;
+
+    /** @type {boolean} */
+    this.fightSoundPlaying = false;
 };
 
 /**
@@ -79,6 +90,8 @@ runmysteriet.handler.EnemyHandler.prototype.createKristen = function(spawn) {
     this.enemies.push(kristen);
     this.stage.addChild(kristen);
 
+    kristen.application = this.application;
+
     /*
      * Skapa spärr efter Kristen.
      * Spärren är osynlig och stoppar spelaren tills Kristen dör.
@@ -96,7 +109,7 @@ runmysteriet.handler.EnemyHandler.prototype.createKristen = function(spawn) {
 //------------------------------------------------------------------------------
 
 /**
- * Skapar en osynlig spärr som går hela vägen uppifrån och ner.
+ * Skapar en osynlig spärr som går hela vägen uppifrån och ner
  *
  * @param {!Object} spawn
  * @param {!runmysteriet.entity.Kristen} enemy
@@ -110,11 +123,11 @@ runmysteriet.handler.EnemyHandler.prototype.createKristenBlocker = function(
     var blocker = null;
     var blockerX = 0;
     var blockerY = 0;
-    var blockerWidth = 48;
+    var blockerWidth = 10;
     var blockerHeight = 2000;
 
-    blockerX = spawn.x + 70;
-    blockerY = -1000;
+    blockerX = enemy.x + enemy.width + 5;
+    blockerY = -500;
 
     blocker = new rune.display.Graphic(
         blockerX,
@@ -123,7 +136,6 @@ runmysteriet.handler.EnemyHandler.prototype.createKristenBlocker = function(
         blockerHeight
     );
 
-    blocker.alpha = 20;
     blocker.visible = false;
     blocker.isEnemyBlocker = true;
     blocker.enemy = enemy;
@@ -162,10 +174,11 @@ runmysteriet.handler.EnemyHandler.prototype.update = function(players) {
     }
 
     this.updateEnemyBlockers();
+    this.updateFightSound();
 };
 
 //------------------------------------------------------------------------------
-// ENEMY BLOCKERS
+// UPDATE ENEMY BLOCKERS
 //------------------------------------------------------------------------------
 
 /**
@@ -195,13 +208,140 @@ runmysteriet.handler.EnemyHandler.prototype.updateEnemyBlockers = function() {
         }
     }
 };
+//------------------------------------------------------------------------------
+// FIGHT SOUND
+//------------------------------------------------------------------------------
+
+/**
+ * Uppdaterar fight-ljudet.
+ * Ljudet spelas så länge minst en Kristen lever.
+ *
+ * @return {void}
+ */
+runmysteriet.handler.EnemyHandler.prototype.updateFightSound = function() {
+
+    var i = 0;
+    var enemy = null;
+    var hasAliveKristen = false;
+
+    for (i = 0; i < this.enemies.length; i++) {
+        enemy = this.enemies[i];
+
+        if (enemy && enemy.isDead !== true) {
+            hasAliveKristen = true;
+            break;
+        }
+    }
+
+    if (hasAliveKristen === true) {
+        this.startFightSound();
+    } else {
+        this.stopFightSound();
+    }
+};
+
+/**
+ * Startar fight-ljudet.
+ *
+ * @return {void}
+ */
+runmysteriet.handler.EnemyHandler.prototype.startFightSound = function() {
+
+    var mediaElement = null;
+
+    if (this.fightSoundPlaying === true) {
+        return;
+    }
+
+    if (!this.application) {
+        console.log("SAKNAR APPLICATION I ENEMYHANDLER");
+        return;
+    }
+
+    if (!this.fightSound) {
+        this.fightSound = this.application.sounds.sound.get("figth");
+        console.log("fightSound:", this.fightSound);
+    }
+
+    if (!this.fightSound) {
+        console.log("HITTADE INTE LJUD: figth");
+        return;
+    }
+
+    /*
+     * Rune-ljud kan ibland behöva styras via mediaElement
+     * för loop och reset.
+     */
+    if (
+        this.fightSound.m_source &&
+        this.fightSound.m_source.mediaElement
+    ) {
+        mediaElement = this.fightSound.m_source.mediaElement;
+
+        mediaElement.loop = true;
+        mediaElement.volume = 0.5;
+
+        try {
+            mediaElement.currentTime = 0;
+        } catch (error) {
+        }
+
+        mediaElement.play();
+
+        this.fightSoundPlaying = true;
+        console.log("fight sound startad via mediaElement");
+        return;
+    }
+
+    /*
+     * Fallback om mediaElement inte finns.
+     */
+    this.fightSound.loop = true;
+    this.fightSound.volume = 0.5;
+    this.fightSound.play();
+
+    this.fightSoundPlaying = true;
+    console.log("fight sound startad via Rune sound");
+};
+/**
+ * Stoppar fight-ljudet säkert.
+ *
+ * @return {void}
+ */
+runmysteriet.handler.EnemyHandler.prototype.stopFightSound = function() {
+
+    var mediaElement = null;
+
+    if (
+        this.fightSound &&
+        this.fightSound.m_source &&
+        this.fightSound.m_source.mediaElement
+    ) {
+        mediaElement = this.fightSound.m_source.mediaElement;
+
+        if (typeof mediaElement.pause === "function") {
+            mediaElement.pause();
+        }
+
+        mediaElement.loop = false;
+
+        try {
+            mediaElement.currentTime = 0;
+        } catch (error) {
+        }
+    } else if (this.fightSound && typeof this.fightSound.stop === "function") {
+        this.fightSound.stop();
+    }
+
+    this.fightSoundPlaying = false;
+};
 
 //------------------------------------------------------------------------------
 // CLEAR
 //------------------------------------------------------------------------------
 
 /**
- * Removes all enemies and enemy blockers from stage.
+ * Tar bort alla kristna och spärrar från stage och tömmer listorna
  *
  * @return {void}
  */
@@ -209,6 +349,8 @@ runmysteriet.handler.EnemyHandler.prototype.clear = function() {
 
     var i = 0;
     var enemy = null;
+
+    this.stopFightSound();
 
     /*
      * Fiender.
@@ -302,8 +444,10 @@ runmysteriet.handler.EnemyHandler.prototype.removeDisplayObject = function(objec
  * @return {void}
  */
 runmysteriet.handler.EnemyHandler.prototype.dispose = function() {
-
     this.clear();
+
+    this.fightSound = null;
+    this.application = null;
 
     this.stage = null;
 };

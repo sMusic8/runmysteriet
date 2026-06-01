@@ -87,7 +87,7 @@ runmysteriet.entity.Player = function(controls, spriteConfig) {
     this.attackCooldown = 0;
 
     /** @type {number} */
-    this.attackCooldownMax = 20;
+    this.attackCooldownMax = 15;
 
     /** @type {number} */
     this.hp = 100;
@@ -218,7 +218,7 @@ runmysteriet.entity.Player.prototype.updateAnimation = function() {
 };
 
 /**
- * Spelar animation om den inte redan är aktiv.
+ * Spelar animation om den inte redan är aktiv
  *
  * @param {string} name
  * @return {void}

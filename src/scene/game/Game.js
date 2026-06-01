@@ -559,7 +559,7 @@ this.m_platformHandler = new runmysteriet.handler.PlatformHandler(
    * Handler för fiender.
    * @type {runmysteriet.handler.EnemyHandler}
    */
-  this.m_enemyHandler = new runmysteriet.handler.EnemyHandler(this.stage);
+  this.m_enemyHandler = new runmysteriet.handler.EnemyHandler(this.stage, this.application);
 
   this.m_enemyHandler.init(
     this.m_levelConfig,
@@ -1777,7 +1777,7 @@ runmysteriet.scene.Game.prototype.restartLevel = function () {
 
   this.m_levelConfig = new runmysteriet.config.LevelConfig(this.m_levelNumber);
 
-  this.m_enemyHandler = new runmysteriet.handler.EnemyHandler(this.stage);
+  this.m_enemyHandler = new runmysteriet.handler.EnemyHandler(this.stage, this.application);
 
   this.m_enemyHandler.init(
     this.m_levelConfig,

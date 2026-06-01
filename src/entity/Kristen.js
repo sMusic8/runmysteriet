@@ -215,12 +215,8 @@ runmysteriet.entity.Kristen.prototype.handleCollision = function(player) {
         return;
     }
 
-    this.hitCooldown = 20;
+    this.hitCooldown = 20; 
 
-    /*
-     * Kristen ska inte ta skada av kroppskollision.
-     * Skada på Kristen ska bara ske via spelarens attack.
-     */
     if (player.hp !== undefined) {
         player.hp -= 10;
 
