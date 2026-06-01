@@ -42,9 +42,8 @@ runmysteriet.entity.EnglishBoat = function(x, y) {
     /** @type {boolean} */
     this.isDangerous = false;
 
-    /*
-     * Separat hitbox.
-     */
+    //Separat hitbox.
+     
     this.hitboxOffsetX = 30;
     this.hitboxOffsetY = 45;
     this.hitboxWidth = 50;
@@ -69,19 +68,11 @@ runmysteriet.entity.EnglishBoat = function(x, y) {
     this.m_isDisposed = false;
 };
 
-//------------------------------------------------------------------------------
-// INHERITANCE
-//------------------------------------------------------------------------------
-
 runmysteriet.entity.EnglishBoat.prototype =
     Object.create(rune.display.Graphic.prototype);
 
 runmysteriet.entity.EnglishBoat.prototype.constructor =
     runmysteriet.entity.EnglishBoat;
-
-//------------------------------------------------------------------------------
-// LIGHTNING
-//------------------------------------------------------------------------------
 
 /**
  * Skapar en ny blixt och placerar den slumpmässigt på båten.
@@ -197,10 +188,6 @@ runmysteriet.entity.EnglishBoat.prototype.setDangerous = function(value) {
     }
 };
 
-//------------------------------------------------------------------------------
-// COLLISION / STATE
-//------------------------------------------------------------------------------
-
 /**
  * Kollar om båten är ovanför en flotte.
  *
@@ -233,16 +220,14 @@ runmysteriet.entity.EnglishBoat.prototype.isAboveRaft = function(raft) {
     raftRight = raft.x + raft.width;
     raftTop = raft.y;
 
-    /*
-     * Kontrollera att mitten av båten är över flotten.
-     */
+    //Kontrollera att mitten av båten är över flotten.
+     
     if (hitboxCenterX < raftLeft || hitboxCenterX > raftRight) {
         return false;
     }
 
-    /*
-     * Kontrollera höjd.
-     */
+    //Kontrollera höjd.
+     
     if (hitboxBottom > raftTop + 20) {
         return false;
     }
@@ -250,9 +235,6 @@ runmysteriet.entity.EnglishBoat.prototype.isAboveRaft = function(raft) {
     return true;
 };
 
-//------------------------------------------------------------------------------
-// COALITION CONTROL
-//------------------------------------------------------------------------------
 /**
  * Kollar om båten är till höger om flotten och ovanför flotten.
  * Detta används bara för varning på flotten, inte för skada.
@@ -287,38 +269,31 @@ runmysteriet.entity.EnglishBoat.prototype.isWarningAboveRaft = function(raft) {
     raftRight = raft.x + raft.width;
     raftTop = raft.y;
 
-    /*
-     * Hur långt åt höger om flotten varningen får synas.
-     */
+    //Hur långt åt höger om flotten varningen får synas.
+     
     warningRightLimit = raftRight + 90;
 
-    /*
-     * Om båten har kommit till vänster sida av flotten
-     * ska DANGER försvinna direkt.
-     */
+    // Om båten har kommit till vänster sida av flotten ska DANGER försvinna direkt.
+     
     if (hitboxCenterX < raftCenterX) {
         return false;
     }
 
-    /*
-     * Om båten är för långt till höger ska DANGER inte visas ännu.
-     */
+    //Om båten är för långt till höger ska DANGER inte visas ännu.
+     
     if (hitboxCenterX > warningRightLimit) {
         return false;
     }
 
-    /*
-     * Båten måste vara ovanför flotten.
-     */
+    //Båten måste vara ovanför flotten.
+     
     if (hitboxBottom > raftTop + 20) {
         return false;
     }
 
     return true;
 };
-//------------------------------------------------------------------------------
-// COLLISION
-//------------------------------------------------------------------------------
+
 /**
  * Kollar om båten träffar spelaren.
  * Endast aktiv när båten är farlig.
@@ -353,10 +328,6 @@ runmysteriet.entity.EnglishBoat.prototype.isTouchingPlayer = function(player) {
         player.y < boatY + this.hitboxHeight
     );
 };
-
-//------------------------------------------------------------------------------
-// UPDATE
-//------------------------------------------------------------------------------
 
 /**
  * Uppdaterar båtens rörelse och blixt-effekter.
@@ -413,9 +384,8 @@ runmysteriet.entity.EnglishBoat.prototype.update = function() {
         }
     }
 
-    /*
-     * Slumpmässigt byt ut blixt.
-     */
+    //Slumpmässigt byt ut blixt.
+     
     if (Math.random() < 0.18) {
         old = this.m_lightnings.shift();
 
@@ -424,10 +394,6 @@ runmysteriet.entity.EnglishBoat.prototype.update = function() {
         this.spawnLightning();
     }
 };
-
-//------------------------------------------------------------------------------
-// TWEEN
-//------------------------------------------------------------------------------
 
 /**
  * Startar horisontell rörelse mellan två punkter.
@@ -461,10 +427,6 @@ runmysteriet.entity.EnglishBoat.prototype.startTween = function(tweens, minX, ma
     });
 };
 
-//------------------------------------------------------------------------------
-// REMOVE DISPLAY OBJECT
-//------------------------------------------------------------------------------
-
 /**
  * Tar bort display object från stage/parent.
  *
@@ -487,10 +449,6 @@ runmysteriet.entity.EnglishBoat.prototype.removeDisplayObject = function(object)
     }
 };
 
-//------------------------------------------------------------------------------
-// REMOVE
-//------------------------------------------------------------------------------
-
 /**
  * Tar bort båten från stage.
  *
@@ -501,10 +459,6 @@ runmysteriet.entity.EnglishBoat.prototype.remove = function() {
     this.hideLightning();
     this.removeDisplayObject(this);
 };
-
-//------------------------------------------------------------------------------
-// DISPOSE
-//------------------------------------------------------------------------------
 
 /**
  * Städar upp båten, blixtar och referenser.
