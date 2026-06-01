@@ -417,6 +417,58 @@ runmysteriet.scene.Game.prototype.createHUD = function () {
 };
 
 /**
+ * lägger levelens plattformar och extra stjärnan framför moln
+ *
+ * @return {void}
+ */
+runmysteriet.scene.Game.prototype.bringPlatformsToFront = function() {
+
+    var i = 0;
+    var platform = null;
+    var extra = null;
+
+    if (!this.m_platformHandler) {
+        return;
+    }
+
+    /*
+     * plattformar framför moln
+     */
+    if (this.m_platformHandler.platforms) {
+        for (i = 0; i < this.m_platformHandler.platforms.length; i++) {
+            platform = this.m_platformHandler.platforms[i];
+
+            if (!platform) {
+                continue;
+            }
+
+            if (platform.parent) {
+                platform.parent.removeChild(platform);
+            }
+
+            this.stage.addChild(platform);
+        }
+    }
+
+    /*
+     * extra 25 läggs framför molnen
+     */
+    if (typeof this.m_platformHandler.getExtra === "function") {
+        extra = this.m_platformHandler.getExtra();
+    } else {
+        extra = this.m_platformHandler.m_extra;
+    }
+
+    if (extra) {
+        if (extra.parent) {
+            extra.parent.removeChild(extra);
+        }
+
+        this.stage.addChild(extra);
+    }
+};
+
+/**
  * Uppdaterar HUD om den finns tillgänglig.
  *
  * @return {void}
@@ -527,6 +579,7 @@ this.m_platformHandler = new runmysteriet.handler.PlatformHandler(
   );
 
   this.m_cloudHandler.init();
+  this.bringPlatformsToFront();
 
   // Spelare
 

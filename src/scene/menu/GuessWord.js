@@ -839,7 +839,7 @@ runmysteriet.scene.GuessWord.prototype.checkAnswer = function(letter) {
 };
 
 /**
- * Applicerar straff vid fel gissning.
+ * ger straff vid fel gissning
  *
  * @return {void}
  */
