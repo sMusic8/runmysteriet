@@ -184,6 +184,10 @@ runmysteriet.handler.PlatformHandler.prototype.addSegmentResult = function (
   this.addRuneSpawns(result.runeSpawns || []);
   this.addArmorSpawns(result.armorSpawns || []);
   this.m_extra = result.m_extra || null;
+
+  if (this.m_extra) {
+      this.setupExtraPulse(this.m_extra);
+  }
 };
 
 //Komentera senare
@@ -195,6 +199,63 @@ runmysteriet.handler.PlatformHandler.prototype.clearExtra = function () {
   
     this.removeDisplayObject(this.m_extra);
     this.m_extra = null;
+};
+
+//------------------------------------------------------------------------------
+// EXTRA PULSE
+//------------------------------------------------------------------------------
+
+/**
+ * Förbereder extra-poäng-bilden för pulserande effekt.
+ *
+ * @param {?Object} extra
+ * @return {void}
+ */
+runmysteriet.handler.PlatformHandler.prototype.setupExtraPulse = function(
+    extra
+) {
+
+    if (!extra) {
+        return;
+    }
+
+    extra.pulseTimer = 0;
+    extra.pulseSpeed = 0.18;
+    extra.pulseAmount = 0.18;
+
+    extra.baseScaleX = 1;
+    extra.baseScaleY = 1;
+
+    extra.scaleX = 1;
+    extra.scaleY = 1;
+};
+
+/**
+ * Uppdaterar pulserande effekt för extra-poäng-bilden.
+ *
+ * @return {void}
+ */
+runmysteriet.handler.PlatformHandler.prototype.updateExtraPulse = function() {
+
+    var pulse = 0;
+
+    if (!this.m_extra) {
+        return;
+    }
+
+    if (this.m_extra.visible === false) {
+        return;
+    }
+
+    this.m_extra.pulseTimer += this.m_extra.pulseSpeed || 0.12;
+
+    pulse =
+        1 +
+        Math.sin(this.m_extra.pulseTimer) *
+        (this.m_extra.pulseAmount || 0.12);
+
+    this.m_extra.scaleX = pulse;
+    this.m_extra.scaleY = pulse;
 };
 //------------------------------------------------------------------------------
 // ADD COLLECTIONS
@@ -544,6 +605,8 @@ runmysteriet.handler.PlatformHandler.prototype.update = function (step) {
       }
     }
   } */
+
+      this.updateExtraPulse();
 };
 
 //------------------------------------------------------------------------------

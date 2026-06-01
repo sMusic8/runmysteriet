@@ -1415,8 +1415,14 @@ runmysteriet.handler.PlayerHandler.prototype.handleAutoScrollCameraBounds = func
 
 
         if (player.x < leftLimit) {
-            player.x = leftLimit;
-        }
+
+    if (this.isCrushedByEnemyBlocker(player, leftLimit) === true) {
+        this.killPlayer(player, i);
+        continue;
+    }
+
+    player.x = leftLimit;
+}
 
         //Stoppa spelaren vid kamerans högerkant.
          
@@ -1683,6 +1689,79 @@ runmysteriet.handler.PlayerHandler.prototype.checkEnemyBlockers = function(playe
     }
 };
 
+/**
+ * Kontrollerar om kamerans vänsterkant skulle trycka spelaren in i en enemy-blocker.
+ *
+ * @param {!runmysteriet.entity.Player} player
+ * @param {number} targetX
+ * @return {boolean}
+ */
+runmysteriet.handler.PlayerHandler.prototype.isCrushedByEnemyBlocker = function(
+    player,
+    targetX
+) {
+
+    var blockers = null;
+    var blocker = null;
+    var enemy = null;
+    var i = 0;
+
+    var playerLeft = targetX;
+    var playerRight = targetX + player.width;
+    var playerTop = player.y;
+    var playerBottom = player.y + player.height;
+
+    var blockerLeft = 0;
+    var blockerRight = 0;
+    var blockerTop = 0;
+    var blockerBottom = 0;
+
+    var overlapsX = false;
+    var overlapsY = false;
+
+    if (!player || player.isDead === true) {
+        return false;
+    }
+
+    if (!this.enemyHandler || !this.enemyHandler.enemyBlockers) {
+        return false;
+    }
+
+    blockers = this.enemyHandler.enemyBlockers;
+
+    for (i = 0; i < blockers.length; i++) {
+        blocker = blockers[i];
+
+        if (!blocker) {
+            continue;
+        }
+
+        enemy = blocker.enemy;
+
+        if (enemy && enemy.isDead === true) {
+            continue;
+        }
+
+        blockerLeft = blocker.x;
+        blockerRight = blocker.x + blocker.width;
+        blockerTop = blocker.y;
+        blockerBottom = blocker.y + blocker.height;
+
+        overlapsX =
+            playerRight > blockerLeft &&
+            playerLeft < blockerRight;
+
+        overlapsY =
+            playerBottom > blockerTop &&
+            playerTop < blockerBottom;
+
+        if (overlapsX && overlapsY) {
+            return true;
+        }
+    }
+
+    return false;
+};
 /**
  * Uppdaterar alla aktiva dödseffekter (death effects) per frame.
  *

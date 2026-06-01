@@ -126,7 +126,7 @@ runmysteriet.handler.EnemyHandler.prototype.createKristenBlocker = function(
     var blockerWidth = 10;
     var blockerHeight = 2000;
 
-    blockerX = enemy.x + enemy.width + 5;
+    blockerX = enemy.x + enemy.width - 5;
     blockerY = -500;
 
     blocker = new rune.display.Graphic(
@@ -295,23 +295,20 @@ runmysteriet.handler.EnemyHandler.prototype.startFightSound = function() {
     }
 
     if (!this.application) {
-        console.log("SAKNAR APPLICATION I ENEMYHANDLER");
         return;
     }
 
     if (!this.fightSound) {
         this.fightSound = this.application.sounds.sound.get("figth");
-        console.log("fightSound:", this.fightSound);
     }
 
     if (!this.fightSound) {
-        console.log("HITTADE INTE LJUD: figth");
         return;
     }
 
     /*
-     * Rune-ljud kan ibland behöva styras via mediaElement
-     * för loop och reset.
+     * styrs via mediaElement
+     * 
      */
     if (
         this.fightSound.m_source &&
@@ -330,7 +327,6 @@ runmysteriet.handler.EnemyHandler.prototype.startFightSound = function() {
         mediaElement.play();
 
         this.fightSoundPlaying = true;
-        console.log("fight sound startad via mediaElement");
         return;
     }
 
@@ -342,7 +338,6 @@ runmysteriet.handler.EnemyHandler.prototype.startFightSound = function() {
     this.fightSound.play();
 
     this.fightSoundPlaying = true;
-    console.log("fight sound startad via Rune sound");
 };
 /**
  * Stoppar fight-ljudet säkert.
@@ -354,32 +349,99 @@ runmysteriet.handler.EnemyHandler.prototype.stopFightSound = function() {
     var mediaElement = null;
 
     /*
-     * Om ljudet inte finns behöver vi bara återställa flaggan.
+     * Viktigt:
+     * clear() körs redan i init(), innan fightSound alltid finns.
+     * Därför måste metoden tåla null.
      */
     if (!this.fightSound) {
         this.fightSoundPlaying = false;
         return;
     }
-    if (
-        this.fightSound.m_source &&
-        this.fightSound.m_source.mediaElement
-    ) {
-        mediaElement = this.fightSound.m_source.mediaElement;
 
-        if (typeof mediaElement.pause === "function") {
-            mediaElement.pause();
-        }
+    if (!this.fightSound.m_source) {
+        this.fightSoundPlaying = false;
+        return;
+    }
 
-        mediaElement.loop = false;
+    if (!this.fightSound.m_source.mediaElement) {
+        this.fightSoundPlaying = false;
+        return;
+    }
 
-        try {
-            mediaElement.currentTime = 0;
-        } catch (error) {
-        }
+    mediaElement = this.fightSound.m_source.mediaElement;
+
+    if (typeof mediaElement.pause === "function") {
+        mediaElement.pause();
+    }
+
+    mediaElement.loop = false;
+
+    try {
+        mediaElement.currentTime = 0;
+    } catch (error) {
     }
 
     this.fightSoundPlaying = false;
 };
+
+/**
+ * Kontrollerar om autoscroll ska pausas för att en levande Kristen
+ * blockerar spelaren i kamerans fight-zon.
+ *
+ * @param {?rune.camera.Camera} camera
+ * @return {boolean}
+ */
+runmysteriet.handler.EnemyHandler.prototype.shouldPauseAutoScroll = function(
+    camera
+) {
+
+    var i = 0;
+    var enemy = null;
+
+    var cameraX = 0;
+    var cameraWidth = 0;
+    var triggerLeft = 0;
+    var triggerRight = 0;
+    var enemyCenterX = 0;
+
+    if (!camera || !camera.viewport) {
+        return false;
+    }
+
+    cameraX = Math.round(camera.viewport.x);
+    cameraWidth = camera.viewport.width || 0;
+
+    if (cameraWidth <= 0) {
+        return false;
+    }
+
+    /*
+     * Fight-zon
+     * justera triggerRight- 0.65 om kameran ska stanna tidigare/senare
+     */
+    triggerLeft = cameraX;
+    triggerRight = cameraX + cameraWidth * 0.65;
+
+    for (i = 0; i < this.enemies.length; i++) {
+        enemy = this.enemies[i];
+
+        if (!enemy || enemy.isDead === true) {
+            continue;
+        }
+
+        enemyCenterX = enemy.x + enemy.width / 2;
+
+        if (
+            enemyCenterX >= triggerLeft &&
+            enemyCenterX <= triggerRight
+        ) {
+            return true;
+        }
+    }
+
+    return false;
+};
+
 //------------------------------------------------------------------------------
 // CLEAR
 //------------------------------------------------------------------------------

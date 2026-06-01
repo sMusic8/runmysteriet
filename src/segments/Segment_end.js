@@ -480,21 +480,25 @@ runmysteriet.segments.Segment_End.prototype.addJumpPlatforms = function(stage, p
         4
     );
 
-    this.addPlatform(
-        stage,
-        platforms,
-        segmentStart + 720,
-        this.groundY - 95,
-        3
-    );
+    var extraPlatformX = segmentStart + 740;
+var extraPlatformY = this.groundY - 135;
 
-    this.m_extra = new rune.display.Graphic(
-    segmentStart + 720 + (3 * this.tileW) - 15,
-    this.groundY - 95 - 25,
+this.addPlatform(
+    stage,
+    platforms,
+    extraPlatformX,
+    extraPlatformY,
+    2
+);
+
+this.m_extra = new rune.display.Graphic(
+    extraPlatformX + 20,
+    extraPlatformY - 32,
     30,
     30,
     "extra"
 );
+
 stage.addChild(this.m_extra);
 
 };
