@@ -260,7 +260,6 @@ runmysteriet.scene.GuessWord.prototype.init = function() {
 
     this.createHeaderPanel();
     this.createWordPanel();
-    this.createHintPanel();
     this.createFeedbackPanel();
     this.createControlsPanel();
 
@@ -330,17 +329,16 @@ runmysteriet.scene.GuessWord.prototype.createHeaderPanel = function() {
 
     this.m_headerPanel = new rune.display.Graphic(
         14,
-        5,
+        6,
         this.application.screen.width - 28,
-        36
+        30
     );
 
     this.m_headerPanel.backgroundColor = "#061313";
-    this.m_headerPanel.alpha = 0.72;
+    this.m_headerPanel.alpha = 0.70;
 
     this.stage.addChild(this.m_headerPanel);
 };
-
 /**
  * Skapar ordpanelen.
  *
@@ -352,9 +350,9 @@ runmysteriet.scene.GuessWord.prototype.createWordPanel = function() {
 
     this.m_wordPanel = new rune.display.Graphic(
         centerX - 155,
-        63,
+        54,
         310,
-        70
+        72
     );
 
     this.m_wordPanel.backgroundColor = "#050b0b";
@@ -362,27 +360,18 @@ runmysteriet.scene.GuessWord.prototype.createWordPanel = function() {
 
     this.stage.addChild(this.m_wordPanel);
 };
-
 /**
  * Skapar hintpanel.
  *
  * @return {void}
  */
+/**
+ * Hintpanel används inte längre.
+ * Hint visas i feedbackrutan och kontrollraden.
+ *
+ * @return {void}
+ */
 runmysteriet.scene.GuessWord.prototype.createHintPanel = function() {
-
-    var centerX = this.application.screen.center.x;
-
-    this.m_hintPanel = new rune.display.Graphic(
-        centerX - 170,
-        178,
-        320,
-        24
-    );
-
-    this.m_hintPanel.backgroundColor = "#071111";
-    this.m_hintPanel.alpha = 0.78;
-
-    this.stage.addChild(this.m_hintPanel);
 };
 
 /**
@@ -395,10 +384,10 @@ runmysteriet.scene.GuessWord.prototype.createFeedbackPanel = function() {
     var centerX = this.application.screen.center.x;
 
     this.m_feedbackBox = new rune.display.Graphic(
-        centerX - 145,
-        206,
-        290,
-        26
+        centerX - 125,
+        168,
+        250,
+        24
     );
 
     this.m_feedbackBox.backgroundColor = "#050b0b";
@@ -418,9 +407,9 @@ runmysteriet.scene.GuessWord.prototype.createControlsPanel = function() {
 
     this.m_controlsPanel = new rune.display.Graphic(
         18,
-        this.application.screen.height - 44,
+        this.application.screen.height - 36,
         this.application.screen.width - 36,
-        34
+        26
     );
 
     this.m_controlsPanel.backgroundColor = "#050b0b";
@@ -445,22 +434,21 @@ runmysteriet.scene.GuessWord.prototype.createHeaderText = function() {
     );
 
     this.m_scoreText.autoSize = true;
-    this.m_scoreText.x = 34;
-    this.m_scoreText.y = 28;
-    this.m_scoreText.scale = 0.65;
+    this.m_scoreText.x = 30;
+    this.m_scoreText.y = 16;
+    this.m_scoreText.scale = 0.55;
     this.stage.addChild(this.m_scoreText);
 
-    this.m_titleText = new rune.text.BitmapField("GUESS THE RUNE WORD");
+    this.m_titleText = new rune.text.BitmapField("GUESS THE SECRET WORD");
     this.m_titleText.autoSize = true;
     this.m_titleText.center = this.application.screen.center;
-    this.m_titleText.y = 27;
-    this.m_titleText.scale = 0.75;
+    this.m_titleText.y = 13;
+    this.m_titleText.scale = 0.72;
     this.stage.addChild(this.m_titleText);
 };
 
-
 /**
- * Skapar hjärtan med din egen hjärtbild.
+ * Skapar hjärtan.
  *
  * @return {void}
  */
@@ -469,16 +457,16 @@ runmysteriet.scene.GuessWord.prototype.createTriesHearts = function() {
     var i = 0;
     var heart = null;
 
-    var heartW = 16;
-    var heartH = 16;
+    var heartW = 15;
+    var heartH = 15;
     var spacing = 5;
 
     var totalWidth =
         this.m_maxWrongGuesses * heartW +
         (this.m_maxWrongGuesses - 1) * spacing;
 
-    var startX = this.application.screen.width - totalWidth - 34;
-    var y = 26;
+    var startX = this.application.screen.width - totalWidth - 30;
+    var y = 14;
 
     this.m_triesHearts = [];
 
@@ -509,7 +497,7 @@ runmysteriet.scene.GuessWord.prototype.createLetterBoxes = function() {
     var spacing = 10;
     var totalWidth = word.length * boxWidth + (word.length - 1) * spacing;
     var startX = this.application.screen.center.x - Math.floor(totalWidth / 2);
-    var y = 85;
+    var y = 78;
 
     var i = 0;
     var box = null;
@@ -529,22 +517,14 @@ runmysteriet.scene.GuessWord.prototype.createLetterBoxes = function() {
 };
 
 /**
- * Skapar info-text för hint.
+ * Extra infotext används inte längre
+ * Kontroller visas längst ner och hint visas i feedback.
  *
  * @return {void}
  */
 runmysteriet.scene.GuessWord.prototype.createInfoText = function() {
-
-    this.m_hintText = new rune.text.BitmapField(
-        "T/TRIANGLE = HINT (-20)"
-    );
-
-    this.m_hintText.autoSize = true;
-    this.m_hintText.center = this.application.screen.center;
-    this.m_hintText.y = 184;
-    this.m_hintText.scale = 0.6;
-    this.stage.addChild(this.m_hintText);
 };
+
 /**
  * Skapar feedbacktext.
  *
@@ -555,11 +535,34 @@ runmysteriet.scene.GuessWord.prototype.createFeedbackText = function() {
     this.m_feedbackText = new rune.text.BitmapField("CHOOSE A LETTER");
     this.m_feedbackText.autoSize = true;
     this.m_feedbackText.center = this.application.screen.center;
-    this.m_feedbackText.y = 213;
-    this.m_feedbackText.scale = 0.7;
+    this.m_feedbackText.y = 147;
+    this.m_feedbackText.scale = 0.62;
     this.stage.addChild(this.m_feedbackText);
 
     this.m_feedbackTextStartX = this.m_feedbackText.x;
+};
+/**
+ * Skapar feedbackpanel.
+ *
+ * @return {void}
+ */
+runmysteriet.scene.GuessWord.prototype.createFeedbackPanel = function() {
+
+    var centerX = this.application.screen.center.x;
+
+    this.m_feedbackBox = new rune.display.Graphic(
+        centerX - 125,
+        140,
+        250,
+        26
+    );
+
+    this.m_feedbackBox.backgroundColor = "#050b0b";
+    this.m_feedbackBox.alpha = 0.90;
+
+    this.stage.addChild(this.m_feedbackBox);
+
+    this.m_feedbackBoxStartX = this.m_feedbackBox.x;
 };
 
 /**
@@ -575,8 +578,8 @@ runmysteriet.scene.GuessWord.prototype.createControlsText = function() {
 
     this.m_messageText.autoSize = true;
     this.m_messageText.center = this.application.screen.center;
-    this.m_messageText.y = this.application.screen.height - 34;
-    this.m_messageText.scale = 0.55;
+    this.m_messageText.y = this.application.screen.height - 29;
+    this.m_messageText.scale = 0.48;
 
     this.stage.addChild(this.m_messageText);
 };
@@ -784,16 +787,15 @@ runmysteriet.scene.GuessWord.prototype.buyHint = function() {
     hint = this.m_hints[this.m_currentHintIndex];
     this.m_currentHintIndex++;
 
-    if (this.m_hintText) {
-        this.m_hintText.text =
-            "HINT " +
-            this.m_currentHintIndex +
-            ": " +
-            String(hint).toUpperCase();
+    this.updateScoreText();
 
-        this.m_hintText.center = this.application.screen.center;
-        this.m_hintText.y = 228;
-    }
+    this.updateMessageText(
+        "HINT: " + String(hint).toUpperCase(),
+        "hint"
+    );
+
+    this.checkHighscoreNotice(this.m_totalScore);
+    return;
 
     this.updateScoreText();
     this.updateMessageText("HINT USED", "hint");
@@ -892,7 +894,7 @@ runmysteriet.scene.GuessWord.prototype.showCorrectWordText = function() {
         "THE WORD WAS: " + this.m_word.toUpperCase();
 
     this.m_correctWordText.center = this.application.screen.center;
-    this.m_correctWordText.y = 94;
+    this.m_correctWordText.y = 130;
 
     this.updateMessageText("NO HEARTS LEFT", "wrong");
 
@@ -990,7 +992,7 @@ runmysteriet.scene.GuessWord.prototype.updateMessageText = function(text, type) 
 
     if (this.m_feedbackBox) {
         this.m_feedbackBox.backgroundColor = "#050b0b";
-        this.m_feedbackBox.alpha = 0.95;
+        this.m_feedbackBox.alpha = 0.90;
     }
 
     if (!this.m_feedbackText) {
@@ -999,7 +1001,7 @@ runmysteriet.scene.GuessWord.prototype.updateMessageText = function(text, type) 
 
     this.m_feedbackText.text = text;
     this.m_feedbackText.center = this.application.screen.center;
-    this.m_feedbackText.y = 213;
+    this.m_feedbackText.y = 147;
 
     if (type === "right") {
         this.m_feedbackText.color = "#7CFF8A";
@@ -1188,8 +1190,8 @@ runmysteriet.scene.GuessWord.prototype.updateScoreText = function() {
     }
 
     this.m_scoreText.text = "SCORE: " + this.m_totalScore;
-    this.m_scoreText.x = 34;
-    this.m_scoreText.y = 28;
+    this.m_scoreText.x = 30;
+    this.m_scoreText.y = 16;
 };
 /**
  * Skapar highscore-notis.
@@ -1261,7 +1263,7 @@ runmysteriet.scene.GuessWord.prototype.updateHighscoreNotice = function() {
     this.m_highscoreText.scaleY = pulse;
 
     this.m_highscoreText.center = this.application.screen.center;
-    this.m_highscoreText.y = 76;
+    this.m_highscoreText.y = 40;
 
     if (this.m_highscoreTimer < 30) {
         this.m_highscoreText.alpha = this.m_highscoreTimer / 30;
