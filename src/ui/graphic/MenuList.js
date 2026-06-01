@@ -42,7 +42,7 @@ runmysteriet.ui.graphic.MenuList = function(
     this.boxes = [];
 
     /** @type {number} */
-    this.boxWidth = 160;
+    this.boxWidth = 80;
 
     /** @type {number} */
     this.boxHeight = 16;
@@ -61,7 +61,7 @@ runmysteriet.ui.graphic.MenuList = function(
 };
 
 /**
- * Skapar en mörk transparent bakgrundsruta bakom ett menyval.
+ * Skapar en mörk transparent bakgrundsruta bakom ett menyval
  *
  * @param {!rune.text.BitmapField} item Menytexten som rutan ska ligga bakom.
  * @return {!rune.display.Graphic} Den skapade bakgrundsrutan.
