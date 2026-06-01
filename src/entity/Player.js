@@ -114,19 +114,11 @@ runmysteriet.entity.Player = function(controls, spriteConfig) {
     this.previousY = 0;
 };
 
-//------------------------------------------------------------------------------
-// INHERITANCE
-//------------------------------------------------------------------------------
-
 runmysteriet.entity.Player.prototype =
     Object.create(rune.display.Sprite.prototype);
 
 runmysteriet.entity.Player.prototype.constructor =
     runmysteriet.entity.Player;
-
-//------------------------------------------------------------------------------
-// INIT
-//------------------------------------------------------------------------------
 
 /**
  * Initierar spelare.
@@ -149,10 +141,6 @@ runmysteriet.entity.Player.prototype.init = function() {
     this.playAnimation("idle");
 };
 
-//------------------------------------------------------------------------------
-// UPDATE
-//------------------------------------------------------------------------------
-
 /**
  * Uppdateringsloopen.
  *
@@ -163,10 +151,6 @@ runmysteriet.entity.Player.prototype.update = function(step) {
 
     rune.display.Sprite.prototype.update.call(this, step);
 };
-
-//------------------------------------------------------------------------------
-// ANIMATION
-//------------------------------------------------------------------------------
 
 /**
  * Uppdaterar animationsstatus.
@@ -179,9 +163,8 @@ runmysteriet.entity.Player.prototype.updateAnimation = function() {
         return;
     }
 
-    /*
-     * Attack ska gå före allt annat.
-     */
+    //Attack ska gå före allt annat.
+     
     if (this.isAttacking === true) {
         this.playAnimation("attack");
 
@@ -196,9 +179,8 @@ runmysteriet.entity.Player.prototype.updateAnimation = function() {
         return;
     }
 
-    /*
-     * Krypning kommer före jump/run/idle.
-     */
+    //Krypning kommer före jump/run/idle.
+     
     if (this.isCrouching === true) {
         this.playAnimation("crouch");
         return;
@@ -234,10 +216,6 @@ runmysteriet.entity.Player.prototype.playAnimation = function(name) {
         this.currentAnimation = name;
     }
 };
-
-//------------------------------------------------------------------------------
-// ATTACK
-//------------------------------------------------------------------------------
 
 /**
  * Kollar om spelaren kan attackera.
@@ -275,10 +253,6 @@ runmysteriet.entity.Player.prototype.updateAttackCooldown = function() {
     }
 };
 
-//------------------------------------------------------------------------------
-// TEXTURE
-//------------------------------------------------------------------------------
-
 /**
  * Sätter spelarens textur om den är annorlunda än nuvarande.
  *
@@ -298,10 +272,6 @@ runmysteriet.entity.Player.prototype.setPlayerTexture = function(texture) {
     this.m_currentTexture = texture;
     this.texture = texture;
 };
-
-//------------------------------------------------------------------------------
-// REMOVE DISPLAY OBJECT
-//------------------------------------------------------------------------------
 
 /**
  * Tar bort display object från stage.
@@ -325,10 +295,6 @@ runmysteriet.entity.Player.prototype.removeDisplayObject = function(object) {
     }
 };
 
-//------------------------------------------------------------------------------
-// REMOVE
-//------------------------------------------------------------------------------
-
 /**
  * Tar bort spelaren från stage.
  *
@@ -341,10 +307,6 @@ runmysteriet.entity.Player.prototype.remove = function() {
 
     this.hpBar = null;
 };
-
-//------------------------------------------------------------------------------
-// DISPOSE
-//------------------------------------------------------------------------------
 
 /**
  * Rensar Player.
