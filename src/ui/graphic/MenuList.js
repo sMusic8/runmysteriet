@@ -295,7 +295,10 @@ runmysteriet.ui.graphic.MenuList.prototype.setCameraPosition = function(
 ) {
 
     var item = null;
+    var box = null;
     var i = 0;
+    var itemY = 0;
+    var cutLeftPosition = 32;
 
     if (!camera || !camera.viewport || !this.items) {
         return;
@@ -304,12 +307,24 @@ runmysteriet.ui.graphic.MenuList.prototype.setCameraPosition = function(
     for (i = 0; i < this.items.length; i++) {
         item = this.items[i];
 
-        if (!item) {
-            continue;
+        itemY = camera.viewport.y + y + i * this.spacing;
+
+        if (item) {
+            item.x = camera.viewport.x + x;
+            item.y = itemY;
         }
 
-        item.x = camera.viewport.x + x;
-        item.y = camera.viewport.y + y + i * this.spacing;
+        if (this.boxes && this.boxes[i]) {
+            box = this.boxes[i];
+
+            box.x =
+                camera.viewport.x +
+                x -
+                this.boxWidth / 2 +
+                cutLeftPosition;
+
+            box.y = itemY - 3;
+        }
     }
 };
 

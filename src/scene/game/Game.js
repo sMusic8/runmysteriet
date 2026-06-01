@@ -1216,6 +1216,8 @@ runmysteriet.scene.Game.prototype.createPauseMenu = function () {
    */
   this.m_pauseTitle = new rune.text.BitmapField("GAME PAUSED");
   this.m_pauseTitle.autoSize = true;
+  this.m_pauseTitle.scaleX = 2;
+  this.m_pauseTitle.scaleY = 2;
   this.m_pauseTitle.visible = false;
 
   this.stage.addChild(this.m_pauseTitle);
@@ -1330,8 +1332,8 @@ runmysteriet.scene.Game.prototype.updatePauseMenuPosition = function () {
   }
 
   if (this.m_pauseTitle) {
-    this.m_pauseTitle.x = camera.viewport.x + 170;
-    this.m_pauseTitle.y = camera.viewport.y + 85;
+    this.m_pauseTitle.x = camera.viewport.x + 120;
+    this.m_pauseTitle.y = camera.viewport.y + 65;
   }
 
   if (this.m_pauseMenu) {
