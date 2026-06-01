@@ -885,6 +885,11 @@ runmysteriet.scene.Game.prototype.updateArmor = function () {
 };
 
 runmysteriet.scene.Game.prototype.updateExtra = function () {
+
+ if (this.m_gameEnd === true) {
+        return;
+    }
+
   if (this.m_platformHandler && this.m_playerHandler) {
     //kollisionskod
     var i = 0;
@@ -898,6 +903,7 @@ runmysteriet.scene.Game.prototype.updateExtra = function () {
 
       if (m_extra.hitTestObject(player)) {
         this.addScore(25);
+        this.playCatchSound();
        this.m_platformHandler.clearExtra();
         break;
       }
@@ -1270,6 +1276,30 @@ runmysteriet.scene.Game.prototype.updatePauseMenuPosition = function () {
   if (this.m_pauseMenu) {
     this.m_pauseMenu.setCameraPosition(camera, 170, 115);
   }
+};
+
+/**
+ * Spelar pickup-ljud.
+ *
+ * @return {void}
+ */
+runmysteriet.scene.Game.prototype.playCatchSound = function() {
+
+    var sound = null;
+
+    if (
+        !this.application ||
+        !this.application.sounds ||
+        !this.application.sounds.sound
+    ) {
+        return;
+    }
+
+    sound = this.application.sounds.sound.get("sound_catch");
+
+    if (sound && typeof sound.play === "function") {
+        sound.play();
+    }
 };
 /**
  * Avslutar spelet och återgår till huvudmenyn.
