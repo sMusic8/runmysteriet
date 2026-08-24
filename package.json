@@ -12,7 +12,7 @@
   "author": "Uncredited Rune developer",
   "license": "MIT",
   "devDependencies": {
-    "electron": "*",
+    "electron": "^43.4.1",
     "electron-builder": "^26.15.3",
     "google-closure-compiler": "*",
     "jsdoc": "*"
