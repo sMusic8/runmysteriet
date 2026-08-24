@@ -8,12 +8,17 @@ files:
   - lib/**/*
   - package.json
 
+directories:
+  buildResources: build
+
 mac:
+  icon: build/icon.icns
   target:
     - dmg
     - zip
   category: public.app-category.games
 
 win:
+  icon: build/icon.ico
   target:
     - nsis
