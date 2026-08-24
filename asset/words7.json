@@ -1,0 +1,170 @@
+[
+    {
+        "word": "warrior",
+        "Subword": ["fighter", "battle"]
+    },
+    {
+        "word": "kingdom",
+        "Subword": ["ruler", "land"]
+    },
+    {
+        "word": "journey",
+        "Subword": ["travel", "adventure"]
+    },
+    {
+        "word": "village",
+        "Subword": ["people", "homes"]
+    },
+    {
+        "word": "thunder",
+        "Subword": ["storm", "sound"]
+    },
+    {
+        "word": "freedom",
+        "Subword": ["liberty", "choice"]
+    },
+    {
+        "word": "mystery",
+        "Subword": ["secret", "unknown"]
+    },
+    {
+        "word": "monster",
+        "Subword": ["creature", "scary"]
+    },
+    {
+        "word": "archers",
+        "Subword": ["bows", "arrows"]
+    },
+    {
+        "word": "weapons",
+        "Subword": ["fight", "battle"]
+    },
+    {
+        "word": "fortune",
+        "Subword": ["luck", "wealth"]
+    },
+    {
+        "word": "horizon",
+        "Subword": ["sky", "distance"]
+    },
+    {
+        "word": "seaside",
+        "Subword": ["ocean", "shore"]
+    },
+    {
+        "word": "country",
+        "Subword": ["nation", "land"]
+    },
+    {
+        "word": "ancient",
+        "Subword": ["old", "history"]
+    },
+    {
+        "word": "beneath",
+        "Subword": ["under", "below"]
+    },
+    {
+        "word": "forward",
+        "Subword": ["ahead", "move"]
+    },
+    {
+        "word": "berserk",
+        "Subword": ["rage", "warrior"]
+    },
+    {
+        "word": "farming",
+        "Subword": ["crops", "animals"]
+    },
+    {
+        "word": "harvest",
+        "Subword": ["crops", "collect"]
+    },
+    {
+        "word": "lantern",
+        "Subword": ["light", "dark"]
+    },
+    {
+        "word": "captain",
+        "Subword": ["leader", "ship"]
+    },
+    {
+        "word": "treetop",
+        "Subword": ["forest", "above"]
+    },
+    {
+        "word": "raiders",
+        "Subword": ["attack", "vikings"]
+    },
+    {
+        "word": "crystal",
+        "Subword": ["shiny", "stone"]
+    },
+        {
+        "word": "burning",
+        "Subword": ["fire heat", "flame rage"]
+    },
+    {
+        "word": "crossed",
+        "Subword": ["paths met", "overlapped fate"]
+    },
+    {
+        "word": "darkens",
+        "Subword": ["grows dark", "shadow spread"]
+    },
+    {
+        "word": "echoing",
+        "Subword": ["repeated sound", "distant call"]
+    },
+    {
+        "word": "falcons",
+        "Subword": ["hunting birds", "sky predators"]
+    },
+        {
+        "word": "glacier",
+        "Subword": ["ice mountain", "frozen river"]
+    },
+    {
+        "word": "howling",
+        "Subword": ["wolf sound", "wind cry"]
+    },
+    {
+        "word": "knights",
+        "Subword": ["armored warriors", "royal fighters"]
+    },
+    {
+        "word": "longing",
+        "Subword": ["deep desire", "missing feeling"]
+    },
+    {
+        "word": "marking",
+        "Subword": ["sign making", "symbol trace"]
+    },
+        {
+        "word": "plunder",
+        "Subword": ["steal loot", "raid wealth"]
+    },
+    {
+        "word": "sailing",
+        "Subword": ["ship travel", "sea journey"]
+    },
+    {
+        "word": "shadows",
+        "Subword": ["dark forms", "hidden figures"]
+    },
+    {
+        "word": "standing",
+        "Subword": ["upright state", "position fixed"]
+    },
+        {
+        "word": "tension",
+        "Subword": ["stress force", "tight feeling"]
+    },
+    {
+        "word": "tracking",
+        "Subword": ["following path", "hunt trail"]
+    },
+    {
+        "word": "unbroken",
+        "Subword": ["not broken", "whole strong"]
+    }
+]

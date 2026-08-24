@@ -1,0 +1,20 @@
+{
+  "name": "runmysteriet",
+  "version": "1.0.0",
+  "description": "An awesome Rune-based application.",
+  "main": "bin/bootstrap.js",
+  "scripts": {
+    "test": "electron ./bin-debug/bootstrap.js",
+    "start": "electron ./bin/bootstrap.js",
+    "build": "cd ./scripts/shell/ && ./make.sh",
+    "dist": "electron-builder"
+  },
+  "author": "Uncredited Rune developer",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "*",
+    "electron-builder": "^26.15.3",
+    "google-closure-compiler": "*",
+    "jsdoc": "*"
+  }
+}

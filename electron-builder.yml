@@ -1,0 +1,19 @@
+appId: se.runmysteriet.app
+productName: Runmysteriet
+
+files:
+  - bin/**/*
+  - dist/**/*
+  - asset/**/*
+  - lib/**/*
+  - package.json
+
+mac:
+  target:
+    - dmg
+    - zip
+  category: public.app-category.games
+
+win:
+  target:
+    - nsis

@@ -1,0 +1,132 @@
+[
+    {
+        "word": "raven",
+        "Subword": ["black bird", "viking sign"]
+    },
+    {
+        "word": "sword",
+        "Subword": ["sharp blade", "battle weapon"]
+    },
+    {
+        "word": "stone",
+        "Subword": ["hard rock", "rune carving"]
+    },
+    {
+        "word": "frost",
+        "Subword": ["cold ice", "winter air"]
+    },
+    {
+        "word": "blood",
+        "Subword": ["red liquid", "battle wound"]
+    },
+    {
+        "word": "horse",
+        "Subword": ["riding animal", "travel"]
+    },
+    {
+        "word": "north",
+        "Subword": ["map direction", "viking lands"]
+    },
+    {
+        "word": "storm",
+        "Subword": ["strong wind", "bad weather"]
+    },
+    {
+        "word": "water",
+        "Subword": ["river sea", "boat travel"]
+    },
+    {
+        "word": "light",
+        "Subword": ["sun glow", "see in dark"]
+    },
+    {
+        "word": "flame",
+        "Subword": ["fire heat", "burning"]
+    },
+    {
+        "word": "spear",
+        "Subword": ["long weapon", "sharp point"]
+    },
+    {
+        "word": "river",
+        "Subword": ["flowing water", "boat path"]
+    },
+    {
+        "word": "crown",
+        "Subword": ["king symbol", "royal power"]
+    },
+    {
+        "word": "night",
+        "Subword": ["dark time", "stars"]
+    },
+    {
+        "word": "earth",
+        "Subword": ["ground", "soil"]
+    },
+    {
+        "word": "giant",
+        "Subword": ["huge creature", "old myth"]
+    },
+    {
+        "word": "trees",
+        "Subword": ["forest", "wood"]
+    },
+    {
+        "word": "shore",
+        "Subword": ["land edge", "near water"]
+    },
+    {
+        "word": "honey",
+        "Subword": ["sweet food", "bees"]
+    },
+       {
+        "word": "blade",
+        "Subword": ["sharp edge", "cutting steel"]
+    },
+    {
+        "word": "armor",
+        "Subword": ["body protection", "war gear"]
+    },
+    {
+        "word": "skull",
+        "Subword": ["bone head", "death symbol"]
+    },
+    {
+        "word": "bones",
+        "Subword": ["skeleton parts", "body structure"]
+    }, {
+        "word": "honor",
+        "Subword": ["respect code", "warrior value"]
+    },  {
+        "word": "vital",
+        "Subword": ["life force", "strong energy"]
+    },
+    {
+        "word": "elder",
+        "Subword": ["old leader", "wise person"]
+    },
+    {
+        "word": "fjord",
+        "Subword": ["narrow sea", "icy inlet"]
+    },
+       {
+        "word": "beast",
+        "Subword": ["wild creature", "danger animal"]
+    },
+    {
+        "word": "ocean",
+        "Subword": ["deep sea", "water world"]
+    },
+      {
+        "word": "drift",
+        "Subword": ["move slowly", "float away"]
+    },
+    {
+        "word": "flint",
+        "Subword": ["spark stone", "fire starter"]
+    },
+    {
+        "word": "runes",
+        "Subword": ["old writing", "vikings age"]
+    }
+]
