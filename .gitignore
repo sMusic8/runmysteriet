@@ -58,3 +58,8 @@ Thumbs.db
 # =========================
 .cache/
 asset/testljud/*.mp3
+# Build outputs
+dist/
+release/
+release-win/
+release-win2/
